@@ -1,0 +1,21 @@
+.school-list .filters {
+	width: 90%;
+	display: flex;
+	flex-direction: column;
+
+}
+
+.school-list .filters .row {
+	margin: 5px 0;
+	width: 100%;
+}
+
+	.school-list .filters .row input {
+		width: 100%;
+		border: 1px solid #777;
+	}
+
+	.school-list .filters .row select {
+		margin-left: auto;
+		border: 1px solid #777;
+	}
