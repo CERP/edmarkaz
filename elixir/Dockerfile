@@ -19,7 +19,7 @@ RUN mix deps.compile
 ADD . .
 
 RUN mix release
-RUN chmod +x "_build/prod/rel/sarkar/bin/sarkar"
+RUN chmod +x "_build/prod/rel/edmarkaz/bin/edmarkaz"
 
 EXPOSE 8080
-CMD _build/prod/rel/sarkar/bin/sarkar foreground
+CMD _build/prod/rel/edmarkaz/bin/edmarkaz foreground
