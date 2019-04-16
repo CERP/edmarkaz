@@ -33,19 +33,6 @@ steps:
     - 'CLOUDSDK_CONTAINER_CLUSTER=platform-web-cluster'
 - name: 'gcr.io/cloud-builders/curl'
   args:
-  - '-X'
-  - 'POST'
-  - "https://api.cloudflare.com/client/v4/zones/$_CLOUDFLARE_ZONE/purge_cache"
-  - '-H'
-  - "X-Auth-Email: $_EMAIL"
-  - '-H'
-  - "X-Auth-Key: $_CLOUDFLARE_API" 
-  - '-H'
-  - "Content-Type: application/json" 
-  - '-d' 
-  - '{"purge_everything": true}'
-- name: 'gcr.io/cloud-builders/curl'
-  args:
   - '-X' 
   - 'POST' 
   - '--data-urlencode'
