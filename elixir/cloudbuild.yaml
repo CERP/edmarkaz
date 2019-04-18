@@ -29,7 +29,7 @@ steps:
   env:
     - 'POSTGRES_PASS=$_POSTGRES_PASS'
     - 'CLOUDSDK_COMPUTE_ZONE=asia-south1-c'
-    - 'CLOUDSDK_CONTAINER_CLUSTER=platform-backend-cluster'
+    - 'CLOUDSDK_CONTAINER_CLUSTER=platform-backend'
 - name: 'gcr.io/cloud-builders/curl'
   args:
   - '-X' 
