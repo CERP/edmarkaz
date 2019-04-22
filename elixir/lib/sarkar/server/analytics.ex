@@ -10,7 +10,7 @@ defmodule EdMarkaz.Server.Analytics do
 	def init(%{bindings: %{type: "platform-writes.csv"}} = req, state) do
 
 		{:ok, data} = case Postgrex.query(EdMarkaz.School.DB,
-		"SELECT id, to_timestamp(time/1000)::date::text as date, count(*) 
+		"SELECT id, to_timestamp(time/1000)::date as date, count(*) 
 		FROM platform_writes
 		GROUP BY id, date 
 		ORDER BY date desc",
@@ -19,7 +19,9 @@ defmodule EdMarkaz.Server.Analytics do
 				{:error, err} -> {:error, err}
 		end
 
-		csv = [ ["supplier_id", "date", "writes"] | data ]
+		formatted = data |> Enum.map(fn [id, d, c] -> [id, Date.to_string(d), c] end)
+
+		csv = [ ["supplier_id", "date", "writes"] | formatted]
 		|> CSV.encode
 		|> Enum.join()
 
@@ -38,7 +40,7 @@ defmodule EdMarkaz.Server.Analytics do
 		{:ok, data} = case Postgrex.query(EdMarkaz.School.DB,
 		"SELECT 
 			id, 
-			to_timestamp((value->>'time')::bigint/1000)::date::text as date,
+			to_timestamp((value->>'time')::bigint/1000)::date as date,
 			path[3] as school_id,
 			value->>'event' as event,
 			value->'meta'->>'call_status' as call_status,
@@ -54,7 +56,8 @@ defmodule EdMarkaz.Server.Analytics do
 					{:error, err}
 		end
 
-		csv = [ ["supplier_id", "date", "school_id", "event", "call_status", "duration"] | data ]
+		formatted = data |> Enum.map(fn [id, d | rest ] -> [id, Date.to_string(d) | rest] end)
+		csv = [ ["supplier_id", "date", "school_id", "event", "call_status", "duration"] | formatted]
 		|> CSV.encode
 		|> Enum.join()
 
@@ -72,7 +75,7 @@ defmodule EdMarkaz.Server.Analytics do
 		{:ok, data} = case Postgrex.query(EdMarkaz.School.DB,
 		"SELECT 
 			id, 
-			to_timestamp((value->>'time')::bigint/1000)::date::text as date,
+			to_timestamp((value->>'time')::bigint/1000)::date as date,
 			value->>'event' as event, 
 			path[3] as school_id,
 			value->'meta'->>'customer_interest' as customer_interest,
@@ -92,6 +95,9 @@ defmodule EdMarkaz.Server.Analytics do
 				{:error, err}
 		end
 
+		formatted = data |> 
+			Enum.map(fn [sid, d | rest] -> [sid, Date.to_string(d) | rest] end)
+
 		csv = [[
 			"supplier_id",
 			"date",
@@ -102,7 +108,7 @@ defmodule EdMarkaz.Server.Analytics do
 			"other_reason_rejected",
 			"customer_likelihood",
 			"follow_up_meeting",
-			"other_notes"] | data]
+			"other_notes"] | formatted]
 		|> CSV.encode
 		|> Enum.join()
 
@@ -119,7 +125,7 @@ defmodule EdMarkaz.Server.Analytics do
 	def init(%{bindings: %{type: "platform-completed-survey.csv"}} = req, state) do
 		{:ok, data} = case Postgrex.query(EdMarkaz.School.DB,
 		"SELECT
-			id, to_timestamp((value->>'time')::bigint/1000)::date::text as date,
+			id, to_timestamp((value->>'time')::bigint/1000)::date as date,
 			value->>'event' as event,
 			path[3] as school_id,
 			value->'meta'->>'reason_completed' as reason_completed
@@ -132,13 +138,14 @@ defmodule EdMarkaz.Server.Analytics do
 				{:error, err}
 		end
 
+		formatted = data |> Enum.map(fn [id, d | rest] -> [id, Date.to_string(d) | rest] end)
 		csv = [[
 			"supplier_id",
 			"date",
 			"event",
 			"school_id",
 			"reason_completed"
-		]]
+		] | formatted]
 		|> CSV.encode
 		|> Enum.join()
 
