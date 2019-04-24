@@ -168,11 +168,17 @@ export const createDeletes = (paths : Delete[]) => (dispatch : Dispatch<AnyActio
 
 // this is only produced by the server. 
 // it will tell us it hsa confirmed sync up to { date: timestamp }
+export const RPC_SUCCEED = "RPC_SUCCEED"
+export interface RPCSucceedAction {
+	type: "RPC_SUCCEED"
+	new_writes: Write[]
+}
+
 export const CONFIRM_SYNC = "CONFIRM_SYNC"
 export const CONFIRM_SYNC_DIFF = "CONFIRM_SYNC_DIFF"
 export interface ConfirmSyncAction {
-	type: "CONFIRM_SYNC_DIFF",
-	date: number,
+	type: "CONFIRM_SYNC_DIFF"
+	date: number
 	new_writes: Write[]
 }
 

@@ -1,5 +1,5 @@
 defmodule EdMarkaz.Server.Analytics do
-	
+
 	def init(%{bindings: %{type: "hi"}} = req, state) do
 		IO.puts "wowwww"
 		req = :cowboy_req.reply(200, req)

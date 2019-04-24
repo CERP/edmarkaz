@@ -91,8 +91,12 @@ export const addToSchoolDB = (school: PMIUSchool) => {
 	}
 }
 
-export const reserveMaskedNumber = (school_id: string) => (dispatch: Dispatch, getState: GetState) => {
+export const reserveMaskedNumber = (school_id: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 	// from the pool in state.mask_pairs select an unused number
+	/*
+
+	this is all handled server-side now
+
 	const state = getState();
 
 	const free = Object.entries(state.sync_state.mask_pairs)
@@ -137,6 +141,30 @@ export const reserveMaskedNumber = (school_id: string) => (dispatch: Dispatch, g
 			value: event
 		}
 	]))
+	*/
+	const state = getState();
+
+	syncr.send({
+		type: "RESERVE_NUMBER",
+		payload: {
+			school_id,
+			user: {
+				number: state.auth.number,
+				name: state.sync_state.numbers[state.auth.number].name
+			}
+		},
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		id: state.auth.id,
+		last_snapshot: state.last_snapshot
+	})
+	.then(res => {
+		console.log(res)
+		dispatch(res)
+	})
+	.catch(err => {
+		console.error(err)
+	})
 
 }
 

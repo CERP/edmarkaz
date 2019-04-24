@@ -28,6 +28,16 @@ defmodule EdMarkaz.ActionHandler.Platform do
 		end
 	end
 
+	def handle_action(%{"type" => "RESERVE_NUMBER", "payload" => %{"school_id" => school_id, "user" => user}, "last_snapshot" => last_sync_date}, %{id: id, client_id: client_id} = state) do
+
+		res = EdMarkaz.Supplier.reserve_masked_number(id, school_id, user, client_id, last_sync_date)
+
+		case res do
+			{:ok, content} -> {:reply, succeed(content), state}
+			{:error, message} -> {:reply, fail(message)}
+		end
+	end
+
 	def handle_action(%{"type" => "SYNC", "payload" => payload, "last_snapshot" => last_sync_date}, %{id: id, client_id: client_id} = state) do
 		res = EdMarkaz.Supplier.sync_changes(id, client_id, payload, last_sync_date)
 
