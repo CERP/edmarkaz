@@ -168,8 +168,33 @@ export const reserveMaskedNumber = (school_id: string) => (dispatch: Dispatch, g
 
 }
 
-export const releaseMaskedNumber = (school_id: string) => (dispatch: Dispatch, getState: GetState) => {
+export const releaseMaskedNumber = (school_id: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 
+	const state = getState();
+
+	syncr.send({
+		type: "RELEASE_NUMBER",
+		payload: {
+			school_id,
+			user: {
+				number: state.auth.number,
+				name: state.sync_state.numbers[state.auth.number].name
+			}
+		},
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		id: state.auth.id,
+		last_snapshot: state.last_snapshot
+	})
+	.then(res => {
+		console.log(res);
+		dispatch(res)
+	})
+	.catch(err => {
+		console.error(err)
+	})
+
+	/*
 	const masked_num = getState().sync_state.matches[school_id].masked_number
 	const time = new Date().getTime()
 	const state = getState();
@@ -203,6 +228,7 @@ export const releaseMaskedNumber = (school_id: string) => (dispatch: Dispatch, g
 			value: event
 		}
 	]))
+	*/
 }
 
 export const saveSchoolRejectedSurvey = (school_id: string, survey: NotInterestedSurvey['meta']) => (dispatch: Dispatch, getState: GetState) => {

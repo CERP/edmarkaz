@@ -38,7 +38,7 @@ defmodule EdMarkaz.Supplier do
 	def reserve_masked_number(id, school_id, %{"number" => number, "name" => name} = user, client_id, last_sync_date) do
 		sync_state = EdMarkaz.Supplier.get_sync_state(id)
 
-		# should first check if this school is already assigned a number
+		# TODO: should first check if this school is already assigned a number
 
 		available_numbers = Dynamic.get(sync_state, ["mask_pairs"])
 			|> Enum.filter(fn {number, %{ "status" => status }} -> status == "FREE" end)
@@ -97,6 +97,59 @@ defmodule EdMarkaz.Supplier do
 
 				{:ok, rpc_succeed(writes)}
 		end
+	end
+
+	def release_masked_number(id, school_id, %{"number" => number, "name" => name} = user, client_id, last_sync_date) do
+		sync_state = EdMarkaz.Supplier.get_sync_state(id)
+
+		masked_num = Dynamic.get(sync_state, ["matches", school_id, "masked_number"])
+		time = :os.system_time(:millisecond)
+
+		event = %{
+			"event" => "MARK_DONE",
+			"time" => time,
+			"user" => user
+		}
+
+		writes = [
+			%{
+				type: "MERGE",
+				path: ["sync_state", "mask_pairs", masked_num],
+				value: %{
+					"status" => "FREE"
+				},
+				date: time,
+				client_id: client_id
+			},
+			%{
+				type: "MERGE",
+				path: ["sync_state", "matches", school_id, "status"],
+				value: "DONE",
+				date: time,
+				client_id: client_id
+			},
+			%{
+				type: "MERGE",
+				path: ["sync_state", "matches", school_id, "masked_number"],
+				value: "",
+				date: time,
+				client_id: client_id
+			},
+			%{
+				type: "MERGE",
+				path: ["sync_state", "matches", school_id, "history", "#{time}"],
+				value: event
+			}
+		]
+
+		changes = prepare_changes(writes)
+
+		%{new_writes: new_writes} = GenServer.call(via(id), {:sync_changes, client_id, changes, last_sync_date})
+
+		IO.inspect new_writes
+
+		{:ok, rpc_succeed(writes)}
+
 	end
 
 	def prepare_changes(changes) do
