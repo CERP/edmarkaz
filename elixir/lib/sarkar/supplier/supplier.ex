@@ -92,9 +92,6 @@ defmodule EdMarkaz.Supplier do
 
 				%{new_writes: new_writes} = GenServer.call(via(id), {:sync_changes, client_id, changes, last_sync_date})
 
-				IO.inspect new_writes
-
-
 				{:ok, rpc_succeed(writes)}
 		end
 	end
@@ -145,8 +142,6 @@ defmodule EdMarkaz.Supplier do
 		changes = prepare_changes(writes)
 
 		%{new_writes: new_writes} = GenServer.call(via(id), {:sync_changes, client_id, changes, last_sync_date})
-
-		IO.inspect new_writes
 
 		{:ok, rpc_succeed(writes)}
 

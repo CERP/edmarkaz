@@ -32,6 +32,7 @@ interface StateProps {
 
 interface StateType {
 	showSurvey: false | "NOT_INTERESTED" | "CALL_END" | "MARK_COMPLETE"
+	loading: boolean
 }
 
 interface DispatchProps {
@@ -58,6 +59,7 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 
 		this.state = {
 			showSurvey: false,
+			loading: false
 		}
 
 		this.former = new Former(this, [])
@@ -82,10 +84,22 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 				showSurvey: "CALL_END"
 			})
 		}
+
+		const currently_masked = Boolean(this.props.schoolMatch && this.props.schoolMatch.masked_number)
+		const next_masked = Boolean(nextProps.schoolMatch && nextProps.schoolMatch.masked_number)
+
+		if(this.state.loading && currently_masked != next_masked) {
+			this.setState({
+				loading: false
+			})
+		}
 	}
 
 	onShowNumber = () => {
 		this.props.reserveNumber()
+		this.setState({
+			loading: true
+		})
 	}
 
 	onMarkComplete = () => {
@@ -96,7 +110,8 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 		if(res) {
 			this.props.releaseNumber()
 			this.setState({
-				showSurvey: "MARK_COMPLETE"
+				showSurvey: "MARK_COMPLETE",
+				loading: true
 			})
 		}
 	}
@@ -196,13 +211,14 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 				}
 
 				{ !this.props.connected && <div style={{textAlign: "center", fontSize: "1.2rem" }}>Connecting....</div> }
+				{ this.state.loading && <div style={{textAlign: "center", fontSize: "1.2rem" }}>Retreiving...</div> }
 
-				{ this.props.connected && !reserved && <div className="save-delete">
+				{ this.props.connected && !this.state.loading && !reserved && <div className="save-delete">
 					<div className="red button" onClick={this.onMarkRejected}>Not Interested</div> 
 					<div className="button blue" onClick={this.onShowNumber}>Show Number</div>
 				</div>
 				}
-				{ this.props.connected && reserved && <div className="button purple" onClick={this.onMarkComplete}>Mark as Complete</div> }
+				{ this.props.connected && reserved && !this.state.loading && <div className="button purple" onClick={this.onMarkComplete}>Mark as Complete</div> }
 
 				<div className="row">
 					<label>Status</label>
