@@ -35,6 +35,137 @@ defmodule EdMarkaz.Supplier do
 		GenServer.call(via(id), {:reload})
 	end
 
+	def reserve_masked_number(id, school_id, %{"number" => number, "name" => name} = user, client_id, last_sync_date) do
+		sync_state = EdMarkaz.Supplier.get_sync_state(id)
+
+		# TODO: should first check if this school is already assigned a number
+
+		available_numbers = Dynamic.get(sync_state, ["mask_pairs"])
+			|> Enum.filter(fn {number, %{ "status" => status }} -> status == "FREE" end)
+			|> Enum.map(fn {number, _} -> number end)
+		
+		time = :os.system_time(:millisecond)
+
+		case available_numbers do
+			[] -> {:error, "No numbers available"}
+			_ -> 
+				num = Enum.random(available_numbers)
+				writes = [
+					%{
+						type: "MERGE",
+						path: ["sync_state", "mask_pairs", num],
+						value: %{
+							"status" => "USED",
+							"school_id" => school_id
+						},
+						date: time,
+						client_id: client_id
+					},
+					%{
+						type: "MERGE",
+						path: ["sync_state", "matches", school_id, "masked_number"],
+						value: num,
+						date: time,
+						client_id: client_id
+					},
+					%{
+						type: "MERGE",
+						path: ["sync_state", "matches", school_id, "status"],
+						value: "IN_PROGRESS",
+						date: time,
+						client_id: client_id
+					},
+					%{
+						type: "MERGE",
+						path: ["sync_state", "matches", school_id, "history", "#{time}"],
+						value: %{
+							"event" => "REVEAL_NUMBER",
+							"time" => time,
+							"user" => user,
+						},
+						date: time,
+						client_id: client_id
+					}
+				]
+
+				changes = prepare_changes(writes)
+
+				%{new_writes: new_writes} = GenServer.call(via(id), {:sync_changes, client_id, changes, last_sync_date})
+
+				{:ok, rpc_succeed(writes)}
+		end
+	end
+
+	def release_masked_number(id, school_id, %{"number" => number, "name" => name} = user, client_id, last_sync_date) do
+		sync_state = EdMarkaz.Supplier.get_sync_state(id)
+
+		masked_num = Dynamic.get(sync_state, ["matches", school_id, "masked_number"])
+		time = :os.system_time(:millisecond)
+
+		event = %{
+			"event" => "MARK_DONE",
+			"time" => time,
+			"user" => user
+		}
+
+		writes = [
+			%{
+				type: "MERGE",
+				path: ["sync_state", "mask_pairs", masked_num],
+				value: %{
+					"status" => "FREE"
+				},
+				date: time,
+				client_id: client_id
+			},
+			%{
+				type: "MERGE",
+				path: ["sync_state", "matches", school_id, "status"],
+				value: "DONE",
+				date: time,
+				client_id: client_id
+			},
+			%{
+				type: "MERGE",
+				path: ["sync_state", "matches", school_id, "masked_number"],
+				value: "",
+				date: time,
+				client_id: client_id
+			},
+			%{
+				type: "MERGE",
+				path: ["sync_state", "matches", school_id, "history", "#{time}"],
+				value: event
+			}
+		]
+
+		changes = prepare_changes(writes)
+
+		%{new_writes: new_writes} = GenServer.call(via(id), {:sync_changes, client_id, changes, last_sync_date})
+
+		{:ok, rpc_succeed(writes)}
+
+	end
+
+	def prepare_changes(changes) do
+
+		# takes an array of changes which are %{ type: "MERGE" | "DELETE", path: [], value: any} and generates the map needed for sync_changes
+
+		changes 
+		|> Enum.map(fn %{type: type, path: path, value: value} -> {
+			Enum.join(path, ","), %{
+				"action" => %{
+					"path" => path,
+					"type" => type,
+					"value" => value
+				},
+				"date" => :os.system_time(:millisecond)
+			}
+		} end)
+		|> Enum.into(%{})
+
+	end
+
 	def get_last_caller(id, school_id) do
 		sync_state = EdMarkaz.Supplier.get_sync_state(id)
 
@@ -138,8 +269,6 @@ defmodule EdMarkaz.Supplier do
 		end
 
 		# end weird section
-
-		# TODO: sort changes by time and process in order.
 
 		{nextSyncState, nextWrites, new_writes, last_date} = changes
 		|> Enum.sort(fn({ _, %{"date" => d1}}, {_, %{"date" => d2}}) -> d1 < d2 end)
@@ -304,6 +433,13 @@ defmodule EdMarkaz.Supplier do
 			type: "CONFIRM_SYNC_DIFF",
 			date: date,
 			new_writes: new_writes # client should only have to check these against queued / pending writes.
+		}
+	end
+
+	defp rpc_succeed(new_writes) do
+		%{
+			type: "RPC_SUCCEED",
+			new_writes: new_writes
 		}
 	end
 
