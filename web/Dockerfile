@@ -13,4 +13,4 @@ RUN rm -rf node_modules
 ARG VERSION
 ENV SHA_VERSION=$VERSION
 
-CMD ./set_config.sh > dist/config*.js && serve -s ./dist
+CMD ./set_config.sh > dist/$(ls dist | egrep ^config.+\.js$) && serve -s ./dist
