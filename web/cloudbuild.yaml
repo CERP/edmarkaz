@@ -30,7 +30,7 @@ steps:
   args: ['set', 'image', 'deployment/platform-web-$BRANCH_NAME', 'platform-web=asia.gcr.io/$PROJECT_ID/platform-web:$SHORT_SHA']
   env:
     - 'CLOUDSDK_COMPUTE_ZONE=asia-southeast1-c'
-    - 'CLOUDSDK_CONTAINER_CLUSTER=platform-web-cluster'
+    - 'CLOUDSDK_CONTAINER_CLUSTER=platform-backend-cluster'
 - name: 'gcr.io/cloud-builders/curl'
   args:
   - '-X' 
