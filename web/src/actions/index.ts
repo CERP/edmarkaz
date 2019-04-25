@@ -93,55 +93,6 @@ export const addToSchoolDB = (school: PMIUSchool) => {
 
 export const reserveMaskedNumber = (school_id: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 	// from the pool in state.mask_pairs select an unused number
-	/*
-
-	this is all handled server-side now
-
-	const state = getState();
-
-	const free = Object.entries(state.sync_state.mask_pairs)
-		.filter(([number, v]) => v.status == "FREE")
-		.map(([num,]) => num)
-
-	if (free.length === 0) {
-		alert("The Maximum amount of schools are in progress. To continue, you must mark an existing school as done.")
-		return;
-	}
-
-	const masked_num = free[Math.floor(Math.random() * free.length)]
-
-	const time = new Date().getTime();
-	const event: SupplierInteractionEvent = {
-		event: "REVEAL_NUMBER",
-		time,
-		user: {
-			number: state.auth.number,
-			name: state.sync_state.numbers[state.auth.number].name
-		}
-	}
-
-	dispatch(createMerges([
-		{
-			path: ["sync_state", "mask_pairs", masked_num],
-			value: {
-				status: "USED",
-				school_id
-			}
-		},
-		{
-			path: ["sync_state", "matches", school_id, "masked_number"],
-			value: masked_num
-		},
-		{
-			path: ["sync_state", "matches", school_id, "status"],
-			value: "IN_PROGRESS"
-		},
-		{
-			path: ["sync_state", "matches", school_id, "history", `${time}`],
-			value: event
-		}
-	]))
-	*/
 	const state = getState();
 
 	syncr.send({
@@ -193,42 +144,6 @@ export const releaseMaskedNumber = (school_id: string) => (dispatch: Dispatch, g
 	.catch(err => {
 		console.error(err)
 	})
-
-	/*
-	const masked_num = getState().sync_state.matches[school_id].masked_number
-	const time = new Date().getTime()
-	const state = getState();
-
-	const event: SupplierInteractionEvent = {
-		event: "MARK_DONE",
-		time,
-		user: {
-			number: state.auth.number,
-			name: state.sync_state.numbers[state.auth.number].name
-		}
-	}
-
-	dispatch(createMerges([
-		{
-			path: ["sync_state", "mask_pairs", masked_num],
-			value: {
-				status: "FREE"
-			}
-		},
-		{
-			path: ["sync_state", "matches", school_id, "status"],
-			value: "DONE"
-		},
-		{
-			path: ["sync_state", "matches", school_id, "masked_number"],
-			value: ""
-		},
-		{
-			path: ["sync_state", "matches", school_id, "history", `${time}`],
-			value: event
-		}
-	]))
-	*/
 }
 
 export const saveSchoolRejectedSurvey = (school_id: string, survey: NotInterestedSurvey['meta']) => (dispatch: Dispatch, getState: GetState) => {
