@@ -4,7 +4,7 @@ steps:
   - '-X' 
   - 'POST' 
   - '--data-urlencode'
-  - 'payload={"channel": "#platform", "username": "deploybot", "text": "Starting build of backend $SHORT_SHA to $BRANCH_NAME...", "icon_emoji": ":construction_worker:"}'
+  - 'payload={"channel": "#platform-dev", "username": "deploybot", "text": "Starting build of backend $SHORT_SHA to $BRANCH_NAME...", "icon_emoji": ":construction_worker:"}'
   - "$_SLACK_URL"
 - name: 'gcr.io/cloud-builders/docker'
   args: ['pull', 'asia.gcr.io/$PROJECT_ID/platform-backend:$BRANCH_NAME']
@@ -35,5 +35,5 @@ steps:
   - '-X' 
   - 'POST' 
   - '--data-urlencode'
-  - 'payload={"channel": "#platform", "username": "deploybot", "text": "Succesfully deployed version $SHORT_SHA of the platform backend to $BRANCH_NAME", "icon_emoji": ":construction_worker:"}'
+  - 'payload={"channel": "#platform-dev", "username": "deploybot", "text": "Succesfully deployed version $SHORT_SHA of the platform backend to $BRANCH_NAME", "icon_emoji": ":construction_worker:"}'
   - "$_SLACK_URL"
