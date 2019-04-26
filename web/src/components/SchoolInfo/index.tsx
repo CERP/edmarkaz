@@ -78,8 +78,17 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 		const current_call_in_progress = call_in_progress(this.props.schoolMatch)
 		const next_call = call_in_progress(nextProps.schoolMatch)
 
+		// if a call is currently in progress, show the survey
+		// if the call was in progress and is not anymore, still show the survey
+		/*
 		if(current_call_in_progress && !next_call && this.props.school_id === nextProps.school_id) {
+			this.setState({
+				showSurvey: "CALL_END"
+			})
+		}
+		*/
 
+		if((current_call_in_progress || next_call) && this.props.school_id === nextProps.school_id) {
 			this.setState({
 				showSurvey: "CALL_END"
 			})
@@ -174,7 +183,10 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 			estimated_monthly_revenue = ((parseInt(school.lowest_fee) + parseInt(school.highest_fee))/2 * parseInt(school.total_enrolment)).toLocaleString() + " Rs"
 		}
 
-		const call_number = Object.values(schoolMatch.history || {}).filter(x => x.event === "CALL_END_SURVEY").length
+		const call_end_surveys : CallEndSurvey[] = Object.values(schoolMatch.history || {})
+			.filter(x => x.event === "CALL_END_SURVEY") as CallEndSurvey[]
+
+		const call_number = call_end_surveys.length
 
 		return <div className="school-info page" style={{ padding: "5px" }}>
 			<div className="close" onClick={this.onClose}>Close</div>
@@ -230,6 +242,27 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 						<label>Phone Number</label>
 						<a href={`tel:${this.props.schoolMatch.masked_number}`} className="number">{this.props.schoolMatch.masked_number}</a> 
 					</div>
+				}
+
+				{ call_end_surveys.filter(x => x.meta.other_notes).length > 0 && <div className="divider">Notes</div> }
+				{
+					call_end_surveys.filter(x => x.meta.other_notes).length > 0 &&
+					<div className="row">
+						<div><b>Date</b></div>
+						<div><b>Interest</b></div>
+						<div><b>Notes</b></div>
+					</div>
+				}
+				{
+					call_end_surveys
+						.filter(x => x.meta.other_notes)
+						.map(x => 
+							<div className="row">
+								<div>{moment(x.time).format("DD/MM")}</div>
+								<div>{x.meta.customer_interest}</div>
+								<div>{x.meta.other_notes}</div>
+							</div>
+						)
 				}
 
 				<div className="divider">School Profile</div>
@@ -301,18 +334,19 @@ const call_in_progress = ( schoolMatch : SchoolMatch) : boolean => {
 		if(curr.event === "CALL_START") {
 			return [...agg, curr]
 		}
+
 		if(curr.event === "CALL_END") {
 			// is there a previous call_start event?
 			const prev = agg.pop();
 			if(prev && prev.event === "CALL_START") {
 				return agg;
 			}
+			console.log(prev)
 			return [...agg, prev, curr]
 		}
 	}, [])
 
 	if(unmatched_call_event.length > 0) {
-		console.log(unmatched_call_event);
 		return true;
 	}
 
