@@ -40,10 +40,11 @@ defmodule EdMarkaz.Supplier do
 
 		# TODO: should first check if this school is already assigned a number
 
-		available_numbers = Dynamic.get(sync_state, ["mask_pairs"])
-			|> Enum.filter(fn {number, %{ "status" => status }} -> status == "FREE" end)
-			|> Enum.map(fn {number, _} -> number end)
-		
+		mask_number_bank = 0..100 |> Enum.map(fn x -> "0#{4232500600 + x}" end)
+
+		available_numbers = mask_number_bank
+			|> Enum.filter(fn num -> Dynamic.get(sync_state, ["mask_pairs", num, "status"]) != "USED" end)
+
 		time = :os.system_time(:millisecond)
 
 		case available_numbers do
