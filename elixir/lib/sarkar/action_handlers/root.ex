@@ -1,7 +1,7 @@
 defmodule EdMarkaz.ActionHandler do
 
-	def handle_action(%{"client_type" => "mis"} = action, state) do
-		EdMarkaz.ActionHandler.Mis.handle_action(action, state)
+	def handle_action(%{"client_type" => "portal_call_center"} = action, state) do
+		EdMarkaz.ActionHandler.CallCenter.handle_action(action, state)
 	end
 
 	def handle_action(%{"client_type" => "bank_portal"} = action, state) do
