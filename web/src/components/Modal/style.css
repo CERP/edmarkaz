@@ -5,7 +5,7 @@
 	bottom: 0;
 	right: 0;
 	left: 0;
-	background-color: rgba(0,0,0,0.3);
+	background-color: rgba(0,0,0,0.7);
 	z-index: 4;
 
 	display: flex;
@@ -35,5 +35,9 @@
 	.modal {
 		height: 70%;
 		width: 70%;
+	}
+
+	.modal-container {
+		right: calc((100% - 220px)/2);
 	}
 }

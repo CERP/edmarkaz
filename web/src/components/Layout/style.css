@@ -198,6 +198,10 @@ a.block {
 		width: 100%;
 	}
 
+	.form .row>.button {
+		width: calc(100% - 30px); /* take padding into account... */
+	}
+
 	.form .row label {
 		color: #aaa;
 		transition: all .2s ease-out;

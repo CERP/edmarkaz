@@ -30,9 +30,9 @@ export default class Survey extends React.Component<P, CallEndSurvey['meta']> {
 	render() {
 
 		return <div className="modal">
-			<div className="title" style={{ marginTop: 0 }}>Call Finished Survey</div>
+			<div className="title" style={{ marginTop: 0 }}>Call Survey</div>
 
-			<div className="form" style={{ width: "90%"}}>
+			<div className="form" style={{ width: "90%" }}>
 
 				<div className="row">
 					<label>Is the customer interested in using your product?</label>
@@ -85,7 +85,7 @@ export default class Survey extends React.Component<P, CallEndSurvey['meta']> {
 
 				<div className="row">
 					<label>Other Notes</label>
-					<input type="text" {...this.former.super_handle(["other_notes"])} placeholder="Enter other notes here" />
+					<textarea {...this.former.super_handle(["other_notes"])} placeholder="Enter Comments Here" style={{ textAlign: "left" }}/>
 				</div>
 
 				<div className="row">
