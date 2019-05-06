@@ -20,3 +20,10 @@
 .form .row>:not(input):not(.button):last-child {
 	text-align: right;
 }
+
+	.special-survey-wrapper .modal {
+		box-shadow: none;
+		width: 100%;
+		height: 100%;
+		padding: 0;
+	}

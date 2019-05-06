@@ -187,6 +187,7 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 			.filter(x => x.event === "CALL_END_SURVEY") as CallEndSurvey[]
 
 		const call_number = call_end_surveys.length
+		const current_call_in_progress = call_in_progress(this.props.schoolMatch)
 
 		return <div className="school-info page" style={{ padding: "5px" }}>
 			<div className="close" onClick={this.onClose}>Close</div>
@@ -257,7 +258,7 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 					call_end_surveys
 						.filter(x => x.meta.other_notes)
 						.map(x => 
-							<div className="row">
+							<div className="row" key={x.time}>
 								<div>{moment(x.time).format("DD/MM")}</div>
 								<div>{x.meta.customer_interest}</div>
 								<div>{x.meta.other_notes}</div>
