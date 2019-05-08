@@ -1,11 +1,27 @@
 import Dynamic from '@ironbay/dynamic'
 
-import { MERGES, MergeAction, ON_CONNECT, ON_DISCONNECT, DELETES, DeletesAction, QueueAction, QUEUE, CONFIRM_SYNC_DIFF, ConfirmSyncAction, SnapshotDiffAction, SNAPSHOT_DIFF, RPC_SUCCEED, RPCSucceedAction} from '../actions/core'
+import { MERGES, MergeAction, ON_CONNECT, ON_DISCONNECT, DELETES, DeletesAction, QueueAction, QUEUE, CONFIRM_SYNC_DIFF, ConfirmSyncAction, SnapshotDiffAction, SNAPSHOT_DIFF, RPC_SUCCEED, RPCSucceedAction, LOGIN_SUCCEED, LoginSucceed} from '../actions/core'
 import { AnyAction } from 'redux';
+import { ADD_SCHOOLS, AddSchoolAction, INCOMING_PHONE_CALL, IncomingPhoneCallAction } from '../actions';
 
 const rootReducer = (state: RootReducerState, action : AnyAction) : RootReducerState => {
 
+	console.log(action)
 	switch(action.type) {
+
+		case LOGIN_SUCCEED:
+		{
+			const succeed = <LoginSucceed>action
+
+			return {
+				...state,
+				auth: {
+					...state.auth,
+					id: succeed.id,
+					token: succeed.token
+				}
+			}
+		}
 
 		case ON_CONNECT: 
 		{
@@ -20,6 +36,28 @@ const rootReducer = (state: RootReducerState, action : AnyAction) : RootReducerS
 			return {
 				...state,
 				connected: false
+			}
+		}
+
+		case INCOMING_PHONE_CALL:
+		{
+			const incoming = (action as IncomingPhoneCallAction)
+
+			console.log("INCOMING", incoming)
+
+			return {
+				...state,
+				caller_id: incoming.number
+			}
+		}
+
+		case ADD_SCHOOLS:
+		{
+			const schools = (action as AddSchoolAction).schools
+
+			return {
+				...state,
+				active_school: Object.values(schools)[0]
 			}
 		}
 

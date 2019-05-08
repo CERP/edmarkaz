@@ -19,6 +19,8 @@ interface RootReducerState {
 			date: number
 		}
 	}
+	active_school?: CERPSchool
+	caller_id?: string
 	last_snapshot: number
 	accept_snapshot: boolean
 	connected: boolean

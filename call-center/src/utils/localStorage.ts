@@ -103,6 +103,8 @@ export const loadDB = () : RootReducerState => {
 		accept_snapshot: false,
 		last_snapshot: loadSnapshot(),
 		connected: false,
-		sync_state: loadSyncState()
+		sync_state: loadSyncState(),
+		active_school: undefined,
+		caller_id: undefined
 	}
 }

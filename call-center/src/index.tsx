@@ -13,7 +13,7 @@ import { loadDB, saveDB } from './utils/localStorage'
 import debounce from './utils/debounce';
 
 
-const debug_url = "wss://c26dc055.ngrok.io/ws"
+const debug_url = "wss://296ca2d0.ngrok.io/ws"
 //@ts-ignore
 const host = window.api_url || debug_url;
 
@@ -23,6 +23,7 @@ const syncr = new Syncr(host, msg => store.dispatch(msg))
 const store : Store<RootReducerState> = createStore(reducer, initial_state, applyMiddleware(thunkMiddleware.withExtraArgument(syncr) as ThunkMiddleware<RootReducerState, AnyAction, Syncr>))
 
 const saveBounce = debounce(() => {
+	console.log('saving')
 	const state = store.getState();
 	saveDB(state)
 }, 500);

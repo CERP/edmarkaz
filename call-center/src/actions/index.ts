@@ -6,7 +6,7 @@ type GetState = () => RootReducerState
 
 export const ADD_SCHOOLS = "ADD_SCHOOLS"
 
-export const createLogin = (username: string, password: string, number: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+export const createLogin = (username: string, password: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 
 	const state = getState();
 
@@ -22,13 +22,22 @@ export const createLogin = (username: string, password: string, number: string) 
 	})
 	.then((res: { token: string  }) => {
 
-		dispatch(createLoginSucceed(username, res.token, {}, number))
+		dispatch(createLoginSucceed(username, res.token, {}))
 	})
+}
+
+export interface AddSchoolAction {
+	type: "ADD_SCHOOLS",
+	schools: { [id: string]: CERPSchool }
 }
 
 export const getSchoolProfiles = (school_ids: string[]) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 
 	const state = getState();
+
+	if(school_ids.length > 1) {
+		alert("only do 1 at a time....")
+	}
 
 	syncr.send({
 		type: "GET_SCHOOL_PROFILES",
@@ -55,6 +64,15 @@ export const getSchoolProfiles = (school_ids: string[]) => (dispatch: Dispatch, 
 		})
 }
 
+export const INCOMING_PHONE_CALL = "INCOMING_PHONE_CALL";
+export interface IncomingPhoneCallAction {
+	type: "INCOMING_PHONE_CALL",
+	number: string
+	dialed: string
+	event: string
+	unique_id: string
+}
+
 export const editSchoolProfile = (school_id: string, school: CERPSchool) => (dispatch: Dispatch, getState: GetState, syncr: Syncr)  => {
 
 	const state = getState();
@@ -62,7 +80,8 @@ export const editSchoolProfile = (school_id: string, school: CERPSchool) => (dis
 	syncr.send({
 		type: "SAVE_SCHOOL",
 		payload: {
-			school
+			school,
+			school_id
 		},
 		client_type: state.auth.client_type,
 		client_id: state.client_id,

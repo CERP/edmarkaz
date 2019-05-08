@@ -258,7 +258,9 @@ export const connected = () => (dispatch: (a : any) => any, getState: () => Root
 				})
 			})
 			.then(resp => {
-				dispatch(resp)
+				if(resp.type) {
+					dispatch(resp)
+				}
 			})
 			.catch(err => {
 				console.error(err)
@@ -277,13 +279,11 @@ export interface LoginSucceed {
 	type: "LOGIN_SUCCEED",
 	id: string,
 	token: string,
-	sync_state: RootReducerState['sync_state'],
-	number: string
+	sync_state: RootReducerState['sync_state']
 }
-export const createLoginSucceed = (id : string, token : string, sync_state: RootReducerState['sync_state'], number : string) : LoginSucceed => ({ 
+export const createLoginSucceed = (id : string, token : string, sync_state: RootReducerState['sync_state']) : LoginSucceed => ({ 
 	type: LOGIN_SUCCEED,
 	id,
 	token,
-	sync_state,
-	number
+	sync_state
 })

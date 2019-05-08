@@ -16,6 +16,8 @@ defmodule EdMarkaz.Server.Masking do
 		# TODO: handle different events with different code blocks inside this case
 		# i.e. if we are passing call_end or call_start events
 		IO.inspect query_params
+
+
 		{school_name, forward, caller} = case query_params do
 			%{"dialed" => dialed, "callerid" => incoming, "event" => event_type, "unique_id" => uid} -> 
 				# look up incoming against supplier db.
@@ -138,6 +140,19 @@ defmodule EdMarkaz.Server.Masking do
 		current_time =  DateTime.utc_now
 			|> DateTime.add(5*60*60, :second)
 			|> DateTime.truncate(:second)
+
+		if school_name == "not-found" do
+			# broadcast number to the cerp-callcenter user....
+			%{"dialed" => dialed, "callerid" => incoming, "event" => event_type, "unique_id" => uid} = query_params
+			Registry.lookup(EdMarkaz.ConnectionRegistry, "cerp-callcenter")
+				|> Enum.map(fn {pid, _} -> send(pid, {:broadcast, %{
+					type: "INCOMING_PHONE_CALL",
+					number: incoming,
+					dialed: dialed,
+					event: event_type,
+					unique_id: uid
+				}}) end)
+		end
 
 		IO.puts "#{current_time}: forwarding #{caller} to #{school_name}: #{forward}"
 

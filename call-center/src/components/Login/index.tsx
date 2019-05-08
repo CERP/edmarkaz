@@ -3,20 +3,19 @@ import { connect } from 'react-redux'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 import { createLogin } from '../../actions'
 
-import former from '~/src/utils/former'
+import former from '../../utils/former'
 
 import './style.css'
 
 interface propTypes {
 	connected: boolean,
-	login: (id : string, password : string, number : string) => void
+	login: (id : string, password : string) => void
 	auth: RootReducerState['auth'],
 }
 
 interface state {
 	username: string
 	password: string
-	number: string
 }
 
 class Login extends Component<propTypes & RouteComponentProps, state>{
@@ -28,15 +27,14 @@ class Login extends Component<propTypes & RouteComponentProps, state>{
 
 		this.state = {
 			username: "",
-			password: "",
-			number: ""
+			password: ""
 		}
 
 		this.former = new former(this, [])
 	}
 
 	login = () => {
-		this.props.login(this.state.username, this.state.password, this.state.number)
+		this.props.login(this.state.username, this.state.password)
 	}
 
 	componentWillReceiveProps(nextProps : propTypes) {
@@ -57,7 +55,7 @@ class Login extends Component<propTypes & RouteComponentProps, state>{
 		return <div className="login page">
 
 			<div className="cover" style={{ }}>
-				<div className="title" style={{ fontSize: "3rem" }}>Welcome to IlmExchange</div>
+				<div className="title" style={{ fontSize: "3rem" }}>Welcome to Call Center</div>
 				<div className="divider"></div>
 				<div className="form">
 					<div className="row">
@@ -65,9 +63,6 @@ class Login extends Component<propTypes & RouteComponentProps, state>{
 					</div>
 					<div className="row">
 						<input type="password" {...this.former.super_handle(["password"])} placeholder="password" />
-					</div>
-					<div className="row">
-						<input type="tel" {...this.former.super_handle(["number"])} placeholder="Your Cellphone Number" />
 					</div>
 					<div className="button blue" onClick={this.login}>Login</div>
 				</div>
@@ -83,5 +78,5 @@ export default connect((state : RootReducerState) => ({
 	connected: state.connected,
 	auth: state.auth
 }), (dispatch : any) => ({
-	login: (username : string, password : string, number : string) => dispatch(createLogin(username, password, number))
+	login: (username : string, password : string) => dispatch(createLogin(username, password))
 }))(withRouter(Login))
