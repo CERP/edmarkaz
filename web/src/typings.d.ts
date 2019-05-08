@@ -41,13 +41,32 @@ interface CallEndEvent extends PlatformInteractionEvent {
 interface CallEndSurvey extends PlatformInteractionEvent {
 	event: "CALL_END_SURVEY",
 	meta: {
+		phone_answered: "NO" | "PHONE_OFF" | "NUMBER_INVALID" | "WRONG_NUMBER" | "YES" | ""
+		respondent_speak: "NO" | "CALL_BACK" | "YES" | ""
+		respond_speak_reason: string
+		call_back_time: number
+		respondent_interested: "YES" | "NO" | ""
+		not_interested_reason: "USE_SIMILAR_PRODUCT" | "NO_NEED_FOR_PRODUCT" | "DONT_LIKE_PRODUCT" | "PREFER_COMPETITOR" | "PRODUCT_TOO_EXPENSIVE" | "NEED_TIME"  | "OTHER"
+		not_interested_other: string
+		not_interested_followup_date: number
+		interested_next_interaction_type: "MEETING" | "PHONE_CALL" | ""
+		interested_next_interaction_time: number
+
+		/*
 		customer_interest: "YES" | "NO" | "UNSURE" | ""
-		reason_rejected: "PRODUCT_TOO_EXPENSIVE" | "PRODUCT_NOT_RELEVANT" | "PRODUCT_NOT_GOOD_ENOUGH" | "OTHER" | "",
+		reason_rejected: 
+			"PRODUCT_TOO_EXPENSIVE" | 
+			"PRODUCT_NOT_RELEVANT" | 
+			"PRODUCT_NOT_GOOD_ENOUGH" | 
+			"ALREADY_USING_SIMILAR" | 
+			"NO_NEED_FOR_PRODUCT" | 
+			"OTHER" | ""
 		other_reason_rejected: string
 		customer_likelihood: "HIGH" | "MEDIUM" | "LOW" | ""
 		follow_up_meeting: "YES" | "NO" | "N/A" | ""
 		other_notes: string,
 		call_number: number
+		*/
 	}
 }
 
@@ -62,7 +81,7 @@ interface MarkCompleteSurvey extends PlatformInteractionEvent {
 	event: "MARK_COMPLETE_SURVEY",
 	meta: {
 		reason_completed: "CLIENT_BOUGHT_PRODUCT" | "RELEASE_MASKED_NUMBER" | "HANDLING_OUTSIDE_PLATFORM" | "CLIENT_NOT_INTERESTED" | "CLIENT_NOT_REACHABLE" | "OTHER" | ""
-		other_reason: String
+		other_reason: string
 	}
 }
 
