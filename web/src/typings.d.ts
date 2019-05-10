@@ -42,12 +42,20 @@ interface CallEndSurvey extends PlatformInteractionEvent {
 	event: "CALL_END_SURVEY",
 	meta: {
 		customer_interest: "YES" | "NO" | "UNSURE" | ""
-		reason_rejected: "PRODUCT_TOO_EXPENSIVE" | "PRODUCT_NOT_RELEVANT" | "PRODUCT_NOT_GOOD_ENOUGH" | "OTHER" | "",
+		reason_rejected: "PRODUCT_TOO_EXPENSIVE" | 
+			"PRODUCT_NOT_RELEVANT" | 
+			"USING_SIMILAR_PRODUCT" |
+			"DONT_LIKE_PRODUCT" |
+			"PREFER_COMPETITOR" |
+			"NEED_MORE_TIME" | "OTHER" | "",
 		other_reason_rejected: string
 		customer_likelihood: "HIGH" | "MEDIUM" | "LOW" | ""
 		follow_up_meeting: "YES" | "NO" | "N/A" | ""
+		follow_up_meeting_medium: "MEETING" | "PHONE_CALL" | ""
+		follow_up_meeting_time?: number
 		other_notes: string,
-		call_number: number
+		call_number: number,
+		answer_phone: "NO" | "PHONE_OFF" | "NUMBER_INVALID" | "WRONG_NUMBER" | "YES" | ""
 	}
 }
 

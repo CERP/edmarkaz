@@ -1,5 +1,6 @@
 import React from 'react'
 import Former from '~/src/utils/former'
+import moment = require('moment');
 
 interface P {
 	saveSurvey: (survey: CallEndSurvey['meta']) => void
@@ -19,8 +20,10 @@ export default class Survey extends React.Component<P, CallEndSurvey['meta']> {
 			other_reason_rejected: "",
 			customer_likelihood: "",
 			follow_up_meeting: "",
+			follow_up_meeting_medium: "",
 			other_notes: "",
-			call_number: props.call_number
+			call_number: props.call_number,
+			answer_phone: ""
 		}
 
 		this.former = new Former(this, [])
@@ -50,7 +53,10 @@ export default class Survey extends React.Component<P, CallEndSurvey['meta']> {
 						<option value="">Select </option>
 						<option value="PRODUCT_TOO_EXPENSIVE">The Product is too expensive</option>
 						<option value="PRODUCT_NOT_RELEVANT">The product is not relevant for them</option>
-						<option value="PRODUCT_NOT_GOOD_ENOUGH">The product does not fulfill or address their needs</option>
+						<option value="USING_SIMILAR_PRODUCT">Already using a similar product</option>
+						<option value="DONT_LIKE_PRODUCT">They do not like the product</option>
+						<option value="PREFER_COMPETITOR">Prefer a competitor's product</option>
+						<option value="NEED_MORE_TIME">Need more time to think about it</option>
 						<option value="OTHER">Other Reason</option>
 					</select>
 				</div>
@@ -82,6 +88,26 @@ export default class Survey extends React.Component<P, CallEndSurvey['meta']> {
 						<option value="N/A">Not Relevant</option>
 					</select>
 				</div>
+
+				{
+					this.state.follow_up_meeting === "YES" && <div className="row">
+						<label>How will you have the meeting?</label>
+						<select {...this.former.super_handle(["follow_up_meeting_medium"])}>
+							<option value="">Please Select an Answer</option>
+							<option value="MEETING">In-Person Meeting</option>
+							<option value="PHONE_CALL">Phone Call</option>
+						</select>
+					</div>
+				}
+				{ this.state.follow_up_meeting === "YES" && <div className="row">
+					<label>When will the meeting be?</label>
+					<input 
+						type="date" 
+						onChange={this.former.handle(["follow_up_meeting_time"])} 
+						value={moment(this.state.follow_up_meeting_time).format("YYYY-MM-DD")}
+						placeholder="Meeting Date"
+					/>
+				</div>}
 
 				<div className="row">
 					<label>Other Notes</label>
