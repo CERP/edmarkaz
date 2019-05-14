@@ -100,7 +100,7 @@ export default class Survey extends React.Component<P, CallEndSurvey['meta']> {
 					</div>
 				}
 				{ this.state.follow_up_meeting === "YES" && <div className="row">
-					<label>When will the meeting be?</label>
+					<label>By when do you think you will have the meeting?</label>
 					<input 
 						type="date" 
 						onChange={this.former.handle(["follow_up_meeting_time"])} 
