@@ -7,6 +7,7 @@ import Former from '~/src/utils/former'
 import { getSchoolProfiles, reserveMaskedNumber, releaseMaskedNumber, rejectSchool, saveCallEndSurvey, saveSchoolRejectedSurvey, saveSchoolCompletedSurvey } from '~/src/actions'
 import Modal from '~/src/components/Modal'
 
+import CallEndSurveyFollowUpComponent from '~/src/components/Surveys/CallEndSurveyFollowUp'
 import CallEndSurveyComponent from '~/src/components/Surveys/CallEndSurvey'
 import MarkCompleteSurveyComponent from '~/src/components/Surveys/MarkCompleteSurvey'
 import NotInterestedSurveyComponent from '~/src/components/Surveys/NotInterested'
@@ -22,6 +23,7 @@ interface StateProps {
 	connected: boolean
 	school?: CERPSchool
 	schoolMatch?: SchoolMatch
+	username: string
 }
 
 // survey is basically going to be an event
@@ -58,12 +60,52 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 		}
 
 		this.state = {
-			showSurvey: false,
+			showSurvey: "CALL_END",
 			loading: false
 		}
 
 		this.former = new Former(this, [])
 
+	}
+
+	getUserType = () => {
+
+		let user_type : USER_TYPE
+
+		switch (this.props.username) {
+			case "alif-laila":
+				user_type = "ESS"
+				break;
+			case "finca":
+				user_type = "FINANCE"
+				break;
+			case "edkasa":
+				user_type = "ESS"
+				break;
+			case "mischool2":
+				user_type = "ESS"
+				break;
+			case "radec": 
+				user_type = "ESS"
+				break;
+			case "telenor":
+				user_type = "FINANCE"
+				break;
+			case "jsbank":
+				user_type = "FINANCE"
+				break;
+			case "sabaq":
+				user_type = "ESS"
+				break;
+			case "kashf":
+				user_type = "FINANCE"
+				break;
+			default:
+				user_type = "ESS"
+				break;
+		}
+
+		return user_type;
 	}
 
 	componentWillReceiveProps(nextProps : propTypes) {
@@ -143,7 +185,7 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 		})
 	}
 
-	saveSurvey = (survey : CallEndSurvey['meta'] | NotInterestedSurvey['meta'] | MarkCompleteSurvey['meta']) => {
+	saveSurvey = (survey : CallEndSurvey['meta'] | NotInterestedSurvey['meta'] | MarkCompleteSurvey['meta'] | CallEndSurveyFollowUp['meta']) => {
 
 		console.log("saving survey", this.state)
 
@@ -204,8 +246,14 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 				}
 
 				{
-					this.state.showSurvey === "CALL_END" && <Modal>
+					this.state.showSurvey === "CALL_END" && call_number === 0 && <Modal>
 						<CallEndSurveyComponent saveSurvey={this.saveSurvey} call_number={call_number} />
+					</Modal>
+				}
+
+				{
+					this.state.showSurvey === "CALL_END" && call_number > 0 && <Modal>
+						<CallEndSurveyFollowUpComponent saveSurvey={this.saveSurvey} call_number={call_number} user_type={this.getUserType()}/>
 					</Modal>
 				}
 
@@ -481,7 +529,8 @@ const SurveyRow : React.StatelessComponent<SurveyRowProp> = ({ label, val }) => 
 export default connect<StateProps, DispatchProps, OwnProps>((state : RootBankState, props: OwnProps) => ({
 	school: state.new_school_db[props.school_id],
 	schoolMatch: state.sync_state.matches[props.school_id],
-	connected: state.connected
+	connected: state.connected,
+	username: state.auth.id
 }), (dispatch : Function, props: OwnProps ) => ({
 	addSchool: () => dispatch(getSchoolProfiles([props.school_id])),
 	reserveNumber: () => dispatch(reserveMaskedNumber(props.school_id)),

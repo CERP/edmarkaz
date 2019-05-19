@@ -180,7 +180,7 @@ class Home extends React.Component<propTypes, stateType> {
 
 			{
 				this.state.showSurvey && <Modal>
-					<CallEndSurveyComponent saveSurvey={this.saveSurvey} call_number={}/>
+					<CallEndSurveyComponent saveSurvey={this.saveSurvey} call_number={this.state.current_school_survey_num}/>
 				</Modal>
 			}
 

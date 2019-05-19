@@ -2,10 +2,10 @@ defmodule Mix.Tasks.Platform do
 	use Mix.Task
 
 	def run(["ingest_data"]) do
-		Application.ensure_all_started(:EdMarkaz)
+		Application.ensure_all_started(:edmarkaz)
 
-		{:ok, body} = case File.exists?(Application.app_dir(:EdMarkaz, "priv/data.json")) do
-			true -> File.read(Application.app_dir(:EdMarkaz, "priv/data.json"))
+		{:ok, body} = case File.exists?(Application.app_dir(:edmarkaz, "priv/data.json")) do
+			true -> File.read(Application.app_dir(:edmarkaz, "priv/data.json"))
 			false -> File.read("priv/sample.json")
 		end
 		{:ok, json} = Poison.decode(body)
@@ -23,6 +23,32 @@ defmodule Mix.Tasks.Platform do
 					IO.inspect err
 			end
 		end)
+	end
+
+	def run(["ingest_data", fname]) do
+		Application.ensure_all_started(:edmarkaz)
+
+		IO.puts "adding schools from priv/#{fname}"
+
+		{:ok, body} = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname}")) do
+			true -> File.read(Application.app_dir(:edmarkaz, "priv/#{fname}"))
+		end
+		{:ok, json} = Poison.decode(body)
+
+		Enum.each(json, fn school_profile -> 
+			id = Map.get(school_profile, "refcode")
+
+			case Postgrex.query(EdMarkaz.School.DB, "
+				INSERT INTO platform_schools(id, db) 
+				VALUES ($1, $2) 
+				ON CONFLICT(id) DO UPDATE SET db=$2 ", [id, school_profile]) do
+				{:ok, _} -> IO.puts "updated #{id}"
+				{:error, err} -> 
+					IO.puts "error on school #{id}"
+					IO.inspect err
+			end
+		end)
+
 	end
 
 	def run(["add_matches", id, offset, limit]) do
