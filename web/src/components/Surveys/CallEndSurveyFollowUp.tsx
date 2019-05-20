@@ -1,6 +1,7 @@
 import React from 'react'
 import Former from '~/src/utils/former'
 import moment = require('moment');
+import { runInThisContext } from 'vm';
 
 interface P {
 	saveSurvey: (survey: CallEndSurveyFollowUp['meta']) => void
@@ -52,6 +53,189 @@ export default class Survey extends React.Component<P, CallEndSurveyFollowUp['me
 				depends: [
 					{
 						path: ["follow_up_meeting_no_reason"],
+						value: "OTHER"
+					}
+				]
+			},
+			{
+				path: ["call_in_person_meeting_scheduled"],
+				value: "",
+				depends: [{
+					path: ["follow_up_meeting_ocurred"],
+					value: "YES_BY_CALL"
+				}]
+			},
+			{
+				path: ["call_in_person_meeting_yes_time"],
+				value: undefined,
+				depends: [{
+					path: ["call_in_person_meeting_scheduled"],
+					value: "YES"
+				}]
+			},
+			{
+				path: ["call_in_person_meeting_no_reason"],
+				value: "",
+				depends: [{
+					path: ["call_in_person_meeting_scheduled"],
+					value: "NO"
+				}]
+			},
+			{
+				path: ["call_in_person_meeting_no_call_scheduled_time"],
+				value: undefined,
+				depends: [{
+					path: ["call_in_person_meeting_no_reason"],
+					value: "ANOTHER_CALL_SCHEDULED"
+				}]
+			},
+			{
+				path: ["call_in_person_meeting_no_other"],
+				value: "",
+				depends: [{
+					path: ["call_in_person_meeting_no_reason"],
+					value: "OTHER"
+				}]
+			},
+			{
+				path: ["call_not_interested_reason_ess"],
+				value: "",
+				depends: [{
+					path: ["call_in_person_meeting_no_reason"],
+					value: "SCHOOL_NO_LONGER_INTERESTED"
+				}]
+			},
+			{
+				path: ["call_not_interested_reason_finance"],
+				value: "",
+				depends: [{
+					path: ["call_in_person_meeting_no_reason"],
+					value: "SCHOOL_NO_LONGER_INTERESTED"
+				}]
+			},
+			{
+				path: ["call_not_interested_reason_other"],
+				value: "",
+				depends: [
+					"OR",
+					{
+						path: ["call_not_interested_reason_ess"],
+						value: "OTHER"
+					},
+					{
+						path: ["call_not_interested_reason_finance"],
+						value: "OTHER"
+					}
+				]
+			},
+			{
+				path: ["call_not_interested_needs_time_followup"],
+				value: "",
+				depends: [
+					"OR",
+					{
+						path: ["call_not_interested_reason_finance"],
+						value: "NEED_MORE_TIME"
+					},
+					{
+						path: ["call_not_interested_reason_ess"],
+						value: "NEED_MORE_TIME"
+					}
+				]
+			},
+			{
+				path: ["call_not_interested_follow_up_time"],
+				value: "",
+				depends: [
+					"OR",
+					{
+						path: ["call_not_interested_needs_time_followup"],
+						value: "PHONE_CALL"
+					},
+					{
+						path: ["call_not_interested_needs_time_followup"],
+						value: "VISIT"
+					}
+				]
+			},
+			{
+				path: ["meeting_ess_purpose"],
+				value: "",
+				depends: [{ 
+					path: ["follow_up_meeting_ocurred"],
+					value: "YES_BY_MEETING"
+				}]
+			},
+			{
+				path: ["meeting_ess_demo_followup"],
+				value: "",
+				depends: [
+					{
+						path: ["meeting_ess_purpose"],
+						value: "GIVE_PRODUCT_DEMO"
+					}
+				]
+			},
+			{
+				path: ["meeting_ess_followup_date"],
+				value: undefined,
+				depends: [
+					"OR",
+					{
+						path: ["meeting_ess_demo_followup"],
+						value: "MEETING"
+					},
+					{
+						path: ["meeting_ess_demo_followup"],
+						value: "PHONE_CALL"
+					},
+				]
+			},
+			{
+				path: ["meeting_ess_transaction_sold"],
+				value: "",
+				depends: [
+					{
+						path: ["meeting_ess_purpose"],
+						value: "CONDUCT_TRANSACTION"
+					}
+				]
+			},
+			{
+				path: ["meeting_ess_transaction_fail_reason"],
+				value: "",
+				depends: [{
+					path: ["meeting_ess_transaction_sold"],
+					value: "NO"
+				}]
+			},
+			{
+				path: ["meeting_finance_transaction_loan"],
+				value: "",
+				depends: [{
+					path: ["follow_up_meeting_ocurred"],
+					value: "YES_BY_MEETING"
+				}]
+			},
+			{
+				path: ["meeting_finance_transaction_fail_reason"],
+				value: "",
+				depends: [{
+					path: ["meeting_finance_transaction_loan"],
+					value: "NO"
+				}]
+			},
+			{
+				path: ["meeting_transaction_fail_reason_other"],
+				value: "",
+				depends:[
+					"OR",
+					{
+						path: ["meeting_finance_transaction_fail_reason"],
+						value: "OTHER"
+					},
+					{
+						path: ["meeting_ess_transaction_fail_reason"],
 						value: "OTHER"
 					}
 				]
@@ -128,7 +312,7 @@ const CallSurvey : React.SFC<{former: Former, user_type: USER_TYPE, state: CallE
 		</div>
 
 		{
-			state.call_in_person_meeting_scheduled === "YES" && <div className="row">
+			former.check(["call_in_person_meeting_yes_time"]) && <div className="row">
 				<label>When is your meeting scheduled?</label>
 				<input type="date" 
 					onChange={former.handle(["call_in_person_meeting_yes_time"])} 
@@ -139,7 +323,7 @@ const CallSurvey : React.SFC<{former: Former, user_type: USER_TYPE, state: CallE
 		}
 
 		{ 
-			state.call_in_person_meeting_scheduled === "NO" && <div className="row">
+			former.check(["call_in_person_meeting_no_reason"]) && <div className="row">
 				<label>Why hasn't an in-person meeting been scheduled?</label>
 				<select {...former.super_handle(["call_in_person_meeting_no_reason"])}>
 					<option value="">Please select an answer</option>
@@ -151,14 +335,14 @@ const CallSurvey : React.SFC<{former: Former, user_type: USER_TYPE, state: CallE
 		}
 
 		{
-			state.call_in_person_meeting_no_reason === "OTHER" && <div className="row">
+			former.check(["call_in_person_meeting_no_other"]) && <div className="row">
 				<label>Please specify why an in-person meeting hasn't been scheduled</label>
 				<input type="text" {...former.super_handle(["call_in_person_meeting_no_other"])} />
 			</div>
 		}
 
 		{
-			state.call_in_person_meeting_scheduled === "NO" && state.call_in_person_meeting_no_reason === "ANOTHER_CALL_SCHEDULED" && <div className="row">
+			former.check(["call_in_person_meeting_no_call_scheduled_time"]) && <div className="row">
 				<label>When is your follow-up call scheduled?</label>
 				<input type="date" 
 					onChange={former.handle(["call_in_person_meeting_no_call_scheduled_time"])} 
@@ -168,7 +352,7 @@ const CallSurvey : React.SFC<{former: Former, user_type: USER_TYPE, state: CallE
 		}
 
 		{
-			state.call_in_person_meeting_scheduled === "NO" && state.call_in_person_meeting_no_reason === "SCHOOL_NO_LONGER_INTERESTED" && user_type === "ESS" && <div className="row">
+			former.check(["call_not_interested_reason_ess"]) && user_type === "ESS" && <div className="row">
 				<label>Why is the school no longer interested?</label>
 				<select {...former.super_handle(["call_not_interested_reason_ess"])}>
 					<option value="">Please select answer</option>
@@ -184,7 +368,7 @@ const CallSurvey : React.SFC<{former: Former, user_type: USER_TYPE, state: CallE
 		}
 
 		{
-			state.call_in_person_meeting_no_reason === "SCHOOL_NO_LONGER_INTERESTED" && user_type === "FINANCE" && <div className="row">
+			former.check(["call_not_interested_reason_finance"]) && user_type === "FINANCE" && <div className="row">
 				<label>Why is the school no longer interested?</label>
 				<select {...former.super_handle(["call_not_interested_reason_finance"])}>
 					<option value="">Please select answer</option>
@@ -199,14 +383,14 @@ const CallSurvey : React.SFC<{former: Former, user_type: USER_TYPE, state: CallE
 		}
 
 		{
-			state.call_in_person_meeting_no_reason === "SCHOOL_NO_LONGER_INTERESTED" && (state.call_not_interested_reason_ess === "OTHER" || state.call_not_interested_reason_finance === "OTHER") && <div className="row">
+			former.check(["call_not_interested_reason_other"]) && <div className="row">
 				<label>Please specify why they are no longer interested</label>
 				<input type="text" {...former.super_handle(["call_not_interested_reason_other"])} />
 			</div>
 		}
 
 		{
-			(state.call_not_interested_reason_finance === "NEED_MORE_TIME" || state.call_not_interested_reason_ess === "NEED_MORE_TIME") && <div className="row">
+			former.check(["call_not_interested_needs_time_followup"]) && <div className="row">
 				<label>Will you be making a follow-up phone call or visit?</label>
 				<select {...former.super_handle(["call_not_interested_needs_time_followup"])}>
 					<option value="">Please select option</option>
@@ -219,7 +403,7 @@ const CallSurvey : React.SFC<{former: Former, user_type: USER_TYPE, state: CallE
 
 		{
 
-			(state.call_not_interested_reason_finance === "NEED_MORE_TIME" || state.call_not_interested_reason_ess === "NEED_MORE_TIME") && (state.call_not_interested_needs_time_followup === "PHONE_CALL" || state.call_not_interested_needs_time_followup === "VISIT") && <div className="row">
+			former.check(["call_not_interested_follow_up_time"]) && <div className="row">
 				<label>When will your follow up be?</label>
 				<input type="date" 
 					onChange={former.handle(["call_not_interested_follow_up_time"])} 
@@ -245,7 +429,7 @@ const MeetingSurvey : React.SFC<{former: Former, user_type: USER_TYPE, state: Ca
 		}
 
 		{
-			user_type === "ESS" && state.meeting_ess_purpose === "GIVE_PRODUCT_DEMO" && <div className="row">
+			user_type === "ESS" && former.check(["meeting_ess_demo_followup"]) && <div className="row">
 				<label>Will the follow up be a phone call or meeting?</label>
 				<select {...former.super_handle(["meeting_ess_demo_followup"])}>
 					<option value="">Please select answer</option>
@@ -257,7 +441,7 @@ const MeetingSurvey : React.SFC<{former: Former, user_type: USER_TYPE, state: Ca
 		}
 
 		{
-			user_type === "ESS" && state.meeting_ess_purpose === "GIVE_PRODUCT_DEMO" && (state.meeting_ess_demo_followup === "MEETING" || state.meeting_ess_demo_followup === "PHONE_CALL") && <div className="row">
+			user_type === "ESS" && former.check(["meeting_ess_followup_date"]) && (state.meeting_ess_demo_followup === "MEETING" || state.meeting_ess_demo_followup === "PHONE_CALL") && <div className="row">
 				<label>When will the follow-up take place?</label>
 				<input type="date" 
 					onChange={former.handle(["meeting_ess_followup_date"])} 
@@ -267,7 +451,7 @@ const MeetingSurvey : React.SFC<{former: Former, user_type: USER_TYPE, state: Ca
 		}
 
 		{
-			user_type === "ESS" && state.meeting_ess_purpose === "CONDUCT_TRANSACTION" && <div className="row">
+			user_type === "ESS" && former.check(["meeting_ess_transaction_sold"]) && <div className="row">
 				<label>Has the product been sold to the school?</label>
 				<select {...former.super_handle(["meeting_ess_transaction_sold"])}>
 					<option value="">Please select answer</option>
@@ -278,7 +462,7 @@ const MeetingSurvey : React.SFC<{former: Former, user_type: USER_TYPE, state: Ca
 		}
 
 		{
-			user_type === "ESS" && state.meeting_ess_transaction_sold === "NO" && <div className="row">
+			user_type === "ESS" && former.check(["meeting_ess_transaction_fail_reason"]) && <div className="row">
 				<label>Why did they not buy the product?</label>
 				<select {...former.super_handle(["meeting_ess_transaction_fail_reason"])}>
 					<option value="">Please select answer</option>
@@ -304,18 +488,21 @@ const MeetingSurvey : React.SFC<{former: Former, user_type: USER_TYPE, state: Ca
 		}
 
 		{
-			user_type === "FINANCE" && state.meeting_finance_transaction_loan === "NO" && <div className="row">
-				<option value="">Please select answer</option>
-				<option value="OUTSTANDING_LOAN">Already have an outstanding loan</option>
-				<option value="NO_LONGER_NEED_LOAN">Does not have a need for a loan anymore</option>
-				<option value="PREFER_COMPETITOR">Prefer a competitors loan product</option>
-				<option value="INTEREST_TOO_HIGH">Interest rate/service charge is too high</option>
-				<option value="OTHER">Other reason</option>
+			user_type === "FINANCE" && former.check(["meeting_finance_transaction_fail_reason"]) && <div className="row">
+				<label>Why was the loan not given?</label>
+				<select {...former.super_handle(["meeting_finance_transaction_fail_reason"])}>
+					<option value="">Please select answer</option>
+					<option value="OUTSTANDING_LOAN">Already have an outstanding loan</option>
+					<option value="NO_LONGER_NEED_LOAN">Does not have a need for a loan anymore</option>
+					<option value="PREFER_COMPETITOR">Prefer a competitors loan product</option>
+					<option value="INTEREST_TOO_HIGH">Interest rate/service charge is too high</option>
+					<option value="OTHER">Other reason</option>
+				</select>
 			</div>
 		}
 
 		{
-			(state.meeting_finance_transaction_fail_reason === "OTHER" || state.meeting_ess_transaction_fail_reason === "OTHER") && <div className="row">
+			former.check(["meeting_transaction_fail_reason_other"]) && <div className="row">
 				<label>Please specify why they did not make the transaction</label>
 				<input type="text" {...former.super_handle(["meeting_transaction_fail_reason_other"])} />
 			</div>

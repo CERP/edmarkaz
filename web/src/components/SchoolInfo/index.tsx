@@ -101,7 +101,7 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 				user_type = "FINANCE"
 				break;
 			default:
-				user_type = "ESS"
+				user_type = "FINANCE"
 				break;
 		}
 

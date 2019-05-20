@@ -4,10 +4,12 @@ import moment from 'moment'
 interface ConditionItem {
 	path: Array<string>
 	value: any
-	depends: Array<{
-		path: Array<string>,
-		value: any
-	}>
+	depends: Array<Spec | "OR">
+}
+
+interface Spec {
+	path: Array<string>
+	value: any
 }
 
 export default class Former {
@@ -40,11 +42,84 @@ export default class Former {
 	
 	_checkCond(cond : ConditionItem, state = this._component.state){
 
+		// cond.depends is no longer a list of all the things that need to be true (list of AND)
+		// there can now be an OR in between two entries.
+		// so we need to do a look-ahead? or keep a stack on the side to eval expressions
+		// we require list to be in prefix notation so we dont need to worry about parenthesis 
+
+		/*
+			(condA or condB) and condC
+			[
+				"OR",
+				{ condA },
+				{ condB },
+				{ condC }
+			]
+
+			(condA or condB) and (condC or condD)
+			[
+				"OR"
+				condA,
+				condB,
+				"OR",
+				condC
+				condD
+			]
+
+			((condA or condB) and condC) or condD // if there is an OR
+
+
+			in the reduce we see an OR so we push it onto the expr stack. if expr stack has length > 0 and length < 3 then we push cond onto the stack.
+			if length == 3, we evaluate the stack. we can do this because there are only 2 operators, and one is the default (AND)
+			NOT is not supported now
+		*/
+
+		const { runner: runner, exprStack: exprStack } = cond.depends.reduce((agg, curr, i, arr) => {
+
+			if(agg.exprStack.length > 0 && agg.exprStack.length < 3) {
+				return { exprStack: [...agg.exprStack, curr], runner: agg.runner }
+			}
+
+			if(curr === "OR") {
+				return { exprStack: [curr], runner: agg.runner}
+			}
+
+			if(agg.exprStack.length === 3) {
+				// first one will be "OR"
+				const condA = agg.exprStack[1]
+				const condB = agg.exprStack[2]
+
+				// check validity of both
+				const condA_val = Dynamic.get(state, [...this.base_path, ...condA.path]) == condA.value
+				const condB_val = Dynamic.get(state, [...this.base_path, ...condB.path]) == condB.value
+
+				return { exprStack: [], runner: agg.runner && (condA_val || condB_val)}
+			}
+
+			return { runner: agg.runner && Dynamic.get(state, [...this.base_path, ...curr.path]) == curr.value, exprStack: [] }
+
+		}, { exprStack: [] as ["OR"?, Spec?, Spec?], runner: true })
+
+		if(exprStack.length === 3) {
+			const condA = exprStack[1] as Spec
+			const condB = exprStack[2] as Spec
+
+			// check validity of both
+			const condA_val = Dynamic.get(state, [...this.base_path, ...condA.path]) == condA.value
+			const condB_val = Dynamic.get(state, [...this.base_path, ...condB.path]) == condB.value
+
+			return runner && (condA_val || condB_val)
+		}
+
+		return runner;
+
+		/*
 		return cond.depends.some(x => {
 				const dep_current = Dynamic.get(state, [...this.base_path, ...x.path]) 
 				console.log("current: ", dep_current, "should be", x.value )
 				return dep_current == x.value
 			})
+		*/
 	}
 
 	_setState(path : Array<string>, value : any, cb = () => {}) {
