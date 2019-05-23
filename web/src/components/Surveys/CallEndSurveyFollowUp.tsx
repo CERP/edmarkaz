@@ -1,7 +1,6 @@
 import React from 'react'
 import Former from '~/src/utils/former'
 import moment = require('moment');
-import { runInThisContext } from 'vm';
 
 interface P {
 	saveSurvey: (survey: CallEndSurveyFollowUp['meta']) => void

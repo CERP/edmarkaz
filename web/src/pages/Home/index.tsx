@@ -190,13 +190,13 @@ class Home extends React.Component<propTypes, stateType> {
 			}
 
 			{
-				this.state.showSurvey && this.state.current_school_survey_num < 2 && <Modal>
+				this.state.showSurvey && this.state.current_school_survey_num == 0 && <Modal>
 					<CallEndSurveyComponent saveSurvey={this.saveSurvey} call_number={this.state.current_school_survey_num}/>
 				</Modal>
 			}
 
 			{
-				this.state.showSurvey && this.state.current_school_survey_num >= 2 && <Modal>
+				this.state.showSurvey && this.state.current_school_survey_num > 0 && <Modal>
 					<CallEndSurveyFollowUpComponent saveSurvey={this.saveSurvey} call_number={this.state.current_school_survey_num} user_type={getUserType(this.props.username)}/>
 				</Modal>
 			}
