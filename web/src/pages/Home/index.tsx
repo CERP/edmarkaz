@@ -3,10 +3,12 @@ import { connect } from 'react-redux'
 import { Link, RouteComponentProps } from 'react-router-dom'
 import moment from 'moment'
 
-import { forceSaveFullStatePotentiallyCausingProblems, getSchoolProfiles, saveCallEndSurvey } from '~/src/actions'
+import { forceSaveFullStatePotentiallyCausingProblems, getSchoolProfiles, saveCallEndSurvey, saveCallEndSurveyFollowUp } from '~/src/actions'
 import Modal from '~/src/components/Modal'
 
+import getUserType from '~/src/utils/getUserType'
 import CallEndSurveyComponent from '~/src/components/Surveys/CallEndSurvey'
+import CallEndSurveyFollowUpComponent from '~/src/components/Surveys/CallEndSurveyFollowUp'
 
 import './style.css'
 
@@ -14,9 +16,11 @@ type propTypes = {
 
 	sync_state: RootBankState['sync_state']
 	school_db: RootBankState['new_school_db']
+	username: string
 	saveFullState: () => void
 	addSchools: (ids: string[]) => void
 	saveCallEndSurvey: (school_id: string, survey: CallEndSurvey['meta']) => void
+	saveCallEndFollowupSurvey: (school_id: string, survey: CallEndSurveyFollowUp['meta']) => void
 } & RouteComponentProps
 
 interface stateType {
@@ -74,8 +78,15 @@ class Home extends React.Component<propTypes, stateType> {
 		})
 	}
 
-	saveSurvey = (survey : CallEndSurvey['meta']) => {
-		this.props.saveCallEndSurvey(this.state.current_school, survey)
+	saveSurvey = (survey : CallEndSurvey['meta'] | CallEndSurveyFollowUp['meta']) => {
+
+		if(this.state.current_school_survey_num === 0) {
+			this.props.saveCallEndSurvey(this.state.current_school, survey as CallEndSurvey['meta'])
+		}
+		else {
+			this.props.saveCallEndFollowupSurvey(this.state.current_school, survey as CallEndSurveyFollowUp['meta'])
+		}
+
 		this.setState({
 			current_school: "",
 			showSurvey: false
@@ -179,8 +190,14 @@ class Home extends React.Component<propTypes, stateType> {
 			}
 
 			{
-				this.state.showSurvey && <Modal>
+				this.state.showSurvey && this.state.current_school_survey_num < 2 && <Modal>
 					<CallEndSurveyComponent saveSurvey={this.saveSurvey} call_number={this.state.current_school_survey_num}/>
+				</Modal>
+			}
+
+			{
+				this.state.showSurvey && this.state.current_school_survey_num >= 2 && <Modal>
+					<CallEndSurveyFollowUpComponent saveSurvey={this.saveSurvey} call_number={this.state.current_school_survey_num} user_type={getUserType(this.props.username)}/>
 				</Modal>
 			}
 
@@ -251,9 +268,11 @@ type MergedEndEvent = CallEndEvent & { school_id: string }
 
 export default connect((state : RootBankState) => ({ 
 	sync_state: state.sync_state,
-	school_db: state.new_school_db
+	school_db: state.new_school_db,
+	username: state.auth.id
 }), (dispatch : Function) => ({
 	saveFullState: () => dispatch(forceSaveFullStatePotentiallyCausingProblems()),
 	addSchools: (ids : string[]) => dispatch(getSchoolProfiles(ids)),
-	saveCallEndSurvey: (school_id: string, survey: CallEndSurvey['meta']) => dispatch(saveCallEndSurvey(school_id, survey))
+	saveCallEndSurvey: (school_id: string, survey: CallEndSurvey['meta']) => dispatch(saveCallEndSurvey(school_id, survey)),
+	saveCallEndFollowupSurvey: (school_id: string, survey: CallEndSurveyFollowUp['meta']) => dispatch(saveCallEndSurveyFollowUp(school_id, survey))
 }))(Home)

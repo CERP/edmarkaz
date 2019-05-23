@@ -4,8 +4,9 @@ import { withRouter, RouteComponentProps } from 'react-router-dom'
 
 import moment from 'moment'
 import Former from '~/src/utils/former'
-import { getSchoolProfiles, reserveMaskedNumber, releaseMaskedNumber, rejectSchool, saveCallEndSurvey, saveSchoolRejectedSurvey, saveSchoolCompletedSurvey } from '~/src/actions'
+import { getSchoolProfiles, reserveMaskedNumber, releaseMaskedNumber, rejectSchool, saveCallEndSurvey, saveSchoolRejectedSurvey, saveSchoolCompletedSurvey, saveCallEndSurveyFollowUp } from '~/src/actions'
 import Modal from '~/src/components/Modal'
+import getUserType from '~/src/utils/getUserType'
 
 import CallEndSurveyFollowUpComponent from '~/src/components/Surveys/CallEndSurveyFollowUp'
 import CallEndSurveyComponent from '~/src/components/Surveys/CallEndSurvey'
@@ -45,6 +46,7 @@ interface DispatchProps {
 	saveCallEndSurvey: (survey: CallEndSurvey['meta']) => void
 	saveSchoolRejectedSurvey: (survey: NotInterestedSurvey['meta']) => void
 	saveSchoolCompletedSurvey: (survey: MarkCompleteSurvey['meta']) => void
+	saveCallEndFollowupSurvey: (survey: CallEndSurveyFollowUp['meta']) => void
 }
 
 type propTypes = OwnProps & StateProps & DispatchProps & RouteComponentProps
@@ -66,46 +68,6 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 
 		this.former = new Former(this, [])
 
-	}
-
-	getUserType = () => {
-
-		let user_type : USER_TYPE
-
-		switch (this.props.username) {
-			case "alif-laila":
-				user_type = "ESS"
-				break;
-			case "finca":
-				user_type = "FINANCE"
-				break;
-			case "edkasa":
-				user_type = "ESS"
-				break;
-			case "mischool2":
-				user_type = "ESS"
-				break;
-			case "radec": 
-				user_type = "ESS"
-				break;
-			case "telenor":
-				user_type = "FINANCE"
-				break;
-			case "jsbank":
-				user_type = "FINANCE"
-				break;
-			case "sabaq":
-				user_type = "ESS"
-				break;
-			case "kashf":
-				user_type = "FINANCE"
-				break;
-			default:
-				user_type = "ESS"
-				break;
-		}
-
-		return user_type;
 	}
 
 	componentWillReceiveProps(nextProps : propTypes) {
@@ -189,8 +151,17 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 
 		console.log("saving survey", this.state)
 
-		if(this.state.showSurvey === "CALL_END") {
+		const call_end_surveys : CallEndSurvey[] = Object.values(this.props.schoolMatch.history || {})
+			.filter(x => x.event === "CALL_END_SURVEY") as CallEndSurvey[]
+		
+		const call_number = call_end_surveys.length;
+
+		if(this.state.showSurvey === "CALL_END" && call_number == 0) {
 			this.props.saveCallEndSurvey(survey as CallEndSurvey['meta'])
+		}
+
+		if(this.state.showSurvey === "CALL_END" && call_number > 0) {
+			this.props.saveCallEndFollowupSurvey(survey as CallEndSurveyFollowUp['meta'])
 		}
 
 		if(this.state.showSurvey === "NOT_INTERESTED") {
@@ -253,7 +224,7 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 
 				{
 					this.state.showSurvey === "CALL_END" && call_number > 0 && <Modal>
-						<CallEndSurveyFollowUpComponent saveSurvey={this.saveSurvey} call_number={call_number} user_type={this.getUserType()}/>
+						<CallEndSurveyFollowUpComponent saveSurvey={this.saveSurvey} call_number={call_number} user_type={getUserType(this.props.username)}/>
 					</Modal>
 				}
 
@@ -538,5 +509,6 @@ export default connect<StateProps, DispatchProps, OwnProps>((state : RootBankSta
 	rejectSchool: () => dispatch(rejectSchool(props.school_id)),
 	saveCallEndSurvey: (survey: CallEndSurvey['meta']) => dispatch(saveCallEndSurvey(props.school_id, survey)),
 	saveSchoolRejectedSurvey: (survey: NotInterestedSurvey['meta']) => dispatch(saveSchoolRejectedSurvey(props.school_id, survey)),
-	saveSchoolCompletedSurvey: (survey: MarkCompleteSurvey['meta']) => dispatch(saveSchoolCompletedSurvey(props.school_id, survey))
+	saveSchoolCompletedSurvey: (survey: MarkCompleteSurvey['meta']) => dispatch(saveSchoolCompletedSurvey(props.school_id, survey)),
+	saveCallEndFollowupSurvey: (survey: CallEndSurveyFollowUp['meta']) => dispatch(saveCallEndSurveyFollowUp(props.school_id, survey))
 }))(withRouter(SchoolInfo))

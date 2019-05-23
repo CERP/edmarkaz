@@ -16,7 +16,7 @@ interface SchoolMatch {
 	status: "NEW" | "IN_PROGRESS" | "REJECTED" | "DONE",
 	masked_number?: string,
 	history: {
-		[timestamp: number]: SupplierInteractionEvent | CallEndEvent | CallEndSurvey
+		[timestamp: number]: SupplierInteractionEvent | CallEndEvent | CallEndSurvey | CallEndSurveyFollowUp
 	}
 }
 
@@ -84,7 +84,7 @@ interface CallEndSurveyFollowUp extends PlatformInteractionEvent {
 		meeting_ess_transaction_fail_reason: "ALREADY_USING_SIMILAR" | "NO_NEED_FOR_PRODUCT" | "DONT_LIKE_PRODUCT" | "PREFER_COMPETITOR" | "PRODUCT_TOO_EXPENSIVE" | "OTHER" | ""
 		meeting_finance_transaction_fail_reason: "OUTSTANDING_LOAN" | "NO_LONGER_NEED_LOAN" | "PREFER_COMPETITOR" | "INTEREST_TOO_HIGH" | "OTHER" | ""
 		meeting_transaction_fail_reason_other: string
-
+		call_number: number
 	}
 }
 

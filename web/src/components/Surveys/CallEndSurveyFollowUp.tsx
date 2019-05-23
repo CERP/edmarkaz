@@ -33,7 +33,8 @@ export default class Survey extends React.Component<P, CallEndSurveyFollowUp['me
 			meeting_finance_transaction_loan: "",
 			meeting_ess_transaction_fail_reason: "",
 			meeting_finance_transaction_fail_reason: "",
-			meeting_transaction_fail_reason_other: ""
+			meeting_transaction_fail_reason_other: "",
+			call_number: props.call_number // for save purposes
 		}
 
 		this.former = new Former(this, [], [
