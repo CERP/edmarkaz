@@ -92,7 +92,7 @@ defmodule EdMarkaz.Store.Supplier do
 
 	def handle_call({:save, id, db}, _from, state) when db == %{} do
 		# ignore empty db save
-		{:noreply, state}
+		{:reply, :ok, state}
 	end
 
 	def handle_call({:save, id, sync_state}, _from, state) do
@@ -101,11 +101,11 @@ defmodule EdMarkaz.Store.Supplier do
 			EdMarkaz.School.DB,
 			"INSERT INTO suppliers (id, sync_state) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET sync_state=$2",
 			[id, sync_state]) do
-				{:ok, resp} -> {:noreply, state}
+				{:ok, resp} -> {:reply, :ok, state}
 				{:error, err} -> 
 					IO.puts "write failed"
 					IO.inspect err 
-					{:noreply, state}
+					{:reply, :error, state}
 		end
 	end
 
@@ -126,11 +126,11 @@ defmodule EdMarkaz.Store.Supplier do
 			EdMarkaz.School.DB,
 			"INSERT INTO platform_writes (id, path, value, time, type, client_id) VALUES #{Enum.join(gen_value_strings, ",")}", 
 			flattened_writes) do
-				{:ok, resp} -> {:noreply, state}
+				{:ok, resp} -> {:reply, :ok, state}
 				{:error, err} -> 
 					IO.puts "write failed"
 					IO.inspect err
-					{:noreply, state}
+					{:reply, :error, state}
 			end
 	end
 end
