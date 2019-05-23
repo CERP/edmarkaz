@@ -219,7 +219,29 @@ export const saveCallEndSurvey = (school_id: string, survey: CallEndSurvey['meta
 			value: event
 		}
 	]))
+}
 
+export const saveCallEndSurveyFollowUp = (school_id: string, survey: CallEndSurveyFollowUp['meta']) => (dispatch: Dispatch, getState: GetState) => {
+	const time = new Date().getTime()
+
+	const state = getState()
+
+	const event : CallEndSurveyFollowUp = {
+		event: "CALL_END_SURVEY_FOLLOWUP",
+		meta: survey,
+		time,
+		user: {
+			name: state.sync_state.numbers[state.auth.number].name,
+			number: state.auth.number
+		}
+	}
+
+	dispatch(createMerges([
+		{
+			path: ["sync_state", "matches", school_id, "history", `${time}`],
+			value: event
+		}
+	]))
 }
 
 export const rejectSchool = (school_id: string) => (dispatch: Dispatch, getState: GetState) => {

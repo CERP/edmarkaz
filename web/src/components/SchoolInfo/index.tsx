@@ -4,9 +4,11 @@ import { withRouter, RouteComponentProps } from 'react-router-dom'
 
 import moment from 'moment'
 import Former from '~/src/utils/former'
-import { getSchoolProfiles, reserveMaskedNumber, releaseMaskedNumber, rejectSchool, saveCallEndSurvey, saveSchoolRejectedSurvey, saveSchoolCompletedSurvey } from '~/src/actions'
+import { getSchoolProfiles, reserveMaskedNumber, releaseMaskedNumber, rejectSchool, saveCallEndSurvey, saveSchoolRejectedSurvey, saveSchoolCompletedSurvey, saveCallEndSurveyFollowUp } from '~/src/actions'
 import Modal from '~/src/components/Modal'
+import getUserType from '~/src/utils/getUserType'
 
+import CallEndSurveyFollowUpComponent from '~/src/components/Surveys/CallEndSurveyFollowUp'
 import CallEndSurveyComponent from '~/src/components/Surveys/CallEndSurvey'
 import MarkCompleteSurveyComponent from '~/src/components/Surveys/MarkCompleteSurvey'
 import NotInterestedSurveyComponent from '~/src/components/Surveys/NotInterested'
@@ -22,6 +24,7 @@ interface StateProps {
 	connected: boolean
 	school?: CERPSchool
 	schoolMatch?: SchoolMatch
+	username: string
 }
 
 // survey is basically going to be an event
@@ -43,6 +46,7 @@ interface DispatchProps {
 	saveCallEndSurvey: (survey: CallEndSurvey['meta']) => void
 	saveSchoolRejectedSurvey: (survey: NotInterestedSurvey['meta']) => void
 	saveSchoolCompletedSurvey: (survey: MarkCompleteSurvey['meta']) => void
+	saveCallEndFollowupSurvey: (survey: CallEndSurveyFollowUp['meta']) => void
 }
 
 type propTypes = OwnProps & StateProps & DispatchProps & RouteComponentProps
@@ -143,12 +147,21 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 		})
 	}
 
-	saveSurvey = (survey : CallEndSurvey['meta'] | NotInterestedSurvey['meta'] | MarkCompleteSurvey['meta']) => {
+	saveSurvey = (survey : CallEndSurvey['meta'] | NotInterestedSurvey['meta'] | MarkCompleteSurvey['meta'] | CallEndSurveyFollowUp['meta']) => {
 
 		console.log("saving survey", this.state)
 
-		if(this.state.showSurvey === "CALL_END") {
+		const call_end_surveys : CallEndSurvey[] = Object.values(this.props.schoolMatch.history || {})
+			.filter(x => x.event === "CALL_END_SURVEY") as CallEndSurvey[]
+		
+		const call_number = call_end_surveys.length;
+
+		if(this.state.showSurvey === "CALL_END" && call_number == 0) {
 			this.props.saveCallEndSurvey(survey as CallEndSurvey['meta'])
+		}
+
+		if(this.state.showSurvey === "CALL_END" && call_number > 0) {
+			this.props.saveCallEndFollowupSurvey(survey as CallEndSurveyFollowUp['meta'])
 		}
 
 		if(this.state.showSurvey === "NOT_INTERESTED") {
@@ -204,8 +217,14 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 				}
 
 				{
-					this.state.showSurvey === "CALL_END" && <Modal>
+					this.state.showSurvey === "CALL_END" && call_number === 0 && <Modal>
 						<CallEndSurveyComponent saveSurvey={this.saveSurvey} call_number={call_number} />
+					</Modal>
+				}
+
+				{
+					this.state.showSurvey === "CALL_END" && call_number > 0 && <Modal>
+						<CallEndSurveyFollowUpComponent saveSurvey={this.saveSurvey} call_number={call_number} user_type={getUserType(this.props.username)}/>
 					</Modal>
 				}
 
@@ -481,7 +500,8 @@ const SurveyRow : React.StatelessComponent<SurveyRowProp> = ({ label, val }) => 
 export default connect<StateProps, DispatchProps, OwnProps>((state : RootBankState, props: OwnProps) => ({
 	school: state.new_school_db[props.school_id],
 	schoolMatch: state.sync_state.matches[props.school_id],
-	connected: state.connected
+	connected: state.connected,
+	username: state.auth.id
 }), (dispatch : Function, props: OwnProps ) => ({
 	addSchool: () => dispatch(getSchoolProfiles([props.school_id])),
 	reserveNumber: () => dispatch(reserveMaskedNumber(props.school_id)),
@@ -489,5 +509,6 @@ export default connect<StateProps, DispatchProps, OwnProps>((state : RootBankSta
 	rejectSchool: () => dispatch(rejectSchool(props.school_id)),
 	saveCallEndSurvey: (survey: CallEndSurvey['meta']) => dispatch(saveCallEndSurvey(props.school_id, survey)),
 	saveSchoolRejectedSurvey: (survey: NotInterestedSurvey['meta']) => dispatch(saveSchoolRejectedSurvey(props.school_id, survey)),
-	saveSchoolCompletedSurvey: (survey: MarkCompleteSurvey['meta']) => dispatch(saveSchoolCompletedSurvey(props.school_id, survey))
+	saveSchoolCompletedSurvey: (survey: MarkCompleteSurvey['meta']) => dispatch(saveSchoolCompletedSurvey(props.school_id, survey)),
+	saveCallEndFollowupSurvey: (survey: CallEndSurveyFollowUp['meta']) => dispatch(saveCallEndSurveyFollowUp(props.school_id, survey))
 }))(withRouter(SchoolInfo))

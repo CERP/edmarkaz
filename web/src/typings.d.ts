@@ -16,7 +16,7 @@ interface SchoolMatch {
 	status: "NEW" | "IN_PROGRESS" | "REJECTED" | "DONE",
 	masked_number?: string,
 	history: {
-		[timestamp: number]: SupplierInteractionEvent | CallEndEvent | CallEndSurvey
+		[timestamp: number]: SupplierInteractionEvent | CallEndEvent | CallEndSurvey | CallEndSurveyFollowUp
 	}
 }
 
@@ -43,11 +43,8 @@ interface CallEndSurvey extends PlatformInteractionEvent {
 	meta: {
 		customer_interest: "YES" | "NO" | "UNSURE" | ""
 		reason_rejected: "PRODUCT_TOO_EXPENSIVE" | 
-			"PRODUCT_NOT_RELEVANT" | 
-			"USING_SIMILAR_PRODUCT" |
-			"DONT_LIKE_PRODUCT" |
-			"PREFER_COMPETITOR" |
-			"NEED_MORE_TIME" | "OTHER" | "",
+			"PRODUCT_NOT_RELEVANT" | "USING_SIMILAR_PRODUCT" | "DONT_LIKE_PRODUCT" |
+			"PREFER_COMPETITOR" | "NEED_MORE_TIME" | "OTHER" | "",
 		other_reason_rejected: string
 		customer_likelihood: "HIGH" | "MEDIUM" | "LOW" | ""
 		follow_up_meeting: "YES" | "NO" | "N/A" | ""
@@ -56,6 +53,38 @@ interface CallEndSurvey extends PlatformInteractionEvent {
 		other_notes: string,
 		call_number: number,
 		answer_phone: "NO" | "PHONE_OFF" | "NUMBER_INVALID" | "WRONG_NUMBER" | "YES" | ""
+	}
+}
+
+type USER_TYPE = "ESS" | "FINANCE" | "UNKNOWN"
+
+interface CallEndSurveyFollowUp extends PlatformInteractionEvent {
+	event: "CALL_END_SURVEY_FOLLOWUP"
+	meta: {
+		follow_up_meeting_ocurred: "YES_BY_CALL" | "YES_BY_MEETING" | "NO" | ""
+		follow_up_meeting_no_reason: "SCHOOL_NOT_RESPOND" | "OTHER" | ""
+		follow_up_meeting_no_other: string
+		call_in_person_meeting_scheduled: "YES" | "NO" | ""
+		call_in_person_meeting_no_reason: "SCHOOL_NO_LONGER_INTERESTED" | "ANOTHER_CALL_SCHEDULED" | "OTHER" | ""
+		call_in_person_meeting_no_call_scheduled_time?: number
+		call_in_person_meeting_no_other: string
+		call_in_person_meeting_yes_time?: number
+		call_not_interested_reason_ess: "ALREADY_USING_SIMILAR" | "NO_NEED_FOR_PRODUCT" | "DONT_LIKE_PRODUCT" | 
+			"PREFER_COMPETITOR" | "PRODUCT_TOO_EXPENSIVE" | "NEED_MORE_TIME" | "OTHER" | ""
+		call_not_interested_reason_finance: "OUTSTANDING_LOAN" | "NO_LONGER_NEED_LOAN" | "PREFER_COMPETITOR" | 
+			"INTEREST_TOO_HIGH" | "NEED_MORE_TIME" | "OTHER" | ""
+		call_not_interested_reason_other: string
+		call_not_interested_needs_time_followup: "PHONE_CALL" | "VISIT" | "NO" | ""
+		call_not_interested_follow_up_time?: number
+		meeting_ess_purpose: "GIVE_PRODUCT_DEMO" | "CONDUCT_TRANSACTION" | ""
+		meeting_ess_demo_followup: "PHONE_CALL" | "MEETING" | "NO" | ""
+		meeting_ess_followup_date?: number
+		meeting_ess_transaction_sold: "YES" | "NO" | ""
+		meeting_finance_transaction_loan: "YES" | "NO" | ""
+		meeting_ess_transaction_fail_reason: "ALREADY_USING_SIMILAR" | "NO_NEED_FOR_PRODUCT" | "DONT_LIKE_PRODUCT" | "PREFER_COMPETITOR" | "PRODUCT_TOO_EXPENSIVE" | "OTHER" | ""
+		meeting_finance_transaction_fail_reason: "OUTSTANDING_LOAN" | "NO_LONGER_NEED_LOAN" | "PREFER_COMPETITOR" | "INTEREST_TOO_HIGH" | "OTHER" | ""
+		meeting_transaction_fail_reason_other: string
+		call_number: number
 	}
 }
 
@@ -106,12 +135,13 @@ interface RootBankState {
 		}
 	},
 	auth: {
-		id: string,
-		token: string,
-		username: string,
-		attempt_failed: boolean,
-		loading: boolean,
-		client_type: "bank_portal",
+		id: string
+		token: string
+		username: string
+		attempt_failed: boolean
+		loading: boolean
+		client_type: "bank_portal"
+		user_type: "ESS" | "FINANCE"
 		number: string
 	},
 	client_id: string,
