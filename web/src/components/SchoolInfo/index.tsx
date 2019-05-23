@@ -60,7 +60,7 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 		}
 
 		this.state = {
-			showSurvey: "CALL_END",
+			showSurvey: false,
 			loading: false
 		}
 
