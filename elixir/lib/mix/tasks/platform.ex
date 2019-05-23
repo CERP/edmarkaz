@@ -51,11 +51,11 @@ defmodule Mix.Tasks.Platform do
 
 	end
 
-	def run(["add_matches", id, offset, limit]) do
-		Application.ensure_all_started(:EdMarkaz)
-		csv = case File.exists?(Application.app_dir(:EdMarkaz, "priv/#{id}.csv")) do
-			true -> File.stream!(Application.app_dir(:EdMarkaz, "priv/#{id}.csv")) |> CSV.decode!
-			false -> File.stream!("priv/#{id}.csv") |> CSV.decode!
+	def run(["add_matches", id, offset, limit, fname]) do
+		Application.ensure_all_started(:edmarkaz)
+		csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) do
+			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) |> CSV.decode!
+			false -> File.stream!("priv/#{fname}.csv") |> CSV.decode!
 		end
 
 		[_ | refcodes] = csv
@@ -77,8 +77,14 @@ defmodule Mix.Tasks.Platform do
 			Map.put(agg, Enum.join(path, ","), write)
 		end)
 
-		start_supplier(id)
-		EdMarkaz.Supplier.sync_changes(id, "backend-task", changes, :os.system_time(:millisecond))
+		IO.inspect changes
+		IO.inspect start_supplier(id)
+		IO.inspect EdMarkaz.Supplier.sync_changes(id, "backend-task", changes, :os.system_time(:millisecond))
+
+	end
+
+	def run(["add_matches", id, offset, limit]) do
+		run(["add_matches", id, offset, limit, id])
 	end
 
 	def run(["add_matches", id]) do
@@ -86,7 +92,7 @@ defmodule Mix.Tasks.Platform do
 	end
 
 	def run(args) do
-		Application.ensure_all_started(:EdMarkaz)
+		Application.ensure_all_started(:edmarkaz)
 		case Postgrex.query(EdMarkaz.School.DB, "SELECT id, sync_state from suppliers", []) do
 			{:ok, res} ->
 				res.rows
@@ -127,8 +133,8 @@ defmodule Mix.Tasks.Platform do
 
 	defp add_matches("mischool2", sync_state) do
 
-		csv = case File.exists?(Application.app_dir(:EdMarkaz, "priv/mischool.csv")) do
-			true -> File.stream!(Application.app_dir(:EdMarkaz, "priv/mischool.csv")) |> CSV.decode!
+		csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/mischool.csv")) do
+			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/mischool.csv")) |> CSV.decode!
 			false -> File.stream!("priv/mischool.csv") |> CSV.decode!
 		end
 

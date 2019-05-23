@@ -17,8 +17,8 @@ defmodule EdMarkaz.Store.Supplier do
 	end
 
 	def save(id, sync_state, writes) do
-		GenServer.cast(:supplier_db, {:save, id, sync_state})
-		GenServer.cast(:supplier_db, {:save_writes, id, writes})
+		GenServer.call(:supplier_db, {:save, id, sync_state})
+		GenServer.call(:supplier_db, {:save_writes, id, writes})
 	end
 
 	def load(id) do
@@ -90,12 +90,12 @@ defmodule EdMarkaz.Store.Supplier do
 		end
 	end
 
-	def handle_cast({:save, id, db}, state) when db == %{} do
+	def handle_call({:save, id, db}, _from, state) when db == %{} do
 		# ignore empty db save
 		{:noreply, state}
 	end
 
-	def handle_cast({:save, id, sync_state}, state) do
+	def handle_call({:save, id, sync_state}, _from, state) do
 
 		case Postgrex.query(
 			EdMarkaz.School.DB,
@@ -109,7 +109,7 @@ defmodule EdMarkaz.Store.Supplier do
 		end
 	end
 
-	def handle_cast({:save_writes, id, writes}, state) do
+	def handle_call({:save_writes, id, writes}, _from, state) do
 
 		gen_value_strings = Stream.with_index(Map.values(writes), 1)
 			|> Enum.map(fn {w, i} -> 

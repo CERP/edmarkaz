@@ -20,7 +20,7 @@ defmodule EdMarkaz.Supplier do
 	# API 
 
 	def sync_changes(id, client_id, changes, last_sync_date) do
-		GenServer.call(via(id), {:sync_changes, client_id, changes, last_sync_date})
+		GenServer.call(via(id), {:sync_changes, client_id, changes, last_sync_date}, :infinity)
 	end
 
 	def get_sync_state(id) do
