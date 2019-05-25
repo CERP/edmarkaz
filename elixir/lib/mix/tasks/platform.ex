@@ -51,7 +51,7 @@ defmodule Mix.Tasks.Platform do
 
 	end
 
-	def run(["add_matches", id, offset, limit, fname]) do
+	def run(["add_matches", id, fname, offset, limit]) do
 		Application.ensure_all_started(:edmarkaz)
 		csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) do
 			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) |> CSV.decode!
@@ -83,12 +83,12 @@ defmodule Mix.Tasks.Platform do
 
 	end
 
-	def run(["add_matches", id, offset, limit]) do
-		run(["add_matches", id, offset, limit, id])
+	def run(["add_matches", id, fname]) do
+		run(["add_matches", id, fname, "0", "1000"])
 	end
 
 	def run(["add_matches", id]) do
-		run(["add_matches", id, 0, 1000]) # 1000 is the max!
+		run(["add_matches", id, id, "0", "1000"]) # 1000 is the max!
 	end
 
 	def run(args) do
