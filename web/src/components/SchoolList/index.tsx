@@ -4,6 +4,8 @@ import Former from '~/src/utils/former'
 
 import './style.css'
 
+import callAnswered from '../../utils/call_answered'
+
 type propTypes = {
 	title: string
 	status: SchoolMatch['status']
@@ -17,7 +19,8 @@ interface stateType {
 	loading: boolean,
 	filters: {
 		name: string,
-		tehsil: string
+		tehsil: string,
+		contact_history: "" | "NEVER" | "ONCE" | "TWICE" | "MULTIPLE"
 	}
 }
 
@@ -39,7 +42,8 @@ export default class SchooList extends React.Component<propTypes, stateType> {
 			loading: blank.length > 0,
 			filters: {
 				name: "",
-				tehsil: ""
+				tehsil: "",
+				contact_history: ""
 			}
 		}
 
@@ -83,6 +87,7 @@ export default class SchooList extends React.Component<propTypes, stateType> {
 				<div className="row">
 					<input type="text" {...this.former.super_handle(["name"])} placeholder="Filter School Name" />
 				</div>
+
 				<div className="row">
 					<select {...this.former.super_handle(["tehsil"])}>
 						<option value="">Select Tehsil Filter</option>
@@ -92,13 +97,57 @@ export default class SchooList extends React.Component<propTypes, stateType> {
 						}
 					</select>
 				</div>
+
+				<div className="row">
+					<select {...this.former.super_handle(["contact_history"])}>
+						<option value="">Select Contact History</option>
+						<option value="NEVER">Never Contacted</option>
+						<option value="ONCE">Contacted Once</option>
+						<option value="TWICE">Contacted Twice</option>
+						<option value="MULTIPLE">Contacted more than twice</option>
+					</select>
+				</div>
 			</div>
+
 			<div className="list">
 			{
 				Object.entries(this.props.matches)
 					.filter(([id, v]) => v.status === this.props.status && this.props.school_db[id] !== undefined)
 					.filter(([id, v]) => (school_db[id].school_name || "").toLowerCase().includes(this.state.filters.name))
 					.filter(([id, v]) => this.state.filters.tehsil === "" || (school_db[id].school_tehsil || "") === this.state.filters.tehsil)
+					.filter(([id, v]) => {
+
+						if(this.state.filters.contact_history === "") {
+							return true;
+						}
+
+						if(this.props.matches[id].history === undefined) {
+							if(this.state.filters.contact_history === "NEVER") {
+								return true;
+							}
+							return false;
+						}
+
+						const calls = Object.values(this.props.matches[id].history)
+							.filter(x => x.event === "CALL_END" && callAnswered(x))
+							.length
+
+						if(this.state.filters.contact_history === "NEVER") {
+							return calls === 0
+						}
+
+						if(this.state.filters.contact_history === "ONCE") {
+							return calls === 1
+						}
+
+						if(this.state.filters.contact_history === "TWICE") {
+							return calls === 2
+						}
+
+						if(this.state.filters.contact_history === "MULTIPLE") {
+							return calls > 2
+						}
+					})
 					.sort(([a,] , [b,]) => (school_db[a].school_name || "").localeCompare(school_db[b].school_name))
 					.map(([sid, v]) => {
 						const school = school_db[sid];
