@@ -38,6 +38,18 @@ export default class Survey extends React.Component<P, CallEndSurvey['meta']> {
 			<div className="form" style={{ width: "90%" }}>
 
 				<div className="row">
+					<label>Did the customer pick up the phone?</label>
+					<select {...this.former.super_handle(["answer_phone"])}>
+						<option value="">Please select an answer</option>
+						<option value="YES">Yes</option>
+						<option value="PHONE_OFF">No, Their phone was off</option>
+						<option value="NUMBER_INVALID">No, The number was invalid</option>
+						<option value="WRONG_NUMBER">No, It was the wrong number</option>
+						<option value="NO">No, other reason</option>
+					</select>
+				</div>
+
+				<div className="row">
 					<label>Is the customer interested in using your product?</label>
 					<select {...this.former.super_handle(["customer_interest"])}>
 						<option value="">Please Select an Answer</option>
