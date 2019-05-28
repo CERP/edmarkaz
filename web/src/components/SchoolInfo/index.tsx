@@ -423,7 +423,7 @@ const SchoolHistory : React.SFC<SchoolMatchProps> = (props : SchoolMatchProps) =
 }
 
 const isValid = (field : string) => {
-	return !(field.trim() === "" || field === "999")
+	return field && !(field.trim() === "" || field === "999")
 }
 
 const map_facilities = (facilities : string) => {
