@@ -426,7 +426,7 @@ const isValid = (field : string) => {
 	return field && !(field.trim() === "" || field === "999")
 }
 
-const map_facilities = (facilities : string) => {
+const map_facilities = (facilities : string = "") => {
 
 	const map = [
 		"Boundary Wall",
@@ -443,7 +443,7 @@ const map_facilities = (facilities : string) => {
 	return facilities.split(' ').map(x => map[parseInt(x)]).join(", ")
 }
 
-const map_ess_products = (products : string) => {
+const map_ess_products = (products : string = "") => {
 	const map = [
 		"Teacher & Management Training",
 		"Learning & Teaching Materials",
@@ -458,7 +458,7 @@ const map_ess_products = (products : string) => {
 	return products.split(' ').map(x => map[parseInt(x)]).join(", ")
 }
 
-const map_textbook_providers = (textbooks : string) => {
+const map_textbook_providers = (textbooks : string = "") => {
 	const map = [
 		"Oxford",
 		"Aafaq",
