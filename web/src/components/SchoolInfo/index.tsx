@@ -287,6 +287,7 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 
 				<div className="divider">School Profile</div>
 				<div className="section">
+					<SurveyRow label="RefCode" val={school.refcode} />
 					<SurveyRow label="Address" val={school.school_address} />
 					<SurveyRow label="Tehsil" val={school.school_tehsil} />
 					<SurveyRow label="District" val={school.school_district} />
