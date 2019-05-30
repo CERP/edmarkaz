@@ -1,8 +1,19 @@
 .school-list .filters {
-	width: 90%;
+	width: calc(90% - 16px);
 	display: flex;
 	flex-direction: column;
 
+	margin-top: 15px;
+	border: 1px solid #aaa;
+	border-radius: 4px;
+	padding: 8px;
+	background-color: rgba(0, 0, 0, 0.03);
+
+}
+
+.school-list .filter.button {
+	margin-right: 5%;
+	align-self: flex-end;
 }
 
 .school-list .filters .row {
@@ -11,11 +22,19 @@
 }
 
 	.school-list .filters .row input {
-		width: 100%;
+		flex-grow: 1;
+		flex-shrink: 1;
 		border: 1px solid #777;
+	}
+
+	.school-list .filters .row label {
+		flex-grow: 2;
+		width: 100%;
+		color: var(--green);
 	}
 
 	.school-list .filters .row select {
 		margin-left: auto;
 		border: 1px solid #777;
+		background-color: white;
 	}

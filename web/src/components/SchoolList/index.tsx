@@ -1,6 +1,7 @@
 import React from 'react'
 import { RouteComponentProps} from 'react-router-dom'
 import Former from '~/src/utils/former'
+import EstimateMonthlyRevenue from '~/src/utils/estimate_revenue'
 
 import './style.css'
 
@@ -16,11 +17,16 @@ type propTypes = {
 } & RouteComponentProps
 
 interface stateType {
-	loading: boolean,
+	loading: boolean
 	filters: {
-		name: string,
-		tehsil: string,
+		active: boolean
+		name: string
+		tehsil: string
 		contact_history: "" | "NEVER" | "ONCE" | "TWICE" | "MULTIPLE"
+		min_year_established: string
+		max_year_established: string
+		min_revenue: string
+		max_revenue: string
 	}
 }
 
@@ -41,9 +47,14 @@ export default class SchooList extends React.Component<propTypes, stateType> {
 		this.state = {
 			loading: blank.length > 0,
 			filters: {
+				active: false,
 				name: "",
 				tehsil: "",
-				contact_history: ""
+				contact_history: "",
+				min_year_established: "",
+				max_year_established: `${new Date().getFullYear()}`,
+				min_revenue: "",
+				max_revenue: ""
 			}
 		}
 
@@ -71,9 +82,10 @@ export default class SchooList extends React.Component<propTypes, stateType> {
 
 		const { school_db, matches } = this.props;
 
-		const tehsils = Object.keys(matches)
-			.filter(k => school_db[k] && school_db[k].school_tehsil)
-			.map(k => school_db[k].school_tehsil)
+
+		const tehsils = Object.entries(matches)
+			.filter(([k, v]) => school_db[k] && school_db[k].school_tehsil && v.status === this.props.status)
+			.map(([k, v]) => school_db[k].school_tehsil)
 		
 		const unique_tehsils = new Set(tehsils)
 
@@ -83,31 +95,57 @@ export default class SchooList extends React.Component<propTypes, stateType> {
 
 			{ this.state.loading && <div className="loading">Loading School Info....</div>}
 
-			<div className="filters">
-				<div className="row">
-					<input type="text" {...this.former.super_handle(["name"])} placeholder="Filter School Name" />
-				</div>
+			<div className="button blue filter" onClick={() => this.setState({filters: { ...this.state.filters, active: !this.state.filters.active}})}>{this.state.filters.active ? "Hide Filters" : "Show Filters"}</div>
 
-				<div className="row">
-					<select {...this.former.super_handle(["tehsil"])}>
-						<option value="">Select Tehsil Filter</option>
-						{
-							Array.from(unique_tehsils)
-								.map(x => <option key={x} value={x}>{x}</option>)
-						}
-					</select>
-				</div>
+			{ this.state.filters.active && 
+				<div className="filters">
+					<div className="row">
+						<input type="text" {...this.former.super_handle(["name"])} placeholder="Filter School Name" />
+					</div>
 
-				<div className="row">
-					<select {...this.former.super_handle(["contact_history"])}>
-						<option value="">Select Contact History</option>
-						<option value="NEVER">Never Contacted</option>
-						<option value="ONCE">Contacted Once</option>
-						<option value="TWICE">Contacted Twice</option>
-						<option value="MULTIPLE">Contacted more than twice</option>
-					</select>
+					<div className="row">
+						<label>Tehsil</label>
+						<select {...this.former.super_handle(["tehsil"])}>
+							<option value="">Select Tehsil Filter</option>
+							{
+								Array.from(unique_tehsils)
+									.map(x => <option key={x} value={x}>{x}</option>)
+							}
+						</select>
+					</div>
+
+					<div className="row">
+						<label>Contact History</label>
+						<select {...this.former.super_handle(["contact_history"])}>
+							<option value="">Select Contact History</option>
+							<option value="NEVER">Never Contacted</option>
+							<option value="ONCE">Contacted Once</option>
+							<option value="TWICE">Contacted Twice</option>
+							<option value="MULTIPLE">Contacted more than twice</option>
+						</select>
+					</div>
+
+					<div className="row">
+						<label>Minimum Year Established</label>
+						<input type="number" {...this.former.super_handle(["min_year_established"])} placeholder="Minimum Year Established"/>
+					</div>
+
+					<div className="row">
+						<label>Maximum Year Established</label>
+						<input type="number" {...this.former.super_handle(["max_year_established"])} placeholder="Maximum Year Established"/>
+					</div>
+
+					<div className="row">
+						<label>Minimum Revenue</label>
+						<input type="number" {...this.former.super_handle(["min_revenue"])} placeholder="Minimum Revenue"/>
+					</div>
+
+					<div className="row">
+						<label>Maximum Revenue</label>
+						<input type="number" {...this.former.super_handle(["max_revenue"])} placeholder="Maximum Revenue"/>
+					</div>
 				</div>
-			</div>
+			}
 
 			<div className="list">
 			{
@@ -147,6 +185,36 @@ export default class SchooList extends React.Component<propTypes, stateType> {
 						if(this.state.filters.contact_history === "MULTIPLE") {
 							return calls > 2
 						}
+					})
+					.filter(([id, v]) => {
+
+						const school = school_db[id]
+						const min_year = parseInt(this.state.filters.min_year_established)
+						const max_year = parseInt(this.state.filters.max_year_established)
+
+						if(school.year_established == undefined) {
+							return this.state.filters.min_year_established === ""
+						}
+
+						const year = parseInt(school.year_established)
+
+						return (isNaN(min_year) || year >= min_year) && (isNaN(max_year) || year <= max_year)
+
+					})
+					.filter(([id, v]) => {
+
+						const school = school_db[id]
+						const min_revenue = parseInt(this.state.filters.min_revenue)
+						const max_revenue = parseInt(this.state.filters.max_revenue)
+						
+						const estimated_revenue = EstimateMonthlyRevenue(school)
+
+						if(estimated_revenue == undefined) {
+							return this.state.filters.min_revenue === ""
+						}
+
+						return (isNaN(min_revenue) || estimated_revenue >= min_revenue) && (isNaN(max_revenue) || estimated_revenue <= max_revenue)
+
 					})
 					.sort(([a,] , [b,]) => (school_db[a].school_name || "").localeCompare(school_db[b].school_name))
 					.map(([sid, v]) => {

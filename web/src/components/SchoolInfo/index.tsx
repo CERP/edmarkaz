@@ -7,6 +7,7 @@ import Former from '~/src/utils/former'
 import { getSchoolProfiles, reserveMaskedNumber, releaseMaskedNumber, rejectSchool, saveCallEndSurvey, saveSchoolRejectedSurvey, saveSchoolCompletedSurvey, saveCallEndSurveyFollowUp } from '~/src/actions'
 import Modal from '~/src/components/Modal'
 import getUserType from '~/src/utils/getUserType'
+import EstimateMonthlyRevenue from '~/src/utils/estimate_revenue'
 
 import CallEndSurveyFollowUpComponent from '~/src/components/Surveys/CallEndSurveyFollowUp'
 import CallEndSurveyComponent from '~/src/components/Surveys/CallEndSurvey'
@@ -191,9 +192,8 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 		const hasHistory = schoolMatch.history && Object.keys(schoolMatch.history).length > 0;
 
 		let estimated_monthly_revenue = ""
-
 		if(isValid(school.lowest_fee) && isValid(school.highest_fee) && isValid(school.total_enrolment)) {
-			estimated_monthly_revenue = ((parseInt(school.lowest_fee) + parseInt(school.highest_fee))/2 * parseInt(school.total_enrolment)).toLocaleString() + " Rs"
+			estimated_monthly_revenue = EstimateMonthlyRevenue(school).toLocaleString() + " Rs"
 		}
 
 		const call_end_surveys : CallEndSurvey[] = Object.values(schoolMatch.history || {})
