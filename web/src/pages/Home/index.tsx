@@ -191,7 +191,7 @@ class Home extends React.Component<propTypes, stateType> {
 
 			{
 				this.state.showSurvey && this.state.current_school_survey_num == 0 && <Modal>
-					<CallEndSurveyComponent saveSurvey={this.saveSurvey} call_number={this.state.current_school_survey_num}/>
+					<CallEndSurveyComponent saveSurvey={this.saveSurvey} call_number={this.state.current_school_survey_num} user_type={getUserType(this.props.username)}/>
 				</Modal>
 			}
 

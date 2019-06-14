@@ -5,6 +5,7 @@ import moment = require('moment');
 interface P {
 	saveSurvey: (survey: CallEndSurvey['meta']) => void
 	call_number: number
+	user_type: USER_TYPE
 }
 
 export default class Survey extends React.Component<P, CallEndSurvey['meta']> {
@@ -17,6 +18,7 @@ export default class Survey extends React.Component<P, CallEndSurvey['meta']> {
 		this.state = {
 			customer_interest: "",
 			reason_rejected: "",
+			reason_rejected_finance: "",
 			other_reason_rejected: "",
 			customer_likelihood: "",
 			follow_up_meeting: "",
@@ -59,7 +61,7 @@ export default class Survey extends React.Component<P, CallEndSurvey['meta']> {
 					</select>
 				</div>
 
-				{ this.state.customer_interest === "NO" && <div className="row">
+				{ this.props.user_type != "FINANCE" && this.state.customer_interest === "NO" && <div className="row">
 					<label>Why is the customer not interested in your product?</label>
 					<select {...this.former.super_handle(["reason_rejected"])}>
 						<option value="">Select </option>
@@ -72,6 +74,26 @@ export default class Survey extends React.Component<P, CallEndSurvey['meta']> {
 						<option value="OTHER">Other Reason</option>
 					</select>
 				</div>
+				}
+
+				{
+					this.props.user_type === "FINANCE" && this.state.customer_interest === "NO" && <div className="row">
+						<label>Why is the customer not interested in your product?</label>
+						<select {...this.former.super_handle(["reason_rejected_finance"])}>
+							<option value="">Please select answer</option>
+							<option value="DONT_NEED_THIS_TYPE">Don't need this type of financing</option>
+							<option value="NOTHING_TO_INVEST_IN">Do not have anything I would like to invest in</option>
+							<option value="AGAINST_RELIGION">Against religious beliefs</option>
+							<option value="DONT_WANT_INTEREST">Don't want to pay interest</option>
+							<option value="INTEREST_TOO_HIGH">Interest rate is too high</option>
+							<option value="DONT_WANT_TO_PAY_SERVICE">Don't want to pay service charge</option>
+							<option value="DONT_WANT_TO_REPAY_PRINCIPAL">Don't want to repay principal amount</option>
+							<option value="TOO_RISKY">Too risky</option>
+							<option value="OUTSTANDING_LOAN">Already have an outstanding loan from a bank</option>
+							<option value="SCHOOL_CLOSING">School is closing</option>
+							<option value="OTHER">Other reason</option>
+						</select>
+					</div>
 				}
 
 				{ this.state.reason_rejected == "OTHER" && <div className="row">

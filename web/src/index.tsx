@@ -10,7 +10,7 @@ import { loadDB, saveDB } from './utils/localStorage'
 import Syncr from './syncr'
 import reducer from './reducers'
 
-const debug_url = "wss://296ca2d0.ngrok.io/ws"
+const debug_url = "wss://eb8a8e01.ngrok.io/ws"
 
 // @ts-ignore
 const host = window.api_url || debug_url;

@@ -372,11 +372,16 @@ const CallSurvey : React.SFC<{former: Former, user_type: USER_TYPE, state: CallE
 				<label>Why is the school no longer interested?</label>
 				<select {...former.super_handle(["call_not_interested_reason_finance"])}>
 					<option value="">Please select answer</option>
-					<option value="OUTSTANDING_LOAN">Already has an outstanding loan</option>
-					<option value="NO_LONGER_NEED_LOAN">Does not have a need for a loan anymore</option>
-					<option value="PREFER_COMPETITOR">Prefer a competitors loan product</option>
-					<option value="INTEREST_TOO_HIGH">Interest rate/service charge is too high</option>
-					<option value="NEED_MORE_TIME">Needs more time to think about it</option>
+					<option value="DONT_NEED_THIS_TYPE">Don't need this type of financing</option>
+					<option value="NOTHING_TO_INVEST_IN">Do not have anything I would like to invest in</option>
+					<option value="AGAINST_RELIGION">Against religious beliefs</option>
+					<option value="DONT_WANT_INTEREST">Don't want to pay interest</option>
+					<option value="INTEREST_TOO_HIGH">Interest rate is too high</option>
+					<option value="DONT_WANT_TO_PAY_SERVICE">Don't want to pay service charge</option>
+					<option value="DONT_WANT_TO_REPAY_PRINCIPAL">Don't want to repay principal amount</option>
+					<option value="TOO_RISKY">Too risky</option>
+					<option value="OUTSTANDING_LOAN">Already have an outstanding loan from a bank</option>
+					<option value="SCHOOL_CLOSING">School is closing</option>
 					<option value="OTHER">Other reason</option>
 				</select>
 			</div>

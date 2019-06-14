@@ -39,19 +39,22 @@ interface CallEndEvent extends PlatformInteractionEvent {
 }
 
 interface CallEndSurvey extends PlatformInteractionEvent {
-	event: "CALL_END_SURVEY",
+	event: "CALL_END_SURVEY"
 	meta: {
 		customer_interest: "YES" | "NO" | "UNSURE" | ""
 		reason_rejected: "PRODUCT_TOO_EXPENSIVE" | 
 			"PRODUCT_NOT_RELEVANT" | "USING_SIMILAR_PRODUCT" | "DONT_LIKE_PRODUCT" |
-			"PREFER_COMPETITOR" | "NEED_MORE_TIME" | "OTHER" | "",
+			"PREFER_COMPETITOR" | "NEED_MORE_TIME" | "OTHER" | ""
+		reason_rejected_finance: "DONT_NEED_THIS_TYPE" | "NOTHING_TO_INVEST_IN" | "AGAINST_RELIGION" | 
+			"DONT_WANT_INTEREST" | "INTEREST_TOO_HIGH" | "DONT_WANT_TO_PAY_SERVICE" | "DONT_WANT_TO_REPAY_PRINCIPAL" | 
+			"TOO_RISKY" | "OUTSTANDING_LOAN" | "SCHOOL_CLOSING" | "OTHER" | ""
 		other_reason_rejected: string
 		customer_likelihood: "HIGH" | "MEDIUM" | "LOW" | ""
 		follow_up_meeting: "YES" | "NO" | "N/A" | ""
 		follow_up_meeting_medium: "MEETING" | "PHONE_CALL" | ""
 		follow_up_meeting_time?: number
-		other_notes: string,
-		call_number: number,
+		other_notes: string
+		call_number: number
 		answer_phone: "NO" | "PHONE_OFF" | "NUMBER_INVALID" | "WRONG_NUMBER" | "YES" | ""
 	}
 }
@@ -71,8 +74,9 @@ interface CallEndSurveyFollowUp extends PlatformInteractionEvent {
 		call_in_person_meeting_yes_time?: number
 		call_not_interested_reason_ess: "ALREADY_USING_SIMILAR" | "NO_NEED_FOR_PRODUCT" | "DONT_LIKE_PRODUCT" | 
 			"PREFER_COMPETITOR" | "PRODUCT_TOO_EXPENSIVE" | "NEED_MORE_TIME" | "OTHER" | ""
-		call_not_interested_reason_finance: "OUTSTANDING_LOAN" | "NO_LONGER_NEED_LOAN" | "PREFER_COMPETITOR" | 
-			"INTEREST_TOO_HIGH" | "NEED_MORE_TIME" | "OTHER" | ""
+		call_not_interested_reason_finance: "DONT_NEED_THIS_TYPE" | "NOTHING_TO_INVEST_IN" | "AGAINST_RELIGION" | 
+			"DONT_WANT_INTEREST" | "INTEREST_TOO_HIGH" | "DONT_WANT_TO_PAY_SERVICE" | "DONT_WANT_TO_REPAY_PRINCIPAL" | 
+			"TOO_RISKY" | "OUTSTANDING_LOAN" | "SCHOOL_CLOSING" | "OTHER" | ""
 		call_not_interested_reason_other: string
 		call_not_interested_needs_time_followup: "PHONE_CALL" | "VISIT" | "NO" | ""
 		call_not_interested_follow_up_time?: number

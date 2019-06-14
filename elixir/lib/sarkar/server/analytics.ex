@@ -84,7 +84,8 @@ defmodule EdMarkaz.Server.Analytics do
 			value->'meta'->>'other_reason_rejected' as other_reason_rejected,
 			value->'meta'->>'customer_likelihood' as customer_likelihood,
 			value->'meta'->>'follow_up_meeting' as follow_up_meeting,
-			value->'meta'->>'other_notes' as other_notes
+			value->'meta'->>'other_notes' as other_notes,
+			value->'meta'->>'reason_rejected_finance' as reason_rejected_finance
 		FROM platform_writes
 		WHERE path[4] = 'history' AND value->>'event' = 'CALL_END_SURVEY'
 		ORDER BY date desc
@@ -110,7 +111,8 @@ defmodule EdMarkaz.Server.Analytics do
 			"other_reason_rejected",
 			"customer_likelihood",
 			"follow_up_meeting",
-			"other_notes"] | formatted]
+			"other_notes",
+			"reason_rejected_finance"] | formatted]
 		|> CSV.encode
 		|> Enum.join()
 

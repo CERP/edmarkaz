@@ -218,7 +218,7 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 
 				{
 					this.state.showSurvey === "CALL_END" && call_number === 0 && <Modal>
-						<CallEndSurveyComponent saveSurvey={this.saveSurvey} call_number={call_number} />
+						<CallEndSurveyComponent saveSurvey={this.saveSurvey} call_number={call_number} user_type={getUserType(this.props.username)} />
 					</Modal>
 				}
 
