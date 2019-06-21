@@ -38,7 +38,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 			end)
 			|> Enum.join(" OR ")
 
-		case Postgrex.query(EdMarkaz.School.DB, "SELECT id, db FROM platform_schools WHERE #{or_str}", ids) do
+		case Postgrex.query(EdMarkaz.DB, "SELECT id, db FROM platform_schools WHERE #{or_str}", ids) do
 			{:ok, resp} ->
 				dbs = resp.rows
 				|> Enum.map(fn [id, db] -> {id, db} end)
@@ -53,7 +53,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 
 	def handle_action(%{"type" => "SAVE_SCHOOL", "payload" => %{"school_id" => school_id, "school" => school}, "last_snapshot" => last_sync_date}, %{id: id, client_id: client_id} = state) do
 
-		case Postgrex.query(EdMarkaz.School.DB, "UPDATE platform_schools set db = $1 where id=$2", [school, school_id]) do 
+		case Postgrex.query(EdMarkaz.DB, "UPDATE platform_schools set db = $1 where id=$2", [school, school_id]) do 
 			{:ok, res} -> 
 				{:reply, succeed(), %{id: id, client_id: client_id}}
 			{:error, msg} -> 
@@ -65,7 +65,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 	def handle_action(%{"type" => "FIND_SCHOOL", "payload" => %{"refcode" => refcode}}, %{id: id, client_id: client_id} = state) do
 
 		IO.puts "FIND SCHOOL"
-		case Postgrex.query(EdMarkaz.School.DB, "SELECT db FROM platform_schools WHERE id=$1", [refcode]) do
+		case Postgrex.query(EdMarkaz.DB, "SELECT db FROM platform_schools WHERE id=$1", [refcode]) do
 			{:ok, %Postgrex.Result{num_rows: 0}} -> {:error, "no school found"}
 			{:ok, res} ->
 				[[ db ]] = res.rows

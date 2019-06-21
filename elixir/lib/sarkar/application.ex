@@ -14,7 +14,7 @@ defmodule EdMarkaz.Application do
 			EdMarkaz.Store.Supplier,
 			{
 				Postgrex,
-					name: EdMarkaz.School.DB,
+					name: EdMarkaz.DB,
 					hostname: System.get_env("POSTGRES_HOST") || "localhost",
 					username: "postgres",
 					password: System.get_env("POSTGRES_PASS") || "postgres",

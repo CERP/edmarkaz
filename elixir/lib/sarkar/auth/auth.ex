@@ -1,7 +1,7 @@
 defmodule EdMarkaz.Auth do
 
 	def create({id, password}) do
-		case Postgrex.query(EdMarkaz.School.DB,
+		case Postgrex.query(EdMarkaz.DB,
 			"INSERT INTO auth (id, password) values ($1, $2)", 
 			[id, hash(password, 52)]) do
 				{:ok, res} -> 
@@ -15,7 +15,7 @@ defmodule EdMarkaz.Auth do
 	def login({id, client_id, password}) do
 		# first check if password is correct.
 		# if correct, generate a new token, put in db
-		case Postgrex.query(EdMarkaz.School.DB,
+		case Postgrex.query(EdMarkaz.DB,
 			"SELECT * from auth where id=$1 AND password=$2", 
 			[id, hash(password, 52)]) do
 				{:ok, %Postgrex.Result{num_rows: 0}} -> {:error, "invalid login"}
@@ -27,7 +27,7 @@ defmodule EdMarkaz.Auth do
 	end
 
 	def updatePassword({id, password}) do
-		case Postgrex.query(EdMarkaz.School.DB,
+		case Postgrex.query(EdMarkaz.DB,
 			"UPDATE auth SET password=$2 WHERE id=$1", 
 			[id, hash(password, 52)]) do
 				{:ok, res} -> 
@@ -39,7 +39,7 @@ defmodule EdMarkaz.Auth do
 	end
 
 	def verify({id, client_id, token}) do
-		case Postgrex.query(EdMarkaz.School.DB,
+		case Postgrex.query(EdMarkaz.DB,
 		"SELECT * FROM tokens WHERE id=$1 AND token=$2 AND client_id=$3",
 		[id, hash(token, 12), client_id]) do
 			{:ok, %Postgrex.Result{num_rows: 0}} -> {:error, "invalid token"}
@@ -55,7 +55,7 @@ defmodule EdMarkaz.Auth do
 			|> Base.url_encode64
 			|> binary_part(0, 12)
 		
-		case Postgrex.query(EdMarkaz.School.DB, "INSERT INTO tokens (id, token, client_id) values ($1, $2, $3)", [id, hash(token, 12), client_id]) do
+		case Postgrex.query(EdMarkaz.DB, "INSERT INTO tokens (id, token, client_id) values ($1, $2, $3)", [id, hash(token, 12), client_id]) do
 			{:ok, res} -> {:ok, token}
 			{:error, err} -> 
 				IO.inspect err

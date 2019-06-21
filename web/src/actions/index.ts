@@ -77,6 +77,48 @@ export const getSchoolProfiles = (school_ids: string[]) => (dispatch: Dispatch, 
 		})
 }
 
+export interface AddProductsAction {
+	type: "ADD_PRODUCTS"
+	products: {
+		[id: string]: Product
+	}
+}
+
+export const GET_PRODUCTS = "GET_PRODUCTS"
+export const ADD_PRODUCTS = "ADD_PRODUCTS"
+export const getProducts = (filters = {}) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+
+	const state = getState();
+
+	syncr.send({
+		type: "GET_PRODUCTS",
+		client_type: state.auth.client_type,
+		client_id: state.auth.id,
+		id: state.auth.id,
+		payload: {
+			filters
+		}
+	})
+	.then(res => {
+		console.log(res)
+		// now dispatch an action that 'saves' these products
+
+		dispatch({
+			type: "ADD_PRODUCTS",
+			products: res
+		})
+
+		return res
+	})
+	.catch(err => {
+		console.error(err)
+
+		setTimeout(() => dispatch(getProducts()), 1000)
+	})
+}
+
+
+
 export const ADD_SCHOOL = "ADD_SCHOOL"
 export interface addSchoolAction {
 	type: string

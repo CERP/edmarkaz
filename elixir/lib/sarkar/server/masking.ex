@@ -22,7 +22,7 @@ defmodule EdMarkaz.Server.Masking do
 			%{"dialed" => dialed, "callerid" => incoming, "event" => event_type, "unique_id" => uid} -> 
 				# look up incoming against supplier db.
 				# then query that supplier for the mask pair.
-				{:ok, resp} = Postgrex.query(EdMarkaz.School.DB, "
+				{:ok, resp} = Postgrex.query(EdMarkaz.DB, "
 					SELECT id from suppliers where sync_state->'numbers'->>$1 is not null
 					", [incoming])
 
@@ -34,7 +34,7 @@ defmodule EdMarkaz.Server.Masking do
 						school_id = EdMarkaz.Supplier.get_school_from_masked(supplier_id, dialed)
 
 						{:ok, resp2} = Postgrex.query(
-							EdMarkaz.School.DB, 
+							EdMarkaz.DB, 
 							"SELECT db->'school_name', db->'phone_number' from platform_schools where id=$1", 
 							[school_id])
 						IO.inspect resp2.rows
@@ -61,7 +61,7 @@ defmodule EdMarkaz.Server.Masking do
 						IO.puts "number is not from a supplier"
 						# we check if its one of the schools calling back.
 						# if it is, then do a lookup against all the mask_pairs->masked_num->school_id=$1
-						{:ok, resp} = Postgrex.query(EdMarkaz.School.DB, "
+						{:ok, resp} = Postgrex.query(EdMarkaz.DB, "
 							SELECT db->'refcode', db->'school_name' FROM platform_schools WHERE 
 								concat('0',db->>'phone_number')=$1 OR
 								db->>'phone_number_1'=$1 OR
@@ -74,7 +74,7 @@ defmodule EdMarkaz.Server.Masking do
 						case resp.rows do
 							[[ school_id, school_name ]] -> 
 								# find the supplier
-								{:ok, resp2} = Postgrex.query(EdMarkaz.School.DB, "
+								{:ok, resp2} = Postgrex.query(EdMarkaz.DB, "
 									SELECT id from suppliers where sync_state->'mask_pairs'->$1->'school_id' = $2
 								", [dialed, school_id])
 								

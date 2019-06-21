@@ -12,6 +12,7 @@ export const saveDB = (db : RootBankState) => {
 		saveSnapshot(db.last_snapshot);
 		saveSchoolDb(db.new_school_db)
 		saveQueue(db.queued)
+		saveProducts(db.products)
 	}
 
 	catch(err) {
@@ -35,7 +36,8 @@ export const loadAuth = (): RootBankState['auth'] => {
 		number: undefined as string,
 		attempt_failed: false,
 		loading: false,
-		client_type: "bank_portal"
+		client_type: "bank_portal",
+		user_type: undefined
 	};
 
 	try {
@@ -130,11 +132,36 @@ const loadSnapshot = () => {
 	return parseInt(localStorage.getItem("last_snapshot") || "0")
 }
 
+const loadProducts = () => {
+
+	const initial : RootBankState['products'] = {
+		last_sync: 0,
+		db: { }
+	}
+
+	try {
+		const prods = JSON.parse(localStorage.getItem("products")) || initial
+		return prods
+	}
+	catch (e) {
+		console.log('returning initial')
+		return initial
+	}
+}
+
+const saveProducts = ( products? : RootBankState['products']) => {
+
+	if(products != undefined) {
+		console.log(products)
+		localStorage.setItem("products", JSON.stringify(products))
+	}
+
+}
+
 export const loadDB = () : RootBankState => {
 
 	return {
 		school_locations: {},
-		school_db: {},
 		new_school_db: loadSchoolDb(),
 		client_id: loadClientId(),
 		auth: loadAuth(),
@@ -142,6 +169,7 @@ export const loadDB = () : RootBankState => {
 		accept_snapshot: false,
 		last_snapshot: loadSnapshot(),
 		connected: false,
-		sync_state: loadSyncState()
+		sync_state: loadSyncState(),
+		products: loadProducts()
 	}
 }
