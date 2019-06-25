@@ -6,7 +6,6 @@ import EstimateMonthlyRevenue from '~/src/utils/estimate_revenue'
 import './style.css'
 
 import callAnswered from '../../utils/call_answered'
-import { CERPSchool } from '~src/typings';
 
 type propTypes = {
 	title: string

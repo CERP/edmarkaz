@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { getSchoolProfiles, getProducts } from '~/src/actions'
+import { getOwnProducts } from '~/src/actions'
 import { RouteComponentProps } from 'react-router-dom';
 
 /*
@@ -27,14 +27,21 @@ class ProductsPage extends React.Component<propTypes> {
 	}
 
 	onAddProduct = () => {
-		// reroute to new product page
-		// actually we want to open the product page as a panel to the right
-		// similar to how it is done with schools
-
 		this.props.history.push({
 			pathname: this.props.location.pathname,
 			search: `?product_id="new"`
 		})
+	}
+
+	onProductClick = (p : Product) => {
+
+		return () => {
+			console.log('button clicked')
+			this.props.history.push({
+				pathname: this.props.location.pathname,
+				search: `?product_id=${p.id}`
+			})
+		}
 
 	}
 
@@ -48,18 +55,17 @@ class ProductsPage extends React.Component<propTypes> {
 			{
 				Object.values(this.props.products)
 					.map(p => <div key={p.id}>
-						<ProductEntry product={p} />
+						<ProductEntry product={p} onClick={this.onProductClick(p)} />
 					</div>)
 			}
 			</div>
-
 		</div>
 	}
 }
 
-const ProductEntry : React.SFC<{product: Product}> = (props) => {
+const ProductEntry : React.SFC<{product: Product, onClick: any}> = (props) => {
 
-	return <div className="product-entry">
+	return <div className="product-entry" onClick={props.onClick}>
 		<div className="name">{props.product.title}</div>
 		<div>{props.product.description}</div>
 	</div>
@@ -68,5 +74,5 @@ const ProductEntry : React.SFC<{product: Product}> = (props) => {
 export default connect((state : RootBankState) => ({
 	products: state.products.db
 }), (dispatch : Function) => ({
-	getProducts: () => dispatch(getProducts())
+	getProducts: () => dispatch(getOwnProducts())
 }))(ProductsPage)

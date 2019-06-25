@@ -227,7 +227,7 @@ a.block {
 			margin-left: auto;
 		}
 
-		.form .row>:not(input):not(.button):last-child {
+		.form .row>:not(input):not(.button):not(textarea):last-child {
 			text-align: right;
 		}
 

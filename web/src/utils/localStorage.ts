@@ -152,7 +152,6 @@ const loadProducts = () => {
 const saveProducts = ( products? : RootBankState['products']) => {
 
 	if(products != undefined) {
-		console.log(products)
 		localStorage.setItem("products", JSON.stringify(products))
 	}
 

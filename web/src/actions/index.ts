@@ -41,6 +41,33 @@ export const forceSaveFullStatePotentiallyCausingProblems = () => (dispatch: Dis
 	]))
 }
 
+export const saveProductAction = (product: Product) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+
+	console.log('saving product')
+
+	// save product...
+
+	const state = getState();
+	syncr.send({
+		type: "MERGE_PRODUCT",
+		payload: {
+			id: product.id,
+			product
+		},
+		client_type: state.auth.client_type,
+		client_id: state.auth.id,
+	})
+	.then(res => {
+		console.log(res)
+		console.log("should now dispatch add product")
+		// dispatch add product action
+	})
+	.catch(err => {
+		console.error(err)
+	})
+
+}
+
 export const ADD_SCHOOLS = "ADD_SCHOOLS"
 
 export interface addNewSchoolAction {
@@ -99,13 +126,12 @@ export const getProducts = (filters = {}) => (dispatch: Dispatch, getState: GetS
 			filters
 		}
 	})
-	.then(res => {
-		console.log(res)
+	.then((res : any) => {
 		// now dispatch an action that 'saves' these products
 
 		dispatch({
 			type: "ADD_PRODUCTS",
-			products: res
+			products: res.products
 		})
 
 		return res
@@ -117,6 +143,37 @@ export const getProducts = (filters = {}) => (dispatch: Dispatch, getState: GetS
 	})
 }
 
+export const GET_OWN_PRODUCTS = "GET_OWN_PRODUCTS"
+export const getOwnProducts = (filters = {}) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+
+	const state = getState();
+
+	syncr.send({
+		type: "GET_OWN_PRODUCTS",
+		client_type: state.auth.client_type,
+		client_id: state.auth.id,
+		id: state.auth.id,
+		payload: {
+			filters
+		}
+	})
+	.then((res : any) => {
+		// now dispatch an action that 'saves' these products
+
+		dispatch({
+			type: "ADD_PRODUCTS",
+			products: res.products
+		})
+
+		return res
+	})
+	.catch(err => {
+		console.error(err)
+
+		setTimeout(() => dispatch(getProducts()), 1000)
+	})
+
+}
 
 
 export const ADD_SCHOOL = "ADD_SCHOOL"

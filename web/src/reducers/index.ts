@@ -216,6 +216,7 @@ const rootReducer = (state : RootBankState, action: Actions) : RootBankState => 
 		{
 			// @ts-ignore
 			const add_action = action as AddProductsAction
+			console.log(add_action)
 
 			return {
 				...state,

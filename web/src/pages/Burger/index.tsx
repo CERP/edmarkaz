@@ -29,12 +29,15 @@ class Burger extends React.Component<RouteComponentProps> {
 		const current = this.props.location.pathname;
 		const search = this.props.location.search;
 		const params = qs.parse(search)
+
 		const selected_id = params.school_id as string;
 		const product_id = params.product_id as string;
 
+		const panel_exists = selected_id || product_id
+
 		// this also can decide if there is a product page or not..
 
-		return <div className={`root-page ${selected_id ? 'double' : ''}`}>
+		return <div className={`root-page ${panel_exists ? 'double' : ''}`}>
 
 			<div className="header">IlmExchange</div>
 

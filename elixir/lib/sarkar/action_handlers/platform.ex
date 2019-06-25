@@ -38,6 +38,23 @@ defmodule EdMarkaz.ActionHandler.Platform do
 
 	end
 
+	def handle_action(%{"type" => "GET_OWN_PRODUCTS", "payload" => payload}, %{id: supplier_id, client_id: client_id} = state) do
+		# currently no filters...
+		# except by supplier
+
+		case Postgrex.query(EdMarkaz.DB, "SELECT id, product, sync_time FROM products WHERE id=$1", [supplier_id]) do
+			{:ok, resp} -> 
+				mapped = resp.rows
+					|> Enum.map(fn [id, product, sync_time] -> {id, product} end)
+					|> Enum.into(%{})
+				{:reply, succeed(%{products: mapped}), state}
+			{:error, err} -> 
+				IO.puts "error getting product"
+				IO.inspect err
+				{:reply, fail("error getting products"), state}
+		end
+	end
+
 	def handle_action(%{"type" => "GET_PRODUCTS", "payload" => payload}, state) do
 		# currently no filters...
 		# except by supplier
