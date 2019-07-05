@@ -249,7 +249,8 @@ defmodule EdMarkaz.Server.Analytics do
 	end
 
 	def init(req, state) do 
-		req = :cowboy_req.reply(200, req)
+		req = :cowboy_req.reply(404, req)
+		IO.puts "route not found"
 		IO.inspect req
 		{:ok, req, state}
 	end
