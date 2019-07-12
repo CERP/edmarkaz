@@ -20,6 +20,7 @@ defmodule EdMarkaz.Server.Masking do
 
 		{school_name, forward, caller} = case query_params do
 			%{"dialed" => dialed, "callerid" => incoming, "event" => event_type, "unique_id" => uid} -> 
+
 				# look up incoming against supplier db.
 				# then query that supplier for the mask pair.
 				{:ok, resp} = Postgrex.query(EdMarkaz.School.DB, "
@@ -57,6 +58,7 @@ defmodule EdMarkaz.Server.Masking do
 
 						{school_name, "0#{outgoing_number}", "supplier: #{supplier_id}"}
 
+					# if supplier not found
 					other -> 
 						IO.puts "number is not from a supplier"
 						# we check if its one of the schools calling back.
@@ -72,6 +74,7 @@ defmodule EdMarkaz.Server.Masking do
 								db->>'alt_phone_number=$1'=$1", [incoming])
 						
 						case resp.rows do
+							# school matched
 							[[ school_id, school_name ]] -> 
 								# find the supplier
 								{:ok, resp2} = Postgrex.query(EdMarkaz.School.DB, "
@@ -141,7 +144,7 @@ defmodule EdMarkaz.Server.Masking do
 			|> DateTime.add(5*60*60, :second)
 			|> DateTime.truncate(:second)
 
-		if school_name == "not-found" do
+		if caller == "not-found" do
 			# broadcast number to the cerp-callcenter user....
 			%{"dialed" => dialed, "callerid" => incoming, "event" => event_type, "unique_id" => uid} = query_params
 			Registry.lookup(EdMarkaz.ConnectionRegistry, "cerp-callcenter")
