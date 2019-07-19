@@ -15,8 +15,8 @@ declare module 'deck.gl' {
 interface SchoolMatch {
 	status: "NEW" | "IN_PROGRESS" | "REJECTED" | "DONE",
 	masked_number?: string,
-	history: {
-		[timestamp: number]: SupplierInteractionEvent | CallEndEvent | CallEndSurvey | CallEndSurveyFollowUp
+	history?: {
+		[timestamp: number]: SupplierInteractionEvent | CallEndEvent | CallEndSurvey | CallEndSurveyFollowUp | MarkCompleteSurvey
 	}
 }
 
