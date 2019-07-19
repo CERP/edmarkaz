@@ -11,7 +11,6 @@ type propTypes = {
 } & RouteComponentProps
 
 interface stateType {
-	filterActive: boolean
 	filters: {
 		survey: "" | "MARK_COMPLETE_SURVEY" | "CALL_END_SURVEY" | "CALL_END_SURVEY_FOLLOWUP"
 		status: "" | "NEW" | "IN_PROGRESS" | "REJECTED" | "DONE"
@@ -26,11 +25,10 @@ class Activities extends React.Component <propTypes, stateType> {
 		super(props)
 	
 		this.state = {
-			filterActive: false,
 			filters: {
 				survey: "",
 				status: "",
-				startDate: moment().subtract(7, "days").unix() * 1000,
+				startDate: moment().subtract(2, "week").unix() * 1000,
 				endDate: moment.now()
 			}
 		}
@@ -69,14 +67,13 @@ class Activities extends React.Component <propTypes, stateType> {
 
 		return	<div className="activities info">
 
-			<div style={{width: "75%", display:"flex", justifyContent:"space-between"}}>
-			<div className="button blue" onClick={() => this.donwloadCsv()}> Download Csv</div>
-				<div className="button blue" onClick={() => this.setState({filterActive: !this.state.filterActive })}> Filters </div>
+			<div style={{width: "75%", display:"flex", justifyContent:"flex-end"}}>
+				<div className="button blue" onClick={() => this.donwloadCsv()}> Download Csv</div>
 			</div>
 			
 			<div className="divider">Activities</div>
 			
-			{ this.state.filterActive && <div className="form" style={{width: "75%"}}>
+			<div className="form section" style={{width: "75%"}}>
 				<div className="row" style={{border:"none"}}>
 					<label>Start Date</label>
 					<input type="date" onChange={this.former.handle(["startDate"])} value={moment(this.state.filters.startDate).format("YYYY-MM-DD")}/>
@@ -105,7 +102,7 @@ class Activities extends React.Component <propTypes, stateType> {
 						<option value="DONE">Done</option>
 					</select>
 				</div>
-			</div>}
+			</div>
 
 			<div className="section" style={{width:"75%"}}>
 				<div className="newtable">
