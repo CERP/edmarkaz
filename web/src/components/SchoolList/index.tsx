@@ -52,7 +52,7 @@ export default class SchooList extends React.Component<propTypes, stateType> {
 				tehsil: "",
 				contact_history: "",
 				min_year_established: "",
-				max_year_established: `${new Date().getFullYear()}`,
+				max_year_established: "",
 				min_revenue: "",
 				max_revenue: ""
 			}
