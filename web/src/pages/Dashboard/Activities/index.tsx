@@ -3,6 +3,7 @@ import { RouteComponentProps } from 'react-router';
 import { connect } from 'react-redux';
 import moment from 'moment'
 import Former from '~src/utils/former';
+import { downloadCSV } from '~src/utils/downloadCSV';
 
 type propTypes = {
 	sync_state: RootBankState["sync_state"]
@@ -12,8 +13,8 @@ type propTypes = {
 
 interface stateType {
 	filters: {
-		survey: "" | "MARK_COMPLETE_SURVEY" | "CALL_END_SURVEY" | "CALL_END_SURVEY_FOLLOWUP"
-		status: "" | "NEW" | "IN_PROGRESS" | "REJECTED" | "DONE"
+		survey: "" | MarkCompleteSurvey["event"] | CallEndSurvey["event"] | CallEndSurveyFollowUp["event"]
+		status: "" | SchoolMatch["status"]
 		startDate: number
 		endDate: number
 	}
@@ -36,39 +37,44 @@ class Activities extends React.Component <propTypes, stateType> {
 		this.former = new Former(this, ["filters"])
 	}
 
-	donwloadCsv = () => {
+	downloadCsv = (items: [string, SchoolMatch][]) => {
 
-		const {sync_state, school_db} = this.props
+		const { school_db } = this.props
 
-		let csv = "Date,School,Event,Status,Person\n"
+		const header = [ "Date","School","Event","Status","Person"]
 
-		Object.entries(sync_state.matches)
-			.filter(([id, matches]) => this.state.filters.status ? this.state.filters.status === matches.status : true )
-			.forEach(([id, matches]) => {
-				const curr_school = school_db[id]
+		const data = [header]
 
-				Object.entries(matches.history || {})
-					.filter(([timestamp, h]) => moment(moment(h.time).format("YYYY-MM-DD")).isBetween(moment(this.state.filters.startDate).format("YYYY-MM-DD"), moment(this.state.filters.endDate).format("YYYY-MM-DD")) && (this.state.filters.survey ? this.state.filters.survey === h.event : h.event === "MARK_COMPLETE_SURVEY" || "CALL_END_SURVEY_FOLLOWUP" || "CALL_END_SURVEY") )
-					.forEach(([timestamp, h]) => {
-						csv += `${moment(h.time).format("MM-DD-YYYY")},${curr_school.school_name},${h.event},${matches.status},${h.user.name}\n`
-					})
-			})
-		
-		var hiddenElement = document.createElement('a');
-		hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
-		hiddenElement.target = '_blank';
-		hiddenElement.download = 'survey.csv';
-		hiddenElement.click();
+		items.forEach(([id, matches]) => {
+			const curr_school = school_db[id]
+
+			Object.entries(matches.history || {})
+				.filter(([timestamp, h]) => ( h.time >= this.state.filters.startDate && h.time <= this.state.filters.endDate ) && (this.state.filters.survey ? this.state.filters.survey === h.event : h.event === "MARK_COMPLETE_SURVEY" || "CALL_END_SURVEY_FOLLOWUP" || "CALL_END_SURVEY") )
+				.forEach(([timestamp, h]) => {
+					let elem = [`${moment(h.time).format("MM-DD-YYYY")}`,
+							`${curr_school.school_name.replace(/[^a-zA-Z0-9]/g, ' ')}`,
+							`${h.event.replace(/[^a-zA-Z0-9]/g, ' ')}`,
+							`${matches.status.replace(/[^a-zA-Z0-9]/g, ' ')}`,
+							`${h.user.name.replace(/[^a-zA-Z0-9]/g, ' ')}`]
+					data.push(elem)
+				}, [])
+		})
+
+		downloadCSV(data, "activity")
+
 	}
 	
 	render() {
 
 		const { sync_state, school_db} = this.props
 
+		const items = Object.entries(sync_state.matches)
+			.filter(([id, matches]) => this.state.filters.status ? this.state.filters.status === matches.status : true )
+		
 		return	<div className="activities info">
 
 			<div style={{width: "75%", display:"flex", justifyContent:"flex-end"}}>
-				<div className="button blue" onClick={() => this.donwloadCsv()}> Download Csv</div>
+				<div className="button blue" onClick={() => this.downloadCsv(items)}> Download Csv</div>
 			</div>
 			
 			<div className="divider">Activities</div>
@@ -114,21 +120,20 @@ class Activities extends React.Component <propTypes, stateType> {
 						<div>Person</div>
 					</div>
 				{
-					Object.entries(sync_state.matches)
-						.filter(([id, matches]) => this.state.filters.status ? this.state.filters.status === matches.status : true )
-						.map(([id, matches]) => {
-							const curr_school = school_db[id]
-							return Object.entries(matches.history || {})
-							.filter(([timestamp, h]) => moment(moment(h.time).format("YYYY-MM-DD")).isBetween(moment(this.state.filters.startDate).format("YYYY-MM-DD"), moment(this.state.filters.endDate).format("YYYY-MM-DD")) && (this.state.filters.survey ? this.state.filters.survey === h.event : true))
-								.map(([timestamp, h]) => {
-									return <div className="newtable-row" key={timestamp}>
-										<div>{moment(h.time).format("MM-DD-YYYY")}</div>
-										<div>{curr_school.school_name}</div>
-										<div>{h.event}</div>
-										<div>{matches.status}</div>
-										<div>{h.user.name}</div>
-									</div>
-								})
+					items.map(([id, matches]) => {
+						const curr_school = school_db[id]
+						
+						return Object.entries(matches.history || {})
+							.filter(([timestamp, h]) => ( h.time >= this.state.filters.startDate && h.time <= this.state.filters.endDate ) && (this.state.filters.survey ? this.state.filters.survey === h.event : true))
+							.map(([timestamp, h]) => {
+								return <div className="newtable-row" key={timestamp}>
+									<div>{moment(h.time).format("MM-DD-YYYY")}</div>
+									<div>{curr_school.school_name}</div>
+									<div>{h.event}</div>
+									<div>{matches.status}</div>
+									<div>{h.user.name}</div>
+								</div>
+							})
 						})
 				}
 			</div>
