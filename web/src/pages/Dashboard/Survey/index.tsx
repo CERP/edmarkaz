@@ -4,11 +4,12 @@ import { connect } from 'react-redux';
 import Former from '~/src/utils/former'
 import moment from 'moment'
 import { downloadCSV } from '~src/utils/downloadCSV';
+import getUserType from '~src/utils/getUserType';
 
 type propTypes = {
 	sync_state: RootBankState["sync_state"]
 	school_db: RootBankState["new_school_db"]
-	username: String
+	username: string
 } & RouteComponentProps
 
 interface stateType {
@@ -40,8 +41,8 @@ class Survey extends React.Component <propTypes, stateType> {
 	
 	downloadCsv = (items: [string, SchoolMatch][]) => {
 
-		const { school_db } = this.props
-		
+		const { school_db , username} = this.props
+		const userType = getUserType(username)
 		let header = [
 			"Date",
 			"School",
@@ -50,8 +51,7 @@ class Survey extends React.Component <propTypes, stateType> {
 			"Customer_Interest",
 			"Follow_Up_Meeting_Occured",
 			"In_Person_Meeting_Scheduled",
-			"Not_Interseted_Reason(Ess)",
-			"Not_Interseted_Reason(finance)",
+			"Not_Interseted_Reason",
 			"Reason_Completed",
 			"Notes"
 		]
@@ -73,8 +73,7 @@ class Survey extends React.Component <propTypes, stateType> {
 							`${h.event === "CALL_END_SURVEY" ? h.meta.customer_interest: "-"}`,
 							`${h.event === "CALL_END_SURVEY_FOLLOWUP" ? h.meta.follow_up_meeting_ocurred.replace(/[^a-zA-Z0-9]/g, ' ') : "-"}`,
 							`${h.event === "CALL_END_SURVEY_FOLLOWUP" ? h.meta.call_in_person_meeting_scheduled.replace(/[^a-zA-Z0-9]/g, ' ') : "-"}`,
-							`${h.event === "CALL_END_SURVEY_FOLLOWUP" ? h.meta.call_not_interested_reason_ess.replace(/[^a-zA-Z0-9]/g, ' ') : "-"}`,
-							`${h.event === "CALL_END_SURVEY_FOLLOWUP" ? h.meta.call_not_interested_reason_finance.replace(/[^a-zA-Z0-9]/g, ' ') : "-"}`,
+							`${h.event === "CALL_END_SURVEY_FOLLOWUP" ? userType === "ESS" ? h.meta.call_not_interested_reason_ess.replace(/[^a-zA-Z0-9]/g, ' ') : h.meta.call_not_interested_reason_finance.replace(/[^a-zA-Z0-9]/g, ' ') : "-"}`,
 							`${h.event === "MARK_COMPLETE_SURVEY" ? h.meta.reason_completed.replace(/[^a-zA-Z0-9]/g, ' ') : "-"}`,
 							`${h.event === 'CALL_END_SURVEY' ? h.meta.other_notes.replace(/[^a-zA-Z0-9]/g, ' ') : "-"}`
 						]
@@ -87,7 +86,9 @@ class Survey extends React.Component <propTypes, stateType> {
 	
 	render() {
 
-		const { sync_state, school_db} = this.props
+		const { sync_state, school_db, username} = this.props
+
+		const userType = getUserType(username)
 
 		const items = Object.entries(sync_state.matches)
 			.filter(([id, matches]) => this.state.filters.status ? this.state.filters.status === matches.status : true )
@@ -142,8 +143,7 @@ class Survey extends React.Component <propTypes, stateType> {
 						<div>Cutomer Interest</div>
 						<div>Follow Up Meeting Occured </div>
 						<div>In Person Meeting Scheduled</div>
-						<div>Not Interested Reason (Ess)</div>
-						<div>Not Interested Reason (Finace)</div>
+						<div>Not Interested Reason</div>
 						<div>Reason Completed</div>
 						<div>Notes</div>
 					</div>
@@ -162,8 +162,7 @@ class Survey extends React.Component <propTypes, stateType> {
 									<div>{ h.event === "CALL_END_SURVEY" ? h.meta.customer_interest: "-"}</div>
 									<div>{ h.event === "CALL_END_SURVEY_FOLLOWUP" ? h.meta.follow_up_meeting_ocurred : "-"} </div>
 									<div>{ h.event === "CALL_END_SURVEY_FOLLOWUP" ? h.meta.call_in_person_meeting_scheduled : "-"} </div>
-									<div>{ h.event === "CALL_END_SURVEY_FOLLOWUP" ? h.meta.call_not_interested_reason_ess : "-"} </div>
-									<div>{ h.event === "CALL_END_SURVEY_FOLLOWUP" ? h.meta.call_not_interested_reason_finance : "-"} </div>
+									<div>{ h.event === "CALL_END_SURVEY_FOLLOWUP" ? userType === "ESS" ? h.meta.call_not_interested_reason_ess : h.meta.call_not_interested_reason_finance : "-"} </div>
 									<div>{ h.event === "MARK_COMPLETE_SURVEY" ? h.meta.reason_completed : "-" } </div>
 									<div>{ h.event === 'CALL_END_SURVEY' ? h.meta.other_notes : "-"}</div>
 								</div>
