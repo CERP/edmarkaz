@@ -111,8 +111,8 @@ export interface AddProductsAction {
 	}
 }
 
-export const GET_PRODUCTS = "GET_PRODUCTS"
 export const ADD_PRODUCTS = "ADD_PRODUCTS"
+export const GET_PRODUCTS = "GET_PRODUCTS"
 export const getProducts = (filters = {}) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 
 	const state = getState();

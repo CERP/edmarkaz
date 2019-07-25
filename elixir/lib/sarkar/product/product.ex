@@ -22,4 +22,14 @@ defmodule EdMarkaz.Product do
 
 	end
 
+	# this is going to need to handle merges and syncing
+	# because call center and consumer can both modify this, which then has to be sent to the 
+	# supplier site.
+
+	# now working in an application that requires that a client subscribe to multiple sync_states / paths
+
+	# for now actually its ok to just have a last_updated flag and send the entire new school up / down between these sites
+	# we don't expect this to be updated often so it won't bite into the consumers data cap
+	# and we don't care about that as much for call center & supplier
+
 end
