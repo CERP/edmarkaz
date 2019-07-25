@@ -68,14 +68,14 @@ class Survey extends React.Component <propTypes, stateType> {
 						let elem = [
 							`${moment(h.time).format("MM-DD-YYYY")}`,
 							`${curr_school.school_name}`,
-							`${h.user.name ? h.user.name.replace(/[^a-zA-Z0-9]/g, ' ') : "-"}`,
+							`${h.user.name ? h.user.name : "-"}`,
 							`${h.event}`,
 							`${h.event === "CALL_END_SURVEY" ? h.meta.customer_interest: "-"}`,
-							`${h.event === "CALL_END_SURVEY_FOLLOWUP" ? h.meta.follow_up_meeting_ocurred.replace(/[^a-zA-Z0-9]/g, ' ') : "-"}`,
-							`${h.event === "CALL_END_SURVEY_FOLLOWUP" ? h.meta.call_in_person_meeting_scheduled.replace(/[^a-zA-Z0-9]/g, ' ') : "-"}`,
-							`${h.event === "CALL_END_SURVEY_FOLLOWUP" ? userType === "ESS" ? h.meta.call_not_interested_reason_ess.replace(/[^a-zA-Z0-9]/g, ' ') : h.meta.call_not_interested_reason_finance.replace(/[^a-zA-Z0-9]/g, ' ') : "-"}`,
-							`${h.event === "MARK_COMPLETE_SURVEY" ? h.meta.reason_completed.replace(/[^a-zA-Z0-9]/g, ' ') : "-"}`,
-							`${h.event === 'CALL_END_SURVEY' ? h.meta.other_notes.replace(/[^a-zA-Z0-9]/g, ' ') : "-"}`
+							`${h.event === "CALL_END_SURVEY_FOLLOWUP" ? h.meta.follow_up_meeting_ocurred : "-"}`,
+							`${h.event === "CALL_END_SURVEY_FOLLOWUP" ? h.meta.call_in_person_meeting_scheduled : "-"}`,
+							`${h.event === "CALL_END_SURVEY_FOLLOWUP" ? userType === "ESS" ? h.meta.call_not_interested_reason_ess : h.meta.call_not_interested_reason_finance : "-"}`,
+							`${h.event === "MARK_COMPLETE_SURVEY" ? h.meta.reason_completed : "-"}`,
+							`${h.event === 'CALL_END_SURVEY' ? h.meta.other_notes : "-"}`
 						]
 						data.push(elem)
 					})

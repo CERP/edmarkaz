@@ -52,10 +52,10 @@ class Activities extends React.Component <propTypes, stateType> {
 				.filter(([timestamp, h]) => ( h.time >= this.state.filters.startDate && h.time <= this.state.filters.endDate ) && (this.state.filters.survey ? this.state.filters.survey === h.event : h.event === "MARK_COMPLETE_SURVEY" || "CALL_END_SURVEY_FOLLOWUP" || "CALL_END_SURVEY") )
 				.forEach(([timestamp, h]) => {
 					let elem = [`${moment(h.time).format("MM-DD-YYYY")}`,
-							`${curr_school.school_name.replace(/[^a-zA-Z0-9]/g, ' ')}`,
-							`${h.event.replace(/[^a-zA-Z0-9]/g, ' ')}`,
-							`${matches.status.replace(/[^a-zA-Z0-9]/g, ' ')}`,
-							`${h.user.name.replace(/[^a-zA-Z0-9]/g, ' ')}`]
+							`${curr_school.school_name}`,
+							`${h.event}`,
+							`${matches.status}`,
+							`${h.user.name}`]
 					data.push(elem)
 				}, [])
 		})
