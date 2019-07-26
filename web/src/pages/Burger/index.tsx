@@ -12,6 +12,7 @@ import Settings from '../Settings'
 import SchoolInfo from '~/src/components/SchoolInfo'
 
 import './style.css'
+import Dashboard from '../Dashboard';
 
 class Burger extends React.Component<RouteComponentProps> {
 
@@ -40,6 +41,7 @@ class Burger extends React.Component<RouteComponentProps> {
 				<Link to={{ pathname: "/progress", search }} className={current === '/progress' ? "active" : ""}>In Progress</Link>
 				<Link to={{ pathname: "/done", search }} className={current === '/done' ? "active" : ""}>Done</Link>
 				<Link to={{ pathname: "/rejected", search }} className={current === '/rejected' ? "active" : ""}>Rejected</Link>
+				<Link to="/dashboard/activities" className={current === '/dashboard' ? "active" : ""}>Dashboard</Link>
 				<Link to="/settings" className={current === '/settings' ? "active" : ""}>Settings</Link>
 			</div>
 
@@ -49,6 +51,7 @@ class Burger extends React.Component<RouteComponentProps> {
 				<Route path="/progress" component={InProgress} />
 				<Route path="/done" component={Done} />
 				<Route path="/rejected" component={Rejected} title={"Rejected"}/>
+				<Route path="/dashboard" component={Dashboard} />
 				<Route path="/settings" component={Settings} />
 			</div>
 				{
