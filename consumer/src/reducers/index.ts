@@ -27,6 +27,11 @@ const rootReducer = (state: RootReducerState, action : AnyAction) : RootReducerS
 		case MERGES: 
 		{
 			const nextState = (action as MergeAction).merges.reduce((agg, curr) => {
+
+				if(curr.value.no_local_apply) {
+					return agg;
+				}
+
 				return Dynamic.put(agg, curr.path, curr.value)
 			}, JSON.parse(JSON.stringify(state)))
 

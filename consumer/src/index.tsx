@@ -13,7 +13,7 @@ import { loadDB, saveDB } from './utils/localStorage'
 import debounce from './utils/debounce';
 
 
-const debug_url = "wss://48c3256a.ngrok.io/ws"
+const debug_url = "wss://10b06109.ngrok.io/ws"
 //@ts-ignore
 const host = window.api_url || debug_url;
 

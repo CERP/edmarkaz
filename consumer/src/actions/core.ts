@@ -8,8 +8,15 @@ export const MERGES = "MERGES"
 
 interface Merge {
 	path: string[],
-	value: any
+	value: any & { no_local_store?: boolean } // is this legal?
 }
+
+// Or i can create a new type called REMOTE_MERGE which doesnt apply locally, and gets queued. this is less hacky
+// then inside the sync method i can just parse out remote_merge types instead of looking through the values
+// need to go through the queue flow a bit to make sure this doesn't impact anything else.
+// basically we're committing something to a path that we are not subscribing to. 
+// by default we handle one subscription, the rest are fetched traditionally
+// 
 
 export interface MergeAction {
 	type: "MERGES",

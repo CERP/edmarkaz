@@ -9,7 +9,7 @@ defmodule EdMarkaz.Consumer do
 		IO.puts "initting supplier #{id}"
 
 		# state is school_id, map of writes, map of db.
-		# {sync_state, writes} = EdMarkaz.Store.Supplier.load(id)
+		{sync_state, writes} = EdMarkaz.Store.Consumer.load(id)
 
 		GenServer.start_link(
 			__MODULE__,

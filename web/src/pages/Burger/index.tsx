@@ -42,13 +42,13 @@ class Burger extends React.Component<RouteComponentProps> {
 			<div className="header">IlmExchange</div>
 
 			<div className="burger">
-				<Link to={{ pathname: "/", search }}  className={current === '/' ? "active" : ""}>Home</Link>
+				<Link to={{ pathname: "/", search }} className={current === '/' ? "active" : ""}>Home</Link>
 				<Link to={{ pathname: "/new", search }} className={current === '/new' ? "active" : ""}>New</Link>
-				{ /* <Link to="/todo" className={current === '/todo' ? "active" : ""}>To-Do</Link> */ }
+				{ /* <Link to="/todo" className={current === '/todo' ? "active" : ""}>To-Do</Link> */}
 				<Link to={{ pathname: "/progress", search }} className={current === '/progress' ? "active" : ""}>In Progress</Link>
 				<Link to={{ pathname: "/done", search }} className={current === '/done' ? "active" : ""}>Done</Link>
 				<Link to={{ pathname: "/rejected", search }} className={current === '/rejected' ? "active" : ""}>Rejected</Link>
-				<Link to={{ pathname: "/products", search}} className={current === '/products' ? "active" : ""}>Products</Link>
+				<Link to={{ pathname: "/products", search }} className={current === '/products' ? "active" : ""}>Products</Link>
 				<Link to="/settings" className={current === '/settings' ? "active" : ""}>Settings</Link>
 			</div>
 
@@ -57,20 +57,20 @@ class Burger extends React.Component<RouteComponentProps> {
 				<Route path="/new" component={New} />
 				<Route path="/progress" component={InProgress} />
 				<Route path="/done" component={Done} />
-				<Route path="/rejected" component={Rejected} title={"Rejected"}/>
+				<Route path="/rejected" component={Rejected} title={"Rejected"} />
 				<Route path="/products" component={Products} />
 				<Route path="/settings" component={Settings} />
 			</div>
-				{
-					selected_id && <div className="info-panel">
-						<SchoolInfo school_id={selected_id} />
-					</div>
-				}
-				{
-					product_id && <div className="info-panel">
-						<ProductInfo product_id={product_id} />
-					</div>
-				}
+			{
+				selected_id && <div className="info-panel">
+					<SchoolInfo school_id={selected_id} />
+				</div>
+			}
+			{
+				product_id && <div className="info-panel">
+					<ProductInfo product_id={product_id} />
+				</div>
+			}
 		</div>
 	}
 }

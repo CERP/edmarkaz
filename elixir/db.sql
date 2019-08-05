@@ -39,7 +39,7 @@ create table platform_schools (
 
 create table products (
 	id text unique not null,
-	supplier_id text unique not null,
+	supplier_id text not null,
 	sync_time timestamp default current_timestamp,
 	product jsonb
 );

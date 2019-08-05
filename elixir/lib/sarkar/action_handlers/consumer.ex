@@ -38,6 +38,32 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 		end
 	end
 
+	# logged-in sync
+	def handle_action(%{"type" => "SYNC", "payload" => payload, "last_snapshot" => last_sync_date}, %{id: id, client_id: client_id} = state) do
+
+	# this goes through our normal sync flow, though we need to figure out how to kill the server at a certain point
+
+	end
+
+	#logged-out sync
+	def handle_action(%{"type" => "SYNC", "payload" => payload, "last_snapshot" => last_sync_date}, state) do
+		# how do we make this less intense. 
+		# what are we even syncing in this case... just analytics
+		# so we can parse through the payload for analytics events and write them direct to table
+		# instead of spinning up a genserver for a client and eating memory
+
+		# so lets nail down our analytics events client-side first.
+
+		# path: [ "analytics", timestamp], value: { type: "page_view | product_view", time: timestamp, product_id: "" }
+		# can i come up with a path that if i get rid of the device_id key, i can rerun them and create a state....
+		# path: ["analytics", "product_view", product_id, timestamp] value: { time: timestamp }
+		# then this can be forwarded to an analytics genserver which merges and broadcasts to the dashboard
+		# we can add a flag on to the value which means that it will get queued, but not applied to local sync_state
+		# value: { no_local_apply: true }
+
+		
+	end
+
 	defp start_supplier(id) do
 		case Registry.lookup(EdMarkaz.SupplierRegistry, id) do
 			[{_, _}] -> {:ok}
