@@ -1,10 +1,12 @@
-import { Dispatch, AnyAction } from 'redux'
 import Syncr from 'src/syncr';
 
 const SYNC = "SYNC"
 
 // TODO: separate out connect, auth merges and deletes into separate folder
 export const MERGES = "MERGES"
+
+type Dispatch = (action: any) => any;
+type GetState = () => RootBankState
 
 interface Merge {
 	path: string[],
@@ -52,6 +54,17 @@ export const createMerges= (merges : Merge[]) => (dispatch : (a: any) => any, ge
 	syncr.send(payload)
 		.then(dispatch)
 		.catch(err => dispatch(QueueUp(new_merges)))
+}
+
+type ImageMerges = Array<{id: string, imageString: string, path: string[]}>
+
+export const createImageMerges = (imageMerges: ImageMerges) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+
+	// the path should be to an image object
+	// which is { id: string, url: string }
+	// we pass in the id here
+	// 
+
 }
 
 export const SMS = "SMS"
@@ -130,7 +143,7 @@ export interface DeletesAction {
 	paths: Delete[]
 }
 
-export const createDeletes = (paths : Delete[]) => (dispatch : Dispatch<AnyAction>, getState : () => RootBankState, syncr : Syncr) => {
+export const createDeletes = (paths : Delete[]) => (dispatch : Dispatch, getState : () => RootBankState, syncr : Syncr) => {
 
 	const action = {
 		type: DELETES,

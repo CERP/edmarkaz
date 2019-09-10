@@ -7,6 +7,7 @@ import { saveProductAction } from '~/src/actions'
 import Former from '~/src/utils/former'
 
 import './style.css'
+import { getDownsizedImage } from '~src/utils/image';
 
 interface OwnProps {
 	product_id: string
@@ -26,6 +27,7 @@ type propTypes = OwnProps & StateProps & DispatchProps & RouteComponentProps
 
 interface S {
 	product: Product
+	imageDataString: string
 }
 
 class ProductInfo extends React.Component<propTypes, S> {
@@ -40,11 +42,16 @@ class ProductInfo extends React.Component<propTypes, S> {
 			title: "",
 			description: "",
 			img_url: "",
-			phone_number: ""
+			phone_number: "",
+			image: {
+				id: "",
+				url: ""
+			}
 		}
 
 		this.state = {
-			product: this.props.product || newProduct
+			product: this.props.product || newProduct,
+			imageDataString: ""
 		}
 
 		this.former = new Former(this, ["product"])
@@ -59,6 +66,41 @@ class ProductInfo extends React.Component<propTypes, S> {
 
 	onSave = () => {
 		this.props.saveProduct(this.state.product)
+
+		// check if this is different than before?
+		// this.props.saveProductImage(this.state.imageDataString)
+	}
+
+	uploadImage = (e : React.ChangeEvent<HTMLInputElement>) => {
+
+		const file = e.target.files[0]
+		if(file === undefined) {
+			return
+		}
+
+		const reader = new FileReader();
+
+		reader.onloadend = () => {
+			const res = reader.result as string;
+
+			getDownsizedImage(res, 544)
+				.then(imgString => {
+
+					// this should also change the Image property of the product
+					// image id
+					this.setState({
+						imageDataString: imgString,
+						product: {
+							...this.state.product,
+							image: {
+								id: v4()
+							}
+						}
+					})
+				})
+		}
+
+		reader.readAsDataURL(file)
 	}
 
 	render() {
@@ -81,6 +123,13 @@ class ProductInfo extends React.Component<propTypes, S> {
 					<label>Phone Number</label>
 					<input type="number" {...this.former.super_handle(["phone_number"])} placeholder="Product Helpline Number" />
 				</div>
+
+				<div className="row">
+					<label>Image</label>
+					<input type="file" accept="image/*" onChange={this.uploadImage}/>
+				</div>
+
+				<img src={this.state.imageDataString} />
 
 			</div>
 			<div className="row">

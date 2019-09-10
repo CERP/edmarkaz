@@ -124,6 +124,10 @@ interface Product {
 	description: string
 	phone_number: string
 	img_url: string
+	image?: {
+		id: string,
+		url?: string
+	}
 }
 
 interface RootBankState {
