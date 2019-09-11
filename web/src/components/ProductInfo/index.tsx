@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router';
 import { v4 } from 'node-uuid'
 
-import { saveProductAction } from '~/src/actions'
+import { saveProductAction, saveProductImage } from '~/src/actions'
 import Former from '~/src/utils/former'
 
 import './style.css'
@@ -21,6 +21,7 @@ interface StateProps {
 
 interface DispatchProps {
 	saveProduct: (p: Product) => void
+	saveProductImage: (imageId: string, dataUrl: string, p: Product) => void
 }
 
 type propTypes = OwnProps & StateProps & DispatchProps & RouteComponentProps
@@ -67,8 +68,17 @@ class ProductInfo extends React.Component<propTypes, S> {
 	onSave = () => {
 		this.props.saveProduct(this.state.product)
 
-		// check if this is different than before?
-		// this.props.saveProductImage(this.state.imageDataString)
+		const current_id = this.state.product.image && this.state.product.image.id;
+		const prev_id = this.props.product && this.props.product.image && this.props.product.image.id;
+
+		if(current_id !== prev_id) {
+			console.log('saving new image')
+			this.props.saveProductImage(
+				current_id,
+				this.state.imageDataString,
+				this.state.product
+			)
+		}
 	}
 
 	uploadImage = (e : React.ChangeEvent<HTMLInputElement>) => {
@@ -129,7 +139,7 @@ class ProductInfo extends React.Component<propTypes, S> {
 					<input type="file" accept="image/*" onChange={this.uploadImage}/>
 				</div>
 
-				<img src={this.state.imageDataString} />
+				<img src={this.state.imageDataString || this.state.product.image && this.state.product.image.url} />
 
 			</div>
 			<div className="row">
@@ -144,5 +154,6 @@ export default connect<StateProps, DispatchProps, OwnProps>((state : RootBankSta
 	supplier_id: state.auth.id,
 	connected: state.connected
 }), (dispatch : Function) => ({
-	saveProduct: (product: Product) => { dispatch(saveProductAction(product)) }
+	saveProduct: (product: Product) => dispatch(saveProductAction(product)),
+	saveProductImage: (imageId: string, dataUrl: string, product: Product) => dispatch(saveProductImage(imageId, dataUrl, product))
 }))(withRouter(ProductInfo))

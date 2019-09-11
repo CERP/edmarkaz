@@ -35,7 +35,30 @@ defmodule EdMarkaz.ActionHandler.Platform do
 		EdMarkaz.Product.merge(id, product, supplier_id)
 
 		{:reply, succeed(), state}
+	end
 
+	def handle_action(%{"type" => "MERGE_PRODUCT_IMAGE", "payload" => %{"id" => id, "product_id" => product_id, "data_url" => data_url}}, %{id: supplier_id, client_id: client_id} = state) do
+		
+		IO.puts "handling merge product image"
+
+		parent = self()
+
+		spawn fn ->
+			img_url = Sarkar.Storage.Google.upload_image("ilmx-product-images", id, data_url)
+
+			IO.inspect img_url
+			EdMarkaz.Product.merge_image(product_id, img_url)
+
+			send(parent, {:broadcast, %{
+				"type" => "PRODUCT_IMAGE_ADDED",
+				"product_id" => product_id,
+				"image_id" => id,
+				"img_url" => img_url
+			}})
+		end
+
+
+		{:reply, succeed(), state}
 	end
 
 	def handle_action(%{"type" => "GET_OWN_PRODUCTS", "payload" => payload}, %{id: supplier_id, client_id: client_id} = state) do
@@ -120,7 +143,26 @@ defmodule EdMarkaz.ActionHandler.Platform do
 	end
 
 	def handle_action(%{"type" => "SYNC", "payload" => payload, "last_snapshot" => last_sync_date}, %{id: id, client_id: client_id} = state) do
-		res = EdMarkaz.Supplier.sync_changes(id, client_id, payload, last_sync_date)
+
+		# TODO: here, pull out the merge/delete/image merges and send them to different places.
+
+		{ write_map, image_map } = Enum.reduce(payload, {%{}, %{}}, fn {pkey, entry}, {w_map, img_map} -> 
+			case entry["action"]["type"] do
+				"IMAGE_MERGE" -> { w_map, Map.put(img_map, pkey, entry)}
+				"MERGE" -> { Map.put(img_map, pkey, entry), img_map}
+				"DELETE" -> { Map.put(img_map, pkey, entry), img_map}
+				other -> 
+					IO.puts "ERROR SPLITTING WRITES"
+					IO.inspect other
+					IO.inspect pkey
+					IO.inspect entry
+					{w_map, img_map}
+			end
+		end)
+
+		IO.inspect image_map
+
+		res = EdMarkaz.Supplier.sync_changes(id, client_id, write_map, last_sync_date)
 
 		{:reply, succeed(res), state}
 	end

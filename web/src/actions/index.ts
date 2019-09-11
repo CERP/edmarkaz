@@ -48,6 +48,7 @@ export const saveProductAction = (product: Product) => (dispatch: Dispatch, getS
 	// save product...
 
 	const state = getState();
+
 	syncr.send({
 		type: "MERGE_PRODUCT",
 		payload: {
@@ -58,9 +59,36 @@ export const saveProductAction = (product: Product) => (dispatch: Dispatch, getS
 		client_id: state.auth.id,
 	})
 	.then(res => {
-		console.log(res)
-		console.log("should now dispatch add product")
-		// dispatch add product action
+		console.log('add product action...')
+	})
+	.catch(err => {
+		console.error(err)
+	})
+
+}
+
+export const PRODUCT_IMAGE_ADDED = "PRODUCT_IMAGE_ADDED"
+export interface ProductImageAddedAction {
+	type: "PRODUCT_IMAGE_ADDED"
+	product_id: string
+	image_id: string
+	img_url: string
+}
+
+export const saveProductImage = (imageId: string, dataUrl: string, product: Product) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+
+	const state = getState();
+	syncr.send({
+		type: "MERGE_PRODUCT_IMAGE",
+		payload: {
+			id: imageId,
+			product_id: product.id,
+			data_url: dataUrl
+		},
+		client_type: state.auth.client_type,
+		client_id: state.auth.id
+	})
+	.then(res => {
 	})
 	.catch(err => {
 		console.error(err)

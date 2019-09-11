@@ -1,7 +1,7 @@
 import Dynamic from '@ironbay/dynamic'
 
 import { MERGES, MergeAction, DELETES, DeletesAction, CONFIRM_SYNC, CONFIRM_SYNC_DIFF, QUEUE, QueueAction, SNAPSHOT, ON_CONNECT, ON_DISCONNECT, LOGIN_FAIL, LOGIN_SUCCEED, SNAPSHOT_DIFF, LoginSucceed, ConfirmSyncAction, SnapshotDiffAction, RPC_SUCCEED, RPCSucceedAction } from '~/src/actions/core'
-import {Actions, ADD_SCHOOL, addSchoolAction, ADD_SCHOOLS, addNewSchoolAction, EditLoginNumberAction, EDIT_LOGIN_NUMBER, ADD_PRODUCTS, AddProductsAction } from '~/src/actions'
+import {Actions, ADD_SCHOOL, addSchoolAction, ADD_SCHOOLS, addNewSchoolAction, EditLoginNumberAction, EDIT_LOGIN_NUMBER, ADD_PRODUCTS, AddProductsAction, PRODUCT_IMAGE_ADDED, ProductImageAddedAction } from '~/src/actions'
 
 
 const rootReducer = (state : RootBankState, action: Actions) : RootBankState => {
@@ -225,6 +225,31 @@ const rootReducer = (state : RootBankState, action: Actions) : RootBankState => 
 					db: {
 						...state.products.db,
 						...add_action.products
+					}
+				}
+			}
+		}
+
+		case PRODUCT_IMAGE_ADDED:
+		{
+			// @ts-ignore
+			const image_action = action as ProductImageAddedAction
+
+			console.log(image_action)
+
+			return {
+				...state,
+				products: {
+					...state.products,
+					db: {
+						...state.products.db,
+						[image_action.product_id]: {
+							...(state.products.db[image_action.product_id]),
+							image: {
+								url: image_action.img_url,
+								id: image_action.image_id
+							}
+						}
 					}
 				}
 			}

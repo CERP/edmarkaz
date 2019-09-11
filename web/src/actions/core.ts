@@ -63,7 +63,57 @@ export const createImageMerges = (imageMerges: ImageMerges) => (dispatch: Dispat
 	// the path should be to an image object
 	// which is { id: string, url: string }
 	// we pass in the id here
-	// 
+
+	const state = getState()
+	const merges = imageMerges.reduce((agg, curr) => {
+		return {
+			...agg,
+			[curr.path.join(',')]: {
+				action: {
+					type: "IMAGE_MERGE",
+					path: curr.path,
+					value: {
+						id: curr.id,
+						image_string: curr.imageString
+					}
+				},
+				date: new Date().getTime()
+			}
+		}
+	}, {})
+
+	const rationalized_merges = {
+		...state.queued,
+		...merges
+	}
+
+	// this would go right into the queued map
+	// is there a chance that the path would overwrite something else...
+	// example:
+	/*
+		A [product, id]: { ... image: {id: 1000 } }
+		B [product, id, image]: { id: 1000 }
+		C [product, id, image, id]: 1000
+
+		then this image merge: 
+		[product, id, image]: { id: [img id]}
+
+		this overwrites C BUT does the same thing. have to ensure C doesnt come second
+		C and B should never happen because if you are only altering the image, it should 
+		only be an image write
+	*/
+
+	syncr.send({
+		type: SYNC,
+		client_type: state.auth.client_type,
+		id: state.auth.id,
+		payload: rationalized_merges
+	})
+	.then(dispatch) // should return a series of merges with an image url 
+	.catch((err : Error) => {
+		dispatch(QueueUp(merges))
+	})
+
 
 }
 

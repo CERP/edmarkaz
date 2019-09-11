@@ -19,7 +19,22 @@ defmodule EdMarkaz.Product do
 					{:error, err}
 
 		end
+	end
 
+	def merge_image(id, img_url) do
+
+		case Postgrex.query(
+			EdMarkaz.DB,
+			"UPDATE products
+			SET product = jsonb_set(product, '{image, url}', $1), sync_time=current_timestamp
+			WHERE id=$2", [img_url, id]
+		) do
+			{:ok, resp} -> {:ok}
+			{:error, err} -> 
+				IO.puts "product img update failed"
+				IO.inspect err
+				{:error, err}
+		end
 	end
 
 	# this is going to need to handle merges and syncing
