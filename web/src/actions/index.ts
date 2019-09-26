@@ -49,6 +49,15 @@ export const saveProductAction = (product: Product) => (dispatch: Dispatch, getS
 
 	const state = getState();
 
+	const a : AddProductsAction = {
+		type: "ADD_PRODUCTS",
+		products: {
+			[product.id]: product
+		}
+	}
+
+	dispatch(a)
+
 	syncr.send({
 		type: "MERGE_PRODUCT",
 		payload: {

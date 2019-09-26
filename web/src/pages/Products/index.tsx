@@ -54,8 +54,9 @@ class ProductsPage extends React.Component<propTypes> {
 			<div className="list">
 			{
 				Object.values(this.props.products)
-					.map(p => <div key={p.id}>
-						<ProductEntry product={p} onClick={this.onProductClick(p)} />
+					.filter(p => !p.deleted)
+					.map(p => <div key={p.id} onClick={this.onProductClick(p)}>
+						<ProductEntry product={p} />
 					</div>)
 			}
 			</div>
@@ -63,9 +64,9 @@ class ProductsPage extends React.Component<propTypes> {
 	}
 }
 
-const ProductEntry : React.SFC<{product: Product, onClick: any}> = (props) => {
+const ProductEntry : React.SFC<{product: Product }> = (props) => {
 
-	return <div className="product-entry" onClick={props.onClick}>
+	return <div className="product-entry">
 		<div className="name">{props.product.title}</div>
 		<div>{props.product.description}</div>
 	</div>

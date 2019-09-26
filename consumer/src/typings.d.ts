@@ -2,6 +2,8 @@ interface SyncState {
 
 }
 
+type SUPPLIER_TYPE = "TEXTBOOKS" | "OTHER_BOOKS" | "EDTECH" | "STATIONARY" | "SOLAR" | "LEARNING_MATERIALS" | "MIS" | "TESTING_SERVICES" | "FINANCE" | "UNKNOWN"
+
 interface Product {
 	id: string
 	supplier_id: string
@@ -9,6 +11,11 @@ interface Product {
 	description: string
 	phone_number: string
 	img_url: string
+	image?: {
+		id: string,
+		url?: string
+	}
+	deleted?: boolean
 }
 
 interface RootReducerState {

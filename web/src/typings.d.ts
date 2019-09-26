@@ -128,6 +128,7 @@ interface Product {
 		id: string,
 		url?: string
 	}
+	deleted?: boolean
 }
 
 interface RootBankState {

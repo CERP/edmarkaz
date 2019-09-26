@@ -2,6 +2,8 @@ import React from 'react'
 import { Route, Link, RouteComponentProps, withRouter } from 'react-router-dom'
 
 import ProductHome from '../ProductHome'
+import SupplierHome from '../Supplier'
+import ProductPage from './Product'
 
 import icon from './icon.svg'
 import './style.css'
@@ -42,6 +44,8 @@ class Accordian extends React.Component<P, S> {
 			</div>
 
 			<div className="burger-stub">
+				<Route exact path="/supplier/:supplier_id/:product_id" component={ProductPage} />
+				<Route exact path="/supplier/:supplier_id" component={SupplierHome} />
 				<Route exact path="/" component={ProductHome} />
 			</div>
 

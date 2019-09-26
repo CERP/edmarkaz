@@ -1,6 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { Link } from 'react-router-dom';
+
 import { getProducts } from '../../actions';
+import getSupplierSection from '../../utils/getSupplierSection';
 
 interface P {
 	products: RootReducerState['products']['db']
@@ -23,34 +26,44 @@ class LoggedOutHome extends React.Component<P, S> {
 
 	*/
 	render() {
+
+		// this should have a supplier image, title, and category
+		const suppliers = {} as {[k: string]: number }
+
+		Object.values(this.props.products).forEach(p => {
+			suppliers[p.supplier_id] = 1
+		});
+
 		return <div className="products page">
 
 			<div className="title">Products</div>
 
 			<div className="divider">Finance</div>
-			<div className="section">
+			<div className="section" style={{ width: "75%" }}>
 			{
-				Object.entries(this.props.products)
-					.filter(([, v]) => 
-						v.supplier_id === "finca" || v.supplier_id === "telenor"
-						|| v.supplier_id === "jsbank" || v.supplier_id === "kashf"
-					)
-					.map(([k, v]) => {
-						return <div className="supplier-box">
-							<div>{v.supplier_id}</div>
-						</div>
+				Object.keys(suppliers)
+					.filter(s => getSupplierSection(s) === "FINANCE")
+					.map(s => {
+						return <Link className="supplier-box" to={`/supplier/${s}`} key={s}>
+							<div>{s}</div>
+						</Link>
+					})
+			}
+			</div>
+
+			<div className="divider">EdTech</div>
+			<div className="section" style={{ width: "75%" }}>
+			{
+				Object.keys(suppliers)
+					.filter(s => getSupplierSection(s) === "EDTECH")
+					.map(s => {
+						return <Link className="supplier-box" to={`/supplier/${s}`} key={s}>
+							<div>{s}</div>
+						</Link>
 					})
 			}
 
 			</div>
-			{
-				Object.entries(this.props.products)
-					.map(([k, v]) => {
-						console.log(v)
-						return <div>{v.title}</div>
-					})
-			}
-
 		</div>
 	}
 }

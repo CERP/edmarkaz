@@ -31,6 +31,8 @@ defmodule EdMarkaz.ActionHandler.Platform do
 	def handle_action(%{"type" => "MERGE_PRODUCT", "payload" => %{"id" => id, "product" => product}}, %{id: supplier_id, client_id: client_id} = state) do
 
 		IO.puts "merge product action recvd"
+		IO.inspect id
+		IO.inspect product
 
 		EdMarkaz.Product.merge(id, product, supplier_id)
 

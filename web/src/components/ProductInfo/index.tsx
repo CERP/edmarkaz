@@ -47,7 +47,8 @@ class ProductInfo extends React.Component<propTypes, S> {
 			image: {
 				id: "",
 				url: ""
-			}
+			},
+			deleted: false
 		}
 
 		this.state = {
@@ -65,6 +66,14 @@ class ProductInfo extends React.Component<propTypes, S> {
 		})
 	}
 
+	componentWillReceiveProps(nextProps : propTypes) {
+		if(nextProps.product && nextProps.product.id != this.props.product_id) {
+			this.setState({
+				product: this.props.product
+			})
+		}
+	}
+
 	onSave = () => {
 		this.props.saveProduct(this.state.product)
 
@@ -79,6 +88,20 @@ class ProductInfo extends React.Component<propTypes, S> {
 				this.state.product
 			)
 		}
+	}
+
+	onDelete = () => {
+
+		if(window.confirm("are you sure you want to delete the product?")) {
+
+			this.props.saveProduct({
+				...this.state.product,
+				deleted: true
+			})
+
+			this.onClose();
+		}
+
 	}
 
 	uploadImage = (e : React.ChangeEvent<HTMLInputElement>) => {
@@ -143,6 +166,7 @@ class ProductInfo extends React.Component<propTypes, S> {
 
 			</div>
 			<div className="row">
+				<div className="button red" onClick={this.onDelete}>Delete Product</div>
 				<div className="button blue" onClick={this.onSave}>Save Product</div>
 			</div>
 		</div>

@@ -24,10 +24,10 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 
 		dt = DateTime.from_unix!(last_sync, :millisecond)
 		IO.inspect dt
-		case Postgrex.query(EdMarkaz.DB, "SELECT supplier_id, product, sync_time from products WHERE sync_time > $1 ", [DateTime.to_naive(dt)]) do
+		case Postgrex.query(EdMarkaz.DB, "SELECT id, supplier_id, product, sync_time from products WHERE sync_time > $1 ", [DateTime.to_naive(dt)]) do
 			{:ok, resp} -> 
 				mapped = resp.rows
-					|> Enum.map(fn [id, product, sync_time] -> {id, product} end)
+					|> Enum.map(fn [id, supplier_id, product, sync_time] -> {id, product} end)
 					|> Enum.into(%{})
 
 				{:reply, succeed(%{products: mapped}), state}

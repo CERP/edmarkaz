@@ -1,0 +1,36 @@
+
+.product-list {
+	display: flex;
+	align-items: flex-start;
+	justify-content: center;
+	flex-wrap: wrap;
+	width: 75%;
+	flex: 1;
+}
+
+.product-box {
+
+	border: 1px solid #333;
+
+	display: flex;
+	width: 300px;
+	flex-direction: column;
+	padding: 10px;
+	align-items: center;
+
+	margin: 10px;
+	border-radius: 6px;
+
+}
+
+.product-box .product-image {
+	height: 200px;
+	width: 200px;
+
+	background-size: contain;
+	background-position: 50% 50%;
+	background-color: rgba(0, 0, 0, 0.2);
+	border-radius: 100%;
+	border: 1px solid #333;
+
+}
