@@ -156,7 +156,7 @@ a.block {
 .row {
 	display: flex;
 	flex-direction: row;
-	align-items: baseline;
+	align-items: center;
 	font-size: 1rem;
 }
 

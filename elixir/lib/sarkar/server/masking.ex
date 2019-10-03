@@ -71,7 +71,7 @@ defmodule EdMarkaz.Server.Masking do
 								db->>'phone_number_3'=$1 OR
 								db->>'owner_phonenumber'=$1 OR
 								db->>'pulled_phonenumber'=$1 OR
-								db->>'alt_phone_number=$1'=$1", [incoming])
+								db->>'alt_phone_number'=$1", [incoming])
 						
 						case resp.rows do
 							# school matched

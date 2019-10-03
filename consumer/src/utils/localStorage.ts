@@ -5,7 +5,7 @@ export const saveDB = (db : RootReducerState) => {
 	try {
 
 		saveAuth(db.auth)
-		saveSyncState(db.sync_state)
+		saveSyncState(db)
 		saveSnapshot(db.last_snapshot)
 		saveQueue(db.queued)
 		saveProducts(db.products)
@@ -92,13 +92,17 @@ const loadSyncState = () : RootReducerState['sync_state'] => {
 		return curr;
 	}
 
-	return {};
+	return {
+		profile: { }
+	};
 
 }
 
-const saveSyncState = (sync_state : RootReducerState['sync_state']) => {
+const saveSyncState = (state: RootReducerState) => {
 
-	localStorage.setItem("sync_state", JSON.stringify(sync_state));
+	if(state.auth.token) {
+		localStorage.setItem("sync_state", JSON.stringify(state.sync_state));
+	}
 }
 
 const saveQueue = (queue : RootReducerState['queued']) => {

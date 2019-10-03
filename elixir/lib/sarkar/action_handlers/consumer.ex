@@ -9,6 +9,51 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 		end
 	end
 
+	def handle_action(%{
+		"type" => "SIGN_UP",
+		"client_id" => client_id, 
+		"payload" => %{"number" => number, "password" => password, "profile" => profile}}, state) do
+
+		IO.puts "handling sign up for #{number}"
+
+		refcode = Map.get(profile, "refcode")
+
+		# we aren't syncing platform schools
+		# if someone saves some bogus value here, we aren't able to undo
+		{:ok, res} = Postgrex.query(EdMarkaz.DB, "INSERT INTO platform_schools (id, db)
+			VALUES ($1, $2) 
+			ON CONFLICT (id) DO UPDATE set db=excluded.db", [refcode, profile])
+
+		{:ok, text} = EdMarkaz.Auth.create({number, password})
+		{:ok, token} = EdMarkaz.Auth.login({number, client_id, password})
+
+
+		{:reply, succeed(%{token: token}), %{id: number, client_id: client_id}}
+	end
+
+	def handle_action(%{"type" => "GET_PROFILE", "payload" => %{"number" => number}}, state) do
+
+		{:ok, resp} = Postgrex.query(EdMarkaz.DB, "SELECT id, db->>'school_name', db FROM platform_schools WHERE 
+			concat('0', db->>'phone_number') = $1 OR
+			db->>'phone_number_1'=$1 OR
+			db->>'phone_number_2'=$1 OR
+			db->>'phone_number_3'=$1 OR
+			db->>'owner_phonenumber'=$1 OR
+			db->>'pulled_phonenumber'=$1 OR
+			db->>'alt_phone_number'=$1", [number])
+
+		case resp.rows do
+			[[ school_id, name, db]] -> 
+				{:reply, succeed(%{"school_id" => school_id, "school" => db}), state}
+			[[school_id, name, db] | more ] ->
+				IO.puts "MULTIPLE SCHOOLS FOUND"
+				{:reply, succeed(%{"school_id" => school_id, "school" => db}), state}
+			other ->
+				IO.puts "no school found"
+				{:reply, fail(%{"msg" => "school not found"}), state}
+		end
+	end
+
 	def handle_action(%{"type" => "VERIFY", "payload" => %{"id" => id, "token" => token, "client_id" => client_id}}, state) do
 		case EdMarkaz.Auth.verify({id, client_id, token}) do
 			{:ok, _} ->
@@ -20,10 +65,23 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 		end
 	end
 
+	def handle_action(%{"type" => "PLACE_ORDER", "payload" => %{"product" => product, "refcode" => refcode}}, %{client_id: client_id, id: id} = state) do
+
+		product_name = Map.get(product, "title")
+		supplier_id = Map.get(product, "supplier_id")
+
+		# EdMarkaz.Slack.send_alert("#{id} placed order for #{product_name} from #{supplier_id}")
+
+		# sync to supplier
+		EdMarkaz.Supplier.place_order(supplier_id, product, refcode, client_id)
+
+		{:reply, succeed(), state}
+
+	end
+
 	def handle_action(%{"type" => "GET_PRODUCTS", "last_sync" => last_sync}, state) do
 
 		dt = DateTime.from_unix!(last_sync, :millisecond)
-		IO.inspect dt
 		case Postgrex.query(EdMarkaz.DB, "SELECT id, supplier_id, product, sync_time from products WHERE sync_time > $1 ", [DateTime.to_naive(dt)]) do
 			{:ok, resp} -> 
 				mapped = resp.rows
@@ -43,6 +101,8 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 
 	# this goes through our normal sync flow, though we need to figure out how to kill the server at a certain point
 
+	{:reply, succeed(%{"type" => "noop"}), state}
+
 	end
 
 	#logged-out sync
@@ -61,7 +121,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 		# we can add a flag on to the value which means that it will get queued, but not applied to local sync_state
 		# value: { no_local_apply: true }
 
-		
+	{:reply, succeed(%{"type" => "noop"}), state}
 	end
 
 	defp start_supplier(id) do

@@ -5,6 +5,7 @@ import Former from '~/src/utils/former'
 import { clearDB } from '~/src/utils/localStorage'
 
 import { addSupplierNumber, deleteSupplierNumber } from '~/src/actions'
+import { getDownsizedImage } from '~src/utils/image'
 
 interface propTypes {
 	numbers: RootBankState['sync_state']['numbers'],
@@ -13,8 +14,9 @@ interface propTypes {
 }
 
 interface stateType {
-	current_number: string,
-	current_name: string,
+	current_number: string
+	current_name: string
+	logoDataString: string
 }
 
 class Settings extends React.Component<propTypes, stateType> {
@@ -26,7 +28,8 @@ class Settings extends React.Component<propTypes, stateType> {
 
 		this.state = {
 			current_number: "",
-			current_name: ""
+			current_name: "",
+			logoDataString: ""
 		}
 
 		this.former = new Former(this, [])
@@ -54,13 +57,44 @@ class Settings extends React.Component<propTypes, stateType> {
 		window.location.reload();
 	}
 
+	uploadLogo = (e : React.ChangeEvent<HTMLInputElement>) => {
+
+		const file = e.target.files[0]
+		if(file === undefined) {
+			return
+		}
+
+		const reader = new FileReader();
+
+		reader.onloadend = () => {
+			const res = reader.result as string;
+
+			getDownsizedImage(res, 544)
+				.then(imgString => {
+
+					this.setState({
+						logoDataString: imgString
+					})
+				})
+		}
+	}
+
 	render() {
 
-		console.log(this.props)
 		return <div className="page">
 			<div className="title">Settings</div>
 
 			<div className="form" style={{ width: "90%" }}>
+
+				<div className="row">
+					<label>Supplier Name</label>
+					<input type="text" {...this.former.super_handle(["supplier_name"])} placeholder="Supplier Name" />
+				</div>
+
+				<div className="row">
+					<label>Official Logo</label>
+					<input type="file" accept="image/*" onChange={this.uploadLogo} />
+				</div>
 
 				<div className="divider">Add New Number</div>
 				<div className="row">

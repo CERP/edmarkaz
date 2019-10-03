@@ -1,7 +1,7 @@
 import Dynamic from '@ironbay/dynamic'
 
-import { MERGES, MergeAction, ON_CONNECT, ON_DISCONNECT, DELETES, DeletesAction, QueueAction, QUEUE, CONFIRM_SYNC_DIFF, ConfirmSyncAction, SnapshotDiffAction, SNAPSHOT_DIFF } from '../actions/core'
-import { ADD_PRODUCTS } from '../actions'
+import { MERGES, MergeAction, ON_CONNECT, ON_DISCONNECT, DELETES, DeletesAction, QueueAction, QUEUE, CONFIRM_SYNC_DIFF, ConfirmSyncAction, SnapshotDiffAction, SNAPSHOT_DIFF, LOGIN_SUCCEED, LoginSucceed } from '../actions/core'
+import { ADD_PRODUCTS, LOAD_PROFILE } from '../actions'
 import { AnyAction } from 'redux';
 
 const rootReducer = (state: RootReducerState, action : AnyAction) : RootReducerState => {
@@ -154,6 +154,32 @@ const rootReducer = (state: RootReducerState, action : AnyAction) : RootReducerS
 						...state.products.db,
 						...add_action.products
 					}
+				}
+			}
+		}
+
+		case LOGIN_SUCCEED:
+		{
+			const login_action = action as LoginSucceed
+
+			return {
+				...state,
+				sync_state: login_action.sync_state,
+				auth: {
+					...state.auth,
+					id: login_action.id,
+					token: login_action.token,
+				}
+			}
+		}
+
+		case LOAD_PROFILE: 
+		{
+			return {
+				...state,
+				sync_state: {
+					...state.sync_state,
+					profile: action.school
 				}
 			}
 		}

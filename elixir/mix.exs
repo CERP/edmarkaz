@@ -27,12 +27,13 @@ defmodule EdMarkaz.MixProject do
 			{:poison, "~> 3.0"},
 			{:google_api_storage, "~> 0.12.0"},
 			{:goth, "~> 1.1.0"},
+			{:tesla, "~> 1.2.0"},
 			{:csv, "~> 2.3"},
 			{:distillery, "~> 2.0"},
 			{:cowboy, "~> 2.2", override: true, manager: :rebar3},
 			{:uuid, "~> 1.1"},
 			{:postgrex, "~>0.13.3"},
-			{:dynamic, github: "ironbay/dynamic", sparse: "elixir"}
+			{:dynamic, github: "taimur38/dynamic", sparse: "elixir"}
 		]
 	end
 end
