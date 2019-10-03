@@ -20,6 +20,7 @@ type P = {
 	products: RootReducerState['products']['db']
 	connected: boolean
 	getProducts: () => void
+	placeOrder: (product: Product) => void
 } & RouteComponentProps<RouteInfo>
 
 //TODO: should request product from backend if not in state
@@ -31,6 +32,8 @@ class ProductPage extends React.Component<P, S> {
 
 	onOrder = () => {
 		// dispatch onOrder action
+		const product_id = this.props.match.params.product_id;
+		this.props.placeOrder(this.props.products[product_id])
 		
 	}
 

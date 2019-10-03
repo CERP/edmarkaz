@@ -5,7 +5,8 @@ defmodule EdMarkaz.Slack do
 
 		url = "https://hooks.slack.com/services/" <> System.get_env("SLACK_TOKEN")
 
-		{:ok, _response } = Tesla.post(url, alert_message)
+		encoded = Poison.encode!(%{"text" => alert_message})
+		{:ok, _response } = Tesla.post(url, encoded)
 	end
 
 end

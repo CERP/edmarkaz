@@ -70,9 +70,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 		product_name = Map.get(product, "title")
 		supplier_id = Map.get(product, "supplier_id")
 
-		# EdMarkaz.Slack.send_alert("#{id} placed order for #{product_name} from #{supplier_id}")
-
-		# sync to supplier
+		EdMarkaz.Slack.send_alert("#{id} placed order for #{product_name} by #{supplier_id}")
 		EdMarkaz.Supplier.place_order(supplier_id, product, refcode, client_id)
 
 		{:reply, succeed(), state}

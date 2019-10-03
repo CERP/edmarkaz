@@ -141,7 +141,8 @@ export const placeOrder = (product: Product) => (dispatch: Dispatch, getState: G
 		client_id: state.client_id,
 		id: state.auth.id,
 		payload: {
-			product
+			product,
+			refcode: state.sync_state.profile.refcode
 		}
 	})
 	.then(res => {
