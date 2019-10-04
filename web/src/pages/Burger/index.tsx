@@ -15,6 +15,7 @@ import SchoolInfo from '~/src/components/SchoolInfo'
 import ProductInfo from '~/src/components/ProductInfo'
 
 import './style.css'
+import Dashboard from '../Dashboard';
 
 class Burger extends React.Component<RouteComponentProps> {
 
@@ -51,6 +52,7 @@ class Burger extends React.Component<RouteComponentProps> {
 				<Link to={{ pathname: "/rejected", search }} className={current === '/rejected' ? "active" : ""}>Rejected</Link>
 				<Link to={{ pathname: "/orders", search }} className={current === '/orders' ? "active" : ""}>Orders</Link>
 				<Link to={{ pathname: "/products", search }} className={current === '/products' ? "active" : ""}>Products</Link>
+				<Link to="/dashboard/activities" className={current === '/dashboard' ? "active" : ""}>Dashboard</Link>
 				<Link to="/settings" className={current === '/settings' ? "active" : ""}>Settings</Link>
 			</div>
 
@@ -62,6 +64,7 @@ class Burger extends React.Component<RouteComponentProps> {
 				<Route path="/rejected" component={Rejected} title={"Rejected"} />
 				<Route path="/products" component={Products} />
 				<Route path="/orders" component={Orders} />
+				<Route path="/dashboard" component={Dashboard} />
 				<Route path="/settings" component={Settings} />
 			</div>
 			{
