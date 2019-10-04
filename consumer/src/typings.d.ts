@@ -16,7 +16,8 @@ interface Product {
 	image?: {
 		id: string,
 		url?: string
-	}
+	},
+	price: string
 	deleted?: boolean
 }
 

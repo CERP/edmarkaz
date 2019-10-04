@@ -9,6 +9,7 @@ import Done from '../Done'
 import Rejected from '../Rejected'
 import Settings from '../Settings'
 import Products from '../Products'
+import Orders from '../Orders'
 
 import SchoolInfo from '~/src/components/SchoolInfo'
 import ProductInfo from '~/src/components/ProductInfo'
@@ -48,6 +49,7 @@ class Burger extends React.Component<RouteComponentProps> {
 				<Link to={{ pathname: "/progress", search }} className={current === '/progress' ? "active" : ""}>In Progress</Link>
 				<Link to={{ pathname: "/done", search }} className={current === '/done' ? "active" : ""}>Done</Link>
 				<Link to={{ pathname: "/rejected", search }} className={current === '/rejected' ? "active" : ""}>Rejected</Link>
+				<Link to={{ pathname: "/orders", search }} className={current === '/orders' ? "active" : ""}>Orders</Link>
 				<Link to={{ pathname: "/products", search }} className={current === '/products' ? "active" : ""}>Products</Link>
 				<Link to="/settings" className={current === '/settings' ? "active" : ""}>Settings</Link>
 			</div>
@@ -59,6 +61,7 @@ class Burger extends React.Component<RouteComponentProps> {
 				<Route path="/done" component={Done} />
 				<Route path="/rejected" component={Rejected} title={"Rejected"} />
 				<Route path="/products" component={Products} />
+				<Route path="/orders" component={Orders} />
 				<Route path="/settings" component={Settings} />
 			</div>
 			{

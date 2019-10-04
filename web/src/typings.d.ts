@@ -22,7 +22,7 @@ interface SchoolMatch {
 	status: "NEW" | "IN_PROGRESS" | "REJECTED" | "DONE",
 	masked_number?: string,
 	history: {
-		[timestamp: number]: SupplierInteractionEvent | CallEndEvent | CallEndSurvey | CallEndSurveyFollowUp
+		[timestamp: number]: SupplierInteractionEvent | CallEndEvent | CallEndSurvey | CallEndSurveyFollowUp | OrderPlacedEvent
 	}
 }
 
@@ -31,7 +31,7 @@ interface PlatformInteractionEvent {
 	time: number,
 	user: {
 		name: string,
-		number: string
+		number?: string
 	}
 }
 
@@ -41,6 +41,14 @@ interface CallEndEvent extends PlatformInteractionEvent {
 		call_status: "ANSWER" | "NO ANSWER" | "BUSY" | "CANCEL" | "FAILED" | "CONGESTION",
 		duration: string,
 		unique_id: string
+	}
+}
+
+interface OrderPlacedEvent extends PlatformInteractionEvent {
+	event: "ORDER_PLACED"
+	meta: {
+		school_id: string
+		product_id: string
 	}
 }
 
@@ -128,6 +136,7 @@ interface Product {
 		id: string,
 		url?: string
 	}
+	price: string
 	deleted?: boolean
 }
 

@@ -23,7 +23,6 @@ type P = {
 	placeOrder: (product: Product) => void
 } & RouteComponentProps<RouteInfo>
 
-//TODO: should request product from backend if not in state
 class ProductPage extends React.Component<P, S> {
 
 	componentDidMount() {
@@ -51,6 +50,7 @@ class ProductPage extends React.Component<P, S> {
 			<img src={product.image && product.image.url} />
 			<div className="supplier">{product.supplier_id}</div>
 			<div className="description">{product.description}</div>
+			<div className="price">{product.price}</div>
 			{ this.props.connected && !this.props.auth.token && <Link className="button blue" to="/sign-up">Sign up to Order Online</Link> }
 			{ this.props.connected && this.props.auth.token && <div className="button blue" onClick={this.onOrder}>Place Order Online</div> }
 			<div className="number">Call 03555935557 to Order now</div>

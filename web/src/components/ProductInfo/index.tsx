@@ -43,6 +43,7 @@ class ProductInfo extends React.Component<propTypes, S> {
 			title: "",
 			description: "",
 			img_url: "",
+			price: "",
 			phone_number: "",
 			image: {
 				id: "",
@@ -69,7 +70,7 @@ class ProductInfo extends React.Component<propTypes, S> {
 	componentWillReceiveProps(nextProps : propTypes) {
 		if(nextProps.product && nextProps.product.id != this.props.product_id) {
 			this.setState({
-				product: this.props.product
+				product: nextProps.product
 			})
 		}
 	}
@@ -158,17 +159,30 @@ class ProductInfo extends React.Component<propTypes, S> {
 				</div>
 
 				<div className="row">
+					<label>Price</label>
+					<input type="text" {...this.former.super_handle(["price"])} placeholder="Price" />
+				</div>
+
+				<div className="row">
 					<label>Image</label>
 					<input type="file" accept="image/*" onChange={this.uploadImage}/>
 				</div>
 
-				<img src={this.state.imageDataString || this.state.product.image && this.state.product.image.url} />
+				<div className="row">
+					<label>Product Image</label>
+					<img src={this.state.imageDataString || this.state.product.image && this.state.product.image.url} />
+				</div>
 
 			</div>
-			<div className="row">
+			{ this.props.connected && <div className="row save-delete">
 				<div className="button red" onClick={this.onDelete}>Delete Product</div>
 				<div className="button blue" onClick={this.onSave}>Save Product</div>
 			</div>
+			}
+			{
+				!this.props.connected && <div>Connecting...</div>
+			}
+
 		</div>
 	}
 }

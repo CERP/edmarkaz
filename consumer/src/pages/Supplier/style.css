@@ -28,6 +28,7 @@
 	width: 200px;
 
 	background-size: contain;
+	background-repeat: no-repeat;
 	background-position: 50% 50%;
 	background-color: rgba(0, 0, 0, 0.2);
 	border-radius: 100%;
