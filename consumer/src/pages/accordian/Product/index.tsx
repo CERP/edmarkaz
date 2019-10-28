@@ -52,7 +52,7 @@ class ProductPage extends React.Component<P, S> {
 			<div className="description">{product.description}</div>
 			<div className="price">{product.price}</div>
 			{ this.props.connected && !this.props.auth.token && <Link className="button blue" to="/sign-up">Sign up to Order Online</Link> }
-			{ this.props.connected && this.props.auth.token && <div className="button blue" onClick={this.onOrder}>Place Order Online</div> }
+			{ this.props.connected && this.props.auth.token && <div className="button blue" onClick={this.onOrder}>Request Information</div> }
 			<div className="number">Call 03555935557 to Order now</div>
 		</div>
 

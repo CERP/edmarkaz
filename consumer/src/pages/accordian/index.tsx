@@ -41,7 +41,7 @@ class Accordian extends React.Component<P, S> {
 		const search = this.props.location.search;
 
 		return <div className={`root-page accordian ${this.state.visible ? "" : "minimized"}`}>
-			<div className="header">IlmExchange</div>
+			<div className="header">IlmExchange (Consumer)</div>
 
 			<div className="burger">
 				<div className="whopper" onClick={this.onMinimize} style={{ background: `url(${icon}) 50% 0 no-repeat`}} />
