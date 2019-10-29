@@ -1,22 +1,28 @@
+import { string } from "prop-types";
+
 declare module "*.json" {
 	const value: any;
 	export default value;
 }
 
+/*
 declare module 'deck.gl' {
 	const value: any;
 	export const ScatterplotLayer: any;
 	export default value;
 }
+*/
 
 // could include "history" here or "timeline"
 // with { [timestamp]: { event: 'number-revealed'}}
 // then when things are added to a supplier from backend its already in sync_state
+
+declare global {
 interface SchoolMatch {
 	status: "NEW" | "IN_PROGRESS" | "REJECTED" | "DONE",
 	masked_number?: string,
-	history?: {
-		[timestamp: number]: SupplierInteractionEvent | CallEndEvent | CallEndSurvey | CallEndSurveyFollowUp | MarkCompleteSurvey
+	history: {
+		[timestamp: number]: SupplierInteractionEvent | CallEndEvent | CallEndSurvey | CallEndSurveyFollowUp | MarkCompleteSurvey | OrderPlacedEvent
 	}
 }
 
@@ -25,7 +31,7 @@ interface PlatformInteractionEvent {
 	time: number,
 	user: {
 		name: string,
-		number: string
+		number?: string
 	}
 }
 
@@ -35,6 +41,14 @@ interface CallEndEvent extends PlatformInteractionEvent {
 		call_status: "ANSWER" | "NO ANSWER" | "BUSY" | "CANCEL" | "FAILED" | "CONGESTION",
 		duration: string,
 		unique_id: string
+	}
+}
+
+interface OrderPlacedEvent extends PlatformInteractionEvent {
+	event: "ORDER_PLACED"
+	meta: {
+		school_id: string
+		product_id: string
 	}
 }
 
@@ -111,33 +125,50 @@ type SupplierInteractionEvent = {
 	event: "MARK_REJECTED" | "REVEAL_NUMBER" | "MARK_DONE" | "CALL_START" | "CALL_BACK",
 } & PlatformInteractionEvent
 
+interface Product {
+	id: string
+	supplier_id: string
+	title: string
+	description: string
+	phone_number: string
+	img_url: string
+	image?: {
+		id: string,
+		url?: string
+	}
+	price: string
+	deleted?: boolean
+}
 
 interface RootBankState {
 	school_locations: {
 		[school_id: string]: SchoolLocation
-	},
-	school_db: {
-		[school_id: string]: PMIUSchool
-	},
+	}
 	new_school_db: {
 		[school_id: string]: CERPSchool
 	},
+	products: {
+		last_sync: number
+		db: {
+			[product_id: string]: Product
+		}
+	}
 	sync_state: {
 		matches: {
 			[school_id : string]: SchoolMatch
-		},
+		}
 		numbers: {
 			[number: string]: {
 				name: string
 			}
-		},
+		}
 		mask_pairs: {
 			[masked_number: string]: {
 				status: "USED" | "FREE",
 				school_id?: string
 			}
 		}
-	},
+	}
 	auth: {
 		id: string
 		token: string
@@ -434,4 +465,5 @@ interface PMIUSchool {
 	Teachers_MAMSC_Female: string
 	EnumeratorID: string
 	EnumeratorName: string
+}
 }

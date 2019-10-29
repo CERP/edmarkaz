@@ -27,7 +27,19 @@ create table suppliers (
 	sync_state jsonb
 );
 
+create table consumers (
+	id text unique not null,
+	sync_state jsonb
+);
+
 create table platform_schools (
 	id text unique not null,
 	db jsonb 
+);
+
+create table products (
+	id text unique not null,
+	supplier_id text not null,
+	sync_time timestamp default current_timestamp,
+	product jsonb
 );

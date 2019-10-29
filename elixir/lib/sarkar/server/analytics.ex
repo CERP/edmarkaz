@@ -9,7 +9,7 @@ defmodule EdMarkaz.Server.Analytics do
 
 	def init(%{bindings: %{type: "platform-writes.csv"}} = req, state) do
 
-		{:ok, data} = case Postgrex.query(EdMarkaz.School.DB,
+		{:ok, data} = case Postgrex.query(EdMarkaz.DB,
 		"SELECT id, to_timestamp(time/1000)::date as date, count(*) 
 		FROM platform_writes
 		GROUP BY id, date 
@@ -37,7 +37,7 @@ defmodule EdMarkaz.Server.Analytics do
 
 	def init(%{bindings: %{type: "platform-events.csv"}} = req, state) do
 
-		{:ok, data} = case Postgrex.query(EdMarkaz.School.DB,
+		{:ok, data} = case Postgrex.query(EdMarkaz.DB,
 		"SELECT 
 			id, 
 			to_timestamp((value->>'time')::bigint/1000)::date as date,
@@ -72,7 +72,7 @@ defmodule EdMarkaz.Server.Analytics do
 	end
 
 	def init(%{bindings: %{type: "platform-call-surveys.csv"}} = req, state) do
-		{:ok, data} = case Postgrex.query(EdMarkaz.School.DB,
+		{:ok, data} = case Postgrex.query(EdMarkaz.DB,
 		"SELECT 
 			id, 
 			to_timestamp((value->>'time')::bigint/1000)::date as date,
@@ -128,7 +128,7 @@ defmodule EdMarkaz.Server.Analytics do
 
 
 	def init(%{bindings: %{type: "platform-call-survey-followup.csv"}} = req, state) do
-		{:ok, data} = case Postgrex.query(EdMarkaz.School.DB,
+		{:ok, data} = case Postgrex.query(EdMarkaz.DB,
 		"SELECT 
 			id, 
 			to_timestamp((value->>'time')::bigint/1000)::date as date,
@@ -212,7 +212,7 @@ defmodule EdMarkaz.Server.Analytics do
 	end
 
 	def init(%{bindings: %{type: "platform-completed-survey.csv"}} = req, state) do
-		{:ok, data} = case Postgrex.query(EdMarkaz.School.DB,
+		{:ok, data} = case Postgrex.query(EdMarkaz.DB,
 		"SELECT
 			id, to_timestamp((value->>'time')::bigint/1000)::date as date,
 			value->>'event' as event,

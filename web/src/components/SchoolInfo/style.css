@@ -17,10 +17,6 @@
 	color: #333;
 }
 
-.form .row>:not(input):not(.button):last-child {
-	text-align: right;
-}
-
 	.special-survey-wrapper .modal {
 		box-shadow: none;
 		width: 100%;

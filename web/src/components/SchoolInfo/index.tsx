@@ -26,6 +26,7 @@ interface StateProps {
 	school?: CERPSchool
 	schoolMatch?: SchoolMatch
 	username: string
+	products: RootBankState['products']['db']
 }
 
 // survey is basically going to be an event
@@ -209,7 +210,7 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 			<div className="form" style={{width: "90%"}}>
 
 				{
-					hasHistory && <SchoolHistory schoolMatch={schoolMatch} />
+					hasHistory && <SchoolHistory schoolMatch={schoolMatch} products={this.props.products}/>
 				}
 
 				{
@@ -376,6 +377,7 @@ const call_in_progress = ( schoolMatch : SchoolMatch) : boolean => {
 
 interface SchoolMatchProps {
 	schoolMatch: SchoolMatch
+	products: RootBankState['products']['db']
 }
 
 const SchoolHistory : React.SFC<SchoolMatchProps> = (props : SchoolMatchProps) => {
@@ -405,20 +407,27 @@ const SchoolHistory : React.SFC<SchoolMatchProps> = (props : SchoolMatchProps) =
 		</div>
 		{
 			combined_events
-				.map(v => <div className="row" key={v.time}>
-					<div>{moment(v.time).format("DD/MM")}</div>
-					<div>{moment(v.time).format("HH:mm")}</div>
-					<div>{
-						// @ts-ignore
-						v.user.name.name || v.user.name
-					}</div>
-					<div>{v.event}</div>
-					<div>{v.meta ? v.meta.call_status : ""}</div>
-					{
-						v.event === "CALL_END" ? console.log("META:", v.meta) : false
+				.map(v => {
+					if(v.event === "ORDER_PLACED") {
+						console.log(v.meta)
+						console.log(props.products[v.meta.product_id])
 					}
-					
-				</div>)
+
+					return <div className="row" key={v.time}>
+						<div>{moment(v.time).format("DD/MM")}</div>
+						<div>{moment(v.time).format("HH:mm")}</div>
+						<div>{
+							// @ts-ignore
+							v.user.name.name || v.user.name
+						}</div>
+						<div>{v.event}</div>
+						<div>{v.meta ? v.meta.call_status || (v.event === "ORDER_PLACED" && props.products[v.meta.product_id].title) : ""}</div>
+						{
+							v.event === "CALL_END" ? console.log("META:", v.meta) : false
+						}
+						
+					</div>
+				})
 		}
 	</div>
 }
@@ -502,7 +511,8 @@ export default connect<StateProps, DispatchProps, OwnProps>((state : RootBankSta
 	school: state.new_school_db[props.school_id],
 	schoolMatch: state.sync_state.matches[props.school_id],
 	connected: state.connected,
-	username: state.auth.id
+	username: state.auth.id,
+	products: state.products.db
 }), (dispatch : Function, props: OwnProps ) => ({
 	addSchool: () => dispatch(getSchoolProfiles([props.school_id])),
 	reserveNumber: () => dispatch(reserveMaskedNumber(props.school_id)),

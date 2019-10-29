@@ -10,11 +10,13 @@ defmodule EdMarkaz.Application do
 		children = [
 			{ Registry, keys: :duplicate, name: EdMarkaz.ConnectionRegistry },
 			{ Registry, keys: :unique, name: EdMarkaz.SupplierRegistry },
+			{ Registry, keys: :unique, name: EdMarkaz.ConsumerRegistry },
 			{ DynamicSupervisor, name: EdMarkaz.SupplierSupervisor, strategy: :one_for_one },
+			{ DynamicSupervisor, name: EdMarkaz.ConsumerSupervisor, strategy: :one_for_one },
 			EdMarkaz.Store.Supplier,
 			{
 				Postgrex,
-					name: EdMarkaz.School.DB,
+					name: EdMarkaz.DB,
 					hostname: System.get_env("POSTGRES_HOST") || "localhost",
 					username: "postgres",
 					password: System.get_env("POSTGRES_PASS") || "postgres",

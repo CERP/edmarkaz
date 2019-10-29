@@ -41,6 +41,70 @@ export const forceSaveFullStatePotentiallyCausingProblems = () => (dispatch: Dis
 	]))
 }
 
+export const saveProductAction = (product: Product) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+
+	console.log('saving product')
+
+	// save product...
+
+	const state = getState();
+
+	const a : AddProductsAction = {
+		type: "ADD_PRODUCTS",
+		products: {
+			[product.id]: product
+		}
+	}
+
+	dispatch(a)
+
+	syncr.send({
+		type: "MERGE_PRODUCT",
+		payload: {
+			id: product.id,
+			product
+		},
+		client_type: state.auth.client_type,
+		client_id: state.auth.id,
+	})
+	.then(res => {
+		console.log('add product action...')
+	})
+	.catch(err => {
+		console.error(err)
+	})
+
+}
+
+export const PRODUCT_IMAGE_ADDED = "PRODUCT_IMAGE_ADDED"
+export interface ProductImageAddedAction {
+	type: "PRODUCT_IMAGE_ADDED"
+	product_id: string
+	image_id: string
+	img_url: string
+}
+
+export const saveProductImage = (imageId: string, dataUrl: string, product: Product) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+
+	const state = getState();
+	syncr.send({
+		type: "MERGE_PRODUCT_IMAGE",
+		payload: {
+			id: imageId,
+			product_id: product.id,
+			data_url: dataUrl
+		},
+		client_type: state.auth.client_type,
+		client_id: state.auth.id
+	})
+	.then(res => {
+	})
+	.catch(err => {
+		console.error(err)
+	})
+
+}
+
 export const ADD_SCHOOLS = "ADD_SCHOOLS"
 
 export interface addNewSchoolAction {
@@ -76,6 +140,78 @@ export const getSchoolProfiles = (school_ids: string[]) => (dispatch: Dispatch, 
 			setTimeout(() => dispatch(getSchoolProfiles(school_ids)), 1000)
 		})
 }
+
+export interface AddProductsAction {
+	type: "ADD_PRODUCTS"
+	products: {
+		[id: string]: Product
+	}
+}
+
+export const ADD_PRODUCTS = "ADD_PRODUCTS"
+export const GET_PRODUCTS = "GET_PRODUCTS"
+export const getProducts = (filters = {}) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+
+	const state = getState();
+
+	syncr.send({
+		type: "GET_PRODUCTS",
+		client_type: state.auth.client_type,
+		client_id: state.auth.id,
+		id: state.auth.id,
+		payload: {
+			filters
+		}
+	})
+	.then((res : any) => {
+		// now dispatch an action that 'saves' these products
+
+		dispatch({
+			type: "ADD_PRODUCTS",
+			products: res.products
+		})
+
+		return res
+	})
+	.catch(err => {
+		console.error(err)
+
+		setTimeout(() => dispatch(getProducts()), 1000)
+	})
+}
+
+export const GET_OWN_PRODUCTS = "GET_OWN_PRODUCTS"
+export const getOwnProducts = (filters = {}) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+
+	const state = getState();
+
+	syncr.send({
+		type: "GET_OWN_PRODUCTS",
+		client_type: state.auth.client_type,
+		client_id: state.auth.id,
+		id: state.auth.id,
+		payload: {
+			filters
+		}
+	})
+	.then((res : any) => {
+		// now dispatch an action that 'saves' these products
+
+		dispatch({
+			type: "ADD_PRODUCTS",
+			products: res.products
+		})
+
+		return res
+	})
+	.catch(err => {
+		console.error(err)
+
+		setTimeout(() => dispatch(getProducts()), 1000)
+	})
+
+}
+
 
 export const ADD_SCHOOL = "ADD_SCHOOL"
 export interface addSchoolAction {

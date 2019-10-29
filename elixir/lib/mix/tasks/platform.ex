@@ -13,7 +13,7 @@ defmodule Mix.Tasks.Platform do
 		Enum.each(json, fn school_profile -> 
 			id = Map.get(school_profile, "refcode")
 
-			case Postgrex.query(EdMarkaz.School.DB, "
+			case Postgrex.query(EdMarkaz.DB, "
 				INSERT INTO platform_schools(id, db) 
 				VALUES ($1, $2) 
 				ON CONFLICT(id) DO UPDATE SET db=$2 ", [id, school_profile]) do
@@ -38,7 +38,7 @@ defmodule Mix.Tasks.Platform do
 		Enum.each(json, fn school_profile -> 
 			id = Map.get(school_profile, "refcode")
 
-			case Postgrex.query(EdMarkaz.School.DB, "
+			case Postgrex.query(EdMarkaz.DB, "
 				INSERT INTO platform_schools(id, db) 
 				VALUES ($1, $2) 
 				ON CONFLICT(id) DO UPDATE SET db=$2 ", [id, school_profile]) do
@@ -93,7 +93,7 @@ defmodule Mix.Tasks.Platform do
 
 	def run(args) do
 		Application.ensure_all_started(:edmarkaz)
-		case Postgrex.query(EdMarkaz.School.DB, "SELECT id, sync_state from suppliers", []) do
+		case Postgrex.query(EdMarkaz.DB, "SELECT id, sync_state from suppliers", []) do
 			{:ok, res} ->
 				res.rows
 				|> Enum.each(fn ([id, sync_state]) ->
@@ -119,7 +119,7 @@ defmodule Mix.Tasks.Platform do
 		matches = Map.get(sync_state, "matches", %{})
 
 		# put the first 100 things into here
-		{:ok, resp} = Postgrex.query(EdMarkaz.School.DB, "SELECT id, db from platform_schools limit 10", [])
+		{:ok, resp} = Postgrex.query(EdMarkaz.DB, "SELECT id, db from platform_schools limit 10", [])
 
 		next_matches = resp.rows
 		|> Enum.reduce(%{}, fn([school_id, db], agg) -> 
