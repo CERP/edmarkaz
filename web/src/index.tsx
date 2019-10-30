@@ -1,4 +1,4 @@
-import * as React  from "react"
+import * as React from "react"
 import * as ReactDOM from "react-dom"
 import { createStore, applyMiddleware } from 'redux'
 import thunkMiddleware, { ThunkMiddleware } from 'redux-thunk'
@@ -19,11 +19,11 @@ import Routes from './routes'
 
 const initial_state = loadDB();
 console.log("initial state", initial_state)
-const syncr : Syncr = new Syncr(host, msg => store.dispatch(msg))
+const syncr: Syncr = new Syncr(host, msg => store.dispatch(msg))
 const store = createStore(reducer, initial_state, applyMiddleware(thunkMiddleware.withExtraArgument(syncr) as ThunkMiddleware<RootBankState, Actions, Syncr>));
 
 //@ts-ignore
-if(window.api_url === undefined) {
+if (window.api_url === undefined) {
 	//@ts-ignore
 	window.createMerges = createMerges;
 	//@ts-ignore

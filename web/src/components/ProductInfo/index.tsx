@@ -34,10 +34,10 @@ interface S {
 class ProductInfo extends React.Component<propTypes, S> {
 
 	former: Former
-	constructor(props : propTypes) {
+	constructor(props: propTypes) {
 		super(props);
 
-		const newProduct : Product = {
+		const newProduct: Product = {
 			id: v4(),
 			supplier_id: this.props.supplier_id,
 			title: "",
@@ -49,7 +49,8 @@ class ProductInfo extends React.Component<propTypes, S> {
 				id: "",
 				url: ""
 			},
-			deleted: false
+			deleted: false,
+			tags: {}
 		}
 
 		this.state = {
@@ -67,8 +68,8 @@ class ProductInfo extends React.Component<propTypes, S> {
 		})
 	}
 
-	componentWillReceiveProps(nextProps : propTypes) {
-		if(nextProps.product && nextProps.product.id != this.props.product_id) {
+	componentWillReceiveProps(nextProps: propTypes) {
+		if (nextProps.product && nextProps.product.id != this.props.product_id) {
 			this.setState({
 				product: nextProps.product
 			})
@@ -81,7 +82,7 @@ class ProductInfo extends React.Component<propTypes, S> {
 		const current_id = this.state.product.image && this.state.product.image.id;
 		const prev_id = this.props.product && this.props.product.image && this.props.product.image.id;
 
-		if(current_id !== prev_id) {
+		if (current_id !== prev_id) {
 			console.log('saving new image')
 			this.props.saveProductImage(
 				current_id,
@@ -93,7 +94,7 @@ class ProductInfo extends React.Component<propTypes, S> {
 
 	onDelete = () => {
 
-		if(window.confirm("are you sure you want to delete the product?")) {
+		if (window.confirm("are you sure you want to delete the product?")) {
 
 			this.props.saveProduct({
 				...this.state.product,
@@ -105,10 +106,10 @@ class ProductInfo extends React.Component<propTypes, S> {
 
 	}
 
-	uploadImage = (e : React.ChangeEvent<HTMLInputElement>) => {
+	uploadImage = (e: React.ChangeEvent<HTMLInputElement>) => {
 
 		const file = e.target.files[0]
-		if(file === undefined) {
+		if (file === undefined) {
 			return
 		}
 
@@ -145,7 +146,7 @@ class ProductInfo extends React.Component<propTypes, S> {
 			<div className="form">
 				<div className="row">
 					<label>Title</label>
-					<input type="text" {...this.former.super_handle(["title"])} placeholder="Title of Product"/>
+					<input type="text" {...this.former.super_handle(["title"])} placeholder="Title of Product" />
 				</div>
 
 				<div className="row">
@@ -165,7 +166,7 @@ class ProductInfo extends React.Component<propTypes, S> {
 
 				<div className="row">
 					<label>Image</label>
-					<input type="file" accept="image/*" onChange={this.uploadImage}/>
+					<input type="file" accept="image/*" onChange={this.uploadImage} />
 				</div>
 
 				<div className="row">
@@ -174,7 +175,7 @@ class ProductInfo extends React.Component<propTypes, S> {
 				</div>
 
 			</div>
-			{ this.props.connected && <div className="row save-delete">
+			{this.props.connected && <div className="row save-delete">
 				<div className="button red" onClick={this.onDelete}>Delete Product</div>
 				<div className="button blue" onClick={this.onSave}>Save Product</div>
 			</div>
@@ -187,11 +188,11 @@ class ProductInfo extends React.Component<propTypes, S> {
 	}
 }
 
-export default connect<StateProps, DispatchProps, OwnProps>((state : RootBankState, props: OwnProps) => ({
+export default connect<StateProps, DispatchProps, OwnProps>((state: RootBankState, props: OwnProps) => ({
 	product: props.product_id === 'new' ? undefined : state.products.db[props.product_id],
 	supplier_id: state.auth.id,
 	connected: state.connected
-}), (dispatch : Function) => ({
+}), (dispatch: Function) => ({
 	saveProduct: (product: Product) => dispatch(saveProductAction(product)),
 	saveProductImage: (imageId: string, dataUrl: string, product: Product) => dispatch(saveProductImage(imageId, dataUrl, product))
 }))(withRouter(ProductInfo))

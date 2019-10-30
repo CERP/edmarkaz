@@ -19,6 +19,9 @@ interface Product {
 	},
 	price: string
 	deleted?: boolean
+	tags: {
+		[tag: string]: boolean
+	}
 }
 
 interface RootReducerState {
