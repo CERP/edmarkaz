@@ -18,15 +18,15 @@ import NotInterestedSurveyComponent from '~/src/components/Surveys/NotInterested
 import './style.css'
 
 interface OwnProps {
-	school_id: string
+	school_id: string;
 }
 
 interface StateProps {
-	connected: boolean
-	school?: CERPSchool
-	schoolMatch?: SchoolMatch
-	username: string
-	products: RootBankState['products']['db']
+	connected: boolean;
+	school?: CERPSchool;
+	schoolMatch?: SchoolMatch;
+	username: string;
+	products: RootBankState['products']['db'];
 }
 
 // survey is basically going to be an event
@@ -36,19 +36,19 @@ interface StateProps {
 // 
 
 interface StateType {
-	showSurvey: false | "NOT_INTERESTED" | "CALL_END" | "MARK_COMPLETE"
-	loading: boolean
+	showSurvey: false | "NOT_INTERESTED" | "CALL_END" | "MARK_COMPLETE";
+	loading: boolean;
 }
 
 interface DispatchProps {
-	addSchool: () => void
-	releaseNumber: () => void
-	reserveNumber: () => void
-	rejectSchool: () => void
-	saveCallEndSurvey: (survey: CallEndSurvey['meta']) => void
-	saveSchoolRejectedSurvey: (survey: NotInterestedSurvey['meta']) => void
-	saveSchoolCompletedSurvey: (survey: MarkCompleteSurvey['meta']) => void
-	saveCallEndFollowupSurvey: (survey: CallEndSurveyFollowUp['meta']) => void
+	addSchool: () => void;
+	releaseNumber: () => void;
+	reserveNumber: () => void;
+	rejectSchool: () => void;
+	saveCallEndSurvey: (survey: CallEndSurvey['meta']) => void;
+	saveSchoolRejectedSurvey: (survey: NotInterestedSurvey['meta']) => void;
+	saveSchoolCompletedSurvey: (survey: MarkCompleteSurvey['meta']) => void;
+	saveCallEndFollowupSurvey: (survey: CallEndSurveyFollowUp['meta']) => void;
 }
 
 type propTypes = OwnProps & StateProps & DispatchProps & RouteComponentProps
@@ -56,7 +56,7 @@ type propTypes = OwnProps & StateProps & DispatchProps & RouteComponentProps
 class SchoolInfo extends React.Component<propTypes, StateType> {
 
 	former: Former
-	constructor(props : propTypes) {
+	constructor(props: propTypes) {
 		super(props);
 
 		if(props.school === undefined) {
@@ -72,7 +72,7 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 
 	}
 
-	componentWillReceiveProps(nextProps : propTypes) {
+	componentWillReceiveProps(nextProps: propTypes) {
 
 		if(nextProps.school === undefined && nextProps.school_id !== this.props.school_id) {
 			nextProps.addSchool()
@@ -149,11 +149,11 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 		})
 	}
 
-	saveSurvey = (survey : CallEndSurvey['meta'] | NotInterestedSurvey['meta'] | MarkCompleteSurvey['meta'] | CallEndSurveyFollowUp['meta']) => {
+	saveSurvey = (survey: CallEndSurvey['meta'] | NotInterestedSurvey['meta'] | MarkCompleteSurvey['meta'] | CallEndSurveyFollowUp['meta']) => {
 
 		console.log("saving survey", this.state)
 
-		const call_end_surveys : CallEndSurvey[] = Object.values(this.props.schoolMatch.history || {})
+		const call_end_surveys: CallEndSurvey[] = Object.values(this.props.schoolMatch.history || {})
 			.filter(x => x.event === "CALL_END_SURVEY") as CallEndSurvey[]
 		
 		const call_number = call_end_surveys.length;
@@ -197,7 +197,7 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 			estimated_monthly_revenue = EstimateMonthlyRevenue(school).toLocaleString() + " Rs"
 		}
 
-		const call_end_surveys : CallEndSurvey[] = Object.values(schoolMatch.history || {})
+		const call_end_surveys: CallEndSurvey[] = Object.values(schoolMatch.history || {})
 			.filter(x => x.event === "CALL_END_SURVEY") as CallEndSurvey[]
 
 		const call_number = call_end_surveys.length
@@ -342,7 +342,7 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 	}
 }
 
-const call_in_progress = ( schoolMatch : SchoolMatch) : boolean => {
+const call_in_progress = ( schoolMatch: SchoolMatch): boolean => {
 
 	if(schoolMatch.history === undefined) {
 		return false;
@@ -352,7 +352,7 @@ const call_in_progress = ( schoolMatch : SchoolMatch) : boolean => {
 		.filter(x => x.event === "CALL_START" || x.event === "CALL_END")
 		.sort((a, b) => a.time - b.time)
 
-	const unmatched_call_event = call_events.reduce((agg : SupplierInteractionEvent[], curr) => {
+	const unmatched_call_event = call_events.reduce((agg: SupplierInteractionEvent[], curr) => {
 		if(curr.event === "CALL_START") {
 			return [...agg, curr]
 		}
@@ -376,11 +376,11 @@ const call_in_progress = ( schoolMatch : SchoolMatch) : boolean => {
 }
 
 interface SchoolMatchProps {
-	schoolMatch: SchoolMatch
-	products: RootBankState['products']['db']
+	schoolMatch: SchoolMatch;
+	products: RootBankState['products']['db'];
 }
 
-const SchoolHistory : React.SFC<SchoolMatchProps> = (props : SchoolMatchProps) => {
+const SchoolHistory: React.SFC<SchoolMatchProps> = (props: SchoolMatchProps) => {
 
 	const combined_events = Object.values(props.schoolMatch.history)
 		.sort((a, b) => a.time - b.time)
@@ -432,11 +432,11 @@ const SchoolHistory : React.SFC<SchoolMatchProps> = (props : SchoolMatchProps) =
 	</div>
 }
 
-const isValid = (field : string) => {
+const isValid = (field: string) => {
 	return field && !(field.trim() === "" || field === "999")
 }
 
-const map_facilities = (facilities : string = "") => {
+const map_facilities = (facilities = "") => {
 
 	const map = [
 		"Boundary Wall",
@@ -453,7 +453,7 @@ const map_facilities = (facilities : string = "") => {
 	return facilities.split(' ').map(x => map[parseInt(x)]).join(", ")
 }
 
-const map_ess_products = (products : string = "") => {
+const map_ess_products = (products = "") => {
 	const map = [
 		"Teacher & Management Training",
 		"Learning & Teaching Materials",
@@ -468,7 +468,7 @@ const map_ess_products = (products : string = "") => {
 	return products.split(' ').map(x => map[parseInt(x)]).join(", ")
 }
 
-const map_textbook_providers = (textbooks : string = "") => {
+const map_textbook_providers = (textbooks = "") => {
 	const map = [
 		"Oxford",
 		"Aafaq",
@@ -487,11 +487,11 @@ const map_textbook_providers = (textbooks : string = "") => {
 }
 
 interface SurveyRowProp {
-	label: string
-	val: string
+	label: string;
+	val: string;
 }
 
-const SurveyRow : React.StatelessComponent<SurveyRowProp> = ({ label, val }) => {
+const SurveyRow: React.StatelessComponent<SurveyRowProp> = ({ label, val }) => {
 
 	if(!isValid(val)) {
 		return null;
@@ -507,13 +507,13 @@ const SurveyRow : React.StatelessComponent<SurveyRowProp> = ({ label, val }) => 
 // and when it ends
 // and when it ends we ask questions via modal
 
-export default connect<StateProps, DispatchProps, OwnProps>((state : RootBankState, props: OwnProps) => ({
+export default connect<StateProps, DispatchProps, OwnProps>((state: RootBankState, props: OwnProps) => ({
 	school: state.new_school_db[props.school_id],
 	schoolMatch: state.sync_state.matches[props.school_id],
 	connected: state.connected,
 	username: state.auth.id,
 	products: state.products.db
-}), (dispatch : Function, props: OwnProps ) => ({
+}), (dispatch: Function, props: OwnProps ) => ({
 	addSchool: () => dispatch(getSchoolProfiles([props.school_id])),
 	reserveNumber: () => dispatch(reserveMaskedNumber(props.school_id)),
 	releaseNumber: () => dispatch(releaseMaskedNumber(props.school_id)),

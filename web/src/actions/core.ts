@@ -9,16 +9,16 @@ type Dispatch = (action: any) => any;
 type GetState = () => RootBankState
 
 interface Merge {
-	path: string[],
-	value: any
+	path: string[];
+	value: any;
 }
 
 export interface MergeAction {
-	type: "MERGES",
-	merges: Merge[]
+	type: "MERGES";
+	merges: Merge[];
 }
 
-export const createMerges= (merges : Merge[]) => (dispatch : (a: any) => any, getState: () => RootBankState, syncr: Syncr) => {
+export const createMerges= (merges: Merge[]) => (dispatch: (a: any) => any, getState: () => RootBankState, syncr: Syncr) => {
 	// merges is a list of path, value
 
 	const action = {
@@ -56,7 +56,7 @@ export const createMerges= (merges : Merge[]) => (dispatch : (a: any) => any, ge
 		.catch(err => dispatch(QueueUp(new_merges)))
 }
 
-type ImageMerges = Array<{id: string, imageString: string, path: string[]}>
+type ImageMerges = Array<{id: string; imageString: string; path: string[]}>
 
 export const createImageMerges = (imageMerges: ImageMerges) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 
@@ -110,7 +110,7 @@ export const createImageMerges = (imageMerges: ImageMerges) => (dispatch: Dispat
 		payload: rationalized_merges
 	})
 	.then(dispatch) // should return a series of merges with an image url 
-	.catch((err : Error) => {
+	.catch((err: Error) => {
 		dispatch(QueueUp(merges))
 	})
 
@@ -118,7 +118,7 @@ export const createImageMerges = (imageMerges: ImageMerges) => (dispatch: Dispat
 }
 
 export const SMS = "SMS"
-export const sendSMS = (text : string, number : string) => (dispatch : (a: any) => any, getState: () => RootBankState, syncr: Syncr) => {
+export const sendSMS = (text: string, number: string) => (dispatch: (a: any) => any, getState: () => RootBankState, syncr: Syncr) => {
 
 	// should i keep a log of all messages sent in the db?
 
@@ -133,14 +133,14 @@ export const sendSMS = (text : string, number : string) => (dispatch : (a: any) 
 		}
 	})
 	.then(dispatch)
-	.catch((err : Error) => console.error(err)) // this should backup to sending the sms via the android app?
+	.catch((err: Error) => console.error(err)) // this should backup to sending the sms via the android app?
 }
 
 
 export const BATCH_SMS = "BATCH_SMS"
 interface SMS {
-	text: string,
-	number: string
+	text: string;
+	number: string;
 }
 
 export const sendBatchSMS = (messages: SMS[]) => (dispatch: (a: any) => any, getState: () => RootBankState, syncr: Syncr) => {
@@ -160,8 +160,8 @@ export const sendBatchSMS = (messages: SMS[]) => (dispatch: (a: any) => any, get
 }
 
 interface ServerAction {
-	type: string,
-	payload: any
+	type: string;
+	payload: any;
 }
 
 export const sendServerAction = ( action: ServerAction ) => (dispatch: Dispatch, getState: () => RootBankState, syncr: Syncr) => {
@@ -176,7 +176,7 @@ export const sendServerAction = ( action: ServerAction ) => (dispatch: Dispatch,
 		payload: action.payload
 	})
 	.then(dispatch)
-	.catch((err : Error) => {
+	.catch((err: Error) => {
 		console.error(err)
 	})
 
@@ -185,15 +185,15 @@ export const sendServerAction = ( action: ServerAction ) => (dispatch: Dispatch,
 
 export const DELETES = "DELETES"
 interface Delete {
-	path: string[]
+	path: string[];
 }
 
 export interface DeletesAction {
-	type: "DELETES",
-	paths: Delete[]
+	type: "DELETES";
+	paths: Delete[];
 }
 
-export const createDeletes = (paths : Delete[]) => (dispatch : Dispatch, getState : () => RootBankState, syncr : Syncr) => {
+export const createDeletes = (paths: Delete[]) => (dispatch: Dispatch, getState: () => RootBankState, syncr: Syncr) => {
 
 	const action = {
 		type: DELETES,
@@ -225,7 +225,7 @@ export const createDeletes = (paths : Delete[]) => (dispatch : Dispatch, getStat
 		payload: rationalized_deletes
 	})
 	.then(dispatch)
-	.catch((err : Error) => dispatch(QueueUp(payload)))
+	.catch((err: Error) => dispatch(QueueUp(payload)))
 
 }
 
@@ -233,24 +233,24 @@ export const createDeletes = (paths : Delete[]) => (dispatch : Dispatch, getStat
 // it will tell us it hsa confirmed sync up to { date: timestamp }
 export const RPC_SUCCEED = "RPC_SUCCEED"
 export interface RPCSucceedAction {
-	type: "RPC_SUCCEED"
-	new_writes: Write[]
+	type: "RPC_SUCCEED";
+	new_writes: Write[];
 }
 
 export const CONFIRM_SYNC = "CONFIRM_SYNC"
 export const CONFIRM_SYNC_DIFF = "CONFIRM_SYNC_DIFF"
 export interface ConfirmSyncAction {
-	type: "CONFIRM_SYNC_DIFF"
-	date: number
-	new_writes: Write[]
+	type: "CONFIRM_SYNC_DIFF";
+	date: number;
+	new_writes: Write[];
 }
 
 export interface Write {
-	date: number,
-	value: any,
-	path: string[],
-	type: "MERGE" | "DELETE",
-	client_id: string
+	date: number;
+	value: any;
+	path: string[];
+	type: "MERGE" | "DELETE";
+	client_id: string;
 }
 
 export const SNAPSHOT = "SNAPSHOT"
@@ -259,32 +259,32 @@ export const SNAPSHOT_DIFF = "SNAPSHOT_DIFF"
 export interface SnapshotDiffAction {
 	new_writes: {
 		[path_string: string]: {
-			type: "MERGE" | "DELETE",
-			path: string[],
-			value?: any
-		}
-	}
+			type: "MERGE" | "DELETE";
+			path: string[];
+			value?: any;
+		};
+	};
 }
 
 export const QUEUE = "QUEUE"
 // queue up an object where key is path, value is action/date
 interface Queuable {
-	[path: string] : {
+	[path: string]: {
 		action: {
-			type: "MERGE" | "DELETE",
-			path: string[],
-			value?: any
-		},
-		date: number
-	}
+			type: "MERGE" | "DELETE";
+			path: string[];
+			value?: any;
+		};
+		date: number;
+	};
 }
 
 export interface QueueAction {
-	type: "QUEUE",
-	payload: Queuable
+	type: "QUEUE";
+	payload: Queuable;
 }
 
-export const QueueUp = (action : Queuable) => {
+export const QueueUp = (action: Queuable) => {
 	return {
 		type: QUEUE,
 		payload: action
@@ -293,7 +293,7 @@ export const QueueUp = (action : Queuable) => {
 
 export const ON_CONNECT = "ON_CONNECT"
 export const ON_DISCONNECT = "ON_DISCONNECT"
-export const connected = () => (dispatch: (a : any) => any, getState: () => RootBankState, syncr: Syncr) => { 
+export const connected = () => (dispatch: (a: any) => any, getState: () => RootBankState, syncr: Syncr) => { 
 	const action = {type: ON_CONNECT}
 
 	dispatch(action)
@@ -337,13 +337,13 @@ export const createLoginFail = () => ({ type: LOGIN_FAIL })
 
 export const LOGIN_SUCCEED = "LOGIN_SUCCEED"
 export interface LoginSucceed {
-	type: "LOGIN_SUCCEED",
-	id: string,
-	token: string,
-	sync_state: RootBankState['sync_state'],
-	number: string
+	type: "LOGIN_SUCCEED";
+	id: string;
+	token: string;
+	sync_state: RootBankState['sync_state'];
+	number: string;
 }
-export const createLoginSucceed = (id : string, token : string, sync_state: RootBankState['sync_state'], number : string) : LoginSucceed => ({ 
+export const createLoginSucceed = (id: string, token: string, sync_state: RootBankState['sync_state'], number: string): LoginSucceed => ({ 
 	type: LOGIN_SUCCEED,
 	id,
 	token,

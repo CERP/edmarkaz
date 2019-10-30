@@ -9,22 +9,22 @@ import Former from '~/src/utils/former'
 // for now we just want them to give their name
 
 interface Props {
-	auth: RootBankState['auth'],
-	addNumber: (number: string, name: string) => void
-	editLogin: (number : string) => void
-	number_exists: boolean
+	auth: RootBankState['auth'];
+	addNumber: (number: string, name: string) => void;
+	editLogin: (number: string) => void;
+	number_exists: boolean;
 }
 
 interface State {
-	name: string,
-	number: string
+	name: string;
+	number: string;
 }
 
 class VerifyNumber extends React.Component<Props, State> {
 
 	former: Former
 
-	constructor(props : Props) {
+	constructor(props: Props) {
 		super(props);
 
 		this.state = {
@@ -73,10 +73,10 @@ class VerifyNumber extends React.Component<Props, State> {
 	}
 }
 
-export default connect((state : RootBankState) => ({
+export default connect((state: RootBankState) => ({
 	auth: state.auth,
 	number_exists: state.sync_state.numbers[state.auth.number] !== undefined
 }), (dispatch: Function) => ({
-	addNumber: (number : string, name: string) => dispatch(addSupplierNumber(number, name)),
+	addNumber: (number: string, name: string) => dispatch(addSupplierNumber(number, name)),
 	editLogin: (number: string) => dispatch(editLoginNumber(number))
 }))(VerifyNumber)

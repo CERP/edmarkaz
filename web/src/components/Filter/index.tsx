@@ -8,13 +8,13 @@ import './style.css'
 import debounce from '../../utils/debounce';
 
 interface propTypes {
-	filterText: string,
-	setFilter: (x: string) => void
+	filterText: string;
+	setFilter: (x: string) => void;
 }
 
 class Filter extends React.Component<propTypes, {filter_text: string}> {
 
-	constructor(props : propTypes) {
+	constructor(props: propTypes) {
 		super(props);
 
 		this.state = {
@@ -23,7 +23,7 @@ class Filter extends React.Component<propTypes, {filter_text: string}> {
 
 	}
 
-	onChange = (e : React.ChangeEvent<HTMLInputElement>) => {
+	onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		console.log('setfilter')
 
 		this.setState({
@@ -43,9 +43,9 @@ class Filter extends React.Component<propTypes, {filter_text: string}> {
 	}
 }
 
-export default connect((state : RootBankState) => ({
+export default connect((state: RootBankState) => ({
 	filterText: state.filter_text
 }),
-(dispatch : any) => ({
-	setFilter: debounce((filterText : string) => dispatch(setFilter(filterText)), 500)
+(dispatch: any) => ({
+	setFilter: debounce((filterText: string) => dispatch(setFilter(filterText)), 500)
 }))(Filter);

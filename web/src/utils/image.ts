@@ -1,5 +1,5 @@
 
-export const getDownsizedImage = (imageDataUrl : string, max_size : number) => {
+export const getDownsizedImage = (imageDataUrl: string, max_size: number) => {
 
 	return new Promise<string>((resolve, reject) => {
 		const image = new Image();

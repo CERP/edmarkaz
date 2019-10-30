@@ -3,12 +3,12 @@ import { Route, Redirect, RouteProps } from 'react-router-dom'
 import { connect } from 'react-redux'
 
 interface StateProps {
-	auth: RootReducerState['auth']
+	auth: RootReducerState['auth'];
 }
 
 type propTypes = StateProps & RouteProps
 
-const AuthedRoute = ({ component, auth: { id, token }, ...rest } : propTypes) => {
+const AuthedRoute = ({ component, auth: { id, token }, ...rest }: propTypes) => {
 
 	if(token && id) {
 
@@ -18,6 +18,6 @@ const AuthedRoute = ({ component, auth: { id, token }, ...rest } : propTypes) =>
 	return <Redirect to="/login" />
 }
 
-export default connect((state : RootReducerState) => ({
+export default connect((state: RootReducerState) => ({
 	auth: state.auth
 }))(AuthedRoute);

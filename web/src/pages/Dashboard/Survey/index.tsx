@@ -7,18 +7,18 @@ import { downloadCSV } from '~src/utils/downloadCSV';
 import getUserType from '~src/utils/getUserType';
 
 type propTypes = {
-	sync_state: RootBankState["sync_state"]
-	school_db: RootBankState["new_school_db"]
-	username: string
+	sync_state: RootBankState["sync_state"];
+	school_db: RootBankState["new_school_db"];
+	username: string;
 } & RouteComponentProps
 
 interface stateType {
 	filters: {
-		survey: "" | MarkCompleteSurvey["event"] | CallEndSurvey["event"] | CallEndSurveyFollowUp["event"]
-		status: "" | SchoolMatch["status"]
-		startDate: number
-		endDate: number
-	}
+		survey: "" | MarkCompleteSurvey["event"] | CallEndSurvey["event"] | CallEndSurveyFollowUp["event"];
+		status: "" | SchoolMatch["status"];
+		startDate: number;
+		endDate: number;
+	};
 }
 
 class Survey extends React.Component <propTypes, stateType> {
@@ -43,7 +43,7 @@ class Survey extends React.Component <propTypes, stateType> {
 
 		const { school_db , username} = this.props
 		const userType = getUserType(username)
-		let header = [
+		const header = [
 			"Date",
 			"School",
 			"Person",
@@ -65,7 +65,7 @@ class Survey extends React.Component <propTypes, stateType> {
 					.filter(([timestamp, h]) => ( h.time >= this.state.filters.startDate && h.time <= this.state.filters.endDate ) && (this.state.filters.survey ? this.state.filters.survey === h.event : h.event === "MARK_COMPLETE_SURVEY" || "CALL_END_SURVEY_FOLLOWUP" || "CALL_END_SURVEY"))
 					.forEach(([timestamp, h]) => {
 
-						let elem = [
+						const elem = [
 							`${moment(h.time).format("MM-DD-YYYY")}`,
 							`${curr_school.school_name}`,
 							`${h.user.name ? h.user.name : "-"}`,

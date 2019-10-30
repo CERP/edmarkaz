@@ -4,12 +4,12 @@ import { RouteComponentProps } from 'react-router';
 import './style.css'
 
 interface propTypes {
-	school?: PMIUSchool,
+	school?: PMIUSchool;
 }
 
 class Sidebar extends React.Component<propTypes, any>{
 
-	constructor(props : propTypes) {
+	constructor(props: propTypes) {
 		super(props);
 		this.state = {
 			hide: false
@@ -17,7 +17,7 @@ class Sidebar extends React.Component<propTypes, any>{
 	}
 
 
-	componentWillReceiveProps(nextProps : propTypes) {
+	componentWillReceiveProps(nextProps: propTypes) {
 		this.setState({
 			hide: false
 		})

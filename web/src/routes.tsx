@@ -11,7 +11,7 @@ import VerifyNumber from './pages/VerifyNumber'
 
 import './components/Layout/style.css'
 
-export default ({ store } : { store: Store }) => (
+export default ({ store }: { store: Store }) => (
 	<Provider store={store}>
 		<BrowserRouter>
 			<Switch>

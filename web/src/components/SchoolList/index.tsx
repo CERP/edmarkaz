@@ -8,32 +8,32 @@ import './style.css'
 import callAnswered from '../../utils/call_answered'
 
 type propTypes = {
-	title: string
-	status: SchoolMatch['status']
-	matches: RootBankState['sync_state']['matches']
-	school_db: RootBankState['new_school_db']
-	connected: boolean
-	addSchools: (ids : string[]) => void
+	title: string;
+	status: SchoolMatch['status'];
+	matches: RootBankState['sync_state']['matches'];
+	school_db: RootBankState['new_school_db'];
+	connected: boolean;
+	addSchools: (ids: string[]) => void;
 } & RouteComponentProps
 
 interface stateType {
-	loading: boolean
+	loading: boolean;
 	filters: {
-		active: boolean
-		name: string
-		tehsil: string
-		contact_history: "" | "NEVER" | "ONCE" | "TWICE" | "MULTIPLE"
-		min_year_established: string
-		max_year_established: string
-		min_revenue: string
-		max_revenue: string
-	}
+		active: boolean;
+		name: string;
+		tehsil: string;
+		contact_history: "" | "NEVER" | "ONCE" | "TWICE" | "MULTIPLE";
+		min_year_established: string;
+		max_year_established: string;
+		min_revenue: string;
+		max_revenue: string;
+	};
 }
 
 export default class SchooList extends React.Component<propTypes, stateType> {
 
 	former: Former
-	constructor(props : propTypes) {
+	constructor(props: propTypes) {
 		super(props)
 
 		const blank = Object.keys(props.matches)
@@ -61,14 +61,14 @@ export default class SchooList extends React.Component<propTypes, stateType> {
 		this.former = new Former(this, ["filters"])
 	}
 
-	onSchoolClick = (school : CERPSchool) => () => {
+	onSchoolClick = (school: CERPSchool) => () => {
 		this.props.history.push({
 			pathname: this.props.location.pathname,
 			search: `?school_id=${school.refcode}`
 		})
 	}
 
-	componentWillReceiveProps(nextProps : propTypes) {
+	componentWillReceiveProps(nextProps: propTypes) {
 
 		const blank = Object.keys(nextProps.matches)
 			.filter(k => nextProps.school_db[k] == undefined)

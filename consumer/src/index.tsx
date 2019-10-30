@@ -20,7 +20,7 @@ const host = window.api_url || debug_url;
 const initial_state = loadDB()
 const syncr = new Syncr(host, msg => store.dispatch(msg))
 //@ts-ignore
-const store : Store<RootReducerState> = createStore(reducer, initial_state, applyMiddleware(thunkMiddleware.withExtraArgument(syncr) as ThunkMiddleware<RootReducerState, AnyAction, Syncr>))
+const store: Store<RootReducerState> = createStore(reducer, initial_state, applyMiddleware(thunkMiddleware.withExtraArgument(syncr) as ThunkMiddleware<RootReducerState, AnyAction, Syncr>))
 
 const saveBounce = debounce(() => {
 	const state = store.getState();

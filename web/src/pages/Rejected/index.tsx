@@ -6,7 +6,7 @@ import { getSchoolProfiles } from '~/src/actions'
 
 import SchooList from '~/src/components/SchoolList';
 
-export default connect((state : RootBankState) => {
+export default connect((state: RootBankState) => {
 	return {
 		matches: state.sync_state.matches || {},
 		school_db: state.new_school_db,
@@ -14,6 +14,6 @@ export default connect((state : RootBankState) => {
 		title: "Rejected",
 		status: "REJECTED"
 	}
-}, (dispatch : ( thing : any) => any) => ({
-	addSchools: (school_ids : string[]) => dispatch(getSchoolProfiles(school_ids)),
+}, (dispatch: ( thing: any) => any) => ({
+	addSchools: (school_ids: string[]) => dispatch(getSchoolProfiles(school_ids)),
 }))( withRouter(SchooList))

@@ -5,7 +5,7 @@ import { Store } from 'redux'
 
 import Burger from './pages/accordian'
 
-export default ({ store } : {store: Store}) => (
+const Routes = ({ store }: { store: Store }) => (
 	<Provider store={store}>
 		<BrowserRouter>
 			<Switch>
@@ -14,3 +14,5 @@ export default ({ store } : {store: Store}) => (
 		</BrowserRouter>
 	</Provider>
 )
+
+export default Routes;

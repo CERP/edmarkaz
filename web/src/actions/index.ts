@@ -20,14 +20,14 @@ export const createLogin = (username: string, password: string, number: string) 
 			password
 		}
 	})
-	.then((res: { token: string, sync_state: RootBankState['sync_state'] }) => {
+		.then((res: { token: string; sync_state: RootBankState['sync_state'] }) => {
 
-		if (res.sync_state.matches === undefined || Object.keys(res.sync_state.matches).length === 0) {
-			dispatch(forceSaveFullStatePotentiallyCausingProblems())
-		}
+			if (res.sync_state.matches === undefined || Object.keys(res.sync_state.matches).length === 0) {
+				dispatch(forceSaveFullStatePotentiallyCausingProblems())
+			}
 
-		dispatch(createLoginSucceed(username, res.token, res.sync_state, number))
-	})
+			dispatch(createLoginSucceed(username, res.token, res.sync_state, number))
+		})
 }
 
 export const forceSaveFullStatePotentiallyCausingProblems = () => (dispatch: Dispatch, getState: GetState) => {
@@ -49,7 +49,7 @@ export const saveProductAction = (product: Product) => (dispatch: Dispatch, getS
 
 	const state = getState();
 
-	const a : AddProductsAction = {
+	const a: AddProductsAction = {
 		type: "ADD_PRODUCTS",
 		products: {
 			[product.id]: product
@@ -67,21 +67,21 @@ export const saveProductAction = (product: Product) => (dispatch: Dispatch, getS
 		client_type: state.auth.client_type,
 		client_id: state.auth.id,
 	})
-	.then(res => {
-		console.log('add product action...')
-	})
-	.catch(err => {
-		console.error(err)
-	})
+		.then(res => {
+			console.log('add product action...')
+		})
+		.catch(err => {
+			console.error(err)
+		})
 
 }
 
 export const PRODUCT_IMAGE_ADDED = "PRODUCT_IMAGE_ADDED"
 export interface ProductImageAddedAction {
-	type: "PRODUCT_IMAGE_ADDED"
-	product_id: string
-	image_id: string
-	img_url: string
+	type: "PRODUCT_IMAGE_ADDED";
+	product_id: string;
+	image_id: string;
+	img_url: string;
 }
 
 export const saveProductImage = (imageId: string, dataUrl: string, product: Product) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
@@ -97,19 +97,19 @@ export const saveProductImage = (imageId: string, dataUrl: string, product: Prod
 		client_type: state.auth.client_type,
 		client_id: state.auth.id
 	})
-	.then(res => {
-	})
-	.catch(err => {
-		console.error(err)
-	})
+		.then(res => {
+		})
+		.catch(err => {
+			console.error(err)
+		})
 
 }
 
 export const ADD_SCHOOLS = "ADD_SCHOOLS"
 
-export interface addNewSchoolAction {
-	readonly type: "ADD_SCHOOLS"
-	schools: { [id: string]: CERPSchool }
+export interface AddNewSchoolAction {
+	readonly type: "ADD_SCHOOLS";
+	schools: { [id: string]: CERPSchool };
 }
 
 export const getSchoolProfiles = (school_ids: string[]) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
@@ -142,10 +142,10 @@ export const getSchoolProfiles = (school_ids: string[]) => (dispatch: Dispatch, 
 }
 
 export interface AddProductsAction {
-	type: "ADD_PRODUCTS"
+	type: "ADD_PRODUCTS";
 	products: {
-		[id: string]: Product
-	}
+		[id: string]: Product;
+	};
 }
 
 export const ADD_PRODUCTS = "ADD_PRODUCTS"
@@ -163,21 +163,21 @@ export const getProducts = (filters = {}) => (dispatch: Dispatch, getState: GetS
 			filters
 		}
 	})
-	.then((res : any) => {
-		// now dispatch an action that 'saves' these products
+		.then((res: any) => {
+			// now dispatch an action that 'saves' these products
 
-		dispatch({
-			type: "ADD_PRODUCTS",
-			products: res.products
+			dispatch({
+				type: "ADD_PRODUCTS",
+				products: res.products
+			})
+
+			return res
 		})
+		.catch(err => {
+			console.error(err)
 
-		return res
-	})
-	.catch(err => {
-		console.error(err)
-
-		setTimeout(() => dispatch(getProducts()), 1000)
-	})
+			setTimeout(() => dispatch(getProducts()), 1000)
+		})
 }
 
 export const GET_OWN_PRODUCTS = "GET_OWN_PRODUCTS"
@@ -194,29 +194,29 @@ export const getOwnProducts = (filters = {}) => (dispatch: Dispatch, getState: G
 			filters
 		}
 	})
-	.then((res : any) => {
-		// now dispatch an action that 'saves' these products
+		.then((res: any) => {
+			// now dispatch an action that 'saves' these products
 
-		dispatch({
-			type: "ADD_PRODUCTS",
-			products: res.products
+			dispatch({
+				type: "ADD_PRODUCTS",
+				products: res.products
+			})
+
+			return res
 		})
+		.catch(err => {
+			console.error(err)
 
-		return res
-	})
-	.catch(err => {
-		console.error(err)
-
-		setTimeout(() => dispatch(getProducts()), 1000)
-	})
+			setTimeout(() => dispatch(getProducts()), 1000)
+		})
 
 }
 
 
 export const ADD_SCHOOL = "ADD_SCHOOL"
 export interface addSchoolAction {
-	type: string
-	school: PMIUSchool
+	type: string;
+	school: PMIUSchool;
 }
 
 export const addToSchoolDB = (school: PMIUSchool) => {
@@ -245,13 +245,13 @@ export const reserveMaskedNumber = (school_id: string) => (dispatch: Dispatch, g
 		id: state.auth.id,
 		last_snapshot: state.last_snapshot
 	})
-	.then(res => {
-		console.log(res)
-		dispatch(res)
-	})
-	.catch(err => {
-		console.error(err)
-	})
+		.then(res => {
+			console.log(res)
+			dispatch(res)
+		})
+		.catch(err => {
+			console.error(err)
+		})
 
 }
 
@@ -273,13 +273,13 @@ export const releaseMaskedNumber = (school_id: string) => (dispatch: Dispatch, g
 		id: state.auth.id,
 		last_snapshot: state.last_snapshot
 	})
-	.then(res => {
-		console.log(res);
-		dispatch(res)
-	})
-	.catch(err => {
-		console.error(err)
-	})
+		.then(res => {
+			console.log(res);
+			dispatch(res)
+		})
+		.catch(err => {
+			console.error(err)
+		})
 }
 
 export const saveSchoolRejectedSurvey = (school_id: string, survey: NotInterestedSurvey['meta']) => (dispatch: Dispatch, getState: GetState) => {
@@ -288,7 +288,7 @@ export const saveSchoolRejectedSurvey = (school_id: string, survey: NotIntereste
 
 	const state = getState()
 
-	const event : NotInterestedSurvey = {
+	const event: NotInterestedSurvey = {
 		event: "MARK_REJECTED_SURVEY",
 		meta: survey,
 		time,
@@ -313,7 +313,7 @@ export const saveSchoolCompletedSurvey = (school_id: string, survey: MarkComplet
 
 	const state = getState()
 
-	const event : MarkCompleteSurvey = {
+	const event: MarkCompleteSurvey = {
 		event: "MARK_COMPLETE_SURVEY",
 		meta: survey,
 		time,
@@ -362,7 +362,7 @@ export const saveCallEndSurveyFollowUp = (school_id: string, survey: CallEndSurv
 
 	const state = getState()
 
-	const event : CallEndSurveyFollowUp = {
+	const event: CallEndSurveyFollowUp = {
 		event: "CALL_END_SURVEY_FOLLOWUP",
 		meta: survey,
 		time,

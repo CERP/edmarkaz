@@ -12,16 +12,16 @@ import icon from './icon.svg'
 import './style.css'
 
 type P = {
-	auth: RootReducerState['auth']
+	auth: RootReducerState['auth'];
 } & RouteComponentProps
 
 interface S {
-	visible: boolean
+	visible: boolean;
 }
 
 class Accordian extends React.Component<P, S> {
 
-	constructor(props : P) {
+	constructor(props: P) {
 		super(props)
 
 		this.state = {
@@ -62,6 +62,6 @@ class Accordian extends React.Component<P, S> {
 	}
 }
 
-export default connect((state : RootReducerState) => ({
+export default connect((state: RootReducerState) => ({
 	auth: state.auth
 }))(withRouter(Accordian));

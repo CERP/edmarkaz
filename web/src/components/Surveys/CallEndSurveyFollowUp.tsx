@@ -3,16 +3,16 @@ import Former from '~/src/utils/former'
 import moment = require('moment');
 
 interface P {
-	saveSurvey: (survey: CallEndSurveyFollowUp['meta']) => void
-	call_number: number
-	user_type: USER_TYPE
+	saveSurvey: (survey: CallEndSurveyFollowUp['meta']) => void;
+	call_number: number;
+	user_type: USER_TYPE;
 }
 
 export default class Survey extends React.Component<P, CallEndSurveyFollowUp['meta']> {
 
-	former : Former
+	former: Former
 
-	constructor(props : P) {
+	constructor(props: P) {
 		super(props);
 
 		this.state = {
@@ -299,7 +299,7 @@ export default class Survey extends React.Component<P, CallEndSurveyFollowUp['me
 	}
 }
 
-const CallSurvey : React.SFC<{former: Former, user_type: USER_TYPE, state: CallEndSurveyFollowUp['meta']}> = ({ former, user_type, state}) => {
+const CallSurvey: React.SFC<{former: Former; user_type: USER_TYPE; state: CallEndSurveyFollowUp['meta']}> = ({ former, user_type, state}) => {
 
 	return <React.Fragment>
 		<div className="row">
@@ -420,7 +420,7 @@ const CallSurvey : React.SFC<{former: Former, user_type: USER_TYPE, state: CallE
 	</React.Fragment>
 }
 
-const MeetingSurvey : React.SFC<{former: Former, user_type: USER_TYPE, state: CallEndSurveyFollowUp['meta']}> = ({ former, user_type, state}) => {
+const MeetingSurvey: React.SFC<{former: Former; user_type: USER_TYPE; state: CallEndSurveyFollowUp['meta']}> = ({ former, user_type, state}) => {
 	return <React.Fragment>
 		{
 			user_type === "ESS" && <div className="row">

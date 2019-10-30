@@ -3,16 +3,16 @@ import Former from '~/src/utils/former'
 import moment = require('moment');
 
 interface P {
-	saveSurvey: (survey: CallEndSurvey['meta']) => void
-	call_number: number
-	user_type: USER_TYPE
+	saveSurvey: (survey: CallEndSurvey['meta']) => void;
+	call_number: number;
+	user_type: USER_TYPE;
 }
 
 export default class Survey extends React.Component<P, CallEndSurvey['meta']> {
 
-	former : Former
+	former: Former
 
-	constructor(props : P) {
+	constructor(props: P) {
 		super(props);
 
 		this.state = {

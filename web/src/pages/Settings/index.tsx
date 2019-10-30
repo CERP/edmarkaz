@@ -8,22 +8,22 @@ import { addSupplierNumber, deleteSupplierNumber } from '~/src/actions'
 import { getDownsizedImage } from '~src/utils/image'
 
 interface propTypes {
-	numbers: RootBankState['sync_state']['numbers'],
-	addNumber: (number: string, name: string) => void
-	removeNumber: (number: string) => void
+	numbers: RootBankState['sync_state']['numbers'];
+	addNumber: (number: string, name: string) => void;
+	removeNumber: (number: string) => void;
 }
 
 interface stateType {
-	current_number: string
-	current_name: string
-	logoDataString: string
+	current_number: string;
+	current_name: string;
+	logoDataString: string;
 }
 
 class Settings extends React.Component<propTypes, stateType> {
 
 	former: Former
 
-	constructor(props : propTypes) {
+	constructor(props: propTypes) {
 		super(props)
 
 		this.state = {
@@ -45,7 +45,7 @@ class Settings extends React.Component<propTypes, stateType> {
 		})
 	}
 
-	removeNumber = (number : string) => () => {
+	removeNumber = (number: string) => () => {
 		this.props.removeNumber(number)
 	}
 
@@ -57,7 +57,7 @@ class Settings extends React.Component<propTypes, stateType> {
 		window.location.reload();
 	}
 
-	uploadLogo = (e : React.ChangeEvent<HTMLInputElement>) => {
+	uploadLogo = (e: React.ChangeEvent<HTMLInputElement>) => {
 
 		const file = e.target.files[0]
 		if(file === undefined) {
@@ -129,7 +129,7 @@ class Settings extends React.Component<propTypes, stateType> {
 	}
 }
 
-export default connect((state : RootBankState) => ({
+export default connect((state: RootBankState) => ({
 	numbers: state.sync_state.numbers || {}
 }), (dispatch: (x: any) => void) => ({
 	addNumber: (number: string, name: string) => dispatch(addSupplierNumber(number, name)),

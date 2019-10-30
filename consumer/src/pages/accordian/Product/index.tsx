@@ -11,16 +11,16 @@ interface S {
 }
 
 interface RouteInfo {
-	supplier_id: string
-	product_id: string
+	supplier_id: string;
+	product_id: string;
 }
 
 type P = {
-	auth: RootReducerState['auth']
-	products: RootReducerState['products']['db']
-	connected: boolean
-	getProducts: () => void
-	placeOrder: (product: Product) => void
+	auth: RootReducerState['auth'];
+	products: RootReducerState['products']['db'];
+	connected: boolean;
+	getProducts: () => void;
+	placeOrder: (product: Product) => void;
 } & RouteComponentProps<RouteInfo>
 
 class ProductPage extends React.Component<P, S> {
@@ -33,7 +33,7 @@ class ProductPage extends React.Component<P, S> {
 		// dispatch onOrder action
 		const product_id = this.props.match.params.product_id;
 		this.props.placeOrder(this.props.products[product_id])
-		
+
 	}
 
 	render() {
@@ -41,29 +41,29 @@ class ProductPage extends React.Component<P, S> {
 
 		const product = this.props.products[product_id]
 
-		if(product === undefined) {
+		if (product === undefined) {
 			return <div className="product-page page">Loading product {product_id}...</div>
 		}
 
 		return <div className="product-page page">
 			<div className="title">{product.title}</div>
-			<img src={product.image && product.image.url} />
+			<img src={product.image && product.image.url} alt="Product" />
 			<div className="supplier">{product.supplier_id}</div>
 			<div className="description">{product.description}</div>
 			<div className="price">{product.price}</div>
-			{ this.props.connected && !this.props.auth.token && <Link className="button blue" to="/sign-up">Sign up to Order Online</Link> }
-			{ this.props.connected && this.props.auth.token && <div className="button blue" onClick={this.onOrder}>Request Information</div> }
+			{this.props.connected && !this.props.auth.token && <Link className="button blue" to="/sign-up">Sign up to Order Online</Link>}
+			{this.props.connected && this.props.auth.token && <div className="button blue" onClick={this.onOrder}>Request Information</div>}
 			<div className="number">Call 03555935557 to Order now</div>
 		</div>
 
 	}
 }
 
-export default connect((state : RootReducerState) => ({
+export default connect((state: RootReducerState) => ({
 	products: state.products.db,
 	connected: state.connected,
 	auth: state.auth
-}), (dispatch : Function) => ({
+}), (dispatch: Function) => ({
 	getProducts: () => dispatch(getProducts()),
-	placeOrder: (product : Product) => dispatch(placeOrder(product))
+	placeOrder: (product: Product) => dispatch(placeOrder(product))
 }))(ProductPage)

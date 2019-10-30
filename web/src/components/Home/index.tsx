@@ -11,7 +11,7 @@ import Filter from '~/src/components/Filter'
 
 class Home extends React.Component<RouteComponentProps<any> & RootBankState & DispatchProps, any> {
 
-	constructor(props : any) {
+	constructor(props: any) {
 		super(props);
 
 		this.state = {
@@ -30,7 +30,7 @@ class Home extends React.Component<RouteComponentProps<any> & RootBankState & Di
 		}
 	}
 
-	onSelect = (loc : SchoolLocation) => {
+	onSelect = (loc: SchoolLocation) => {
 		this.props.history.push(`/school/${loc.id}`);
 		this.props.selectLocation(loc)
 	}
@@ -62,9 +62,9 @@ class Home extends React.Component<RouteComponentProps<any> & RootBankState & Di
 }
 
 interface DispatchProps {
-	selectLocation: (item: SchoolLocation) => void
+	selectLocation: (item: SchoolLocation) => void;
 }
 
-export default connect((state : RootBankState) => state, (dispatch : any) => ({
-	selectLocation: (item : SchoolLocation) => dispatch(selectLocation(item))
+export default connect((state: RootBankState) => state, (dispatch: any) => ({
+	selectLocation: (item: SchoolLocation) => dispatch(selectLocation(item))
 }))(withRouter(Home))

@@ -1,5 +1,5 @@
 
-export default function getSupplierSection(supplier_id : string) : SUPPLIER_TYPE {
+export default function getSupplierSection(supplier_id: string): SUPPLIER_TYPE {
 
 	switch(supplier_id) {
 		case "finca": 

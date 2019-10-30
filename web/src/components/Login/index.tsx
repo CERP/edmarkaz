@@ -11,22 +11,22 @@ import former from '~/src/utils/former'
 import './style.css'
 
 interface propTypes {
-	connected: boolean,
-	login: (id : string, password : string, number : string) => void
-	auth: RootBankState['auth'],
+	connected: boolean;
+	login: (id: string, password: string, number: string) => void;
+	auth: RootBankState['auth'];
 }
 
 interface state {
-	username: string
-	password: string
-	number: string
+	username: string;
+	password: string;
+	number: string;
 }
 
 class Login extends Component<propTypes & RouteComponentProps, state>{
 
 	private former: former
 
-	constructor(props : any) {
+	constructor(props: any) {
 		super(props);
 
 		this.state = {
@@ -42,7 +42,7 @@ class Login extends Component<propTypes & RouteComponentProps, state>{
 		this.props.login(this.state.username, this.state.password, this.state.number)
 	}
 
-	componentWillReceiveProps(nextProps : propTypes) {
+	componentWillReceiveProps(nextProps: propTypes) {
 
 		console.log(nextProps)
 		console.log("NEXT PROPS")
@@ -82,9 +82,9 @@ class Login extends Component<propTypes & RouteComponentProps, state>{
 /*
 */
 
-export default connect((state : RootBankState) => ({
+export default connect((state: RootBankState) => ({
 	connected: state.connected,
 	auth: state.auth
-}), (dispatch : any) => ({
-	login: (username : string, password : string, number : string) => dispatch(createLogin(username, password, number))
+}), (dispatch: any) => ({
+	login: (username: string, password: string, number: string) => dispatch(createLogin(username, password, number))
 }))(withRouter(Login))

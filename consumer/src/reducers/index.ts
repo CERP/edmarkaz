@@ -4,7 +4,7 @@ import { MERGES, MergeAction, ON_CONNECT, ON_DISCONNECT, DELETES, DeletesAction,
 import { ADD_PRODUCTS, LOAD_PROFILE } from '../actions'
 import { AnyAction } from 'redux';
 
-const rootReducer = (state: RootReducerState, action : AnyAction) : RootReducerState => {
+const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerState => {
 
 	switch(action.type) {
 

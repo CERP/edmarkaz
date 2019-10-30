@@ -6,8 +6,8 @@ import { getProducts } from '../../actions';
 import getSupplierSection from '../../utils/getSupplierSection';
 
 interface P {
-	products: RootReducerState['products']['db']
-	getProducts: () => void
+	products: RootReducerState['products']['db'];
+	getProducts: () => void;
 }
 
 interface S {
@@ -68,8 +68,8 @@ class LoggedOutHome extends React.Component<P, S> {
 	}
 }
 
-export default connect((state : RootReducerState) => ({
+export default connect((state: RootReducerState) => ({
 	products: state.products.db
-}), (dispatch : Function) => ({
+}), (dispatch: Function) => ({
 	getProducts: () => dispatch(getProducts())
 }))(LoggedOutHome)

@@ -7,9 +7,9 @@ const modalRoot = document.getElementById('modal-root')
 
 export default class Modal extends React.Component {
 
-	el : HTMLDivElement
+	el: HTMLDivElement
 
-	constructor(props : any) {
+	constructor(props: any) {
 		super(props);
 
 		this.el = document.createElement('div');

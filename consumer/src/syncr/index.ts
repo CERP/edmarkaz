@@ -9,10 +9,10 @@ export default class Syncr {
 	ws?: WebSocket;
 	pingInterval?: number;
 	dispatch: (action: any) => void;
-	pending: Map<string, { resolve: (a: any) => any, reject: (a :any) => any}>;
+	pending: Map<string, { resolve: (a: any) => any; reject: (a: any) => any}>;
 	message_timeout: number;
 
-	constructor(url : string, dispatch: (action: any) => void) {
+	constructor(url: string, dispatch: (action: any) => void) {
 
 		this.url = url;
 		this.ready = false;
@@ -95,7 +95,7 @@ export default class Syncr {
 		}
 	}
 
-	async send(message : any) {
+	async send(message: any) {
 		if(!this.ready) {
 			throw new Error("not ready");
 		}

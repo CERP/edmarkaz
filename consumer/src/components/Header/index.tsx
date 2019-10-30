@@ -1,8 +1,7 @@
 import React from 'react'
 
-export default () => {
-
-	return <div className="header">
-		Ilm Exchange
+const Header = () => <div className="header">
+	IlmExchange
 	</div>
-}
+
+export default Header;

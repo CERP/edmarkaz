@@ -4,7 +4,7 @@ import { MERGES, MergeAction, DELETES, DeletesAction, CONFIRM_SYNC, CONFIRM_SYNC
 import {Actions, ADD_SCHOOL, addSchoolAction, ADD_SCHOOLS, addNewSchoolAction, EditLoginNumberAction, EDIT_LOGIN_NUMBER, ADD_PRODUCTS, AddProductsAction, PRODUCT_IMAGE_ADDED, ProductImageAddedAction } from '~/src/actions'
 
 
-const rootReducer = (state : RootBankState, action: Actions) : RootBankState => {
+const rootReducer = (state: RootBankState, action: Actions): RootBankState => {
 
 	console.log("action type:", action.type)
 

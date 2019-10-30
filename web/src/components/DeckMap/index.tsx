@@ -8,13 +8,13 @@ const mapbox_style_url = "mapbox://styles/taimur38/cjnu7h5pn4jel2rqk4pbo74ke"
 
 
 interface propTypes {
-	onSelect: (item : SchoolLocation) => void,
-	school_locations: { [school_id: string]: SchoolLocation }
+	onSelect: (item: SchoolLocation) => void;
+	school_locations: { [school_id: string]: SchoolLocation };
 }
 
 class Map extends React.Component<propTypes, any> {
 
-	constructor(props : propTypes) {
+	constructor(props: propTypes) {
 		super(props);
 
 		this.state = {
@@ -50,10 +50,10 @@ class Map extends React.Component<propTypes, any> {
 					radiusScale={90}
 					radiusMinPixels={Object.keys(this.props.school_locations).length > 2000 ? 1 : 5}
 					radiusMaxPixels={300}
-					getPosition={(d : any) => ([parseFloat(d.GPS_East), parseFloat(d.GPS_North)])}
+					getPosition={(d: any) => ([parseFloat(d.GPS_East), parseFloat(d.GPS_North)])}
 					getColor={(d: any) => ([116, 172, 237])}
 					pickable={true}
-					onClick={(item : any) => this.props.onSelect(item.object as SchoolLocation)}
+					onClick={(item: any) => this.props.onSelect(item.object as SchoolLocation)}
 					autoHighlight={true}
 					highlightColor={[0, 140, 255, 255]}
 				/>

@@ -1,5 +1,5 @@
  
-export const downloadCSV = (data: String[][], name: string) => {
+export const downloadCSV = (data: string[][], name: string) => {
 
 	let csv = ""
 	
@@ -9,7 +9,7 @@ export const downloadCSV = (data: String[][], name: string) => {
 		csv += "\n"
 	})
 	
-	var hiddenElement = document.createElement('a');
+	const hiddenElement = document.createElement('a');
 	hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
 	hiddenElement.target = '_blank';
 	hiddenElement.download = `${name}.csv`; 

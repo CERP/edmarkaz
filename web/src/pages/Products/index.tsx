@@ -14,13 +14,13 @@ import { RouteComponentProps } from 'react-router-dom';
 */
 
 type propTypes = {
-	products: RootBankState['products']['db']
-	getProducts: () => void
+	products: RootBankState['products']['db'];
+	getProducts: () => void;
 } & RouteComponentProps
 
 class ProductsPage extends React.Component<propTypes> {
 
-	constructor(props : propTypes) {
+	constructor(props: propTypes) {
 		super(props);
 
 		props.getProducts()
@@ -33,7 +33,7 @@ class ProductsPage extends React.Component<propTypes> {
 		})
 	}
 
-	onProductClick = (p : Product) => {
+	onProductClick = (p: Product) => {
 
 		return () => {
 			console.log('button clicked')
@@ -64,7 +64,7 @@ class ProductsPage extends React.Component<propTypes> {
 	}
 }
 
-const ProductEntry : React.SFC<{product: Product }> = (props) => {
+const ProductEntry: React.SFC<{product: Product }> = (props) => {
 
 	return <div className="product-entry">
 		<div className="name">{props.product.title}</div>
@@ -72,8 +72,8 @@ const ProductEntry : React.SFC<{product: Product }> = (props) => {
 	</div>
 }
 
-export default connect((state : RootBankState) => ({
+export default connect((state: RootBankState) => ({
 	products: state.products.db
-}), (dispatch : Function) => ({
+}), (dispatch: Function) => ({
 	getProducts: () => dispatch(getOwnProducts())
 }))(ProductsPage)

@@ -10,25 +10,25 @@ import './style.css'
 import { getDownsizedImage } from '~src/utils/image';
 
 interface OwnProps {
-	product_id: string
+	product_id: string;
 }
 
 interface StateProps {
-	supplier_id: string
-	connected: boolean
-	product?: Product
+	supplier_id: string;
+	connected: boolean;
+	product?: Product;
 }
 
 interface DispatchProps {
-	saveProduct: (p: Product) => void
-	saveProductImage: (imageId: string, dataUrl: string, p: Product) => void
+	saveProduct: (p: Product) => void;
+	saveProductImage: (imageId: string, dataUrl: string, p: Product) => void;
 }
 
 type propTypes = OwnProps & StateProps & DispatchProps & RouteComponentProps
 
 interface S {
-	product: Product
-	imageDataString: string
+	product: Product;
+	imageDataString: string;
 }
 
 class ProductInfo extends React.Component<propTypes, S> {

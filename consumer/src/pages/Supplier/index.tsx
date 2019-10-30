@@ -11,19 +11,17 @@ interface S {
 }
 
 interface RouteInfo {
-	supplier_id: string
+	supplier_id: string;
 }
 
-type P =  {
-	products: RootReducerState['products']['db']
-	getProducts: () => void
+type P = {
+	products: RootReducerState['products']['db'];
+	getProducts: () => void;
 } & RouteComponentProps<RouteInfo>
 
 class SupplierHomePage extends React.Component<P, S>{
 
 	componentDidMount() {
-		const supplier_id = this.props.match.params.supplier_id;
-
 		this.props.getProducts()
 	}
 
@@ -40,7 +38,7 @@ class SupplierHomePage extends React.Component<P, S>{
 			<div className="product-list">
 				{
 					products.map(([k, p]) => <div className="product-box" key={k}>
-						<div className="product-image" style={{backgroundImage: `url(${p.image && p.image.url})`}} />
+						<div className="product-image" style={{ backgroundImage: `url(${p.image && p.image.url})` }} />
 						<Link to={`/supplier/${supplier_id}/${p.id}`}><b>{p.title}</b></Link>
 						<div>{p.description}</div>
 					</div>)
@@ -52,8 +50,8 @@ class SupplierHomePage extends React.Component<P, S>{
 }
 
 
-export default connect((state : RootReducerState) => ({
+export default connect((state: RootReducerState) => ({
 	products: state.products.db
-}), (dispatch : Function) => ({
+}), (dispatch: Function) => ({
 	getProducts: () => dispatch(getProducts())
 }))(SupplierHomePage)

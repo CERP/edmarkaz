@@ -2,7 +2,7 @@ import { v4 } from 'node-uuid';
 
 const mask_number_bank = Array(100).fill(1).map((x, i) => `0${4232500600 + i}`);
 
-export const saveDB = (db : RootBankState) => {
+export const saveDB = (db: RootBankState) => {
 
 	try {
 		const auth_json = JSON.stringify(db.auth);
@@ -29,7 +29,7 @@ export const clearDB = () => {
 
 export const loadAuth = (): RootBankState['auth'] => {
 
-	let init_auth : RootBankState['auth'] = {
+	const init_auth: RootBankState['auth'] = {
 		id: undefined as string,
 		token: undefined as string,
 		username: undefined as string,
@@ -62,7 +62,7 @@ const loadClientId = () => {
 	return client_id;
 }
 
-const loadSyncState = () : RootBankState['sync_state'] => {
+const loadSyncState = (): RootBankState['sync_state'] => {
 
 	const str = localStorage.getItem("sync_state");
 
@@ -98,12 +98,12 @@ const loadSyncState = () : RootBankState['sync_state'] => {
 	}
 }
 
-const saveSyncState = (sync_state : RootBankState['sync_state']) => {
+const saveSyncState = (sync_state: RootBankState['sync_state']) => {
 
 	localStorage.setItem("sync_state", JSON.stringify(sync_state));
 }
 
-const saveQueue = (queue : RootBankState['queued']) => {
+const saveQueue = (queue: RootBankState['queued']) => {
 
 	localStorage.setItem("queued", JSON.stringify(queue))
 
@@ -113,7 +113,7 @@ const loadQueue = () => {
 	return JSON.parse(localStorage.getItem("queued") || "{}") as RootBankState['queued']
 }
 
-const saveSchoolDb = (db : RootBankState['new_school_db']) => {
+const saveSchoolDb = (db: RootBankState['new_school_db']) => {
 
 	localStorage.setItem("school_db", JSON.stringify(db))
 }
@@ -122,7 +122,7 @@ const loadSchoolDb = () => {
 	return JSON.parse(localStorage.getItem("school_db") || "{}")
 }
 
-const saveSnapshot = (last_snapshot : number) => {
+const saveSnapshot = (last_snapshot: number) => {
 
 	//@ts-ignore
 	localStorage.setItem("last_snapshot", last_snapshot);
@@ -134,7 +134,7 @@ const loadSnapshot = () => {
 
 const loadProducts = () => {
 
-	const initial : RootBankState['products'] = {
+	const initial: RootBankState['products'] = {
 		last_sync: 0,
 		db: { }
 	}
@@ -157,7 +157,7 @@ const saveProducts = ( products? : RootBankState['products']) => {
 
 }
 
-export const loadDB = () : RootBankState => {
+export const loadDB = (): RootBankState => {
 
 	return {
 		school_locations: {},

@@ -1,7 +1,7 @@
 
 const getUserType = (username: string) => {
 
-	let user_type : USER_TYPE
+	let user_type: USER_TYPE
 
 	switch (username) {
 		case "alif-laila":

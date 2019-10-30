@@ -14,25 +14,25 @@ import './style.css'
 
 type propTypes = {
 
-	sync_state: RootBankState['sync_state']
-	school_db: RootBankState['new_school_db']
-	username: string
-	saveFullState: () => void
-	addSchools: (ids: string[]) => void
-	saveCallEndSurvey: (school_id: string, survey: CallEndSurvey['meta']) => void
-	saveCallEndFollowupSurvey: (school_id: string, survey: CallEndSurveyFollowUp['meta']) => void
+	sync_state: RootBankState['sync_state'];
+	school_db: RootBankState['new_school_db'];
+	username: string;
+	saveFullState: () => void;
+	addSchools: (ids: string[]) => void;
+	saveCallEndSurvey: (school_id: string, survey: CallEndSurvey['meta']) => void;
+	saveCallEndFollowupSurvey: (school_id: string, survey: CallEndSurveyFollowUp['meta']) => void;
 } & RouteComponentProps
 
 interface stateType {
-	loading: boolean
-	showSurvey: boolean
-	current_school: string,
-	current_school_survey_num: number
+	loading: boolean;
+	showSurvey: boolean;
+	current_school: string;
+	current_school_survey_num: number;
 }
 
 class Home extends React.Component<propTypes, stateType> {
 
-	constructor(props : propTypes) {
+	constructor(props: propTypes) {
 		super(props);
 
 		const blank = Object.keys(props.sync_state.matches)
@@ -50,7 +50,7 @@ class Home extends React.Component<propTypes, stateType> {
 		}
 	}
 
-	componentWillReceiveProps(nextProps : propTypes) {
+	componentWillReceiveProps(nextProps: propTypes) {
 
 		const blank = Object.keys(nextProps.sync_state.matches)
 			.filter(k => nextProps.school_db[k] == undefined)
@@ -58,14 +58,14 @@ class Home extends React.Component<propTypes, stateType> {
 		this.setState({ loading: blank.length > 0 })
 	}
 
-	onSchoolClick = (school_id : string) => () => {
+	onSchoolClick = (school_id: string) => () => {
 		this.props.history.push({
 			pathname: this.props.location.pathname,
 			search: `?school_id=${school_id}`
 		})
 	}
 
-	onSurveyClick = (school_id : string) => () => {
+	onSurveyClick = (school_id: string) => () => {
 		
 		const num = Object.values(this.props.sync_state.matches[school_id].history || {})
 			.filter(x => x.event === "CALL_END_SURVEY")
@@ -78,7 +78,7 @@ class Home extends React.Component<propTypes, stateType> {
 		})
 	}
 
-	saveSurvey = (survey : CallEndSurvey['meta'] | CallEndSurveyFollowUp['meta']) => {
+	saveSurvey = (survey: CallEndSurvey['meta'] | CallEndSurveyFollowUp['meta']) => {
 
 		if(this.state.current_school_survey_num === 0) {
 			this.props.saveCallEndSurvey(this.state.current_school, survey as CallEndSurvey['meta'])
@@ -101,7 +101,7 @@ class Home extends React.Component<propTypes, stateType> {
 
 		const min_convo_length = 0;
 
-		const call_end_events : MergedEndEvent[]  = Object.entries(matches)
+		const call_end_events: MergedEndEvent[]  = Object.entries(matches)
 			.filter(([, x]) => x.history)
 			.reduce((agg, [sid, curr]) => {
 				// interaction between user and school - need to just keep id and name here of school
@@ -141,7 +141,7 @@ class Home extends React.Component<propTypes, stateType> {
 			return agg;
 		}, 0)/60.0
 
-		const missing_surveys : MergedEndEvent[] = Object.entries(matches)
+		const missing_surveys: MergedEndEvent[] = Object.entries(matches)
 			.reduce((agg, [id, curr]) => {
 
 				if(curr.history === undefined) {
@@ -266,13 +266,13 @@ class Home extends React.Component<propTypes, stateType> {
 
 type MergedEndEvent = CallEndEvent & { school_id: string }
 
-export default connect((state : RootBankState) => ({ 
+export default connect((state: RootBankState) => ({ 
 	sync_state: state.sync_state,
 	school_db: state.new_school_db,
 	username: state.auth.id
-}), (dispatch : Function) => ({
+}), (dispatch: Function) => ({
 	saveFullState: () => dispatch(forceSaveFullStatePotentiallyCausingProblems()),
-	addSchools: (ids : string[]) => dispatch(getSchoolProfiles(ids)),
+	addSchools: (ids: string[]) => dispatch(getSchoolProfiles(ids)),
 	saveCallEndSurvey: (school_id: string, survey: CallEndSurvey['meta']) => dispatch(saveCallEndSurvey(school_id, survey)),
 	saveCallEndFollowupSurvey: (school_id: string, survey: CallEndSurveyFollowUp['meta']) => dispatch(saveCallEndSurveyFollowUp(school_id, survey))
 }))(Home)

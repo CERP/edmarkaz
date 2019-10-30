@@ -2,14 +2,14 @@ import React from 'react'
 import Former from '~/src/utils/former'
 
 interface P {
-	saveSurvey: (survey: NotInterestedSurvey['meta']) => void
+	saveSurvey: (survey: NotInterestedSurvey['meta']) => void;
 }
 
 export default class Survey extends React.Component<P, NotInterestedSurvey['meta']> {
 
-	former : Former
+	former: Former
 
-	constructor(props : P) {
+	constructor(props: P) {
 		super(props);
 
 		this.state = {

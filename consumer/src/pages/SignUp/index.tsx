@@ -6,31 +6,30 @@ import { loadProfile, signUp } from '../../actions'
 import Former from 'former'
 
 import { SchoolForm } from './form'
-import { tsExpressionWithTypeArguments } from '@babel/types'
 
 type P = {
-	auth: RootReducerState['auth']
-	profile: RootReducerState['sync_state']['profile']
-	loadProfile: (number: string) => void
-	createAccount: (number: string, password: string, profile: CERPSchool) => void
+	auth: RootReducerState['auth'];
+	profile: RootReducerState['sync_state']['profile'];
+	loadProfile: (number: string) => void;
+	createAccount: (number: string, password: string, profile: CERPSchool) => void;
 
 } & RouteComponentProps
 
 type S = {
-	phone_number: string
-	password: string
-	button_pressed: boolean 
-	loading: boolean
-	redirect: boolean
+	phone_number: string;
+	password: string;
+	button_pressed: boolean;
+	loading: boolean;
+	redirect: boolean;
 
-	school?: CERPSchool
+	school?: CERPSchool;
 }
 
 class SignUp extends React.Component<P, S> {
 
-	former : Former
+	former: Former
 
-	constructor(props : P) {
+	constructor(props: P) {
 		super(props)
 
 		this.state = {
@@ -48,7 +47,7 @@ class SignUp extends React.Component<P, S> {
 
 	onLoad = () => {
 
-		if(this.state.phone_number === "") {
+		if (this.state.phone_number === "") {
 			return alert("please enter phone number")
 		}
 
@@ -72,35 +71,35 @@ class SignUp extends React.Component<P, S> {
 		const password = this.state.password;
 		const profile = this.state.school;
 
-		if(profile === undefined) {
+		if (profile === undefined) {
 			alert("please fill out profile");
 			return;
 		}
 
-		if(!number) {
+		if (!number) {
 			alert("Phone Number is required")
 		}
 
-		if(!password) {
+		if (!password) {
 			alert("Password is required")
 		}
 
-		if(!profile.school_name) {
+		if (!profile.school_name) {
 			alert("school name is required")
 		}
 
-		if(!profile.school_district) {
+		if (!profile.school_district) {
 			alert("school district is required")
 		}
 
-		if(password && profile.school_name && profile.school_district) {
+		if (password && profile.school_name && profile.school_district) {
 			this.props.createAccount(number, password, profile)
 		}
 
 	}
 
-	componentWillReceiveProps(nextProps : P) {
-		if(nextProps.profile && Object.keys(nextProps.profile).length > 0) {
+	componentWillReceiveProps(nextProps: P) {
+		if (nextProps.profile && Object.keys(nextProps.profile).length > 0) {
 			this.setState({
 				school: JSON.parse(JSON.stringify(nextProps.profile)),
 				button_pressed: true
@@ -110,16 +109,16 @@ class SignUp extends React.Component<P, S> {
 			loading: false
 		})
 
-		if(nextProps.auth.token) {
-			this.setState({ 
+		if (nextProps.auth.token) {
+			this.setState({
 				redirect: true
 			})
 		}
 	}
 
-	render () {
+	render() {
 
-		if(this.state.redirect) {
+		if (this.state.redirect) {
 			return <Redirect to="/" />
 		}
 
@@ -143,17 +142,17 @@ class SignUp extends React.Component<P, S> {
 			</div>
 
 			{this.state.loading && <div>Loading...</div>}
-			{ this.state.button_pressed && <SchoolForm school={this.state.school} former={this.former} base_path={["school"]} /> }
-			{ this.state.button_pressed && <div className="button blue save" onClick={this.onSave}>Sign Up</div> }
+			{this.state.button_pressed && <SchoolForm school={this.state.school} former={this.former} base_path={["school"]} />}
+			{this.state.button_pressed && <div className="button blue save" onClick={this.onSave}>Sign Up</div>}
 		</div>
 	}
 }
 
-export default connect( (state : RootReducerState) => ({
+export default connect((state: RootReducerState) => ({
 	connected: state.connected,
 	profile: state.sync_state.profile,
 	auth: state.auth
-}), (dispatch : Function) => ({
-	loadProfile: (number : string) => dispatch(loadProfile(number)),
+}), (dispatch: Function) => ({
+	loadProfile: (number: string) => dispatch(loadProfile(number)),
 	createAccount: (number: string, password: string, profile: CERPSchool) => dispatch(signUp(number, password, profile))
 }))(SignUp)

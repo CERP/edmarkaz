@@ -18,13 +18,13 @@ export const createLogin = (username: string, password: string, number: string) 
 			password
 		}
 	})
-	.then((res: {token: string, sync_state: SyncState }) => {
-		dispatch(createLoginSucceed(username, res.token, res.sync_state))
-	})
-	.catch(res => {
-		console.error(res)
-		alert("login failed" + JSON.stringify(res))
-	})
+		.then((res: { token: string; sync_state: SyncState }) => {
+			dispatch(createLoginSucceed(username, res.token, res.sync_state))
+		})
+		.catch(res => {
+			console.error(res)
+			alert("login failed" + JSON.stringify(res))
+		})
 
 }
 
@@ -44,21 +44,21 @@ export const getProducts = (filters = {}) => (dispatch: Dispatch, getState: GetS
 		},
 		last_sync: state.products.last_sync
 	})
-	.then((res : any) => {
-		// now dispatch an action that 'saves' these products
+		.then((res: any) => {
+			// now dispatch an action that 'saves' these products
 
-		dispatch({
-			type: ADD_PRODUCTS,
-			products: res.products
+			dispatch({
+				type: ADD_PRODUCTS,
+				products: res.products
+			})
+
+			return res
 		})
+		.catch(err => {
+			console.error(err)
 
-		return res
-	})
-	.catch(err => {
-		console.error(err)
-
-		setTimeout(() => dispatch(getProducts()), 1000)
-	})
+			setTimeout(() => dispatch(getProducts()), 1000)
+		})
 }
 
 export const LOAD_PROFILE = "LOAD_PROFILE"
@@ -74,33 +74,33 @@ export const loadProfile = (number: string) => (dispatch: Dispatch, getState: Ge
 		payload: { number },
 		last_sync: state.products.last_sync
 	})
-	.then(res => {
-		console.log(res)
+		.then(res => {
+			console.log(res)
 
-		dispatch({
-			type: LOAD_PROFILE,
-			school_id: res.school_id,
-			school: res.school
-		})
-	})
-	.catch((err: Error) => {
-		if(err.message == "not ready") {
-			alert("not yet connected...")
-		}
-		else {
-			alert("No existing school found")
 			dispatch({
 				type: LOAD_PROFILE,
-				school_id: "",
-				school: undefined
+				school_id: res.school_id,
+				school: res.school
 			})
-		}
-	})
+		})
+		.catch((err: Error) => {
+			if (err.message === "not ready") {
+				alert("not yet connected...")
+			}
+			else {
+				alert("No existing school found")
+				dispatch({
+					type: LOAD_PROFILE,
+					school_id: "",
+					school: undefined
+				})
+			}
+		})
 
 }
 
 export const SIGN_UP = "SIGN_UP"
-export const signUp = (number: string, password: string, profile: Partial<CERPSchool> ) => (dispatch : Dispatch, getState: GetState, syncr: Syncr)  => {
+export const signUp = (number: string, password: string, profile: Partial<CERPSchool>) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 
 	const state = getState();
 
@@ -115,19 +115,19 @@ export const signUp = (number: string, password: string, profile: Partial<CERPSc
 			profile
 		}
 	})
-	.then(res => {
-		// get token back
-		console.log(res)
-		const token : string = res.token;
+		.then(res => {
+			// get token back
+			console.log(res)
+			const token: string = res.token;
 
-		dispatch(createLoginSucceed(number, token, { profile }))
-		// set auth
-	})
-	.catch(err => {
-		console.error(err)
+			dispatch(createLoginSucceed(number, token, { profile }))
+			// set auth
+		})
+		.catch(err => {
+			console.error(err)
 
-		// dispatch sign-up failed (phone number not unique?)
-	})
+			// dispatch sign-up failed (phone number not unique?)
+		})
 
 }
 
@@ -146,11 +146,11 @@ export const placeOrder = (product: Product) => (dispatch: Dispatch, getState: G
 			school_name: state.sync_state.profile.school_name
 		}
 	})
-	.then(res => {
-		// get token back
-		console.log(res)
-	})
-	.catch(err => {
-		console.error(err)
-	})
+		.then(res => {
+			// get token back
+			console.log(res)
+		})
+		.catch(err => {
+			console.error(err)
+		})
 }
