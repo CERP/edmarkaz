@@ -4,13 +4,16 @@ import Former from '~/src/utils/former'
 
 import { clearDB } from '~/src/utils/localStorage'
 
-import { addSupplierNumber, deleteSupplierNumber } from '~/src/actions'
+import { addSupplierNumber, deleteSupplierNumber, saveSupplierLogo } from '~/src/actions'
 import { getDownsizedImage } from '~src/utils/image'
+import { v4 } from 'node-uuid'
 
 interface propTypes {
 	numbers: RootBankState['sync_state']['numbers'];
+	logo: RootBankState['sync_state']['logo']
 	addNumber: (number: string, name: string) => void;
 	removeNumber: (number: string) => void;
+	saveLogo: (imageId: string, dataUrl: string) => void
 }
 
 interface stateType {
@@ -60,7 +63,7 @@ class Settings extends React.Component<propTypes, stateType> {
 	uploadLogo = (e: React.ChangeEvent<HTMLInputElement>) => {
 
 		const file = e.target.files[0]
-		if(file === undefined) {
+		if (file === undefined) {
 			return
 		}
 
@@ -75,8 +78,12 @@ class Settings extends React.Component<propTypes, stateType> {
 					this.setState({
 						logoDataString: imgString
 					})
+
+					this.props.saveLogo(v4(), imgString)
 				})
 		}
+
+		reader.readAsDataURL(file)
 	}
 
 	render() {
@@ -92,14 +99,19 @@ class Settings extends React.Component<propTypes, stateType> {
 				</div>
 
 				<div className="row">
-					<label>Official Logo</label>
+					<label>Change Logo</label>
 					<input type="file" accept="image/*" onChange={this.uploadLogo} />
+				</div>
+
+				<div className="row">
+					<label>Current Logo</label>
+					<img className="logo-preview" src={this.state.logoDataString || this.props.logo.url} />
 				</div>
 
 				<div className="divider">Add New Number</div>
 				<div className="row">
 					<label>Number</label>
-					<input type="tel" {...this.former.super_handle(["current_number"])} placeholder="New Number"/>
+					<input type="tel" {...this.former.super_handle(["current_number"])} placeholder="New Number" />
 				</div>
 				<div className="row">
 					<label>Name</label>
@@ -116,7 +128,8 @@ class Settings extends React.Component<propTypes, stateType> {
 								<div>{number}</div>
 								<div className="button red" onClick={this.removeNumber(number)} style={{
 									padding: "5px 10px",
-									borderRadius: "50%"
+									borderRadius: "50%",
+									width: "initial"
 								}}>X</div>
 							</div>
 						})
@@ -130,8 +143,10 @@ class Settings extends React.Component<propTypes, stateType> {
 }
 
 export default connect((state: RootBankState) => ({
-	numbers: state.sync_state.numbers || {}
+	numbers: state.sync_state.numbers || {},
+	logo: state.sync_state.logo || {}
 }), (dispatch: (x: any) => void) => ({
 	addNumber: (number: string, name: string) => dispatch(addSupplierNumber(number, name)),
-	removeNumber: (number: string) => dispatch(deleteSupplierNumber(number))
+	removeNumber: (number: string) => dispatch(deleteSupplierNumber(number)),
+	saveLogo: (imageId: string, dataUrl: string) => dispatch(saveSupplierLogo(imageId, dataUrl))
 }))(Settings)

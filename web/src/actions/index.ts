@@ -1,5 +1,5 @@
 import Syncr from '~/src/syncr'
-import { MergeAction, DeletesAction, QueueAction, sendServerAction, createLoginSucceed, createMerges, createDeletes } from './core'
+import { MergeAction, DeletesAction, QueueAction, sendServerAction, createLoginSucceed, createMerges, createDeletes, createImageMerges } from './core'
 
 export const SELECT_LOCATION = "SELECT_LOCATION"
 
@@ -102,6 +102,19 @@ export const saveProductImage = (imageId: string, dataUrl: string, product: Prod
 		.catch(err => {
 			console.error(err)
 		})
+
+}
+
+export const saveSupplierLogo = (imageId: string, dataUrl: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+	dispatch(createImageMerges(
+		[
+			{
+				id: imageId,
+				imageString: dataUrl,
+				path: ["sync_state", "logo"]
+			}
+		]
+	))
 
 }
 

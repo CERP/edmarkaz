@@ -147,8 +147,8 @@ defmodule EdMarkaz.ActionHandler.Platform do
 		{ write_map, image_map } = Enum.reduce(payload, {%{}, %{}}, fn {pkey, entry}, {w_map, img_map} -> 
 			case entry["action"]["type"] do
 				"IMAGE_MERGE" -> { w_map, Map.put(img_map, pkey, entry)}
-				"MERGE" -> { Map.put(img_map, pkey, entry), img_map}
-				"DELETE" -> { Map.put(img_map, pkey, entry), img_map}
+				"MERGE" -> { Map.put(w_map, pkey, entry), img_map}
+				"DELETE" -> { Map.put(w_map, pkey, entry), img_map}
 				other -> 
 					IO.puts "ERROR SPLITTING WRITES"
 					IO.inspect other
@@ -158,7 +158,41 @@ defmodule EdMarkaz.ActionHandler.Platform do
 			end
 		end)
 
-		IO.inspect image_map
+		spawn fn -> 
+
+			image_map 
+			|> Enum.each(fn {pkey, entry} -> 
+
+				%{
+					"action" => %{
+						"path" => path,
+						"value" => %{
+							"id" => image_id,
+							"image_string" => image_string
+						}
+					},
+					"date" => date
+				} = entry
+
+				image_url = Sarkar.Storage.Google.upload_image("ilmx-product-images", image_id, image_string)
+				merges = %{ 
+					pkey => %{
+						"action" => %{
+							"type" => "MERGE",
+							"path" => path,
+							"value" => %{
+								"id" => image_id,
+								"url" => image_url
+							}
+						},
+						"date" => date
+					}
+				}
+
+				EdMarkaz.Supplier.sync_changes(id, "backend-task", merges, :os.system_time(:millisecond))
+
+			end)
+		end
 
 		res = EdMarkaz.Supplier.sync_changes(id, client_id, write_map, last_sync_date)
 
@@ -189,6 +223,7 @@ defmodule EdMarkaz.ActionHandler.Platform do
 	end
 
 	def handle_action(action, state) do
+		IO.puts "===================="
 		IO.inspect action
 		IO.inspect state
 		IO.puts "NOT YET READY"

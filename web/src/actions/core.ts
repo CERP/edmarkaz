@@ -18,7 +18,7 @@ export interface MergeAction {
 	merges: Merge[];
 }
 
-export const createMerges= (merges: Merge[]) => (dispatch: (a: any) => any, getState: () => RootBankState, syncr: Syncr) => {
+export const createMerges = (merges: Merge[]) => (dispatch: (a: any) => any, getState: () => RootBankState, syncr: Syncr) => {
 	// merges is a list of path, value
 
 	const action = {
@@ -41,7 +41,7 @@ export const createMerges= (merges: Merge[]) => (dispatch: (a: any) => any, getS
 	}), {})
 
 	const state = getState();
-	const rationalized_merges = {...state.queued, ...new_merges}
+	const rationalized_merges = { ...state.queued, ...new_merges }
 
 	const payload = {
 		type: SYNC,
@@ -56,7 +56,7 @@ export const createMerges= (merges: Merge[]) => (dispatch: (a: any) => any, getS
 		.catch(err => dispatch(QueueUp(new_merges)))
 }
 
-type ImageMerges = Array<{id: string; imageString: string; path: string[]}>
+type ImageMerges = Array<{ id: string; imageString: string; path: string[] }>
 
 export const createImageMerges = (imageMerges: ImageMerges) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 
@@ -105,15 +105,16 @@ export const createImageMerges = (imageMerges: ImageMerges) => (dispatch: Dispat
 
 	syncr.send({
 		type: SYNC,
-		client_type: state.auth.client_type,
 		id: state.auth.id,
+		client_type: state.auth.client_type,
+		last_snapshot: state.last_snapshot,
 		payload: rationalized_merges
 	})
-	.then(dispatch) // should return a series of merges with an image url 
-	.catch((err: Error) => {
-		dispatch(QueueUp(merges))
-	})
-
+		.then(dispatch) // should return a series of merges with an image url 
+		.catch((err: Error) => {
+			console.error(err)
+			dispatch(QueueUp(merges))
+		})
 
 }
 
@@ -132,8 +133,8 @@ export const sendSMS = (text: string, number: string) => (dispatch: (a: any) => 
 			number,
 		}
 	})
-	.then(dispatch)
-	.catch((err: Error) => console.error(err)) // this should backup to sending the sms via the android app?
+		.then(dispatch)
+		.catch((err: Error) => console.error(err)) // this should backup to sending the sms via the android app?
 }
 
 
@@ -154,9 +155,9 @@ export const sendBatchSMS = (messages: SMS[]) => (dispatch: (a: any) => any, get
 			messages
 		}
 	})
-	.catch((err: Error) => {
-		console.error(err) // send via android app?
-	})
+		.catch((err: Error) => {
+			console.error(err) // send via android app?
+		})
 }
 
 interface ServerAction {
@@ -164,7 +165,7 @@ interface ServerAction {
 	payload: any;
 }
 
-export const sendServerAction = ( action: ServerAction ) => (dispatch: Dispatch, getState: () => RootBankState, syncr: Syncr) => {
+export const sendServerAction = (action: ServerAction) => (dispatch: Dispatch, getState: () => RootBankState, syncr: Syncr) => {
 	const state = getState();
 
 	console.log('send server action...', action)
@@ -175,10 +176,10 @@ export const sendServerAction = ( action: ServerAction ) => (dispatch: Dispatch,
 		id: state.auth.id,
 		payload: action.payload
 	})
-	.then(dispatch)
-	.catch((err: Error) => {
-		console.error(err)
-	})
+		.then(dispatch)
+		.catch((err: Error) => {
+			console.error(err)
+		})
 
 	// should it get queued up....
 }
@@ -204,18 +205,18 @@ export const createDeletes = (paths: Delete[]) => (dispatch: Dispatch, getState:
 
 	const state = getState();
 	const payload = paths.reduce((agg, curr) => ({
-			...agg, 
-			[curr.path.join(',')]: {
-				action: {
-					type: "DELETE",
-					path: curr.path.map(x => x === undefined ? "" : x),
-					value: 1
-				},
-				date: new Date().getTime()
-			}
-		}), {})
-	
-	const rationalized_deletes = {...state.queued, ...payload}
+		...agg,
+		[curr.path.join(',')]: {
+			action: {
+				type: "DELETE",
+				path: curr.path.map(x => x === undefined ? "" : x),
+				value: 1
+			},
+			date: new Date().getTime()
+		}
+	}), {})
+
+	const rationalized_deletes = { ...state.queued, ...payload }
 
 	syncr.send({
 		type: SYNC,
@@ -224,8 +225,8 @@ export const createDeletes = (paths: Delete[]) => (dispatch: Dispatch, getState:
 		last_snapshot: state.last_snapshot,
 		payload: rationalized_deletes
 	})
-	.then(dispatch)
-	.catch((err: Error) => dispatch(QueueUp(payload)))
+		.then(dispatch)
+		.catch((err: Error) => dispatch(QueueUp(payload)))
 
 }
 
@@ -293,14 +294,14 @@ export const QueueUp = (action: Queuable) => {
 
 export const ON_CONNECT = "ON_CONNECT"
 export const ON_DISCONNECT = "ON_DISCONNECT"
-export const connected = () => (dispatch: (a: any) => any, getState: () => RootBankState, syncr: Syncr) => { 
-	const action = {type: ON_CONNECT}
+export const connected = () => (dispatch: (a: any) => any, getState: () => RootBankState, syncr: Syncr) => {
+	const action = { type: ON_CONNECT }
 
 	dispatch(action)
 
 	const state = getState();
 
-	if(state.auth.id && state.auth.token) {
+	if (state.auth.id && state.auth.token) {
 		syncr
 			.send({
 				type: "VERIFY",
@@ -343,7 +344,7 @@ export interface LoginSucceed {
 	sync_state: RootBankState['sync_state'];
 	number: string;
 }
-export const createLoginSucceed = (id: string, token: string, sync_state: RootBankState['sync_state'], number: string): LoginSucceed => ({ 
+export const createLoginSucceed = (id: string, token: string, sync_state: RootBankState['sync_state'], number: string): LoginSucceed => ({
 	type: LOGIN_SUCCEED,
 	id,
 	token,

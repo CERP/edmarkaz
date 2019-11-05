@@ -28,7 +28,7 @@ class LoggedOutHome extends React.Component<P, S> {
 	render() {
 
 		// this should have a supplier image, title, and category
-		const suppliers = {} as {[k: string]: number }
+		const suppliers = {} as { [k: string]: number }
 
 		Object.values(this.props.products).forEach(p => {
 			suppliers[p.supplier_id] = 1
@@ -40,28 +40,28 @@ class LoggedOutHome extends React.Component<P, S> {
 
 			<div className="divider">Finance</div>
 			<div className="section" style={{ width: "75%" }}>
-			{
-				Object.keys(suppliers)
-					.filter(s => getSupplierSection(s) === "FINANCE")
-					.map(s => {
-						return <Link className="supplier-box" to={`/supplier/${s}`} key={s}>
-							<div>{s}</div>
-						</Link>
-					})
-			}
+				{
+					Object.keys(suppliers)
+						.filter(s => getSupplierSection(s) === "FINANCE")
+						.map(s => {
+							return <Link className="supplier-box" to={`/supplier/${s}`} key={s}>
+								<div>{s}</div>
+							</Link>
+						})
+				}
 			</div>
 
 			<div className="divider">EdTech</div>
 			<div className="section" style={{ width: "75%" }}>
-			{
-				Object.keys(suppliers)
-					.filter(s => getSupplierSection(s) === "EDTECH")
-					.map(s => {
-						return <Link className="supplier-box" to={`/supplier/${s}`} key={s}>
-							<div>{s}</div>
-						</Link>
-					})
-			}
+				{
+					Object.keys(suppliers)
+						.filter(s => getSupplierSection(s) === "EDTECH")
+						.map(s => {
+							return <Link className="supplier-box" to={`/supplier/${s}`} key={s}>
+								<div>{s}</div>
+							</Link>
+						})
+				}
 
 			</div>
 		</div>

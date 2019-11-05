@@ -19,7 +19,7 @@ steps:
       - "asia.gcr.io/$PROJECT_ID/platform-consumer:$BRANCH_NAME"
       - "--build-arg"
       - "VERSION=$SHORT_SHA"
-      - "web"
+      - "consumer"
     env:
       - "VERSION=$SHORT_SHA"
   - name: "gcr.io/cloud-builders/docker"
