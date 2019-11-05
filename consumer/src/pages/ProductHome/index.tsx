@@ -5,6 +5,8 @@ import { Link } from 'react-router-dom';
 import { getProducts } from '../../actions';
 import getSupplierSection from '../../utils/getSupplierSection';
 
+import './style.css'
+
 interface P {
 	products: RootReducerState['products']['db'];
 	getProducts: () => void;
@@ -28,10 +30,10 @@ class LoggedOutHome extends React.Component<P, S> {
 	render() {
 
 		// this should have a supplier image, title, and category
-		const suppliers = {} as { [k: string]: number }
+		const suppliers = {} as { [k: string]: string }
 
 		Object.values(this.props.products).forEach(p => {
-			suppliers[p.supplier_id] = 1
+			suppliers[p.supplier_id] = (p.logo && p.logo.url) || ""
 		});
 
 		return <div className="products page">
@@ -45,6 +47,7 @@ class LoggedOutHome extends React.Component<P, S> {
 						.filter(s => getSupplierSection(s) === "FINANCE")
 						.map(s => {
 							return <Link className="supplier-box" to={`/supplier/${s}`} key={s}>
+								<img src={suppliers[s]} className='logo' alt="logo" />
 								<div>{s}</div>
 							</Link>
 						})

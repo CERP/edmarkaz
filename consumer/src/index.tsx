@@ -13,7 +13,7 @@ import { loadDB, saveDB } from './utils/localStorage'
 import debounce from './utils/debounce';
 
 
-const debug_url = "wss://7130cfb1.ngrok.io/ws"
+const debug_url = "wss://c0723802.ngrok.io/ws"
 //@ts-ignore
 const host = window.api_url || debug_url;
 
@@ -28,7 +28,7 @@ const saveBounce = debounce(() => {
 }, 500);
 
 store.subscribe(saveBounce as () => void)
-ReactDOM.render(<Routes store={store}/>, document.getElementById('root'));
+ReactDOM.render(<Routes store={store} />, document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

@@ -22,10 +22,14 @@ interface Product {
 	tags: {
 		[tag: string]: boolean;
 	};
+	logo?: {
+		id: string,
+		url: string
+	}
 }
 
 interface RootReducerState {
-	sync_state: SyncState; 
+	sync_state: SyncState;
 	auth: {
 		id?: string;
 		token?: string;
@@ -168,7 +172,7 @@ interface CERPSchool {
 	school_facilities_7: string;
 	school_facilities_8: string;
 	school_fef: string;
-	school_name: string; 
+	school_name: string;
 	school_pef: string;
 	school_registration: string;
 	school_sef: string;
