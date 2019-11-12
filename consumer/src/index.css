@@ -30,8 +30,8 @@ html,body, #root, .layout{
 	width: 100%;
 	margin: 0;
 	position: absolute;
-	font-family: 'Roboto', serif;
-	background-color: #c7c7c7;
+	font-family: 'Poppins', serif;
+	background-color: #ffffff;
 	overflow: visible;
 }
 

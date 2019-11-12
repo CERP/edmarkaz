@@ -36,36 +36,38 @@ class LoggedOutHome extends React.Component<P, S> {
 			suppliers[p.supplier_id] = (p.logo && p.logo.url) || ""
 		});
 
-		return <div className="products page">
+		return <div className="products">
+			<div className="tabs-banner"></div>
+			<div className="tabs-home">
 
-			<div className="title">Products</div>
+				<div className="title">Finance</div>
+				<div className="item-row" style={{ width: "75%" }}>
+					{
+						Object.keys(suppliers)
+							.filter(s => getSupplierSection(s) === "FINANCE")
+							.map(s => {
+								return <Link className="item-card" to={`/supplier/${s}`} key={s}>
+									<img src={suppliers[s]} className='item-image' alt="logo" />
+									<div className="subtitle">{s}</div>
+								</Link>
+							})
+					}
+				</div>
 
-			<div className="divider">Finance</div>
-			<div className="section" style={{ width: "75%" }}>
-				{
-					Object.keys(suppliers)
-						.filter(s => getSupplierSection(s) === "FINANCE")
-						.map(s => {
-							return <Link className="supplier-box" to={`/supplier/${s}`} key={s}>
-								<img src={suppliers[s]} className='logo' alt="logo" />
-								<div>{s}</div>
-							</Link>
-						})
-				}
-			</div>
+				<div className="title">EdTech</div>
+				<div className="item-row" style={{ width: "75%" }}>
+					{
+						Object.keys(suppliers)
+							.filter(s => getSupplierSection(s) === "EDTECH")
+							.map(s => {
+								return <Link className="item-card" to={`/supplier/${s}`} key={s}>
+									<img className="item-image" alt="no-image"/>
+									<div className="subtitle">{s}</div>
+								</Link>
+							})
+					}
 
-			<div className="divider">EdTech</div>
-			<div className="section" style={{ width: "75%" }}>
-				{
-					Object.keys(suppliers)
-						.filter(s => getSupplierSection(s) === "EDTECH")
-						.map(s => {
-							return <Link className="supplier-box" to={`/supplier/${s}`} key={s}>
-								<div>{s}</div>
-							</Link>
-						})
-				}
-
+				</div>
 			</div>
 		</div>
 	}
