@@ -67,6 +67,8 @@
 	flex-direction: row;
 }
 	.supplier-logo {
+		border-radius: 5px;
+		box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 		min-width: 150px;
 		max-width: 150px;
 		height: 150px;
@@ -86,7 +88,17 @@
 
  .tabs-home .item-row {
 	display: flex;
-	flex-direction: row;
+	flex-direction: column;
+	box-shadow: 0px 0px 5px #e4e4e4;
+	padding: 20px;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	background-color: #ffffff;
+ }
+
+ .item-row .items {
+	 display: flex;
+	 flex-direction: row;
  }
 	 
  .item-row .item-card {

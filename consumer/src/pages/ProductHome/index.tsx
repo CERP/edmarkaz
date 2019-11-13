@@ -40,8 +40,8 @@ class LoggedOutHome extends React.Component<P, S> {
 			<div className="tabs-banner"></div>
 			<div className="tabs-home">
 
+				<div className="item-row">
 				<div className="title">Finance</div>
-				<div className="item-row" style={{ width: "75%" }}>
 					{
 						Object.keys(suppliers)
 							.filter(s => getSupplierSection(s) === "FINANCE")
@@ -54,8 +54,9 @@ class LoggedOutHome extends React.Component<P, S> {
 					}
 				</div>
 
-				<div className="title">EdTech</div>
-				<div className="item-row" style={{ width: "75%" }}>
+				<div className="item-row">
+					<div className="title">EdTech</div>
+					<div className="items">
 					{
 						Object.keys(suppliers)
 							.filter(s => getSupplierSection(s) === "EDTECH")
@@ -67,6 +68,7 @@ class LoggedOutHome extends React.Component<P, S> {
 							})
 					}
 
+					</div>
 				</div>
 			</div>
 		</div>
