@@ -4,22 +4,25 @@ import Former from '~/src/utils/former'
 
 import { clearDB } from '~/src/utils/localStorage'
 
-import { addSupplierNumber, deleteSupplierNumber, saveSupplierLogo } from '~/src/actions'
-import { getDownsizedImage } from '~src/utils/image'
+import { addSupplierNumber, deleteSupplierNumber, saveSupplierLogo, saveSupplierBanner } from '~/src/actions'
+import { getDownsizedImage, getImageString } from '~src/utils/image'
 import { v4 } from 'node-uuid'
 
 interface propTypes {
 	numbers: RootBankState['sync_state']['numbers'];
 	logo: RootBankState['sync_state']['logo']
-	addNumber: (number: string, name: string) => void;
-	removeNumber: (number: string) => void;
+	banner: RootBankState['sync_state']['banner']
+	addNumber: (number: string, name: string) => void
+	removeNumber: (number: string) => void
 	saveLogo: (imageId: string, dataUrl: string) => void
+	saveBanner: (imageId: string, dataUrl: string) => void
 }
 
 interface stateType {
 	current_number: string;
 	current_name: string;
 	logoDataString: string;
+	bannerDataString: string
 }
 
 class Settings extends React.Component<propTypes, stateType> {
@@ -32,7 +35,8 @@ class Settings extends React.Component<propTypes, stateType> {
 		this.state = {
 			current_number: "",
 			current_name: "",
-			logoDataString: ""
+			logoDataString: "",
+			bannerDataString: ""
 		}
 
 		this.former = new Former(this, [])
@@ -60,30 +64,30 @@ class Settings extends React.Component<propTypes, stateType> {
 		window.location.reload();
 	}
 
+
 	uploadLogo = (e: React.ChangeEvent<HTMLInputElement>) => {
 
-		const file = e.target.files[0]
-		if (file === undefined) {
-			return
-		}
-
-		const reader = new FileReader();
-
-		reader.onloadend = () => {
-			const res = reader.result as string;
-
-			getDownsizedImage(res, 544)
-				.then(imgString => {
-
-					this.setState({
-						logoDataString: imgString
-					})
-
-					this.props.saveLogo(v4(), imgString)
+		getImageString(e)
+			.then(res => getDownsizedImage(res, 544))
+			.then(imgString => {
+				this.setState({
+					logoDataString: imgString
 				})
-		}
 
-		reader.readAsDataURL(file)
+				this.props.saveLogo(v4(), imgString)
+			})
+	}
+
+	uploadBanner = (e: React.ChangeEvent<HTMLInputElement>) => {
+		getImageString(e)
+			.then(res => getDownsizedImage(res, 544))
+			.then(imgString => {
+				this.setState({
+					bannerDataString: imgString
+				})
+
+				this.props.saveBanner(v4(), imgString)
+			})
 	}
 
 	render() {
@@ -106,6 +110,16 @@ class Settings extends React.Component<propTypes, stateType> {
 				<div className="row">
 					<label>Current Logo</label>
 					<img className="logo-preview" src={this.state.logoDataString || this.props.logo.url} />
+				</div>
+
+				<div className="row">
+					<label>Change Banner Image</label>
+					<input type="file" accept="image/*" onChange={this.uploadBanner} />
+				</div>
+
+				<div className="row">
+					<label>Current Logo</label>
+					<img className="logo-preview" src={this.state.bannerDataString || this.props.banner.url} />
 				</div>
 
 				<div className="divider">Add New Number</div>
@@ -144,9 +158,11 @@ class Settings extends React.Component<propTypes, stateType> {
 
 export default connect((state: RootBankState) => ({
 	numbers: state.sync_state.numbers || {},
-	logo: state.sync_state.logo || {}
+	logo: state.sync_state.logo || {},
+	banner: state.sync_state.banner || {}
 }), (dispatch: (x: any) => void) => ({
 	addNumber: (number: string, name: string) => dispatch(addSupplierNumber(number, name)),
 	removeNumber: (number: string) => dispatch(deleteSupplierNumber(number)),
-	saveLogo: (imageId: string, dataUrl: string) => dispatch(saveSupplierLogo(imageId, dataUrl))
+	saveLogo: (imageId: string, dataUrl: string) => dispatch(saveSupplierLogo(imageId, dataUrl)),
+	saveBanner: (imageId: string, dataUrl: string) => dispatch(saveSupplierBanner(imageId, dataUrl))
 }))(Settings)

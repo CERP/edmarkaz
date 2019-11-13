@@ -151,6 +151,7 @@ defmodule EdMarkaz.ActionHandler.Platform do
 				"DELETE" -> { Map.put(w_map, pkey, entry), img_map}
 				other -> 
 					IO.puts "ERROR SPLITTING WRITES"
+					IO.inspect payload
 					IO.inspect other
 					IO.inspect pkey
 					IO.inspect entry

@@ -105,7 +105,7 @@ export const saveProductImage = (imageId: string, dataUrl: string, product: Prod
 
 }
 
-export const saveSupplierLogo = (imageId: string, dataUrl: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+export const saveSupplierLogo = (imageId: string, dataUrl: string) => (dispatch: Dispatch) => {
 	dispatch(createImageMerges(
 		[
 			{
@@ -116,6 +116,18 @@ export const saveSupplierLogo = (imageId: string, dataUrl: string) => (dispatch:
 		]
 	))
 
+}
+
+export const saveSupplierBanner = (imageId: string, dataUrl: string) => (dispatch: Dispatch) => {
+	dispatch(createImageMerges(
+		[
+			{
+				id: imageId,
+				imageString: dataUrl,
+				path: ["sync_state", "banner"]
+			}
+		]
+	))
 }
 
 export const ADD_SCHOOLS = "ADD_SCHOOLS"
