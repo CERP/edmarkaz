@@ -32,17 +32,38 @@ class SupplierHomePage extends React.Component<P, S>{
 		const products = Object.entries(this.props.products)
 			.filter(([k, v]) => v.supplier_id === supplier_id && !v.deleted)
 
-		return <div className="supplier-home page">
-			<div className="title">{this.props.match.params.supplier_id}</div>
-			<div className="divider">Products</div>
-			<div className="product-list">
-				{
-					products.map(([k, p]) => <div className="product-box" key={k}>
-						<div className="product-image" style={{ backgroundImage: `url(${p.image && p.image.url})` }} />
-						<Link to={`/supplier/${supplier_id}/${p.id}`}><b>{p.title}</b></Link>
-						<div>{p.description}</div>
-					</div>)
-				}
+		return <div className="supplier-home">
+
+			<div className="tabs-banner">
+				<div className="supplier-logo">
+				</div>
+			</div>
+			<div className="tabs-home">
+				<div className="supplier-info">
+
+					<div className="supplier-desc">
+						<div className="title" style={{ marginLeft:"160px"}}>{this.props.match.params.supplier_id}</div>
+						<div>
+							Lorem ipsum, or lipsum as it is sometimes known, 
+							is dummy text used in laying out print, graphic 
+							or web designs. The passage is attributed to an
+							unknown typesetter in the 15th century who is 
+							thought to have scrambled parts of Cicero's De 
+							Finibus Bonorum et Malorum for use in a type 
+							specimen book.
+						</div>
+					</div>
+				</div>
+				<div className="title">Products</div>
+				<div className="item-row">
+					{
+						products.map(([k, p]) => <div className="item-card" key={k}>
+							<div className="item-image" style={{ backgroundImage: `url(${p.image && p.image.url})` }} />
+							<Link className="subitle" to={`/supplier/${supplier_id}/${p.id}`}><b>{p.title}</b></Link>
+							<div className="item-para">{p.description}</div>
+						</div>)
+					}
+				</div>
 			</div>
 		</div>
 	}
