@@ -26,6 +26,10 @@ interface Product {
 		id: string,
 		url: string
 	}
+	banner?: {
+		id: string,
+		url: string
+	}
 }
 
 interface RootReducerState {

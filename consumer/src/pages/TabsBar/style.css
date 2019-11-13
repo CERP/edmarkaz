@@ -57,6 +57,9 @@
 	background-color: rgb(60, 133, 11);
 	height: 300px;
 	width: 100%;
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-position: 50% 50%;
 }
 
 .supplier-info {

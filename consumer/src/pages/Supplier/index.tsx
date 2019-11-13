@@ -32,24 +32,25 @@ class SupplierHomePage extends React.Component<P, S>{
 		const products = Object.entries(this.props.products)
 			.filter(([k, v]) => v.supplier_id === supplier_id && !v.deleted)
 
+		const { banner, logo } = products[0][1]
+
 		return <div className="supplier-home">
 
-			<div className="tabs-banner">
-				<div className="supplier-logo">
-				</div>
+			<div className="tabs-banner" style={{ backgroundImage: `url(${banner && banner.url})` }}>
+				<img className="supplier-logo" src={logo && logo.url} />
 			</div>
 			<div className="tabs-home">
 				<div className="supplier-info">
 
 					<div className="supplier-desc">
-						<div className="title" style={{ marginLeft:"160px"}}>{this.props.match.params.supplier_id}</div>
+						<div className="title" style={{ marginLeft: "160px" }}>{this.props.match.params.supplier_id}</div>
 						<div>
-							Lorem ipsum, or lipsum as it is sometimes known, 
-							is dummy text used in laying out print, graphic 
+							Lorem ipsum, or lipsum as it is sometimes known,
+							is dummy text used in laying out print, graphic
 							or web designs. The passage is attributed to an
-							unknown typesetter in the 15th century who is 
-							thought to have scrambled parts of Cicero's De 
-							Finibus Bonorum et Malorum for use in a type 
+							unknown typesetter in the 15th century who is
+							thought to have scrambled parts of Cicero's De
+							Finibus Bonorum et Malorum for use in a type
 							specimen book.
 						</div>
 					</div>
