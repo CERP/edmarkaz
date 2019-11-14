@@ -91,6 +91,72 @@ defmodule Mix.Tasks.Platform do
 		run(["add_matches", id, id, "0", "1000"]) # 1000 is the max!
 	end
 
+	def run(["add_products", fname]) do
+		Application.ensure_all_started(:edmarkaz)
+
+		csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) do
+			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) |> CSV.decode!
+			false -> File.stream!("priv/#{fname}.csv") |> CSV.decode!
+		end
+
+		# loop through the csv, add products to table
+		# we don't have ID's for the product...
+		# loop through the csv
+		# schema: supplier_id, product_id, product_name, price, description, category, picture_url
+
+		[_ | products] = csv 
+		|> Enum.map(fn row -> row end)
+
+		tasks = products
+		|> Enum.map(fn [sid, pid, name, price, desc, category, picture_url] -> 
+			Task.async fn -> 
+
+				case picture_url do
+					"" -> 
+						IO.puts "no url"
+						IO.inspect picture_url
+
+						product = %{
+							"id" => pid,
+							"supplier_id" => sid,
+							"title" => name,
+							"description" => desc,
+							"phone_number" => "",
+							"price" => price,
+							"categories" => [ category ]
+						}
+
+						EdMarkaz.Product.merge(pid, product, sid)
+					has_url -> 
+						IO.puts "has url"
+						IO.inspect picture_url
+
+						img_url = Sarkar.Storage.Google.upload_image_from_url("ilmx-product-images", picture_url)
+						product = %{
+							"id" => pid,
+							"supplier_id" => sid,
+							"title" => name,
+							"description" => desc,
+							"phone_number" => "",
+							"price" => price,
+							"categories" => [ category ],
+							"image" => %{
+								"id" => picture_url,
+								"url" => img_url
+							}
+						}
+
+						EdMarkaz.Product.merge(pid, product, sid)
+				end
+			end
+		end)
+
+		results = Enum.map(tasks, fn task -> Task.await(task, 5000) end)
+
+		IO.inspect results
+
+	end
+
 	def run(args) do
 		Application.ensure_all_started(:edmarkaz)
 		case Postgrex.query(EdMarkaz.DB, "SELECT id, sync_state from suppliers", []) do

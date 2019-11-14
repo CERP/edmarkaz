@@ -80,13 +80,23 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 	def handle_action(%{"type" => "GET_PRODUCTS", "last_sync" => last_sync}, state) do
 
 		dt = DateTime.from_unix!(last_sync, :millisecond)
-		case Postgrex.query(EdMarkaz.DB, "SELECT p.id, p.supplier_id, p.product, p.sync_time, s.sync_state->'logo', s.sync_state->'banner'
+
+		case Postgrex.query(EdMarkaz.DB, "
+			SELECT 
+				p.id, 
+				p.supplier_id, 
+				p.product,
+				p.sync_time,
+				s.sync_state->'logo',
+				s.sync_state->'banner'
 			FROM products p JOIN suppliers s ON p.supplier_id = s.id
-			WHERE sync_time > $1 ", [DateTime.to_naive(dt)]) do
+			WHERE extract(epoch from sync_time) > $1 ", [last_sync]) do
 			{:ok, resp} -> 
 				mapped = resp.rows
 					|> Enum.map(fn [id, supplier_id, product, sync_time, logo, banner] -> {id, Map.put(product, "logo", logo) |> Map.put("banner", banner)} end)
 					|> Enum.into(%{})
+
+					IO.inspect mapped
 
 				{:reply, succeed(%{products: mapped}), state}
 			{:error, err} -> 
