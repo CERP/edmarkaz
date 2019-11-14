@@ -7,6 +7,8 @@ import Former from 'former'
 
 import { SchoolForm } from './form'
 
+import './style.css'
+
 type P = {
 	auth: RootReducerState['auth'];
 	profile: RootReducerState['sync_state']['profile'];
@@ -25,6 +27,8 @@ type S = {
 	school?: CERPSchool;
 }
 
+export const Span = (): any => <span style={{ color: "#FF6347"}}>{`* `}</span>
+
 class SignUp extends React.Component<P, S> {
 
 	former: Former
@@ -33,7 +37,7 @@ class SignUp extends React.Component<P, S> {
 		super(props)
 
 		this.state = {
-			phone_number: "",
+			phone_number: "0331",
 			password: "",
 			button_pressed: false,
 			loading: false,
@@ -122,28 +126,34 @@ class SignUp extends React.Component<P, S> {
 			return <Redirect to="/" />
 		}
 
-		return <div className="sign-up page">
-			<div className="title">Sign Up</div>
+
+		return <div className="sign-up">
 
 			<div className="form">
+				<div className="title">Sign Up</div>
+				<div className="subtitle">
+					<Span/>
+					Required Information
+				</div>
+
 				<div className="row">
-					<label>Phone Number</label>
+					<div className="subtitle">Phone Number <Span/></div>
 					<input type="tel" {...this.former.super_handle(["phone_number"])} />
 				</div>
 
 				<div className="row">
-					<label>Password</label>
+					<div className="subtitle">Password <Span/></div>
 					<input type="text" {...this.former.super_handle(["password"])} />
 				</div>
 
 				<div className="row">
-					<div className="button blue" onClick={this.onLoad}>Load Data</div>
+					<div className="tabs-button" onClick={this.onLoad}>Load Data</div>
 				</div>
-			</div>
 
-			{this.state.loading && <div>Loading...</div>}
+				{this.state.loading && <div>Loading...</div>}
+			</div>
 			{this.state.button_pressed && <SchoolForm school={this.state.school} former={this.former} base_path={["school"]} />}
-			{this.state.button_pressed && <div className="button blue save" onClick={this.onSave}>Sign Up</div>}
+			{this.state.button_pressed && <div className="tabs-button" style={{ marginTop: "10px",marginBottom: "10px"}} onClick={this.onSave}>Sign Up</div>}
 		</div>
 	}
 }

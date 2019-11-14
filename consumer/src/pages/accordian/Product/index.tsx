@@ -45,15 +45,21 @@ class ProductPage extends React.Component<P, S> {
 			return <div className="product-page page">Loading product {product_id}...</div>
 		}
 
-		return <div className="product-page page">
-			<div className="title">{product.title}</div>
-			<img src={product.image && product.image.url} alt="Product" />
-			<div className="supplier">{product.supplier_id}</div>
+		return <div className="item-page">
+			
+			<img src={product.image && product.image.url} className="item-image" alt="Product" />
+			<div className="item-info">
+				<div className="title">{product.title}</div>
+				<div className="subtitle">{product.supplier_id}</div>
+				<div className="heading" style={{ color: "#FF6347" }}>{`Rs. ${product.price}`}</div>
+			</div>
+
+			{this.props.connected && !this.props.auth.token && <Link to="/sign-up" className="order-button"> SignUp to Order Online</Link>}
+			{this.props.connected && this.props.auth.token && <div className="order-button" onClick={this.onOrder}> Request Information</div>}
+
 			<div className="description">{product.description}</div>
-			<div className="price">{product.price}</div>
-			{this.props.connected && !this.props.auth.token && <Link className="button blue" to="/sign-up">Sign up to Order Online</Link>}
-			{this.props.connected && this.props.auth.token && <div className="button blue" onClick={this.onOrder}>Request Information</div>}
-			<div className="number">Call 03555935557 to Order now</div>
+			{/* {this.props.connected && !this.props.auth.token && <Link className="button blue" to="/sign-up">Sign up to Order Online</Link>}
+			{this.props.connected && this.props.auth.token && <div className="button blue" onClick={this.onOrder}>Request Information</div>} */}
 		</div>
 
 	}

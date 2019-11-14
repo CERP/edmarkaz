@@ -76,7 +76,7 @@ class LoggedOutHome extends React.Component<P, S> {
 }
 
 export default connect((state: RootReducerState) => ({
-	products: state.products.db
+	products: state.products.db    
 }), (dispatch: Function) => ({
 	getProducts: () => dispatch(getProducts())
 }))(LoggedOutHome)

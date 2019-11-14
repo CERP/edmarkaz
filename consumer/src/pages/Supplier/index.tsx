@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { Link } from 'react-router-dom'
 
-import './style.css'
 import { getProducts } from '../../actions'
 
 interface S {
@@ -44,7 +43,7 @@ class SupplierHomePage extends React.Component<P, S>{
 
 					<div className="supplier-desc">
 						<div className="title" style={{ marginLeft: "160px" }}>{this.props.match.params.supplier_id}</div>
-						<div>
+						<div className="subtitle" style={{ marginTop:"10px"}}>
 							Lorem ipsum, or lipsum as it is sometimes known,
 							is dummy text used in laying out print, graphic
 							or web designs. The passage is attributed to an
@@ -61,7 +60,7 @@ class SupplierHomePage extends React.Component<P, S>{
 					{
 						products.map(([k, p]) => <div className="item-card" key={k}>
 							<div className="item-image" style={{ backgroundImage: `url(${p.image && p.image.url})` }} />
-							<Link className="subitle" to={`/supplier/${supplier_id}/${p.id}`}><b>{p.title}</b></Link>
+							<Link className="subtitle" to={`/supplier/${supplier_id}/${p.id}`}><b>{p.title}</b></Link>
 						</div>)
 					}
 					</div>

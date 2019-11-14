@@ -1,0 +1,41 @@
+
+.tabs-page .sign-up {
+	display: flex;
+	flex-direction: column;
+}
+
+	.tabs-page .sign-up .form {
+		margin-top: 10px;
+		padding: 20px;
+		border-radius: 5px;
+		background: #ffffff;
+	}
+		.tabs-page .sign-up .form .row {
+			margin-top: 10px;
+		}
+
+	.tabs-page .tabs-button {
+		background-color: #003333;
+		width: 100%;
+		text-align: center !important;
+		color: #ffffff;
+		font-size: 16px;
+		font-style: normal;
+		font-weight: 500;
+		line-height: 50px;
+		text-decoration: none;
+		cursor: pointer;
+		border-radius: 5px;
+	}
+	.tabs-page input {
+		height: 20px;
+		border: 1px solid #9E9E9E;
+		border-radius: 4px;
+		font-size: 12px;
+		padding: 10px;
+	}
+
+	.tabs-page .row-row {
+		display: flex;
+		flex-direction: row;
+	}

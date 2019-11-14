@@ -33,20 +33,20 @@ class TabsBar extends Component < propTypes, S > {
 			 
 		}
 	}
-	
+
 	render() {
 
 		const current = this.props.location.pathname;
 		const search = this.props.location.search;
 
 		return <div className="tabs-page">
-			<Header />
+			<Header path={current}/>
 
-			<div className="tabs-bar subtitle">
+			{ current === "/" && <div className="tabs-bar subtitle">
 				<Link to="" className="cell">Articles</Link>
-				<Link to={{ pathname:"/", search}} className={ current === "/"? "cell active":"cell"}>Bazaar</Link>
+				<Link to={{ pathname: "/", search }} className={current === "/" ? "cell active" : "cell"}>Bazaar</Link>
 				<Link to="" className="cell">FAQs</Link>
-			</div>
+			</div>}
 
 			<div className="">
 				<Route exact path="/" component={ProductHome} />
@@ -55,30 +55,6 @@ class TabsBar extends Component < propTypes, S > {
 				<Route path="/sign-up" component={SignUp} />
 				<Route path="/profile" component={Profile} />
 			</div>
-			{/* <div className="tabs-home">
-				<div className="heading">Topic of the Month:</div>
-				<div className="title">What is Education?</div>
-				<div className="title" style={{ marginTop: "10px", marginBottom: "10px", textAlign:"right"}}> View All</div>
-				<div className="item-row">
-					<div className="item-card">
-						<div className="item-image"></div>
-						<div className="subtitle"> Article 1 Title</div>
-						<div className="item-para">
-						A simply dummy text of the printing and 
-						typesetting industry ...
-						</div>
-					</div>
-
-					<div className="item-card">
-						<div className="item-image"></div>
-						<div className="subtitle"> Article 1 Title</div>
-						<div className="item-para">
-						A simply dummy text of the printing and 
-						typesetting industry ...
-						</div>
-					</div>
-				</div>
-			</div> */}
 		</div>
 	}
 }
