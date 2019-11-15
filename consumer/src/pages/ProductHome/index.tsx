@@ -65,14 +65,13 @@ class LoggedOutHome extends React.Component<P, S> {
 			<div className="tabs-banner"></div>
 			<div className="tabs-home">
 
-				<div className="item-row">
+				{
+					Object.entries(categories)
+						.map(([category, suppliers]) => {
 
-					{
-						Object.entries(categories)
-							.map(([category, suppliers]) => {
-
-								return <>
-									<div className="title" key={category}>{category}</div>
+							return <div className="item-row">
+								<div className="title" key={category}>{category}</div>
+								<div className="items">
 									{
 										Object.entries(suppliers)
 											.map(([sid, profile]) => <Link className="item-card" to={`/supplier/${sid}`} key={`${category}-${sid}`}>
@@ -80,10 +79,10 @@ class LoggedOutHome extends React.Component<P, S> {
 												<div className="subtitle">{profile.name}</div>
 											</Link>)
 									}
-								</>
-							})
-					}
-				</div>
+								</div>
+							</div>
+						})
+				}
 			</div>
 		</div>
 	}

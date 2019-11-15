@@ -8,6 +8,7 @@ import SupplierHome from '../Supplier'
 import ProductPage from '../accordian/Product'
 import SignUp from '../SignUp'
 import Profile from '../Profile'
+import Articles, { ArticleRouter } from '../Articles'
 import { Link } from 'react-router-dom'
 
 interface S {
@@ -24,13 +25,13 @@ interface RouteInfo {
 
 type propTypes = RouteComponentProps<RouteInfo> & P
 
-class TabsBar extends Component < propTypes, S > {
-	
+class TabsBar extends Component<propTypes, S> {
+
 	constructor(props: propTypes) {
 		super(props)
-	
+
 		this.state = {
-			 
+
 		}
 	}
 
@@ -40,10 +41,10 @@ class TabsBar extends Component < propTypes, S > {
 		const search = this.props.location.search;
 
 		return <div className="tabs-page">
-			<Header path={current}/>
+			<Header path={current} />
 
-			{ current === "/" && <div className="tabs-bar subtitle">
-				<Link to="" className="cell">Articles</Link>
+			{current !== "sign-up" && <div className="tabs-bar subtitle">
+				<Link to="/articles" className="cell">Articles</Link>
 				<Link to={{ pathname: "/", search }} className={current === "/" ? "cell active" : "cell"}>Bazaar</Link>
 				<Link to="" className="cell">FAQs</Link>
 			</div>}
@@ -54,6 +55,8 @@ class TabsBar extends Component < propTypes, S > {
 				<Route exact path="/supplier/:supplier_id" component={SupplierHome} />
 				<Route path="/sign-up" component={SignUp} />
 				<Route path="/profile" component={Profile} />
+				<Route path="/articles/:article_id" component={ArticleRouter} />
+				<Route exact path="/articles" component={Articles} />
 			</div>
 		</div>
 	}
