@@ -22,7 +22,7 @@ interface Product {
 	tags: {
 		[tag: string]: boolean;
 	};
-	categories: string[]
+	categories: { string: boolean }
 	supplier_profile: {
 		name: string
 		description: string

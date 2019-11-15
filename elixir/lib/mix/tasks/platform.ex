@@ -185,7 +185,9 @@ defmodule Mix.Tasks.Platform do
 							"description" => desc,
 							"phone_number" => "",
 							"price" => price,
-							"categories" => [ category ]
+							"categories" => %{
+								category => true
+							}
 						}
 
 						EdMarkaz.Product.merge(pid, product, sid)
@@ -201,7 +203,7 @@ defmodule Mix.Tasks.Platform do
 							"description" => desc,
 							"phone_number" => "",
 							"price" => price,
-							"categories" => [ category ],
+							"categories" => %{ category => true },
 							"image" => %{
 								"id" => picture_url,
 								"url" => img_url

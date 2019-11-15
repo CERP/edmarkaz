@@ -52,23 +52,23 @@ class ProductsPage extends React.Component<propTypes> {
 
 			<div className="button blue" onClick={this.onAddProduct}>Add Product</div>
 			<div className="list">
-			{
-				Object.values(this.props.products)
-					.filter(p => !p.deleted)
-					.map(p => <div key={p.id} onClick={this.onProductClick(p)}>
-						<ProductEntry product={p} />
-					</div>)
-			}
+				{
+					Object.values(this.props.products)
+						.filter(p => !p.deleted)
+						.map(p => <div key={p.id} onClick={this.onProductClick(p)}>
+							<ProductEntry product={p} />
+						</div>)
+				}
 			</div>
 		</div>
 	}
 }
 
-const ProductEntry: React.SFC<{product: Product }> = (props) => {
+const ProductEntry: React.SFC<{ product: Product }> = (props) => {
 
 	return <div className="product-entry">
 		<div className="name">{props.product.title}</div>
-		<div>{props.product.description}</div>
+		<div>{props.product.description.slice(0, 80)}...</div>
 	</div>
 }
 

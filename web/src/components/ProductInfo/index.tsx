@@ -29,6 +29,7 @@ type propTypes = OwnProps & StateProps & DispatchProps & RouteComponentProps
 interface S {
 	product: Product;
 	imageDataString: string;
+	newCategory: string
 }
 
 class ProductInfo extends React.Component<propTypes, S> {
@@ -50,15 +51,18 @@ class ProductInfo extends React.Component<propTypes, S> {
 				url: ""
 			},
 			deleted: false,
-			tags: {}
+			tags: {},
+			categories: {}
 		}
 
 		this.state = {
 			product: this.props.product || newProduct,
-			imageDataString: ""
+			imageDataString: "",
+			newCategory: ""
+
 		}
 
-		this.former = new Former(this, ["product"])
+		this.former = new Former(this, [])
 	}
 
 	onClose = () => {
@@ -138,6 +142,31 @@ class ProductInfo extends React.Component<propTypes, S> {
 		reader.readAsDataURL(file)
 	}
 
+	addCategory = () => {
+		this.setState({
+			product: {
+				...this.state.product,
+				categories: {
+					...this.state.product.categories,
+					[this.state.newCategory]: true
+				}
+			},
+			newCategory: ""
+		})
+	}
+
+	removeCategory = (c: string) => () => {
+
+		const { [c]: val, ...nextCategory } = this.state.product.categories
+
+		this.setState({
+			product: {
+				...this.state.product,
+				categories: nextCategory
+			}
+		})
+	}
+
 	render() {
 		return <div className="product-info page">
 			<div className="close" onClick={this.onClose}>Close</div>
@@ -146,22 +175,49 @@ class ProductInfo extends React.Component<propTypes, S> {
 			<div className="form">
 				<div className="row">
 					<label>Title</label>
-					<input type="text" {...this.former.super_handle(["title"])} placeholder="Title of Product" />
+					<input type="text" {...this.former.super_handle(["product", "title"])} placeholder="Title of Product" />
 				</div>
 
 				<div className="row">
 					<label>Description</label>
-					<textarea {...this.former.super_handle(["description"])} placeholder="Description of Product" />
+					<textarea {...this.former.super_handle(["product", "description"])} placeholder="Description of Product" />
 				</div>
 
 				<div className="row">
 					<label>Phone Number</label>
-					<input type="number" {...this.former.super_handle(["phone_number"])} placeholder="Product Helpline Number" />
+					<input type="number" {...this.former.super_handle(["product", "phone_number"])} placeholder="Product Helpline Number" />
 				</div>
 
 				<div className="row">
 					<label>Price</label>
-					<input type="text" {...this.former.super_handle(["price"])} placeholder="Price" />
+					<input type="text" {...this.former.super_handle(["product", "price"])} placeholder="Price" />
+				</div>
+
+				<div className="section">
+
+					<div className="divider">Product Categories</div>
+
+					<div className="row">
+						<select {...this.former.super_handle(["newCategory"])}>
+							<option value="">Select a Category</option>
+							<option>Library and Reference Books</option>
+							<option>EdTech</option>
+							<option>Co-curricular</option>
+						</select>
+
+						<div className="button" onClick={this.addCategory}>+</div>
+					</div>
+
+					<div className="row">
+						{
+							Object.keys(this.state.product.categories || {})
+								.map(c => <div className="row">
+									<label>{c}</label>
+									<div className="button red" onClick={this.removeCategory(c)}>x</div>
+								</div>)
+						}
+					</div>
+
 				</div>
 
 				<div className="row">

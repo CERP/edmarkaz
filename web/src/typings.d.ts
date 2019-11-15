@@ -114,63 +114,66 @@ declare global {
 	}
 
 	interface MarkCompleteSurvey extends PlatformInteractionEvent {
-		event: "MARK_COMPLETE_SURVEY";
+		event: "MARK_COMPLETE_SURVEY"
 		meta: {
-			reason_completed: "CLIENT_BOUGHT_PRODUCT" | "RELEASE_MASKED_NUMBER" | "HANDLING_OUTSIDE_PLATFORM" | "CLIENT_NOT_INTERESTED" | "CLIENT_NOT_REACHABLE" | "OTHER" | "";
-			other_reason: string;
-		};
+			reason_completed: "CLIENT_BOUGHT_PRODUCT" | "RELEASE_MASKED_NUMBER" | "HANDLING_OUTSIDE_PLATFORM" | "CLIENT_NOT_INTERESTED" | "CLIENT_NOT_REACHABLE" | "OTHER" | ""
+			other_reason: string
+		}
 	}
 
 	type SupplierInteractionEvent = {
-		event: "MARK_REJECTED" | "REVEAL_NUMBER" | "MARK_DONE" | "CALL_START" | "CALL_BACK";
+		event: "MARK_REJECTED" | "REVEAL_NUMBER" | "MARK_DONE" | "CALL_START" | "CALL_BACK"
 	} & PlatformInteractionEvent
 
 	interface Product {
-		id: string;
-		supplier_id: string;
-		title: string;
-		description: string;
-		phone_number: string;
-		img_url: string;
+		id: string
+		supplier_id: string
+		title: string
+		description: string
+		phone_number: string
+		img_url: string
 		image?: {
-			id: string;
-			url?: string;
-		};
-		price: string;
-		deleted?: boolean;
+			id: string
+			url?: string
+		}
+		price: string
+		deleted?: boolean
 		tags: {
 			[tag: string]: boolean;
-		};
+		}
+		categories: {
+			[category: string]: boolean
+		}
 	}
 
 	interface RootBankState {
 		school_locations: {
-			[school_id: string]: SchoolLocation;
-		};
+			[school_id: string]: SchoolLocation
+		}
 		new_school_db: {
-			[school_id: string]: CERPSchool;
-		};
+			[school_id: string]: CERPSchool
+		}
 		products: {
-			last_sync: number;
+			last_sync: number
 			db: {
-				[product_id: string]: Product;
-			};
-		};
+				[product_id: string]: Product
+			}
+		}
 		sync_state: {
 			matches: {
-				[school_id: string]: SchoolMatch;
-			};
+				[school_id: string]: SchoolMatch
+			}
 			numbers: {
 				[number: string]: {
-					name: string;
-				};
+					name: string
+				}
 			};
 			mask_pairs: {
 				[masked_number: string]: {
 					status: "USED" | "FREE";
 					school_id?: string;
-				};
-			};
+				}
+			}
 			logo?: {
 				id: string
 				url: string

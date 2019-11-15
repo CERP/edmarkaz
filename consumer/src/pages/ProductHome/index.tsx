@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom';
 
 import { getProducts } from '../../actions';
-import getSupplierSection from '../../utils/getSupplierSection';
 
 import './style.css'
 
@@ -43,7 +42,7 @@ class LoggedOutHome extends React.Component<P, S> {
 
 			if (p.categories && p.supplier_profile) {
 
-				p.categories.forEach(category => {
+				Object.keys(p.categories).forEach(category => {
 
 					let existing = categories[category]
 
@@ -73,10 +72,10 @@ class LoggedOutHome extends React.Component<P, S> {
 							.map(([category, suppliers]) => {
 
 								return <>
-									<div className="title">{category}</div>
+									<div className="title" key={category}>{category}</div>
 									{
 										Object.entries(suppliers)
-											.map(([sid, profile]) => <Link className="item-card" to={`/supplier/${sid}`}>
+											.map(([sid, profile]) => <Link className="item-card" to={`/supplier/${sid}`} key={`${category}-${sid}`}>
 												<img src={profile.logo && profile.logo.url} className="item-image" alt="logo" />
 												<div className="subtitle">{profile.name}</div>
 											</Link>)
