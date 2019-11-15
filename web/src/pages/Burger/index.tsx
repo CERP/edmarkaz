@@ -41,7 +41,7 @@ class Burger extends React.Component<RouteComponentProps> {
 
 		return <div className={`root-page ${panel_exists ? 'double' : ''}`}>
 
-			<div className="header">IlmExchange (Supplier)</div>
+			<div className="header">ilmExchange</div>
 
 			<div className="burger">
 				<Link to={{ pathname: "/", search }} className={current === '/' ? "active" : ""}>Home</Link>

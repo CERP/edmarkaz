@@ -87,16 +87,13 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 				p.supplier_id, 
 				p.product,
 				p.sync_time,
-				s.sync_state->'logo',
-				s.sync_state->'banner'
-			FROM products p JOIN suppliers s ON p.supplier_id = s.id
+				s.sync_state->'profile'
+			FROM products p LEFT JOIN suppliers s ON p.supplier_id = s.id
 			WHERE extract(epoch from sync_time) > $1 ", [last_sync]) do
 			{:ok, resp} -> 
 				mapped = resp.rows
-					|> Enum.map(fn [id, supplier_id, product, sync_time, logo, banner] -> {id, Map.put(product, "logo", logo) |> Map.put("banner", banner)} end)
+					|> Enum.map(fn [id, supplier_id, product, sync_time, supplier_profile] -> {id, Map.put(product, "supplier_profile", supplier_profile)} end)
 					|> Enum.into(%{})
-
-					IO.inspect mapped
 
 				{:reply, succeed(%{products: mapped}), state}
 			{:error, err} -> 

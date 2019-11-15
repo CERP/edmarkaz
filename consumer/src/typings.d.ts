@@ -22,13 +22,18 @@ interface Product {
 	tags: {
 		[tag: string]: boolean;
 	};
-	logo?: {
-		id: string,
-		url: string
-	}
-	banner?: {
-		id: string,
-		url: string
+	categories: string[]
+	supplier_profile: {
+		name: string
+		description: string
+		logo?: {
+			id: string,
+			url: string
+		}
+		banner?: {
+			id: string,
+			url: string
+		}
 	}
 }
 

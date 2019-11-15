@@ -35,6 +35,30 @@ defmodule EdMarkaz.Supplier do
 		GenServer.call(via(id), {:reload})
 	end
 
+	def exists(id) do
+		{:ok, res} = Postgrex.query(EdMarkaz.DB, "Select count(*) from suppliers where id=$1", [id])
+
+		[[num]] = res.rows
+
+		num != 0
+	end
+
+	def save_profile(id, profile) do
+		changes = prepare_changes([
+			%{
+				type: "MERGE",
+				path: ["sync_state", "profile"],
+				value: profile
+			}
+		])
+
+		time = :os.system_time(:millisecond)
+
+		%{new_writes: new_writes} = GenServer.call(via(id), {:sync_changes, "backend", changes, time})
+
+		{:ok, new_writes}
+	end
+
 	def reserve_masked_number(id, school_id, %{"number" => number, "name" => name} = user, client_id, last_sync_date) do
 		sync_state = EdMarkaz.Supplier.get_sync_state(id)
 

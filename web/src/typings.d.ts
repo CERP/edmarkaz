@@ -179,6 +179,18 @@ declare global {
 				id: string
 				url: string
 			}
+			profile: {
+				description: string
+				name: string
+				logo?: {
+					id: string
+					url: string
+				}
+				banner?: {
+					id: string
+					url: string
+				}
+			}
 		};
 		auth: {
 			id: string;

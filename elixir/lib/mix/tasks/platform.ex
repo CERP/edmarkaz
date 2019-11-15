@@ -91,6 +91,66 @@ defmodule Mix.Tasks.Platform do
 		run(["add_matches", id, id, "0", "1000"]) # 1000 is the max!
 	end
 
+	def run(["set_suppliers", fname]) do
+		Application.ensure_all_started(:edmarkaz)
+
+		csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) do
+			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) |> CSV.decode!
+			false -> File.stream!("priv/#{fname}.csv") |> CSV.decode!
+		end
+
+		# supplier_login, supplier_name, description, logo_url, banner_url
+		[_ | suppliers] = csv 
+		|> Enum.map(fn row -> row end)
+
+		tasks = suppliers 
+		|> Enum.map(fn [id, name, description, logo_url, banner_url] ->
+			Task.async fn -> 
+				start_supplier(id)
+				case logo_url do 
+					"" -> 
+						EdMarkaz.Supplier.save_profile(id, %{
+							"description" => description,
+							"name" => name
+						})
+
+					has_url -> 
+						new_logo_url = Sarkar.Storage.Google.upload_image_from_url("ilmx-product-images", logo_url)
+
+						if banner_url != "" do
+							new_banner_url = Sarkar.Storage.Google.upload_image_from_url("ilmx-product-images", banner_url)
+							EdMarkaz.Supplier.save_profile(id, %{
+								"description" => description,
+								"name" => name,
+								"logo" => %{
+									"id" => logo_url,
+									"url" => new_logo_url
+								},
+								"banner" => %{
+									"id" => banner_url,
+									"url" => new_banner_url
+								}
+							})
+						else
+							EdMarkaz.Supplier.save_profile(id, %{
+								"description" => description,
+								"name" => name,
+								"logo" => %{
+									"id" => logo_url,
+									"url" => new_logo_url
+								}
+							})
+						end
+				end
+			end
+		end)
+
+		results = Enum.map(tasks, &Task.await/1)
+		
+		IO.inspect results
+
+	end
+
 	def run(["add_products", fname]) do
 		Application.ensure_all_started(:edmarkaz)
 
@@ -103,6 +163,8 @@ defmodule Mix.Tasks.Platform do
 		# we don't have ID's for the product...
 		# loop through the csv
 		# schema: supplier_id, product_id, product_name, price, description, category, picture_url
+
+		# before doing all this, need to init the suppliers
 
 		[_ | products] = csv 
 		|> Enum.map(fn row -> row end)

@@ -30,45 +30,60 @@ class LoggedOutHome extends React.Component<P, S> {
 	render() {
 
 		// this should have a supplier image, title, and category
-		const suppliers = {} as { [k: string]: string }
+		const suppliers = {} as { [k: string]: Product['supplier_profile'] }
 
+		const categories = {} as {
+			[category_id: string]: {
+				[supplier_id: string]: Product['supplier_profile']
+			}
+		}
+
+		// create { [category]: { supplier_id: profile }}
 		Object.values(this.props.products).forEach(p => {
-			suppliers[p.supplier_id] = (p.logo && p.logo.url) || ""
-		});
+
+			if (p.categories && p.supplier_profile) {
+
+				p.categories.forEach(category => {
+
+					let existing = categories[category]
+
+					if (!existing) {
+						categories[category] = {
+							[p.supplier_id]: p.supplier_profile
+						}
+					}
+					else if (existing && existing[p.supplier_id] == undefined) {
+						existing[p.supplier_id] = p.supplier_profile
+					}
+
+				})
+			}
+
+
+		})
 
 		return <div className="products">
 			<div className="tabs-banner"></div>
 			<div className="tabs-home">
 
 				<div className="item-row">
-				<div className="title">Finance</div>
+
 					{
-						Object.keys(suppliers)
-							.filter(s => getSupplierSection(s) === "FINANCE")
-							.map(s => {
-								return <Link className="item-card" to={`/supplier/${s}`} key={s}>
-									<img src={suppliers[s]} className='item-image' alt="logo" />
-									<div className="subtitle">{s}</div>
-								</Link>
+						Object.entries(categories)
+							.map(([category, suppliers]) => {
+
+								return <>
+									<div className="title">{category}</div>
+									{
+										Object.entries(suppliers)
+											.map(([sid, profile]) => <Link className="item-card" to={`/supplier/${sid}`}>
+												<img src={profile.logo && profile.logo.url} className="item-image" alt="logo" />
+												<div className="subtitle">{profile.name}</div>
+											</Link>)
+									}
+								</>
 							})
 					}
-				</div>
-
-				<div className="item-row">
-					<div className="title">EdTech</div>
-					<div className="items">
-					{
-						Object.keys(suppliers)
-							.filter(s => getSupplierSection(s) === "EDTECH")
-							.map(s => {
-								return <Link className="item-card" to={`/supplier/${s}`} key={s}>
-									<img className="item-image" alt="no-image"/>
-									<div className="subtitle">{s}</div>
-								</Link>
-							})
-					}
-
-					</div>
 				</div>
 			</div>
 		</div>
@@ -76,7 +91,7 @@ class LoggedOutHome extends React.Component<P, S> {
 }
 
 export default connect((state: RootReducerState) => ({
-	products: state.products.db    
+	products: state.products.db
 }), (dispatch: Function) => ({
 	getProducts: () => dispatch(getProducts())
 }))(LoggedOutHome)
