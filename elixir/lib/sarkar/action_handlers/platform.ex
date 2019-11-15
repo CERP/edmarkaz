@@ -63,7 +63,7 @@ defmodule EdMarkaz.ActionHandler.Platform do
 		# currently no filters...
 		# except by supplier
 
-		case Postgrex.query(EdMarkaz.DB, "SELECT id, product, sync_time FROM products WHERE id=$1", [supplier_id]) do
+		case Postgrex.query(EdMarkaz.DB, "SELECT id, product, sync_time FROM products WHERE supplier_id=$1", [supplier_id]) do
 			{:ok, resp} -> 
 				mapped = resp.rows
 					|> Enum.map(fn [id, product, sync_time] -> {id, product} end)

@@ -197,7 +197,7 @@ class ProductInfo extends React.Component<propTypes, S> {
 
 					<div className="divider">Product Categories</div>
 
-					<div className="row">
+					<div className="row" style={{ flexDirection: "row" }}>
 						<select {...this.former.super_handle(["newCategory"])}>
 							<option value="">Select a Category</option>
 							<option>Library and Reference Books</option>
@@ -205,15 +205,15 @@ class ProductInfo extends React.Component<propTypes, S> {
 							<option>Co-curricular</option>
 						</select>
 
-						<div className="button" onClick={this.addCategory}>+</div>
+						<div className="button green" onClick={this.addCategory} style={{ width: "24px", height: "24px", marginLeft: "10px" }}>+</div>
 					</div>
 
-					<div className="row">
+					<div className="categories">
 						{
 							Object.keys(this.state.product.categories || {})
-								.map(c => <div className="row">
+								.map(c => <div className="row" style={{ flexDirection: "row" }}>
 									<label>{c}</label>
-									<div className="button red" onClick={this.removeCategory(c)}>x</div>
+									<div className="button red" onClick={this.removeCategory(c)} style={{ width: "initial" }}>Remove</div>
 								</div>)
 						}
 					</div>

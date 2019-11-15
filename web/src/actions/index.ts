@@ -188,36 +188,6 @@ export interface AddProductsAction {
 }
 
 export const ADD_PRODUCTS = "ADD_PRODUCTS"
-export const GET_PRODUCTS = "GET_PRODUCTS"
-export const getProducts = (filters = {}) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
-
-	const state = getState();
-
-	syncr.send({
-		type: "GET_PRODUCTS",
-		client_type: state.auth.client_type,
-		client_id: state.auth.id,
-		id: state.auth.id,
-		payload: {
-			filters
-		}
-	})
-		.then((res: any) => {
-			// now dispatch an action that 'saves' these products
-
-			dispatch({
-				type: "ADD_PRODUCTS",
-				products: res.products
-			})
-
-			return res
-		})
-		.catch(err => {
-			console.error(err)
-
-			setTimeout(() => dispatch(getProducts()), 1000)
-		})
-}
 
 export const GET_OWN_PRODUCTS = "GET_OWN_PRODUCTS"
 export const getOwnProducts = (filters = {}) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
@@ -246,7 +216,7 @@ export const getOwnProducts = (filters = {}) => (dispatch: Dispatch, getState: G
 		.catch(err => {
 			console.error(err)
 
-			setTimeout(() => dispatch(getProducts()), 1000)
+			setTimeout(() => dispatch(getOwnProducts()), 1000)
 		})
 
 }
