@@ -26,6 +26,11 @@ code {
 	--grey: #e0e0e0;
 }
 
+@font-face {
+	font-family: urdu;
+	src: url('./fonts/NotoNastaliqUrdu-Regular.ttf');
+}
+
 html,body, #root, .layout{
 	height: 100%;
 	width: 100%;
