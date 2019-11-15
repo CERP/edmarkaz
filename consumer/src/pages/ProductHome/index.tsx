@@ -33,8 +33,8 @@ class LoggedOutHome extends React.Component<P, S> {
 
 		const categories = {} as {
 			[category_id: string]: {
-				[supplier_id: string]: Product['supplier_profile']
-			}
+				[supplier_id: string]: Product['supplier_profile'];
+			};
 		}
 
 		// create { [category]: { supplier_id: profile }}
@@ -44,7 +44,7 @@ class LoggedOutHome extends React.Component<P, S> {
 
 				Object.keys(p.categories).forEach(category => {
 
-					let existing = categories[category]
+					const existing = categories[category]
 
 					if (!existing) {
 						categories[category] = {
@@ -69,8 +69,8 @@ class LoggedOutHome extends React.Component<P, S> {
 					Object.entries(categories)
 						.map(([category, suppliers]) => {
 
-							return <div className="item-row">
-								<div className="title" key={category}>{category}</div>
+							return <div className="item-row" key={category}>
+								<div className="title">{category}</div>
 								<div className="items">
 									{
 										Object.entries(suppliers)
