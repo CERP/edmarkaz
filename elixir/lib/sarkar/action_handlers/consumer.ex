@@ -89,7 +89,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 				p.sync_time,
 				s.sync_state->'profile'
 			FROM products p LEFT JOIN suppliers s ON p.supplier_id = s.id
-			WHERE extract(epoch from sync_time) > $1 ", [last_sync]) do
+			WHERE extract(epoch from sync_time) > $1 ", [0]) do
 			{:ok, resp} -> 
 				mapped = resp.rows
 					|> Enum.map(fn [id, supplier_id, product, sync_time, supplier_profile] -> {id, Map.put(product, "supplier_profile", supplier_profile)} end)

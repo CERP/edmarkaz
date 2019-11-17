@@ -145,7 +145,7 @@ defmodule Mix.Tasks.Platform do
 			end
 		end)
 
-		results = Enum.map(tasks, &Task.await/1)
+		results = Enum.map(tasks, fn task -> Task.await(task, 45000) end)
 		
 		IO.inspect results
 
@@ -215,7 +215,7 @@ defmodule Mix.Tasks.Platform do
 			end
 		end)
 
-		results = Enum.map(tasks, fn task -> Task.await(task, 5000) end)
+		results = Enum.map(tasks, fn task -> Task.await(task, 45000) end)
 
 		IO.inspect results
 

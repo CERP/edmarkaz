@@ -22,7 +22,9 @@ defmodule EdMarkaz.Application do
 					password: System.get_env("POSTGRES_PASS") || "postgres",
 					database: "postgres",
 					port: System.get_env("POSTGRES_PORT") || "5432",
-					types: EdMarkaz.PostgrexTypes
+					types: EdMarkaz.PostgrexTypes,
+					pool_size: 10,
+					timeout: 60000
 			},
 			EdMarkaz.Server
 		]

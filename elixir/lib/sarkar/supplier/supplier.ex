@@ -20,7 +20,7 @@ defmodule EdMarkaz.Supplier do
 	# API 
 
 	def sync_changes(id, client_id, changes, last_sync_date) do
-		GenServer.call(via(id), {:sync_changes, client_id, changes, last_sync_date})
+		GenServer.call(via(id), {:sync_changes, client_id, changes, last_sync_date}, 60000)
 	end
 
 	def get_sync_state(id) do
@@ -54,7 +54,7 @@ defmodule EdMarkaz.Supplier do
 
 		time = :os.system_time(:millisecond)
 
-		%{new_writes: new_writes} = GenServer.call(via(id), {:sync_changes, "backend", changes, time})
+		%{new_writes: new_writes} = GenServer.call(via(id), {:sync_changes, "backend", changes, time}, 60000)
 
 		{:ok, new_writes}
 	end
