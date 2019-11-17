@@ -1,11 +1,12 @@
 import React from 'react'
+import '../style.css'
 
-export default () => <div>
+export default () => <div className="article-page">
 	<h1>What is the Purpose of School?</h1>
 
 	<p>Look at this picture: does it seem like a good classroom to you? It was created by the French artist Jean-Marc Côté over 100 years ago (in 1899), when he was asked to draw what the world would look like in the year 2000. The students are listening to and processing information, but they do not look interested or excited by what they are learning. They are also not interacting with the teacher or with each other. This picture was drawn to show what a classroom might look like in the future, but what it really shows us today is how little classrooms have evolved. </p>
 
-	<img src="https://lh5.googleusercontent.com/V9qlXsqwKJykzdiUoL3pNgWJNEtb9xEfg8dUFuu7wEQ2ItW1MBh7GgC9QggXzXt6HG2F8xnw_DEq5E9YjrRkiyZpBbaTv3UbtiExXUxBVGcvmjsndr1WLoBgNBHoNzJ5GvXZ7JHG" />
+	<img className="image" src="https://lh5.googleusercontent.com/V9qlXsqwKJykzdiUoL3pNgWJNEtb9xEfg8dUFuu7wEQ2ItW1MBh7GgC9QggXzXt6HG2F8xnw_DEq5E9YjrRkiyZpBbaTv3UbtiExXUxBVGcvmjsndr1WLoBgNBHoNzJ5GvXZ7JHG" />
 
 	<p>If we look at the timeline of human history, schools are a relatively recent invention. Humans lived as hunter-gatherers for hundreds of thousands of years, learning through exploration. It was the Industrial Revolution in the 19th century that created the need for schooling — but this was a very particular kind of schooling. Schools were built to produce workers for the factory floor: workers who would show up on time and follow instructions. Structured classrooms, where students sat at one desk for the entire day, were good preparation for the industrial workforce. However, even though the industrial age is far behind us, many schools still function the way schools used to 200 years ago. </p>
 
@@ -26,7 +27,7 @@ export default () => <div>
 
 	<p>After providing students with the basic concepts functional skills in every subject, teachers need to train them to apply this knowledge. Learning how to apply knowledge is a critical step towards becoming an independent learner. Once you know how to process information, you can process any new information that comes your way. A helpful tool teachers can use towards this end is Bloom’s Taxonomy. This was developed by the educational psychologist Benjamin Bloom in 1956 and is used by teachers all around the world. </p>
 
-	<img src="https://lh4.googleusercontent.com/l9kf8ti1RLCeMiv4cXmiFcZ7xX8w6cLFVWwEl-2St7sfN3nORMD6FGlL0II7FP8BPMiMJxnA8vPizTZz0TIP2TFASYRIuIlWOCUb4faCZkk8H2pqAOYbBwZ0-ufJMUHIpo__wjX7" />
+	<img className="image"	src="https://lh4.googleusercontent.com/l9kf8ti1RLCeMiv4cXmiFcZ7xX8w6cLFVWwEl-2St7sfN3nORMD6FGlL0II7FP8BPMiMJxnA8vPizTZz0TIP2TFASYRIuIlWOCUb4faCZkk8H2pqAOYbBwZ0-ufJMUHIpo__wjX7" />
 
 	<ol>
 		<li>Remember: Students learn basic concepts [e.g. definition of a noun, times tables]</li>
