@@ -27,7 +27,7 @@ type S = {
 	school?: CERPSchool;
 }
 
-export const Span = (): any => <span style={{ color: "#FF6347"}}>{`* `}</span>
+export const Span = (): any => <span style={{ color: "#FF6347" }}>{`* `}</span>
 
 class SignUp extends React.Component<P, S> {
 
@@ -132,28 +132,23 @@ class SignUp extends React.Component<P, S> {
 			<div className="form">
 				<div className="title">Sign Up</div>
 				<div className="subtitle">
-					<Span/>
+					<Span />
 					Required Information
 				</div>
 
 				<div className="row">
-					<div className="subtitle">Phone Number <Span/></div>
+					<div className="subtitle">Phone Number <Span /></div>
 					<input type="tel" {...this.former.super_handle(["phone_number"])} />
 				</div>
 
 				<div className="row">
-					<div className="subtitle">Password <Span/></div>
+					<div className="subtitle">Password <Span /></div>
 					<input type="text" {...this.former.super_handle(["password"])} />
 				</div>
 
-				<div className="row">
-					<div className="tabs-button" onClick={this.onLoad}>Load Data</div>
-				</div>
-
-				{this.state.loading && <div>Loading...</div>}
 			</div>
-			{this.state.button_pressed && <SchoolForm school={this.state.school} former={this.former} base_path={["school"]} />}
-			{this.state.button_pressed && <div className="tabs-button" style={{ marginTop: "10px",marginBottom: "10px"}} onClick={this.onSave}>Sign Up</div>}
+			<SchoolForm school={this.state.school} former={this.former} base_path={["school"]} />
+			<div className="tabs-button" style={{ marginTop: "10px", marginBottom: "10px" }} onClick={this.onSave}>Sign Up</div>
 		</div>
 	}
 }
