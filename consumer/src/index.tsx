@@ -5,6 +5,8 @@ import * as serviceWorker from './serviceWorker';
 import { applyMiddleware, AnyAction, createStore, Store } from 'redux';
 import thunkMiddleware, { ThunkMiddleware } from 'redux-thunk'
 
+import 'core-js/features/object'
+
 import Routes from './routes'
 import Syncr from './syncr'
 import reducer from './reducers'
