@@ -72,7 +72,12 @@ export default (props: P) => {
 export const ArticleRouter = (props: P) => {
 
 	useEffect(() => {
-		window.scroll({ top: 0, left: 0, behavior: "smooth" })
+		try {
+			window.scroll({ top: 0, left: 0, behavior: "smooth" })
+		}
+		catch (e) {
+			console.error(e)
+		}
 	})
 
 	return <div className="article">
