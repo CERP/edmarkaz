@@ -93,6 +93,10 @@
 	/*margin: 30px 20px auto;*/
 }
 
+.tabs-home a {
+	text-decoration: none;
+}
+
  .tabs-home .item-row {
 	margin: 30px 20px auto;
 	display: flex;
