@@ -14,16 +14,9 @@ code {
 }
 
 :root {
-	--darkgrey: #333;
-	--header_bg: #333;
-	--blue: #74ACED;
-	--green: #8d8d8d;
-	--red: #a1a1a1;
-	--offwhite: #f5f5f5;
-	--yellow: #B1DDF1;
-	--purple: #7e88f7;
-	--orange: #ff6b68;
-	--grey: #e0e0e0;
+	--blue: #1BB4BB;
+	--light-blue: #B1E1E8;
+	--red: #F05967;
 }
 
 @font-face {

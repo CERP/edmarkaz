@@ -19,21 +19,19 @@ interface SchoolProp {
 
 export const SchoolForm: React.SFC<SchoolProp> = ({ school, former, base_path }) => {
 
-	const generated_refcode = v4()
-
 	return <div className="">
 
 		<div className="form">
 			<div className="title">School Profile</div>
 			<div className="row">
 				<label>RefCode</label>
-				<div>{(school && school.refcode) || generated_refcode}</div>
+				<div>{(school && school.refcode)}</div>
 			</div>
 			<EditSurveyRow base_path={base_path} label="School Name" path={["school_name"]} former={former} />
 			<EditSurveyRow base_path={base_path} label="Address" path={["school_address"]} former={former} />
 
 			<div className="row">
-				<div className="subtitle">Location<Span/></div>
+				<div className="subtitle">Location<Span /></div>
 				<div className="row-row">
 					<EditSurveyRow base_path={base_path} label="Tehsil" path={["school_tehsil"]} former={former} />
 					<EditSurveyRow base_path={base_path} label="District" path={["school_district"]} former={former} />

@@ -51,7 +51,7 @@ class ProductPage extends React.Component<P, S> {
 			<div className="item-info">
 				<div className="title">{product.title}</div>
 				<div className="subtitle">{product.supplier_id}</div>
-				<div className="heading" style={{ color: "#FF6347" }}>{product.price}</div>
+				<div className="heading">{product.price}</div>
 			</div>
 
 			{this.props.connected && !this.props.auth.token && <Link to="/sign-up" className="order-button"> SignUp to Order Online</Link>}

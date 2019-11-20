@@ -1,0 +1,13 @@
+.heading .logo {
+	/*
+	background-image: url('./ilmexchange-01.svg');
+	*/
+	background-position: 0% 50%;
+	background-repeat: no-repeat;
+	color: var(--blue);
+	text-decoration: none;
+}
+
+.heading .logo .ilm {
+	color: var(--red);
+}

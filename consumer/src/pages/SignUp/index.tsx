@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps, Redirect } from 'react-router'
+import { v4 } from 'uuid'
 
 import { loadProfile, signUp } from '../../actions'
 import Former from 'former'
@@ -13,7 +14,7 @@ type P = {
 	auth: RootReducerState['auth'];
 	profile: RootReducerState['sync_state']['profile'];
 	loadProfile: (number: string) => void;
-	createAccount: (number: string, password: string, profile: CERPSchool) => void;
+	createAccount: (number: string, password: string, profile: Partial<CERPSchool>) => void;
 
 } & RouteComponentProps
 
@@ -24,10 +25,22 @@ type S = {
 	loading: boolean;
 	redirect: boolean;
 
-	school?: CERPSchool;
+	school: Partial<CERPSchool>;
 }
 
 export const Span = (): any => <span style={{ color: "#FF6347" }}>{`* `}</span>
+
+const initSchool = (): Partial<CERPSchool> => ({
+	refcode: v4(),
+	school_name: "",
+	school_address: "",
+	school_tehsil: "",
+	school_district: "",
+	total_enrolment: "",
+	lowest_fee: "",
+	highest_fee: "",
+	respondent_owner: ""
+})
 
 class SignUp extends React.Component<P, S> {
 
@@ -37,11 +50,11 @@ class SignUp extends React.Component<P, S> {
 		super(props)
 
 		this.state = {
-			phone_number: "0331",
+			phone_number: "",
 			password: "",
 			button_pressed: false,
 			loading: false,
-			school: undefined,
+			school: initSchool(),
 			redirect: false
 		}
 
@@ -126,7 +139,6 @@ class SignUp extends React.Component<P, S> {
 			return <Redirect to="/" />
 		}
 
-
 		return <div className="sign-up">
 
 			<div className="form">
@@ -159,5 +171,5 @@ export default connect((state: RootReducerState) => ({
 	auth: state.auth
 }), (dispatch: Function) => ({
 	loadProfile: (number: string) => dispatch(loadProfile(number)),
-	createAccount: (number: string, password: string, profile: CERPSchool) => dispatch(signUp(number, password, profile))
+	createAccount: (number: string, password: string, profile: Partial<CERPSchool>) => dispatch(signUp(number, password, profile))
 }))(SignUp)

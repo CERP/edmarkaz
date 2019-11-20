@@ -1,4 +1,3 @@
-.product-page .description {
-
-	
+.item-page .item-info .heading {
+	color: var(--red);
 }
