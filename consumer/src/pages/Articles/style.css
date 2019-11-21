@@ -5,9 +5,9 @@
 }
 
 .article-page {
-	padding: 20px 20px;
+	padding: 20px;
+	margin: 20px 0px;
 	align-items: center;
-	margin-top: 10px;
 	background: #ffffff;
 	font-size: 12px;
 	text-align: left;
@@ -19,7 +19,7 @@
 
 	.article-page .sm-image {
 		display: block;
-		width: 250px;
+		width: 70%;
 		height: auto;
 		margin-left: auto;
 		margin-right:auto;
@@ -30,5 +30,9 @@
 @media only screen and (min-width: 768px) {
 	.article-page {
 		font-size: 14px;
+		margin: 0px 40px;
+	}
+	.article-page .sm-image {
+		width: 250px;
 	}
 }
