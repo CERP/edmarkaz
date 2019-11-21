@@ -23,10 +23,6 @@ export const SchoolForm: React.SFC<SchoolProp> = ({ school, former, base_path })
 
 		<div className="form">
 			<div className="title">School Profile</div>
-			<div className="row">
-				<label>RefCode</label>
-				<div>{(school && school.refcode)}</div>
-			</div>
 			<EditSurveyRow base_path={base_path} label="School Name" path={["school_name"]} former={former} />
 			<EditSurveyRow base_path={base_path} label="Address" path={["school_address"]} former={former} />
 

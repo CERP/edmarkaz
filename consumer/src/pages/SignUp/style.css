@@ -15,7 +15,7 @@
 		}
 
 	.tabs-page .tabs-button {
-		background-color: #003333;
+		background-color: var(--blue);
 		width: 100%;
 		text-align: center !important;
 		color: #ffffff;
@@ -27,6 +27,15 @@
 		cursor: pointer;
 		border-radius: 5px;
 	}
+
+	.tabs-button.save {
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		border-radius: 0;
+	}
+
 	.tabs-page input {
 		height: 20px;
 		border: 1px solid #9E9E9E;

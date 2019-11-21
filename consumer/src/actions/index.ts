@@ -28,6 +28,38 @@ export const createLogin = (username: string, password: string, number: string) 
 
 }
 
+export const verifyUrlAuth = (token: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+
+	const state = getState();
+
+	if (!state.connected) {
+		setTimeout(() => dispatch(verifyUrlAuth(token)), 2000)
+		return
+	}
+
+	syncr.send({
+		type: "URL_AUTH",
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		payload: {
+			token
+		}
+	})
+		.then((res: { id: string, token: string, sync_state: SyncState }) => {
+			dispatch(createLoginSucceed(res.id, res.token, res.sync_state))
+		})
+		.catch(res => {
+			console.error(res)
+			if (res === "timeout") {
+				setTimeout(() => dispatch(verifyUrlAuth(token)), 2000)
+			}
+			else {
+				alert("login failed" + JSON.stringify(res))
+			}
+		})
+
+}
+
 export const ADD_PRODUCTS = "ADD_PRODUCTS"
 export const GET_PRODUCTS = "GET_PRODUCTS"
 export const getProducts = (filters = {}) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {

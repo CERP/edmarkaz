@@ -4,6 +4,7 @@ import Former from 'former'
 
 import { SchoolForm } from '../SignUp/form'
 import { RouteComponentProps } from 'react-router'
+import './style.css'
 
 type P = {
 	school: Partial<CERPSchool>;
@@ -35,11 +36,9 @@ class Profile extends React.Component<P, S> {
 
 	render() {
 
-		return <div className="user-profile page">
-			<div className="title">Profile</div>
-
+		return <div className="user-profile">
 			<SchoolForm school={this.props.school} former={this.former} base_path={["profile"]} />
-
+			<div className="tabs-button save" onClick={this.onSave}>Save</div>
 		</div>
 	}
 }

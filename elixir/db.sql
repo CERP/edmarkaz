@@ -9,6 +9,12 @@ create table tokens (
 	client_id text not null
 );
 
+create table one_time_tokens (
+	id text not null,
+	token text not null,
+	sync_time timestamp default current_timestamp
+);
+
 create table platform_writes (
 	id text,
 	path text[],

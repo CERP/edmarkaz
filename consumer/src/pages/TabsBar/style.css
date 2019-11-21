@@ -149,7 +149,7 @@
 			padding: 20px;
 		}
 		.item-page .order-button {
-			background-color: #003333;
+			background-color: var(--blue);
 			width: 100%;
 			text-align: center;
 			color: #ffffff;

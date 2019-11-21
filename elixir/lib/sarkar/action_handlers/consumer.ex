@@ -27,8 +27,26 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 		{:ok, text} = EdMarkaz.Auth.create({number, password})
 		{:ok, token} = EdMarkaz.Auth.login({number, client_id, password})
 
+		{:ok, one_token} = EdMarkaz.Auth.gen_onetime_token(refcode)
+
+		res = EdMarkaz.Contegris.send_sms(number, "Welcome to ilmExchange. Please go here to login https://ilmexchange.com/auth/#{one_token}")
 
 		{:reply, succeed(%{token: token}), %{id: number, client_id: client_id}}
+	end
+
+	def handle_action(%{"type" => "URL_AUTH", "client_id" => client_id, "payload" => %{"token" => token} }, state) do
+		case EdMarkaz.Auth.verifyOneTime(token) do
+			{:ok, refcode} ->
+				# from the refcode we need to retrieve the phone number
+				# and then we can log them in
+				{:ok, res} = Postgrex.query(EdMarkaz.DB, "SELECT db->>'phone_number' FROM platform_schools WHERE id=$1", [refcode])
+				[[ number ]] = res.rows
+				{:ok, new_token} = EdMarkaz.Auth.gen_token(number, client_id)
+				{:reply, succeed(%{token: new_token, sync_state: %{}, id: number }), %{id: number, client_id: client_id}}
+			{:error, err} -> 
+				IO.inspect err
+				{:reply, fail(err), %{}}
+		end
 	end
 
 	def handle_action(%{"type" => "GET_PROFILE", "payload" => %{"number" => number}}, state) do

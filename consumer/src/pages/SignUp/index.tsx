@@ -97,6 +97,10 @@ class SignUp extends React.Component<P, S> {
 			alert("Phone Number is required")
 		}
 
+		if (!number.startsWith("03")) {
+			return alert("phone number must start with 03")
+		}
+
 		if (!password) {
 			alert("Password is required")
 		}
@@ -110,7 +114,10 @@ class SignUp extends React.Component<P, S> {
 		}
 
 		if (password && profile.school_name && profile.school_district) {
-			this.props.createAccount(number, password, profile)
+			this.props.createAccount(number, password, {
+				...profile,
+				phone_number: number
+			})
 		}
 
 	}
