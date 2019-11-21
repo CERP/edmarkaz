@@ -34,10 +34,19 @@ class Profile extends React.Component<P, S> {
 		// should just be a sync, set up a consumer genserver
 	}
 
+	onLogout = () => {
+
+		localStorage.removeItem("auth")
+		window.history.pushState(undefined, '', '/')
+		window.location.reload()
+
+	}
+
 	render() {
 
 		return <div className="user-profile">
 			<SchoolForm school={this.props.school} former={this.former} base_path={["profile"]} />
+			<div className="tabs-button red" onClick={this.onLogout}>Logout</div>
 			<div className="tabs-button save" onClick={this.onSave}>Save</div>
 		</div>
 	}

@@ -28,6 +28,10 @@
 		border-radius: 5px;
 	}
 
+	.tabs-button.red {
+		background-color: var(--red);
+	}
+
 	.tabs-button.save {
 		position: fixed;
 		bottom: 0;
