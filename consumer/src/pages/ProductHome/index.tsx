@@ -75,7 +75,7 @@ class LoggedOutHome extends React.Component<P, S> {
 									{
 										Object.entries(suppliers)
 											.map(([sid, profile]) => <Link className="item-card" to={`/supplier/${sid}`} key={`${category}-${sid}`}>
-												<img src={profile.logo && profile.logo.url} className="item-image" alt="logo" />
+												<div style={{ backgroundImage: `url(${profile.logo && profile.logo.url})` }} className="item-image" />
 												<div className="subtitle">{profile.name}</div>
 											</Link>)
 									}
