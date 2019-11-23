@@ -54,8 +54,8 @@
 			border-bottom: 2px solid var(--blue);
 		}
 	.tabs-bar .cell:hover {
-		border-bottom: 2px solid #003333;
-		color: #003333;
+		border-bottom: 2px solid var(--blue);
+		color: var(--blue);
 		transition: ease-in;
 	}
 

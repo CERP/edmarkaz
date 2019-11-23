@@ -8,6 +8,8 @@ import prepare_students from './topics/prepare_students'
 import leaders_make_great from './topics/leaders_make_great'
 import can_we_help_all_children from './topics/can_we_help_all_children'
 
+import banner from './ilmexchange-banner.png'
+
 interface RouteInfo {
 	article_id: string;
 }
@@ -22,7 +24,7 @@ export default (props: P) => {
 
 	return <div className="articles">
 
-		<div className="tabs-banner" />
+		<div className="tabs-banner" style={{ backgroundImage: `url(${banner})` }} />
 
 		<div className="select-row" style={{ display: "flex", justifyContent: "flex-end", padding: "5px 20px" }}>
 			<select onChange={(e) => setLanguage(e.target.value)} value={language}>
