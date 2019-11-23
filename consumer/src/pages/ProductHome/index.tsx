@@ -29,8 +29,6 @@ class LoggedOutHome extends React.Component<P, S> {
 	render() {
 
 		// this should have a supplier image, title, and category
-		const suppliers = {} as { [k: string]: Product['supplier_profile'] }
-
 		const categories = {} as {
 			[category_id: string]: {
 				[supplier_id: string]: Product['supplier_profile'];
@@ -51,7 +49,7 @@ class LoggedOutHome extends React.Component<P, S> {
 							[p.supplier_id]: p.supplier_profile
 						}
 					}
-					else if (existing && existing[p.supplier_id] == undefined) {
+					else if (existing && existing[p.supplier_id] === undefined) {
 						existing[p.supplier_id] = p.supplier_profile
 					}
 

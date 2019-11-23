@@ -1,7 +1,6 @@
 import * as React from 'react'
 import Former from 'former'
 import Dynamic from '@ironbay/dynamic'
-import { v4 } from 'uuid'
 import { Span } from '.'
 
 interface SurveyRowProp {

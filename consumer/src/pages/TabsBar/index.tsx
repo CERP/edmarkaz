@@ -39,12 +39,12 @@ class TabsBar extends Component<propTypes, S> {
 
 		const current = this.props.location.pathname;
 		const search = this.props.location.search;
-		
+
 		return <div className="tabs-page">
 			<Header path={current} />
 
 			{current !== "sign-up" && <div className="tabs-bar subtitle">
-				<Link to="/articles" className={current === "/articles" ? "cell active" : "cell"}>Articles</Link>
+				<Link to="/articles" className={current === "/articles" ? "cell active" : "cell"}>Library</Link>
 				<Link to={{ pathname: "/", search }} className={current === "/" ? "cell active" : "cell"}>Bazaar</Link>
 				<Link to="" className="cell">FAQs</Link>
 			</div>}
