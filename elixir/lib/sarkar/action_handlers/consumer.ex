@@ -43,7 +43,10 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 				{:ok, res} = Postgrex.query(EdMarkaz.DB, "SELECT db->>'phone_number' FROM platform_schools WHERE id=$1", [refcode])
 				[[ number ]] = res.rows
 				{:ok, new_token} = EdMarkaz.Auth.gen_token(number, client_id)
-				{:reply, succeed(%{token: new_token, sync_state: %{}, id: number }), %{id: number, client_id: client_id}}
+
+				{:ok, school_id, profile } = EdMarkaz.School.get_profile(number)
+
+				{:reply, succeed(%{token: new_token, sync_state: %{ "profile" => profile }, id: number }), %{id: number, client_id: client_id}}
 			{:error, err} -> 
 				IO.inspect err
 				{:reply, fail(err), %{}}
@@ -52,25 +55,11 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 
 	def handle_action(%{"type" => "GET_PROFILE", "payload" => %{"number" => number}}, state) do
 
-		{:ok, resp} = Postgrex.query(EdMarkaz.DB, "SELECT id, db->>'school_name', db FROM platform_schools WHERE 
-			concat('0', db->>'phone_number') = $1 OR
-			db->>'phone_number_1'=$1 OR
-			db->>'phone_number_2'=$1 OR
-			db->>'phone_number_3'=$1 OR
-			db->>'owner_phonenumber'=$1 OR
-			db->>'pulled_phonenumber'=$1 OR
-			db->>'alt_phone_number'=$1", [number])
-
-		case resp.rows do
-			[[ school_id, name, db]] -> 
-				{:reply, succeed(%{"school_id" => school_id, "school" => db}), state}
-			[[school_id, name, db] | more ] ->
-				IO.puts "MULTIPLE SCHOOLS FOUND"
-				{:reply, succeed(%{"school_id" => school_id, "school" => db}), state}
-			other ->
-				IO.puts "no school found"
-				{:reply, fail(%{"msg" => "school not found"}), state}
+		case EdMarkaz.School.get_profile(number) do
+			{:ok, school_id, db} -> {:reply, succeed(%{"school_id" => school_id, "school" => db}), state}
+			{:error, msg} -> {:reply, fail(%{"msg" => msg}), state}
 		end
+
 	end
 
 	def handle_action(%{"type" => "VERIFY", "payload" => %{"id" => id, "token" => token, "client_id" => client_id}}, state) do
