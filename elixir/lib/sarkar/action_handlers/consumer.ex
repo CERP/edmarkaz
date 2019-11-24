@@ -40,11 +40,9 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 			{:ok, refcode} ->
 				# from the refcode we need to retrieve the phone number
 				# and then we can log them in
-				{:ok, res} = Postgrex.query(EdMarkaz.DB, "SELECT db->>'phone_number' FROM platform_schools WHERE id=$1", [refcode])
-				[[ number ]] = res.rows
+				{:ok, res} = Postgrex.query(EdMarkaz.DB, "SELECT db, db->>'phone_number' FROM platform_schools WHERE id=$1", [refcode])
+				[[ profile, number ]] = res.rows
 				{:ok, new_token} = EdMarkaz.Auth.gen_token(number, client_id)
-
-				{:ok, school_id, profile } = EdMarkaz.School.get_profile(number)
 
 				{:reply, succeed(%{token: new_token, sync_state: %{ "profile" => profile }, id: number }), %{id: number, client_id: client_id}}
 			{:error, err} -> 
