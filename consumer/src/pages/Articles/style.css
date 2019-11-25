@@ -27,6 +27,13 @@
 
 	}
 
+	/* For URDU */
+	.urdu {
+		font-family: urdu;
+		direction: rtl;
+		text-align: right;
+	}
+
 @media only screen and (min-width: 768px) {
 	.article-page {
 		font-size: 14px;
