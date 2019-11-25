@@ -11,7 +11,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 
 	def handle_action(%{
 		"type" => "SIGN_UP",
-		"client_id" => client_id, 
+		"client_id" => client_id,
 		"payload" => %{"number" => number, "password" => password, "profile" => profile}}, state) do
 
 		IO.puts "handling sign up for #{number}"
@@ -21,7 +21,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 		# we aren't syncing platform schools
 		# if someone saves some bogus value here, we aren't able to undo
 		{:ok, res} = Postgrex.query(EdMarkaz.DB, "INSERT INTO platform_schools (id, db)
-			VALUES ($1, $2) 
+			VALUES ($1, $2)
 			ON CONFLICT (id) DO UPDATE set db=excluded.db", [refcode, profile])
 
 		{:ok, text} = EdMarkaz.Auth.create({number, password})
@@ -45,10 +45,19 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 				{:ok, new_token} = EdMarkaz.Auth.gen_token(number, client_id)
 
 				{:reply, succeed(%{token: new_token, sync_state: %{ "profile" => profile }, id: number }), %{id: number, client_id: client_id}}
-			{:error, err} -> 
+			{:error, err} ->
 				IO.inspect err
 				{:reply, fail(err), %{}}
 		end
+	end
+
+	def handle_action(%{"type" => "SUBMIT_ERROR", "payload" => %{"error" => error, "errInfo" => errInfo, "date" => date}}, state) do
+
+		%{ "name" => name, "message" => message } = error
+
+		EdMarkaz.Slack.send_alert("#{name}: #{message}\n #{errInfo}", "#platform-dev")
+
+		{:reply, succeed(), state}
 	end
 
 	def handle_action(%{"type" => "GET_PROFILE", "payload" => %{"number" => number}}, state) do
@@ -88,21 +97,21 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 		dt = DateTime.from_unix!(last_sync, :millisecond)
 
 		case Postgrex.query(EdMarkaz.DB, "
-			SELECT 
-				p.id, 
-				p.supplier_id, 
+			SELECT
+				p.id,
+				p.supplier_id,
 				p.product,
 				p.sync_time,
 				s.sync_state->'profile'
 			FROM products p LEFT JOIN suppliers s ON p.supplier_id = s.id
 			WHERE extract(epoch from sync_time) > $1 ", [0]) do
-			{:ok, resp} -> 
+			{:ok, resp} ->
 				mapped = resp.rows
 					|> Enum.map(fn [id, supplier_id, product, sync_time, supplier_profile] -> {id, Map.put(product, "supplier_profile", supplier_profile)} end)
 					|> Enum.into(%{})
 
 				{:reply, succeed(%{products: mapped}), state}
-			{:error, err} -> 
+			{:error, err} ->
 				IO.puts "error getting product"
 				IO.inspect err
 				{:reply, fail("error getting products"), state}
@@ -120,7 +129,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 
 	#logged-out sync
 	def handle_action(%{"type" => "SYNC", "payload" => payload, "last_snapshot" => last_sync_date}, state) do
-		# how do we make this less intense. 
+		# how do we make this less intense.
 		# what are we even syncing in this case... just analytics
 		# so we can parse through the payload for analytics events and write them direct to table
 		# instead of spinning up a genserver for a client and eating memory
@@ -135,6 +144,14 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 		# value: { no_local_apply: true }
 
 	{:reply, succeed(%{"type" => "noop"}), state}
+	end
+
+	def handle_action(msg, state) do
+		IO.puts "no handler for msg"
+		IO.inspect msg
+		IO.inspect state
+
+		{:reply, fail(), state}
 	end
 
 	defp start_supplier(id) do

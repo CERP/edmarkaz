@@ -1,22 +1,28 @@
 import React, { Component } from 'react'
 import { RouteComponentProps, Route } from 'react-router'
-import Header from '../../components/Header'
+import { Link } from 'react-router-dom'
 
-import './style.css'
+import Header from '../../components/Header'
 import ProductHome from '../ProductHome'
 import SupplierHome from '../Supplier'
 import ProductPage from '../accordian/Product'
 import SignUp from '../SignUp'
 import Profile from '../Profile'
 import Articles, { ArticleRouter } from '../Articles'
-import { Link } from 'react-router-dom'
+import ErrorComponent from '../../components/Error'
+import { submitError } from '../../actions/core'
+import { connect } from 'react-redux'
+
+import './style.css'
 
 interface S {
-
+	error: boolean,
+	err?: Error,
+	errInfo?: React.ErrorInfo
 }
 
 interface P {
-
+	sendError: (err: Error, errInfo: React.ErrorInfo) => void
 }
 
 interface RouteInfo {
@@ -31,14 +37,32 @@ class TabsBar extends Component<propTypes, S> {
 		super(props)
 
 		this.state = {
-
+			error: false,
+			err: undefined,
+			errInfo: undefined
 		}
+	}
+
+	componentDidCatch(err: Error, errInfo: React.ErrorInfo) {
+
+		this.props.sendError(err, errInfo)
+
+		this.setState({
+			error: true,
+			err,
+			errInfo
+		})
 	}
 
 	render() {
 
 		const current = this.props.location.pathname;
 		const search = this.props.location.search;
+
+		if (this.state.error && this.state.err && this.state.errInfo) {
+
+			return <ErrorComponent error={this.state.err} errInfo={this.state.errInfo} />
+		}
 
 		return <div className="tabs-page">
 			<Header path={current} />
@@ -61,4 +85,8 @@ class TabsBar extends Component<propTypes, S> {
 		</div>
 	}
 }
-export default TabsBar
+export default connect((state: RootReducerState) => ({
+
+}), (dispatch: Function) => ({
+	sendError: (err: Error, errInfo: React.ErrorInfo) => dispatch(submitError(err, errInfo))
+}))(TabsBar)

@@ -45,7 +45,7 @@ export const getDownsizedImage = (imageDataUrl: string, max_size: number) => {
 			canvas.width = width;
 			canvas.height = height;
 			canvas.getContext('2d').drawImage(image, 0, 0, width, height)
-			const dataUrl = canvas.toDataURL('image/jpeg')
+			const dataUrl = canvas.toDataURL('image/png')
 
 			resolve(dataUrl)
 
