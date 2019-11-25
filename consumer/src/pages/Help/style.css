@@ -1,0 +1,41 @@
+.help-page {
+}
+
+.help-page .q-row {
+
+}
+	.help-page .q-bar {
+		margin-top: 20px;
+		padding: 15px 20px;
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		font-size: 14px;
+		background: #ffffff;
+		border-radius: 5px;
+		color: #000000;
+		cursor: pointer;
+	}
+
+	.help-page :last-child {
+		margin-bottom: 10px;
+	}
+	.help-page .q-bar .q-title {
+		width: 90%;
+	}
+	.help-page .q-bar .q-img {
+		width: 10%;
+		background-repeat: no-repeat;
+		background-position: center;
+	}
+		.help-page .q-bar .rot {
+			transform: rotate(180deg);
+			background-position: center;
+			transition: transform 0.5s;
+		}
+
+	.help-page .answer {
+		margin-top: 20px;
+		padding: 0px 20px;
+		font-size: 12px;
+	}
