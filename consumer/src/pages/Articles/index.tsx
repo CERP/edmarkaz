@@ -23,7 +23,7 @@ export default (props: P) => {
 
 	return <div className="articles">
 
-		<div className="tabs-banner" style={{ backgroundImage: `url(${banner})` }} />
+		<img className="tabs-banner" src={banner} />
 
 		<div className="tabs-home">
 

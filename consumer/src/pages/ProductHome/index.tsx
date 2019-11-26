@@ -60,7 +60,7 @@ class LoggedOutHome extends React.Component<P, S> {
 		})
 
 		return <div className="products">
-			<div className="tabs-banner"></div>
+			<div className="tabs-banner" style={{ height: "300px" }}></div>
 			<div className="tabs-home">
 
 				{

@@ -61,11 +61,8 @@
 
 .tabs-banner {
 	background-color: var(--blue);
-	height: 300px;
+	height: auto;
 	width: 100%;
-	background-repeat: no-repeat;
-	background-size: cover;
-	background-position: 50% 50%;
 }
 
 .supplier-info {
