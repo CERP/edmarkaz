@@ -17,8 +17,8 @@ defmodule EdMarkaz.Store.Supplier do
 	end
 
 	def save(id, sync_state, writes) do
-		GenServer.call(:supplier_db, {:save, id, sync_state})
-		GenServer.call(:supplier_db, {:save_writes, id, writes})
+		GenServer.call(:supplier_db, {:save, id, sync_state}, 60000)
+		GenServer.call(:supplier_db, {:save_writes, id, writes}, 60000)
 	end
 
 	def load(id) do
@@ -30,7 +30,7 @@ defmodule EdMarkaz.Store.Supplier do
 	end
 
 	def get_writes(id, last_sync_date) do
-		GenServer.call(:supplier_db, {:get_writes, id, last_sync_date})
+		GenServer.call(:supplier_db, {:get_writes, id, last_sync_date}, 60000)
 	end
 
 	# modify this to return db + (last 50) writes writes map of path, value, data, type
@@ -42,7 +42,12 @@ defmodule EdMarkaz.Store.Supplier do
 				{:ok, resp} ->
 					[[sync_state]] = resp.rows
 
-					case Postgrex.query(EdMarkaz.DB, "SELECT path, value, time, type, client_id FROM platform_writes WHERE id=$1 ORDER BY time desc limit $2", [id, 50]) do
+					case Postgrex.query(EdMarkaz.DB, "
+						SELECT path, value, time, type, client_id
+						FROM platform_writes
+						WHERE id=$1
+						ORDER BY time desc
+						LIMIT $2", [id, 1]) do
 						{:ok, writes_resp} ->
 							write_formatted = writes_resp.rows
 								|> Enum.map(fn([ [_ | p] = path, value, time, type, client_id]) -> {Enum.join(p, ","), %{
@@ -52,7 +57,7 @@ defmodule EdMarkaz.Store.Supplier do
 								|> Enum.into(%{})
 
 							{:reply, {sync_state, write_formatted}, state}
-						{:error, err} -> {:reply, {:error, err}, state} 
+						{:error, err} -> {:reply, {:error, err}, state}
 					end
 				{:error, err} ->
 					IO.inspect err
@@ -62,8 +67,11 @@ defmodule EdMarkaz.Store.Supplier do
 
 	def handle_call({:get_writes, id, last_sync_date}, _from, state) do
 		case Postgrex.query(
-			EdMarkaz.DB,
-			"SELECT path, value, time, type, client_id FROM platform_writes where id=$1 AND time > $2 ORDER BY time desc", 
+			EdMarkaz.DB, "
+			SELECT path, value, time, type, client_id
+			FROM platform_writes
+			WHERE id=$1 AND time > $2
+			ORDER BY time desc",
 			[id, last_sync_date]) do
 				{:ok, writes_resp} ->
 					write_formatted = writes_resp.rows
@@ -72,7 +80,7 @@ defmodule EdMarkaz.Store.Supplier do
 						}} end)
 						|> Enum.reverse
 						|> Enum.into(%{})
-					
+
 					{:reply, {:ok, write_formatted}, state}
 
 				{:error, err} -> {:reply, {:error, err}, state}
@@ -83,7 +91,7 @@ defmodule EdMarkaz.Store.Supplier do
 		case Postgrex.query(
 			EdMarkaz.DB,
 			"SELECT id from suppliers", []) do
-				{:ok, resp} -> 
+				{:ok, resp} ->
 					suppliers = Enum.map(resp.rows, fn([ supplier ]) -> supplier end)
 					{:reply, {:ok, suppliers}, state}
 				{:error, err} -> {:reply, {:error, err}, state}
@@ -102,9 +110,9 @@ defmodule EdMarkaz.Store.Supplier do
 			"INSERT INTO suppliers (id, sync_state) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET sync_state=$2",
 			[id, sync_state]) do
 				{:ok, resp} -> {:reply, :ok, state}
-				{:error, err} -> 
+				{:error, err} ->
 					IO.puts "write failed"
-					IO.inspect err 
+					IO.inspect err
 					{:reply, :error, state}
 		end
 	end
@@ -112,22 +120,22 @@ defmodule EdMarkaz.Store.Supplier do
 	def handle_call({:save_writes, id, writes}, _from, state) do
 
 		gen_value_strings = Stream.with_index(Map.values(writes), 1)
-			|> Enum.map(fn {w, i} -> 
+			|> Enum.map(fn {w, i} ->
 				x = (i - 1) * 6 + 1
 				"($#{x}, $#{x + 1}, $#{x + 2}, $#{x + 3}, $#{x + 4}, $#{x + 5})" end)
 
 		flattened_writes = Map.values(writes)
-			|> Enum.map(fn %{"date" => date, "value" => value, "path" => path, "type" => type, "client_id" => client_id} -> 
-				[id, path, value, date, type, client_id] 
+			|> Enum.map(fn %{"date" => date, "value" => value, "path" => path, "type" => type, "client_id" => client_id} ->
+				[id, path, value, date, type, client_id]
 			end)
 			|> Enum.reduce([], fn curr, agg -> Enum.concat(agg, curr) end)
 
 		case Postgrex.query(
 			EdMarkaz.DB,
-			"INSERT INTO platform_writes (id, path, value, time, type, client_id) VALUES #{Enum.join(gen_value_strings, ",")}", 
+			"INSERT INTO platform_writes (id, path, value, time, type, client_id) VALUES #{Enum.join(gen_value_strings, ",")}",
 			flattened_writes) do
 				{:ok, resp} -> {:reply, :ok, state}
-				{:error, err} -> 
+				{:error, err} ->
 					IO.puts "write failed"
 					IO.inspect err
 					{:reply, :error, state}

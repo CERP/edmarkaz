@@ -10,15 +10,15 @@ defmodule Mix.Tasks.Platform do
 		end
 		{:ok, json} = Poison.decode(body)
 
-		Enum.each(json, fn school_profile -> 
+		Enum.each(json, fn school_profile ->
 			id = Map.get(school_profile, "refcode")
 
 			case Postgrex.query(EdMarkaz.DB, "
-				INSERT INTO platform_schools(id, db) 
-				VALUES ($1, $2) 
+				INSERT INTO platform_schools(id, db)
+				VALUES ($1, $2)
 				ON CONFLICT(id) DO UPDATE SET db=$2 ", [id, school_profile]) do
 				{:ok, _} -> IO.puts "updated #{id}"
-				{:error, err} -> 
+				{:error, err} ->
 					IO.puts "error on school #{id}"
 					IO.inspect err
 			end
@@ -35,15 +35,15 @@ defmodule Mix.Tasks.Platform do
 		end
 		{:ok, json} = Poison.decode(body)
 
-		Enum.each(json, fn school_profile -> 
+		Enum.each(json, fn school_profile ->
 			id = Map.get(school_profile, "refcode")
 
 			case Postgrex.query(EdMarkaz.DB, "
-				INSERT INTO platform_schools(id, db) 
-				VALUES ($1, $2) 
+				INSERT INTO platform_schools(id, db)
+				VALUES ($1, $2)
 				ON CONFLICT(id) DO UPDATE SET db=$2 ", [id, school_profile]) do
 				{:ok, _} -> IO.puts "updated #{id}"
-				{:error, err} -> 
+				{:error, err} ->
 					IO.puts "error on school #{id}"
 					IO.inspect err
 			end
@@ -63,7 +63,7 @@ defmodule Mix.Tasks.Platform do
 		|> Enum.slice(String.to_integer(offset), String.to_integer(limit))
 
 		changes = refcodes
-		|> Enum.reduce(%{}, fn(school_id, agg) -> 
+		|> Enum.reduce(%{}, fn(school_id, agg) ->
 			path = ["sync_state", "matches", school_id]
 			write = %{
 				"action" => %{
@@ -100,21 +100,29 @@ defmodule Mix.Tasks.Platform do
 		end
 
 		# supplier_login, supplier_name, description, logo_url, banner_url
-		[_ | suppliers] = csv 
+		[_ | suppliers] = csv
 		|> Enum.map(fn row -> row end)
 
-		tasks = suppliers 
-		|> Enum.map(fn [id, name, description, logo_url, banner_url] ->
-			Task.async fn -> 
+		# create login if doesnt exist (silent error)
+		suppliers
+		|> Enum.each(fn [id, _name, _description, _logo_url, _banner_url, password] ->
+			if password != "" do
+				EdMarkaz.Auth.create({ id, password })
+			end
+		end)
+
+		tasks = suppliers
+		|> Enum.map(fn [id, name, description, logo_url, banner_url, password] ->
+			Task.async fn ->
 				start_supplier(id)
-				case logo_url do 
-					"" -> 
+				case logo_url do
+					"" ->
 						EdMarkaz.Supplier.save_profile(id, %{
 							"description" => description,
 							"name" => name
 						})
 
-					has_url -> 
+					has_url ->
 						new_logo_url = Sarkar.Storage.Google.upload_image_from_url("ilmx-product-images", logo_url)
 
 						if banner_url != "" do
@@ -146,7 +154,7 @@ defmodule Mix.Tasks.Platform do
 		end)
 
 		results = Enum.map(tasks, fn task -> Task.await(task, 45000) end)
-		
+
 		IO.inspect results
 
 	end
@@ -166,15 +174,15 @@ defmodule Mix.Tasks.Platform do
 
 		# before doing all this, need to init the suppliers
 
-		[_ | products] = csv 
+		[_ | products] = csv
 		|> Enum.map(fn row -> row end)
 
 		tasks = products
-		|> Enum.map(fn [sid, pid, name, price, desc, category, picture_url] -> 
-			Task.async fn -> 
+		|> Enum.map(fn [sid, pid, name, price, desc, category, picture_url] ->
+			# Task.async fn ->
 
 				case picture_url do
-					"" -> 
+					"" ->
 						IO.puts "no url"
 						IO.inspect picture_url
 
@@ -191,7 +199,7 @@ defmodule Mix.Tasks.Platform do
 						}
 
 						EdMarkaz.Product.merge(pid, product, sid)
-					has_url -> 
+					has_url ->
 						IO.puts "has url"
 						IO.inspect picture_url
 
@@ -212,12 +220,12 @@ defmodule Mix.Tasks.Platform do
 
 						EdMarkaz.Product.merge(pid, product, sid)
 				end
-			end
+			# end
 		end)
 
-		results = Enum.map(tasks, fn task -> Task.await(task, 45000) end)
+		# results = Enum.map(tasks, fn task -> Task.await(task, 45000) end)
 
-		IO.inspect results
+		IO.inspect tasks
 
 	end
 
@@ -231,7 +239,7 @@ defmodule Mix.Tasks.Platform do
 					{:ok, _} = case args do
 						["add_matches"] -> {:ok, add_matches(id, sync_state)}
 						["gen_matches"] -> {:ok, gen_matches(id, sync_state)}
-						other -> 
+						other ->
 							IO.inspect other
 							IO.puts "ERROR: supply a recognized task to run"
 							{:error, "no task"}
@@ -239,7 +247,7 @@ defmodule Mix.Tasks.Platform do
 
 				end)
 
-			{:err, msg} -> 
+			{:err, msg} ->
 				IO.puts "ERROR"
 				IO.inspect msg
 		end
@@ -252,7 +260,7 @@ defmodule Mix.Tasks.Platform do
 		{:ok, resp} = Postgrex.query(EdMarkaz.DB, "SELECT id, db from platform_schools limit 10", [])
 
 		next_matches = resp.rows
-		|> Enum.reduce(%{}, fn([school_id, db], agg) -> 
+		|> Enum.reduce(%{}, fn([school_id, db], agg) ->
 			Map.put(agg, school_id, %{
 				"status" => "NEW"
 			})
@@ -268,14 +276,14 @@ defmodule Mix.Tasks.Platform do
 			false -> File.stream!("priv/mischool.csv") |> CSV.decode!
 		end
 
-		[_ | refcodes] = csv 
+		[_ | refcodes] = csv
 		|> Enum.map(fn [refcode | _ ] -> refcode end)
 
 		# instead of directly manipulating the matches dir, should be creating writes
 		# and writing the writes to the supplier.
 
-		changes = refcodes 
-		|> Enum.reduce(%{}, fn(school_id, agg) -> 
+		changes = refcodes
+		|> Enum.reduce(%{}, fn(school_id, agg) ->
 			path = ["sync_state", "matches", school_id]
 			write = %{
 				"action" => %{

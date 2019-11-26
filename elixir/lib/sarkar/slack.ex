@@ -9,13 +9,13 @@ defmodule EdMarkaz.Slack do
 		url = "https://hooks.slack.com/services/" <> System.get_env("SLACK_TOKEN")
 
 		encoded = Poison.encode!(%{
-			"text" => text, 
+			"text" => text,
 			"channel" => channel,
 			"username" => "platform-bot",
 			"icon_emoji" => ":robot_face:"
 		})
+
 		{:ok, _response } = Tesla.post(url, encoded)
 	end
-
 
 end
