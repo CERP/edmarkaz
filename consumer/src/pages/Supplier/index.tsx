@@ -5,6 +5,8 @@ import { Link } from 'react-router-dom'
 
 import { getProducts } from '../../actions'
 
+import './style.css'
+
 interface S {
 
 }
@@ -35,7 +37,7 @@ class SupplierHomePage extends React.Component<P, S>{
 
 		return <div className="supplier-home">
 
-			<div className="tabs-banner" style={{ backgroundImage: `url(${banner && banner.url})` }}>
+			<div className="tabs-banner" style={{ backgroundImage: `url(${banner && banner.url})`, height: banner && banner.url ? undefined : "300px" }}>
 				<img className="supplier-logo" src={logo && logo.url} />
 			</div>
 			<div className="tabs-home">
