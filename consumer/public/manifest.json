@@ -8,14 +8,14 @@
 			"type": "image/x-icon"
 		},
 		{
-			"src": "icon-3.png",
+			"src": "Icon-3.png",
 			"sizes": "192x192 256x256 512x512",
 			"type": "image/png"
 		}
 	],
 	"start_url": ".",
 	"display": "standalone",
-	"theme_color": "#000000",
+	"theme_color": "#ffffff",
 	"background_color": "#ffffff",
 	"developer": {
 		"name": "CERP Labs",
