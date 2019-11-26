@@ -1,12 +1,25 @@
 defmodule EdMarkaz.ActionHandler.Consumer do
 
-	def handle_action(%{"type" => "LOGIN", "client_id" => client_id, "payload" => %{"id" => id, "password" => password}}, state) do
-		case EdMarkaz.Auth.login({id, client_id, password}) do
-			{:ok, token} ->
-				register_connection(id, client_id)
-				{:reply, succeed(%{token: token}), %{id: id, client_id: client_id}}
-			{:error, message} -> {:reply, fail(message), %{}}
-		end
+	# def handle_action(%{"type" => "LOGIN", "client_id" => client_id, "payload" => %{"id" => id, "password" => password}}, state) do
+
+	# end
+
+	def handle_action(%{ "type" => "SMS_AUTH_CODE",
+		"client_id" => client_id,
+		"payload" => %{ "phone" => phone }}, state) do
+
+			IO.inspect phone
+
+			case EdMarkaz.School.get_profile(phone) do
+				{:ok, school_id, profile} ->
+					refcode = Map.get(profile, "refcode")
+					{:ok, one_token} = EdMarkaz.Auth.gen_onetime_token(refcode)
+					res = EdMarkaz.Contegris.send_sms(phone, "Click here to login https://ilmexchange.com/auth/#{one_token} \nOr enter code #{one_token}")
+
+					{:reply, succeed(), state}
+				{:error, msg} ->
+					{:reply, fail(msg), state}
+				end
 	end
 
 	def handle_action(%{

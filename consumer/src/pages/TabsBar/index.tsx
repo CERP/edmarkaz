@@ -15,6 +15,7 @@ import { connect } from "react-redux";
 import Help from "../Help";
 
 import "./style.css";
+import login from "../SignUp/login";
 
 interface S {
 	error: boolean;
@@ -83,6 +84,7 @@ class TabsBar extends Component<propTypes, S> {
 					<Route exact path="/" component={ProductHome} />
 					<Route exact path="/supplier/:supplier_id/:product_id" component={ProductPage} />
 					<Route exact path="/supplier/:supplier_id" component={SupplierHome} />
+					<Route exact path="/log-in" component={login} />
 					<Route path="/sign-up" component={SignUp} />
 					<Route path="/profile" component={Profile} />
 					<Route path="/articles/:article_id" component={ArticleRouter} />

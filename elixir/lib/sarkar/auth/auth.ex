@@ -2,11 +2,11 @@ defmodule EdMarkaz.Auth do
 
 	def create({id, password}) do
 		case Postgrex.query(EdMarkaz.DB,
-			"INSERT INTO auth (id, password) values ($1, $2)", 
+			"INSERT INTO auth (id, password) values ($1, $2)",
 			[id, hash(password, 52)]) do
-				{:ok, res} -> 
+				{:ok, res} ->
 					{:ok, "created #{id} with password #{password}"}
-				{:error, err} -> 
+				{:error, err} ->
 					IO.inspect err
 					{:error, "creation failed"}
 		end
@@ -16,7 +16,7 @@ defmodule EdMarkaz.Auth do
 		# first check if password is correct.
 		# if correct, generate a new token, put in db
 		case Postgrex.query(EdMarkaz.DB,
-			"SELECT * from auth where id=$1 AND password=$2", 
+			"SELECT * from auth where id=$1 AND password=$2",
 			[id, hash(password, 52)]) do
 				{:ok, %Postgrex.Result{num_rows: 0}} -> {:error, "invalid login"}
 				{:ok, rows} -> gen_token(id, client_id)
@@ -30,10 +30,10 @@ defmodule EdMarkaz.Auth do
 		case Postgrex.query(EdMarkaz.DB,
 			"SELECT id from one_time_tokens where token=$1", [hash(token, 12)]) do
 				{:ok, %Postgrex.Result{num_rows: 0}} -> {:error, "invalid token"}
-				{:ok, res} -> 
+				{:ok, res} ->
 					[[ id ]] = res.rows
 					{:ok, id}
-				{:error, err} -> 
+				{:error, err} ->
 					IO.inspect err
 					{:error, "error verifying token"}
 		end
@@ -41,11 +41,11 @@ defmodule EdMarkaz.Auth do
 
 	def updatePassword({id, password}) do
 		case Postgrex.query(EdMarkaz.DB,
-			"UPDATE auth SET password=$2 WHERE id=$1", 
+			"UPDATE auth SET password=$2 WHERE id=$1",
 			[id, hash(password, 52)]) do
-				{:ok, res} -> 
+				{:ok, res} ->
 					{:ok, "updated #{id} with new password #{password}"}
-				{:error, err} -> 
+				{:error, err} ->
 					IO.inspect err
 					{:error, "updating failed"}
 		end
@@ -57,7 +57,7 @@ defmodule EdMarkaz.Auth do
 		[id, hash(token, 12), client_id]) do
 			{:ok, %Postgrex.Result{num_rows: 0}} -> {:error, "invalid token"}
 			{:ok, res} -> {:ok, "success"}
-			{:error, err} -> 
+			{:error, err} ->
 				IO.inspect err
 				{:error, "error verifying token"}
 		end
@@ -67,23 +67,22 @@ defmodule EdMarkaz.Auth do
 		token = :crypto.strong_rand_bytes(12)
 			|> Base.url_encode64
 			|> binary_part(0, 12)
-		
+
 		case Postgrex.query(EdMarkaz.DB, "INSERT INTO tokens (id, token, client_id) values ($1, $2, $3)", [id, hash(token, 12), client_id]) do
 			{:ok, res} -> {:ok, token}
-			{:error, err} -> 
+			{:error, err} ->
 				IO.inspect err
 				{:error, "error generating token"}
 		end
 	end
 
-	def gen_onetime_token(id) do 
-		token = :crypto.strong_rand_bytes(12)
-			|> Base.url_encode64
-			|> binary_part(0, 12)
-		
+	def gen_onetime_token(id) do
+
+		token = Enum.random(10000..99999)
+
 		case Postgrex.query(EdMarkaz.DB, "INSERT INTO one_time_tokens (id, token) values ($1, $2)", [id, hash(token, 12)]) do
 			{:ok, res} -> {:ok, token}
-			{:error, err} -> 
+			{:error, err} ->
 				IO.inspect err
 				{:error, "error generating token"}
 		end
