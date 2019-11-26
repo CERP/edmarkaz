@@ -17,99 +17,86 @@ import Help from "../Help";
 import "./style.css";
 
 interface S {
-  error: boolean;
-  err?: Error;
-  errInfo?: React.ErrorInfo;
+	error: boolean;
+	err?: Error;
+	errInfo?: React.ErrorInfo;
 }
 
 interface P {
-  sendError: (err: Error, errInfo: React.ErrorInfo) => void;
+	sendError: (err: Error, errInfo: React.ErrorInfo) => void;
 }
 
-interface RouteInfo {}
+interface RouteInfo { }
 
 type propTypes = RouteComponentProps<RouteInfo> & P;
 
 class TabsBar extends Component<propTypes, S> {
-  constructor(props: propTypes) {
-    super(props);
+	constructor(props: propTypes) {
+		super(props);
 
-    this.state = {
-      error: false,
-      err: undefined,
-      errInfo: undefined
-    };
-  }
+		this.state = {
+			error: false,
+			err: undefined,
+			errInfo: undefined
+		};
+	}
 
-  componentDidCatch(err: Error, errInfo: React.ErrorInfo) {
-    this.props.sendError(err, errInfo);
+	componentDidCatch(err: Error, errInfo: React.ErrorInfo) {
+		this.props.sendError(err, errInfo);
 
-    this.setState({
-      error: true,
-      err,
-      errInfo
-    });
-  }
+		this.setState({
+			error: true,
+			err,
+			errInfo
+		});
+	}
 
-  render() {
-    const current = this.props.location.pathname;
-    const search = this.props.location.search;
+	render() {
+		const current = this.props.location.pathname;
+		const search = this.props.location.search;
 
-    if (this.state.error && this.state.err && this.state.errInfo) {
-      return (
-        <ErrorComponent error={this.state.err} errInfo={this.state.errInfo} />
-      );
-    }
+		if (this.state.error && this.state.err && this.state.errInfo) {
+			return (
+				<ErrorComponent error={this.state.err} errInfo={this.state.errInfo} />
+			);
+		}
 
-    return (
-      <div className="tabs-page">
-        <Header path={current} />
+		return (
+			<div className="tabs-page">
+				<Header path={current} />
 
-        {current !== "sign-up" && (
-          <div className="tabs-bar subtitle">
-            <Link
-              to="/articles"
-              className={current === "/articles" ? "cell active" : "cell"}
-            >
-              Library
-            </Link>
-            <Link
-              to={{ pathname: "/", search }}
-              className={current === "/" ? "cell active" : "cell"}
-            >
-              Bazaar
-            </Link>
-            <Link
-              to="/help"
-              className={current === "/help" ? "cell active" : "cell"}
-            >
-              FAQs
-            </Link>
-          </div>
-        )}
+				{current !== "sign-up" && (
+					<div className="tabs-bar subtitle">
+						<Link to="/articles" className={current === "/articles" ? "cell active" : "cell"}>
+							Library
+						</Link>
+						<Link to={{ pathname: "/", search }} className={current === "/" ? "cell active" : "cell"}>
+							Bazaar
+						</Link>
+						<Link to="/help" className={current === "/help" ? "cell active" : "cell"}>
+							Help
+						</Link>
+					</div>
+				)}
 
-        <div className="">
-          <Route exact path="/" component={ProductHome} />
-          <Route
-            exact
-            path="/supplier/:supplier_id/:product_id"
-            component={ProductPage}
-          />
-          <Route exact path="/supplier/:supplier_id" component={SupplierHome} />
-          <Route path="/sign-up" component={SignUp} />
-          <Route path="/profile" component={Profile} />
-          <Route path="/articles/:article_id" component={ArticleRouter} />
-          <Route exact path="/articles" component={Articles} />
-          <Route path="/help" component={Help} />
-        </div>
-      </div>
-    );
-  }
+				<>
+					<Route exact path="/" component={ProductHome} />
+					<Route exact path="/supplier/:supplier_id/:product_id" component={ProductPage} />
+					<Route exact path="/supplier/:supplier_id" component={SupplierHome} />
+					<Route path="/sign-up" component={SignUp} />
+					<Route path="/profile" component={Profile} />
+					<Route path="/articles/:article_id" component={ArticleRouter} />
+					<Route exact path="/articles" component={Articles} />
+					<Route path="/help" component={Help} />
+				</>
+			</div>
+		);
+	}
 }
 export default connect(
-  (state: RootReducerState) => ({}),
-  (dispatch: Function) => ({
-    sendError: (err: Error, errInfo: React.ErrorInfo) =>
-      dispatch(submitError(err, errInfo))
-  })
+	(state: RootReducerState) => ({}),
+	(dispatch: Function) => ({
+		sendError: (err: Error, errInfo: React.ErrorInfo) =>
+			dispatch(submitError(err, errInfo))
+	})
 )(TabsBar);
