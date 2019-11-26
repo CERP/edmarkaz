@@ -73,29 +73,22 @@ class TabsBar extends Component<propTypes, S> {
 						<Link to={{ pathname: "/", search }} className={current === "/" ? "cell active" : "cell"}>
 							Bazaar
 						</Link>
-						<Link
-							to="/help"
-							className={current === "/help" ? "cell active" : "cell"}
-						>
-							FAQs
-            </Link>
+						<Link to="/help" className={current === "/help" ? "cell active" : "cell"}>
+							Help
+						</Link>
 					</div>
 				)}
 
-				<div className="">
+				<>
 					<Route exact path="/" component={ProductHome} />
-					<Route
-						exact
-						path="/supplier/:supplier_id/:product_id"
-						component={ProductPage}
-					/>
+					<Route exact path="/supplier/:supplier_id/:product_id" component={ProductPage} />
 					<Route exact path="/supplier/:supplier_id" component={SupplierHome} />
 					<Route path="/sign-up" component={SignUp} />
 					<Route path="/profile" component={Profile} />
 					<Route path="/articles/:article_id" component={ArticleRouter} />
 					<Route exact path="/articles" component={Articles} />
 					<Route path="/help" component={Help} />
-				</div>
+				</>
 			</div>
 		);
 	}
