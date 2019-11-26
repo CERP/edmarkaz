@@ -85,6 +85,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 		product_name = Map.get(product, "title")
 		supplier_id = Map.get(product, "supplier_id")
 
+		start_supplier(supplier_id)
 		EdMarkaz.Supplier.place_order(supplier_id, product, refcode, client_id)
 		EdMarkaz.Slack.send_alert("#{school_name} placed order for #{product_name} by #{supplier_id}. Their number is #{id}", "#platform-orders")
 		number = EdMarkaz.School.get_number(id)
