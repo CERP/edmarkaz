@@ -43,10 +43,6 @@ class ProductPage extends React.Component<P, S> {
 		// dispatch onOrder action
 		const product_id = this.props.match.params.product_id;
 
-		//@ts-ignore
-		const modal: HTMLElement = document.getElementById('modal')
-		modal.setAttribute('class', 'modal-active')
-
 		this.setState({
 			showModal: true
 		})
@@ -55,9 +51,6 @@ class ProductPage extends React.Component<P, S> {
 	}
 
 	closeModal = () => {
-		//@ts-ignore
-		const modal: HTMLElement = document.getElementById('modal')
-		modal.removeAttribute('class')
 		this.setState({
 			showModal: false
 		})
