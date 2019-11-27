@@ -93,7 +93,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 		end
 	end
 
-	def handle_action(%{"type" => "PLACE_ORDER", "payload" => %{"product" => product, "refcode" => refcode, "school_name" => school_name}}, %{client_id: client_id, id: id} = state) do
+	def handle_action(%{"type" => "PLACE_ORDER", "payload" => %{"product" => product, "refcode" => refcode, "school_name" => school_name }}, %{client_id: client_id, id: id} = state) do
 
 		product_name = Map.get(product, "title")
 		supplier_id = Map.get(product, "supplier_id")
@@ -101,8 +101,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 		start_supplier(supplier_id)
 		EdMarkaz.Supplier.place_order(supplier_id, product, refcode, client_id)
 		EdMarkaz.Slack.send_alert("#{school_name} placed order for #{product_name} by #{supplier_id}. Their number is #{id}", "#platform-orders")
-		number = EdMarkaz.School.get_number(id)
-		EdMarkaz.Contegris.send_sms(number, "You have requested information for #{product_name} and will be contacted soon with more information.")
+		EdMarkaz.Contegris.send_sms(id, "You have requested information for #{product_name} and will be contacted soon with more information.")
 
 		{:reply, succeed(), state}
 
