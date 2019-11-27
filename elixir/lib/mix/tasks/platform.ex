@@ -178,7 +178,7 @@ defmodule Mix.Tasks.Platform do
 		|> Enum.map(fn row -> row end)
 
 		tasks = products
-		|> Enum.map(fn [sid, pid, name, price, desc, category, picture_url] ->
+		|> Enum.map(fn [sid, pid, name, price, desc, category, picture_url | _] ->
 			# Task.async fn ->
 
 				case picture_url do
