@@ -15,6 +15,24 @@ interface S {
 
 }
 
+const getCategoryOrder = (category: string) => {
+	const orders = {
+		"Library Books & Co-curricular Activities": 3,
+		"Education Technology": 4,
+		"School Loans": 1,
+		"Textbooks": 2,
+		"Stationery and Printing": 6,
+		"Learning Materials": 5,
+		"Solar Power": 7
+	} as { [k: string]: number }
+
+	if (orders[category]) {
+		return orders[category]
+	}
+
+	return 999;
+}
+
 class LoggedOutHome extends React.Component<P, S> {
 
 	componentDidMount() {
@@ -59,12 +77,15 @@ class LoggedOutHome extends React.Component<P, S> {
 
 		})
 
+		const sorted = Object.entries(categories)
+			.sort(([c1,], [c2,]) => getCategoryOrder(c1) - getCategoryOrder(c2))
+
 		return <div className="products">
 			<div className="tabs-banner" style={{ height: "300px" }}></div>
 			<div className="tabs-home">
 
 				{
-					Object.entries(categories)
+					sorted
 						.map(([category, suppliers]) => {
 
 							return <div className="item-row" key={category}>
