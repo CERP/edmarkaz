@@ -31,6 +31,10 @@ export const createLogin = (username: string, password: string, number: string) 
 export const SMSAuth = (phone: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 	const state = getState()
 
+	dispatch({
+		type: "SENDING_AUTH_SMS"
+	})
+
 	syncr.send({
 		type: "SMS_AUTH_CODE",
 		client_type: state.auth.client_type,

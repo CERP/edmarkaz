@@ -8,6 +8,7 @@ import { connect } from 'react-redux'
 
 interface P {
 	sent: boolean;
+	token: string | undefined;
 	sendAuthSms: (phone: string) => any;
 	verify: (token: string) => any;
 }
@@ -37,18 +38,38 @@ class Login extends Component<propTypes, S> {
 		this.former = new Former(this, [])
 	}
 
-	onSendCode = () => {
-		console.log("PHONE NUMBER", this.state.phone)
+	SendAuthSms = () => {
+
+		const { phone } = this.state
+
+		if (phone.trim().length !== 11) {
+			window.alert("Please enter a valid mobile number")
+			return
+		}
 
 		this.props.sendAuthSms(this.state.phone)
 	}
 
 	verifyToken = () => {
-		console.log("CODE", this.state.code)
+		const { code } = this.state
+
+		if (code.trim().length !== 5) {
+			window.alert("Please enter a valid 5-digit code")
+			return
+		}
+
 		this.props.verify(this.state.code)
 	}
 
+
 	render() {
+
+		if (this.props.token) {
+			setTimeout(() => {
+				window.location.replace("/")
+			}, 1000);
+		}
+
 		return <div className="login-page">
 			<div className="form">
 
@@ -68,7 +89,7 @@ class Login extends Component<propTypes, S> {
 					<div
 						className="tabs-button"
 						style={{ marginTop: "10px", marginBottom: "10px" }}
-						onClick={() => this.onSendCode()}>
+						onClick={() => this.SendAuthSms()}>
 						Send Code
 					</div>
 				}
@@ -88,19 +109,23 @@ class Login extends Component<propTypes, S> {
 							style={{ marginTop: "10px", marginBottom: "10px" }}
 							onClick={() => this.verifyToken()}>
 							Enter Code
-					</div>
+						</div>
+						<div className="subtitle">
+							Did not get the sms ? <span style={{ cursor: "pointer", textDecoration: "underline", color: "#1BB4BB" }} onClick={() => this.SendAuthSms()}>Send Again</span>
+						</div>
 					</>
 				}
 
 				<div className="subtitle">
-					New to IlmExchange ? <Link to="/sign-up" >Sign-Up</Link>
+					New to IlmExchange ? <Link to="/sign-up"> Sign-Up </Link>
 				</div>
 			</div>
 		</div>
 	}
 }
 export default connect((state: RootReducerState) => ({
-	sent: state.auth.sms_sent
+	sent: state.auth.sms_sent,
+	token: state.auth.token
 }), (dispatch: Function) => ({
 	sendAuthSms: (phone: string) => dispatch(SMSAuth(phone)),
 	verify: (token: string) => dispatch(verifyUrlAuth(token))

@@ -16,6 +16,17 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 				}
 			}
 
+		case "SENDING_AUTH_SMS":
+			{
+				return {
+					...state,
+					auth: {
+						...state.auth,
+						sms_sent: false
+					}
+				}
+			}
+
 		case "SMS_SENT":
 			{
 				return {
