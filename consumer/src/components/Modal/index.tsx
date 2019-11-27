@@ -1,11 +1,12 @@
 import { createPortal } from 'react-dom'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
 export default ({ children }: any) => {
-	const [el, setEl] = useState(document.getElementById('modal') as HTMLElement)
-
 	useEffect(() => {
+		//@ts-ignore
+		const el: HTMLElement = document.getElementById('modal')
 		el.setAttribute("class", "modal-active")
+
 		return () => {
 			el.removeAttribute("class")
 		}
