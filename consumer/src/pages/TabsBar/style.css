@@ -131,6 +131,32 @@
 		font-size: 18px;
 	 }
 
+	.modal-active {
+		position: fixed;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		z-index: 999999;
+		background-color: rgba(0,0,0,0.4);
+	}
+
+	.modal-box {
+		border: 5px solid #1BB4B8;
+		position: fixed;
+		z-index: 1;
+		padding: 20px;
+		background-color: #ffffff;
+		border-radius: 5px;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		width: 80%;
+		height: fit-content;
+		margin: auto;
+		animation: fadeIn 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+	}
 
 
 	@media only screen and (max-width: 768px) {
