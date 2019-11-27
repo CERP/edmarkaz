@@ -40,6 +40,7 @@ class ProductPage extends React.Component<P, S> {
 		const product_id = this.props.match.params.product_id;
 
 		const product = this.props.products[product_id]
+		const supplier_name = product.supplier_profile.name
 
 		if (product === undefined) {
 			return <div className="product-page page">Loading product {product_id}...</div>
@@ -50,7 +51,7 @@ class ProductPage extends React.Component<P, S> {
 			<img src={product.image && product.image.url} className="item-image" alt="Product" />
 			<div className="item-info">
 				<div className="title">{product.title}</div>
-				<div className="subtitle">{product.supplier_id}</div>
+				<div className="subtitle">{supplier_name}</div>
 				<div className="heading">{product.price}</div>
 			</div>
 
