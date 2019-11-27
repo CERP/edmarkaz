@@ -28,7 +28,8 @@ export const loadAuth = (): RootReducerState['auth'] => {
 	const init_auth: RootReducerState['auth'] = {
 		id: undefined,
 		token: undefined,
-		client_type: "consumer"
+		client_type: "consumer",
+		sms_sent: false
 	};
 
 	try {
@@ -72,7 +73,10 @@ const loadProducts = () => {
 }
 
 export const saveAuth = (auth: RootReducerState['auth']) => {
-	localStorage.setItem("auth", JSON.stringify(auth))
+	localStorage.setItem("auth", JSON.stringify({
+		...auth,
+		sms_sent: false
+	}))
 }
 
 const loadClientId = () => {
