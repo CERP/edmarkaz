@@ -43,8 +43,10 @@ class Login extends Component<propTypes, S> {
 		const { phone } = this.state
 
 		if (phone.trim().length !== 11) {
-			window.alert("Please enter a valid mobile number")
-			return
+			return window.alert("Please enter a valid mobile number")
+		}
+		if (!phone.startsWith("03")) {
+			return alert("phone number must start with 03")
 		}
 
 		this.props.sendAuthSms(this.state.phone)
@@ -67,7 +69,7 @@ class Login extends Component<propTypes, S> {
 		if (this.props.token) {
 			setTimeout(() => {
 				window.location.replace("/")
-			}, 1000);
+			}, 700);
 		}
 
 		return <div className="login-page">
@@ -97,11 +99,11 @@ class Login extends Component<propTypes, S> {
 				{
 					this.props.sent && <>
 						<div className="row">
-							<div className="subtitle"> Enter 4-digit Code </div>
+							<div className="subtitle"> Enter 5-digit Code that has been sent to your phone </div>
 							<input
 								type="tel"
 								{...this.former.super_handle(["code"])}
-								placeholder="eg 0331 234567" />
+								placeholder="eg 12345" />
 						</div>
 
 						<div

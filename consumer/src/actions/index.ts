@@ -31,6 +31,11 @@ export const createLogin = (username: string, password: string, number: string) 
 export const SMSAuth = (phone: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 	const state = getState()
 
+	if (!state.connected) {
+		setTimeout(() => dispatch(SMSAuth(phone)), 2000)
+		return
+	}
+
 	dispatch({
 		type: "SENDING_AUTH_SMS"
 	})

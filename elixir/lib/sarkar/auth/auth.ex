@@ -79,8 +79,9 @@ defmodule EdMarkaz.Auth do
 	def gen_onetime_token(id) do
 
 		token = Enum.random(10000..99999)
+			|> to_string
 
-		case Postgrex.query(EdMarkaz.DB, "INSERT INTO one_time_tokens (id, token) values ($1, $2)", [id, hash(to_string(token), 12)]) do
+		case Postgrex.query(EdMarkaz.DB, "INSERT INTO one_time_tokens (id, token) values ($1, $2)", [id, hash(token, 12)]) do
 			{:ok, res} -> {:ok, token}
 			{:error, err} ->
 				IO.inspect err

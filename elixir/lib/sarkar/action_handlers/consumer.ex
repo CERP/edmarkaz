@@ -14,9 +14,14 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 				{:ok, school_id, profile} ->
 					refcode = Map.get(profile, "refcode")
 					{:ok, one_token} = EdMarkaz.Auth.gen_onetime_token(refcode)
-					res = EdMarkaz.Contegris.send_sms(phone, "Click here to login https://ilmexchange.com/auth/#{one_token} \nOr enter code #{one_token}")
 
-					{:reply, succeed(), state}
+					case EdMarkaz.Contegris.send_sms(phone, "Click here to login https://ilmexchange.com/auth/#{one_token} \nOr enter code #{one_token}") do
+						{:ok, res} ->
+							{:reply, succeed(res), state}
+						{:error, msg} ->
+							IO.inspect msg
+							{:reply, fail(msg), state}
+					end
 				{:error, msg} ->
 					{:reply, fail(msg), state}
 				end
