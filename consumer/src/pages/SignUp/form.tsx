@@ -30,7 +30,7 @@ export const SchoolForm: React.SFC<SchoolProp> = ({ school, former, base_path })
 				<div className="row-row">
 					<div className="row">
 						<label>District</label>
-						<select {...former.super_handle(["school", "school_district"])}>
+						<select {...former.super_handle([...base_path, "school_district"])}>
 							<option value="">Select a District</option>
 							<option value="LAHORE">Lahore</option>
 							<option value="SHEIKHUPURA">Sheikhupura</option>
@@ -40,7 +40,7 @@ export const SchoolForm: React.SFC<SchoolProp> = ({ school, former, base_path })
 
 					<div className="row">
 						<label>Tehsil</label>
-						<select {...former.super_handle(["school", "school_tehsil"])}>
+						<select {...former.super_handle([...base_path, "school_tehsil"])}>
 							<option value="">Select a Location</option>
 							{
 								school && school.school_district === "LAHORE" && <>

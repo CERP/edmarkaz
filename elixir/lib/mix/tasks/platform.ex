@@ -203,7 +203,15 @@ defmodule Mix.Tasks.Platform do
 						IO.puts "has url"
 						IO.inspect picture_url
 
-						img_url = Sarkar.Storage.Google.upload_image_from_url("ilmx-product-images", picture_url)
+						img_url = try do
+							Sarkar.Storage.Google.upload_image_from_url("ilmx-product-images", picture_url)
+						rescue
+							error ->
+								IO.puts "error uploading img"
+								IO.inspect error
+								nil
+						end
+
 						product = %{
 							"id" => pid,
 							"supplier_id" => sid,

@@ -45,6 +45,8 @@ class Profile extends React.Component<P, S> {
 
 	render() {
 
+		console.log("PROFILE", this.state.profile)
+
 		return <div className="user-profile">
 			<SchoolForm school={this.state.profile} former={this.former} base_path={["profile"]} />
 			<div className="tabs-button red" onClick={this.onLogout}>Logout</div>
