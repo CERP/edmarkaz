@@ -19,11 +19,11 @@ defmodule EdMarkaz.Contegris do
 		}
 
 		case post("sendSMS", encoded) do
-			{:ok, res} -> res.body
+			{:ok, res} -> {:ok, res.body}
 			{:error, err} ->
 				IO.puts "SEND SMS ERROR to #{number}"
 				IO.inspect text
-				err
+				{:error, err}
 		end
 	end
 
