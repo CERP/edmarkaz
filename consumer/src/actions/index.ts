@@ -28,6 +28,37 @@ export const createLogin = (username: string, password: string, number: string) 
 
 }
 
+export const SMSAuth = (phone: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+	const state = getState()
+
+	if (!state.connected) {
+		setTimeout(() => dispatch(SMSAuth(phone)), 2000)
+		return
+	}
+
+	dispatch({
+		type: "SENDING_AUTH_SMS"
+	})
+
+	syncr.send({
+		type: "SMS_AUTH_CODE",
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		id: state.auth.id,
+		payload: {
+			phone
+		}
+	})
+		.then(res => {
+			dispatch({
+				type: "SMS_SENT"
+			})
+		})
+		.catch(err => {
+			window.alert(err)
+		})
+}
+
 export const verifyUrlAuth = (token: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 
 	const state = getState();
@@ -45,7 +76,7 @@ export const verifyUrlAuth = (token: string) => (dispatch: Dispatch, getState: G
 			token
 		}
 	})
-		.then((res: { id: string, token: string, sync_state: SyncState }) => {
+		.then((res: { id: string; token: string; sync_state: SyncState }) => {
 			dispatch(createLoginSucceed(res.id, res.token, res.sync_state))
 		})
 		.catch(res => {

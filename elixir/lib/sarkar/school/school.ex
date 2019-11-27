@@ -4,6 +4,7 @@ defmodule EdMarkaz.School do
 
 		{:ok, resp} = Postgrex.query(EdMarkaz.DB, "SELECT id, db->>'school_name', db FROM platform_schools WHERE
 			concat('0', db->>'phone_number') = $1 OR
+			db->>'phone_number'=$1 OR
 			db->>'phone_number_1'=$1 OR
 			db->>'phone_number_2'=$1 OR
 			db->>'phone_number_3'=$1 OR

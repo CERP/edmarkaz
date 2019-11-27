@@ -22,19 +22,19 @@ interface Product {
 	tags: {
 		[tag: string]: boolean;
 	};
-	categories: { string: boolean }
+	categories: { string: boolean };
 	supplier_profile: {
-		name: string
-		description: string
+		name: string;
+		description: string;
 		logo?: {
-			id: string,
-			url: string
-		}
+			id: string;
+			url: string;
+		};
 		banner?: {
-			id: string,
-			url: string
-		}
-	}
+			id: string;
+			url: string;
+		};
+	};
 }
 
 interface RootReducerState {
@@ -43,6 +43,7 @@ interface RootReducerState {
 		id?: string;
 		token?: string;
 		client_type: "consumer";
+		sms_sent: boolean;
 	};
 	products: {
 		last_sync: number;
