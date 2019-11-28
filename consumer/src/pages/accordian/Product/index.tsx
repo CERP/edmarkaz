@@ -3,11 +3,12 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { Link } from 'react-router-dom'
 import { getProducts, placeOrder } from '../../../actions';
+import Modal from "../../../components/Modal";
 
 import './style.css'
 
 interface S {
-
+	showModal: boolean;
 }
 
 interface RouteInfo {
@@ -25,6 +26,15 @@ type P = {
 
 class ProductPage extends React.Component<P, S> {
 
+	constructor(props: P) {
+		super(props)
+
+		this.state = {
+			showModal: false
+		}
+	}
+
+
 	componentDidMount() {
 		this.props.getProducts()
 	}
@@ -32,8 +42,18 @@ class ProductPage extends React.Component<P, S> {
 	onOrder = () => {
 		// dispatch onOrder action
 		const product_id = this.props.match.params.product_id;
-		this.props.placeOrder(this.props.products[product_id])
 
+		this.setState({
+			showModal: true
+		})
+
+		this.props.placeOrder(this.props.products[product_id])
+	}
+
+	closeModal = () => {
+		this.setState({
+			showModal: false
+		})
 	}
 
 	render() {
@@ -47,6 +67,21 @@ class ProductPage extends React.Component<P, S> {
 		}
 
 		return <div className="item-page">
+
+			{this.state.showModal && <Modal>
+				<div className="modal-box">
+
+					<div className="title">Congratulations</div>
+					<div className="subtitle" style={{ margin: "10px 0px" }}>
+						Our Reperesenative will soon contact you with further information.
+					</div>
+
+					<div className="button save" onClick={() => this.closeModal()}>
+						Great
+					</div>
+				</div>
+			</Modal>}
+
 
 			<img src={product.image && product.image.url} className="item-image" alt="Product" />
 			<div className="item-info">
