@@ -9,11 +9,11 @@ defmodule EdMarkaz.Product do
 		case Postgrex.query(
 			EdMarkaz.DB,
 			"INSERT INTO products (id, supplier_id, product) VALUES ($1, $2, $3)
-			ON CONFLICT (id) DO UPDATE SET product=$3, sync_time=current_timestamp",
-			[id, supplier_id, product]) do 
+			ON CONFLICT (id) DO UPDATE SET product=$3, supplier_id=$2, sync_time=current_timestamp",
+			[id, supplier_id, product]) do
 
 				{:ok, resp} -> {:ok}
-				{:error, err} -> 
+				{:error, err} ->
 					IO.puts "product merge failed"
 					IO.inspect err
 					{:error, err}
@@ -30,7 +30,7 @@ defmodule EdMarkaz.Product do
 			WHERE id=$2", [img_url, id]
 		) do
 			{:ok, resp} -> {:ok}
-			{:error, err} -> 
+			{:error, err} ->
 				IO.puts "product img update failed"
 				IO.inspect err
 				{:error, err}
@@ -38,7 +38,7 @@ defmodule EdMarkaz.Product do
 	end
 
 	# this is going to need to handle merges and syncing
-	# because call center and consumer can both modify this, which then has to be sent to the 
+	# because call center and consumer can both modify this, which then has to be sent to the
 	# supplier site.
 
 	# now working in an application that requires that a client subscribe to multiple sync_states / paths

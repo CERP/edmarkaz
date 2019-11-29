@@ -32,6 +32,7 @@ class SupplierHomePage extends React.Component<P, S>{
 
 		const products = Object.entries(this.props.products)
 			.filter(([k, v]) => v.supplier_id === supplier_id && !v.deleted)
+			.sort(([, p1], [, p2]) => (p1.order || 9999) - (p2.order || 9999))
 
 		const { banner, logo, name, description } = products[0][1].supplier_profile
 

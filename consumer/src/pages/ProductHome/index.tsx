@@ -54,9 +54,9 @@ class LoggedOutHome extends React.Component<P, S> {
 		}
 
 		// create { [category]: { supplier_id: profile }}
-		Object.values(this.props.products).forEach(p => {
+		Object.entries(this.props.products).forEach(([pid, p]) => {
 
-			if (p.categories && p.supplier_profile) {
+			if (pid && p.categories && p.supplier_profile && !p.deleted) {
 
 				Object.keys(p.categories).forEach(category => {
 
@@ -96,6 +96,7 @@ class LoggedOutHome extends React.Component<P, S> {
 								<div className="items">
 									{
 										Object.entries(suppliers)
+											.sort(([, s1], [, s2]) => (s1.order || 9999) - (s2.order || 9999))
 											.map(([sid, profile]) => <Link className="item-card" to={`/supplier/${sid}`} key={`${category}-${sid}`}>
 												<div style={{ backgroundImage: `url(${profile.logo && profile.logo.url})` }} className="item-image" />
 												<div className="subtitle">{profile.name}</div>

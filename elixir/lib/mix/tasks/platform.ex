@@ -105,21 +105,27 @@ defmodule Mix.Tasks.Platform do
 
 		# create login if doesnt exist (silent error)
 		suppliers
-		|> Enum.each(fn [id, _name, _description, _logo_url, _banner_url, password] ->
+		|> Enum.each(fn [id, _name, _description, _logo_url, _banner_url, password | _rest] ->
 			if password != "" do
 				EdMarkaz.Auth.create({ id, password })
 			end
 		end)
 
 		tasks = suppliers
-		|> Enum.map(fn [id, name, description, logo_url, banner_url, password] ->
+		|> Enum.map(fn [id, name, description, logo_url, banner_url, password, order] ->
+
+			order = if order == "" do
+				nil
+			end
+
 			Task.async fn ->
 				start_supplier(id)
 				case logo_url do
 					"" ->
 						EdMarkaz.Supplier.save_profile(id, %{
 							"description" => description,
-							"name" => name
+							"name" => name,
+							"order" => order
 						})
 
 					has_url ->
@@ -137,7 +143,8 @@ defmodule Mix.Tasks.Platform do
 								"banner" => %{
 									"id" => banner_url,
 									"url" => new_banner_url
-								}
+								},
+								"order" => order
 							})
 						else
 							EdMarkaz.Supplier.save_profile(id, %{
@@ -146,7 +153,8 @@ defmodule Mix.Tasks.Platform do
 								"logo" => %{
 									"id" => logo_url,
 									"url" => new_logo_url
-								}
+								},
+								"order" => order
 							})
 						end
 				end
@@ -170,15 +178,27 @@ defmodule Mix.Tasks.Platform do
 		# loop through the csv, add products to table
 		# we don't have ID's for the product...
 		# loop through the csv
-		# schema: supplier_id, product_id, product_name, price, description, category, picture_url
+		# schema: supplier_id, product_id, product_name, price, description, category, picture_url, order
 
-		# before doing all this, need to init the suppliers
 
 		[_ | products] = csv
 		|> Enum.map(fn row -> row end)
 
+		# first mark as deleted all products that no longer exist (use sid, pid combo)
+		pids = products
+			|> Enum.map(fn [_, pid | _rest] -> "'#{pid}'" end)
+			|> Enum.join(",")
+
+		res = Postgrex.query(EdMarkaz.DB, "
+			UPDATE products
+			SET product=jsonb_set(product, '{deleted}'::text[], to_jsonb(true), true)
+			WHERE id not in (#{pids}) and length(id) != 36
+			RETURNING i
+			d
+			", [])
+
 		tasks = products
-		|> Enum.map(fn [sid, pid, name, price, desc, category, picture_url | _] ->
+		|> Enum.map(fn [sid, pid, name, price, desc, category, picture_url, order | _] ->
 			# Task.async fn ->
 
 				case picture_url do
@@ -195,7 +215,8 @@ defmodule Mix.Tasks.Platform do
 							"price" => price,
 							"categories" => %{
 								category => true
-							}
+							},
+							"order" => order
 						}
 
 						EdMarkaz.Product.merge(pid, product, sid)
@@ -223,7 +244,8 @@ defmodule Mix.Tasks.Platform do
 							"image" => %{
 								"id" => picture_url,
 								"url" => img_url
-							}
+							},
+							"order" => order
 						}
 
 						EdMarkaz.Product.merge(pid, product, sid)
