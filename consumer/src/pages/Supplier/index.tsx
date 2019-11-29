@@ -60,6 +60,7 @@ class SupplierHomePage extends React.Component<P, S>{
 							products.map(([k, p]) => <Link className="item-card" to={`/supplier/${supplier_id}/${p.id}`} key={k}>
 								<div className="item-image" style={{ backgroundImage: `url(${p.image && p.image.url})` }} />
 								<div className="subtitle">{p.title}</div>
+								<div>{p.price}</div>
 							</Link>)
 						}
 					</div>
