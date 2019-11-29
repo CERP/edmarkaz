@@ -1,15 +1,20 @@
-.supplier-logo {
-	border-radius: 5px;
-	box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-	min-width: 150px;
-	max-width: 150px;
+
+.supp-logo-container {
+	width: 150px;
 	height: 150px;
-	background-color: #fff;
-	margin-right: 20px;
-	transform: translate(20px, 220px);
-	background-size: cover;
-	background-repeat: no-repeat;
+	transform: translate(20px,220px);
+	background: #fff;
+	align-items: center;
+	display: flex;
+	box-shadow: 0 4px 8px rgba(0,0,0,.1);
+	border-radius: 5px;
 }
+	.supplier-logo {
+		background-size: cover;
+		background-repeat: no-repeat;
+		width: 100%;
+		max-height: 100%;
+	}
 
 .supplier-desc {
 	flex-direction: column;

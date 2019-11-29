@@ -41,7 +41,9 @@ class SupplierHomePage extends React.Component<P, S>{
 				backgroundImage: `url(${banner && banner.url})`,
 				height: "300px"
 			}}>
-				<img className="supplier-logo" src={logo && logo.url} />
+				<div className="supp-logo-container">
+					<img className="supplier-logo" src={logo && logo.url} />
+				</div>
 			</div>
 			<div className="tabs-home">
 				<div className="supplier-info">
