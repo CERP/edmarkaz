@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom';
 import Arrow from '../../icons/arrow.svg'
 import { getProducts } from '../../actions';
+import banner from './Banner.png'
 
 import './style.css'
 
@@ -81,7 +82,7 @@ class LoggedOutHome extends React.Component<P, S> {
 			.sort(([c1,], [c2,]) => getCategoryOrder(c1) - getCategoryOrder(c2))
 
 		return <div className="products">
-			<div className="tabs-banner" style={{ height: "300px" }}></div>
+			<img className="tabs-banner" src={banner} />
 			<div className="tabs-home">
 
 				{
