@@ -104,6 +104,19 @@
 	 overflow: auto;
  }
 
+ 	.item-row .title-row {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+	 }
+
+	 .item-row .title-row .arrow-icon {
+		background-repeat:no-repeat;
+		width: 15px;
+		height: auto;
+	 }
+
  .item-row .item-card {
 
 	display: flex;

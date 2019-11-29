@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom';
-
+import Arrow from '../../icons/arrow.svg'
 import { getProducts } from '../../actions';
 
 import './style.css'
@@ -89,7 +89,10 @@ class LoggedOutHome extends React.Component<P, S> {
 						.map(([category, suppliers]) => {
 
 							return <div className="item-row" key={category}>
-								<div className="title">{category}</div>
+								<div className="title-row" >
+									<div className="title">{category}</div>
+									<img className="arrow-icon" src={Arrow} alt="arrow" />
+								</div>
 								<div className="items">
 									{
 										Object.entries(suppliers)

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { RouteComponentProps, Route } from 'react-router'
-
+import Arrow from '../../icons/arrow.svg'
 import Purpose from './topics/purpose'
 import makes_school_great from './topics/makes_school_great'
 import prepare_students from './topics/prepare_students'
@@ -28,7 +28,10 @@ export default (props: P) => {
 		<div className="tabs-home">
 
 			<div className="item-row">
-				<div className="title">What is our Purpose as Educators?</div>
+				<div className="title-row">
+					<div className="title">What is our Purpose as Educators?</div>
+					<img className="arrow-icon" src={Arrow} alt="arrow" />
+				</div>
 
 				<div className="items">
 					<Link className="item-card" to={`/articles/purpose`}>
@@ -46,7 +49,10 @@ export default (props: P) => {
 				</div>
 			</div>
 			<div className="item-row">
-				<div className="title">Tools for School Leaders</div>
+				<div className="title-row">
+					<div className="title">Tools for School Leaders</div>
+					<img className="arrow-icon" src={Arrow} alt="arrow" />
+				</div>
 
 				<div className="items">
 					<Link className="item-card" to={`/articles/leaders_make_great`}>
