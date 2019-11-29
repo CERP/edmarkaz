@@ -116,6 +116,8 @@ defmodule Mix.Tasks.Platform do
 
 			order = if order == "" do
 				nil
+			else
+				order
 			end
 
 			Task.async fn ->
