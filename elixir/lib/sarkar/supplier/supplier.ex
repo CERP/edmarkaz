@@ -17,7 +17,7 @@ defmodule EdMarkaz.Supplier do
 			name: {:via, Registry, {EdMarkaz.SupplierRegistry, id}})
 	end
 
-	# API 
+	# API
 
 	def sync_changes(id, client_id, changes, last_sync_date) do
 		GenServer.call(via(id), {:sync_changes, client_id, changes, last_sync_date}, 60000)
@@ -73,7 +73,7 @@ defmodule EdMarkaz.Supplier do
 
 		case available_numbers do
 			[] -> {:error, "No numbers available"}
-			_ -> 
+			_ ->
 				num = Enum.random(available_numbers)
 				writes = [
 					%{
@@ -216,7 +216,7 @@ defmodule EdMarkaz.Supplier do
 
 		# takes an array of changes which are %{ type: "MERGE" | "DELETE", path: [], value: any} and generates the map needed for sync_changes
 
-		changes 
+		changes
 		|> Enum.map(fn %{type: type, path: path, value: value} -> {
 			Enum.join(path, ","), %{
 				"action" => %{
@@ -235,7 +235,7 @@ defmodule EdMarkaz.Supplier do
 		sync_state = EdMarkaz.Supplier.get_sync_state(id)
 
 		history = Dynamic.get(sync_state, ["matches", school_id, "history"])
-		# get the latest call_start or call_end event 
+		# get the latest call_start or call_end event
 		{_, %{"user" => %{"number" => number}}} = history
 			|> Enum.filter(fn {_, %{"event" => event}} -> event == "CALL_START" end)
 			|> Enum.sort(fn( {t1 , _}, {t2, _} ) -> t1 > t2 end)
@@ -259,7 +259,7 @@ defmodule EdMarkaz.Supplier do
 					"name" => Dynamic.get(sync_state, ["numbers", caller_id, "name"])
 				}
 			}
-			other -> 
+			other ->
 				%{
 					"event" => event_type,
 					"time" => time,
@@ -310,9 +310,9 @@ defmodule EdMarkaz.Supplier do
 		# This is happening way more than expected. It should only happen for very out of date clients - which should not be the case in 1 day and no GC
 		min_write_date = if writes != %{} do
 
-			{_, %{"date" => mwd }} = writes 
+			{_, %{"date" => mwd }} = writes
 				|> Enum.min_by(fn {path_string, %{"date" => path_date}} -> path_date end)
-			
+
 			mwd
 		end
 
@@ -320,11 +320,11 @@ defmodule EdMarkaz.Supplier do
 
 		writes = if not have_all_in_memory? do
 				case EdMarkaz.Store.Supplier.get_writes(id, last_sync_date) do
-					{:ok, aug_writes} -> 
+					{:ok, aug_writes} ->
 						# whats in aug_writes that isnt in writes??
 						IO.puts "SUCCESSFUL DB RECOVERY @ #{:os.system_time(:millisecond)}. last_sync_date: #{last_sync_date} min_write_date: #{min_write_date}"
 						aug_writes
-					{:error, err} -> 
+					{:error, err} ->
 						IO.puts "ERROR ON DB RECOVERY"
 						IO.inspect err
 						writes
@@ -338,8 +338,8 @@ defmodule EdMarkaz.Supplier do
 		{nextSyncState, nextWrites, new_writes, last_date} = changes
 		|> Enum.sort(fn({ _, %{"date" => d1}}, {_, %{"date" => d2}}) -> d1 < d2 end)
 		|> Enum.reduce(
-			{sync_state, writes, %{}, 0}, 
-			fn({path_key, payload}, {agg_sync_state, agg_writes, agg_new_writes, max_date}) -> 
+			{sync_state, writes, %{}, 0},
+			fn({path_key, payload}, {agg_sync_state, agg_writes, agg_new_writes, max_date}) ->
 
 				%{
 					"action" => %{
@@ -364,7 +364,7 @@ defmodule EdMarkaz.Supplier do
 				case type do
 					"MERGE" ->
 						case Map.get(agg_writes, p_key) do
-							nil -> 
+							nil ->
 								{
 									Dynamic.put(agg_sync_state, p, value),
 									Map.put(agg_writes, p_key, write),
@@ -387,7 +387,7 @@ defmodule EdMarkaz.Supplier do
 									agg_new_writes,
 									max_date
 								}
-							other -> 
+							other ->
 								IO.puts "OTHER!!!!!!!!!!!!!"
 								IO.inspect other
 								{
@@ -398,9 +398,9 @@ defmodule EdMarkaz.Supplier do
 								}
 						end
 
-					"DELETE" -> 
+					"DELETE" ->
 						case Map.get(agg_writes, p_key) do
-							nil -> 
+							nil ->
 								{
 									Dynamic.delete(agg_sync_state, p),
 									Map.put(agg_writes, p_key, write),
@@ -431,7 +431,7 @@ defmodule EdMarkaz.Supplier do
 									max(date, max_date)
 								}
 						end
-					other -> 
+					other ->
 						IO.puts "unrecognized type"
 						{agg_sync_state, max_date}
 				end
@@ -439,24 +439,24 @@ defmodule EdMarkaz.Supplier do
 
 		# at this point we need to send the new snapshot to all clients that are up to date.
 
-		# each client has sent its "last received data" date. 
+		# each client has sent its "last received data" date.
 		# when it connects, we should send all the latest writes that have happened since then, not the full db.
 		# get that data for it here.
 
 		relevant = nextWrites
-					|> Enum.filter(fn {path_string, %{"date" => path_date, "client_id" => cid }} -> 
+					|> Enum.filter(fn {path_string, %{"date" => path_date, "client_id" => cid }} ->
 
-						old = path_date > last_sync_date and not Map.has_key?(new_writes, path_string) 
+						old = path_date > last_sync_date and not Map.has_key?(new_writes, path_string)
 						new = old and cid != client_id
 
 						old and new
 					end)
 					|> Enum.into(%{})
-		
+
 		case map_size(new_writes) do
 			# 0 -> {:reply, confirm_sync(last_date, nextDb), {school_id, nextWrites, nextDb}}
 			0 -> {:reply, confirm_sync_diff(last_date, relevant), {id, nextWrites, nextSyncState}}
-			_ -> 
+			_ ->
 				#broadcast(school_id, client_id, snapshot(nextDb))
 				broadcast(id, client_id, snapshot_diff(new_writes))
 				EdMarkaz.Store.Supplier.save(id, nextSyncState, new_writes)
@@ -470,7 +470,7 @@ defmodule EdMarkaz.Supplier do
 		{:reply, sync_state, state}
 	end
 
-	def handle_call(a, b, c) do 
+	def handle_call(a, b, c) do
 		IO.inspect a
 		IO.inspect b
 		IO.inspect c

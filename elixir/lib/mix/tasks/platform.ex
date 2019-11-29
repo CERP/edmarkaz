@@ -121,7 +121,8 @@ defmodule Mix.Tasks.Platform do
 			end
 
 			Task.async fn ->
-				start_supplier(id)
+				res = start_supplier(id)
+				IO.inspect res
 				case logo_url do
 					"" ->
 						EdMarkaz.Supplier.save_profile(id, %{

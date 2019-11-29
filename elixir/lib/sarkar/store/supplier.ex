@@ -22,7 +22,7 @@ defmodule EdMarkaz.Store.Supplier do
 	end
 
 	def load(id) do
-		GenServer.call(:supplier_db, {:load, id})
+		GenServer.call(:supplier_db, {:load, id}, 60000)
 	end
 
 	def get_ids() do
