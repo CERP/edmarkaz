@@ -42,17 +42,19 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 			VALUES ($1, $2)
 			ON CONFLICT (id) DO UPDATE set db=excluded.db", [refcode, profile])
 
-		{:ok, text} = EdMarkaz.Auth.create({number, password})
-		{:ok, token} = EdMarkaz.Auth.login({number, client_id, password})
+		case EdMarkaz.Auth.create({ number, password }) do
+			{:ok, text} ->
+				{:ok, token} = EdMarkaz.Auth.login({number, client_id, password})
+				{:ok, one_token} = EdMarkaz.Auth.gen_onetime_token(refcode)
 
-		{:ok, one_token} = EdMarkaz.Auth.gen_onetime_token(refcode)
-
-		spawn fn ->
-			res = EdMarkaz.Contegris.send_sms(number, "Welcome to ilmExchange. Please go here to login https://ilmexchange.com/auth/#{one_token}")
-			IO.inspect res
+				spawn fn ->
+					res = EdMarkaz.Contegris.send_sms(number, "Welcome to ilmExchange. Please go here to login https://ilmexchange.com/auth/#{one_token}")
+					IO.inspect res
+				end
+				{:reply, succeed(%{token: token}), %{id: number, client_id: client_id}}
+			{:error, msg} ->
+				{:reply, fail(msg), state}
 		end
-
-		{:reply, succeed(%{token: token}), %{id: number, client_id: client_id}}
 	end
 
 	def handle_action(%{"type" => "URL_AUTH", "client_id" => client_id, "payload" => %{"token" => token} }, state) do

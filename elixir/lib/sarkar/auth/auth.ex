@@ -6,6 +6,13 @@ defmodule EdMarkaz.Auth do
 			[id, hash(password, 52)]) do
 				{:ok, res} ->
 					{:ok, "created #{id} with password #{password}"}
+				{:error, %Postgrex.Error{
+					postgres: %{
+						constraint: "auth_id_key"
+					}}} ->
+						IO.puts "already exists"
+						{:error, "id #{id} is already created"}
+
 				{:error, err} ->
 					IO.inspect err
 					{:error, "creation failed"}

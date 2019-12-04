@@ -188,6 +188,7 @@ export const signUp = (number: string, password: string, profile: Partial<CERPSc
 		})
 		.catch(err => {
 			console.error(err)
+			alert(err)
 
 			// dispatch sign-up failed (phone number not unique?)
 		})
