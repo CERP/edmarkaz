@@ -47,8 +47,10 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 
 		{:ok, one_token} = EdMarkaz.Auth.gen_onetime_token(refcode)
 
-		res = EdMarkaz.Contegris.send_sms(number, "Welcome to ilmExchange. Please go here to login https://ilmexchange.com/auth/#{one_token}")
-		IO.inspect res
+		spawn fn ->
+			res = EdMarkaz.Contegris.send_sms(number, "Welcome to ilmExchange. Please go here to login https://ilmexchange.com/auth/#{one_token}")
+			IO.inspect res
+		end
 
 		{:reply, succeed(%{token: token}), %{id: number, client_id: client_id}}
 	end

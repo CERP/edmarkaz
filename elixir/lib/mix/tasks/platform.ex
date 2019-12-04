@@ -196,9 +196,10 @@ defmodule Mix.Tasks.Platform do
 			UPDATE products
 			SET product=jsonb_set(product, '{deleted}'::text[], to_jsonb(true), true)
 			WHERE id not in (#{pids}) and length(id) != 36
-			RETURNING i
-			d
+			RETURNING id
 			", [])
+
+		IO.inspect res
 
 		tasks = products
 		|> Enum.map(fn [sid, pid, name, price, desc, category, picture_url, order | _] ->
