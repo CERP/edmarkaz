@@ -13,7 +13,7 @@ import ErrorComponent from "../../components/Error";
 import { submitError } from "../../actions/core";
 import { connect } from "react-redux";
 import Help from "../Help";
-
+import contactUs from '../../icons/contactUs.svg'
 import "./style.css";
 import login from "../SignUp/login";
 
@@ -24,6 +24,7 @@ interface S {
 }
 
 interface P {
+	connected: boolean;
 	sendError: (err: Error, errInfo: React.ErrorInfo) => void;
 }
 
@@ -62,6 +63,9 @@ class TabsBar extends Component<propTypes, S> {
 			);
 		}
 
+		const callLink = this.props.connected ?
+			"https://api.whatsapp.com/send?phone=923481119119" : "tel:0348-1119-119"
+
 		return (
 			<div className="tabs-page">
 				<Header path={current} />
@@ -91,12 +95,18 @@ class TabsBar extends Component<propTypes, S> {
 					<Route exact path="/articles" component={Articles} />
 					<Route path="/help" component={Help} />
 				</>
+				<a className="contact-us" href={callLink}>
+					<img src={contactUs} />
+					<div className="title">Contact-Us</div>
+				</a>
 			</div>
 		);
 	}
 }
 export default connect(
-	(state: RootReducerState) => ({}),
+	(state: RootReducerState) => ({
+		connected: state.connected
+	}),
 	(dispatch: Function) => ({
 		sendError: (err: Error, errInfo: React.ErrorInfo) =>
 			dispatch(submitError(err, errInfo))

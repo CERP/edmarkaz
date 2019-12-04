@@ -171,6 +171,27 @@
 		animation: fadeIn 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
 	}
 
+	.tabs-page .contact-us {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+		position: fixed;
+		background-color: var(--blue);
+		padding: 15px 15px;
+		z-index: 1;
+		bottom: 20px;
+		right: 10px;
+		border-radius: 50px;
+		box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.3  );
+		color: #ffffff;
+		text-decoration: none;
+	}
+		.contact-us .title{
+			color: #ffffff;
+			margin-left: 5px;
+		}
+
 
 	@media only screen and (max-width: 768px) {
 		.tabs-home .item-row {
@@ -196,4 +217,7 @@
 				text-decoration: none;
 				color: #000000;
 			}
+		.tabs-page .contact-us {
+			padding: 5px 15px;
+		}
 	}
