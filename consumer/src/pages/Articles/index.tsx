@@ -23,7 +23,9 @@ export default (props: P) => {
 
 	return <div className="articles">
 
-		<img className="tabs-banner" src={banner} />
+		<div className="tabs-banner">
+			<img className="banner-img" src={banner} />
+		</div>
 
 		<div className="tabs-home">
 

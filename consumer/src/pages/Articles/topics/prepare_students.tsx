@@ -4,17 +4,19 @@ import '../style.css'
 // eslint-disable-next-line react/display-name
 export default () => <div>
 
-	<img
-		className="tabs-banner"
-		src="https://lh5.googleusercontent.com/l3QVeNyXAS6j4t5Z1uAnNlCmqmcv74ZpafoVNqFf8x5L2LEx620QinO6NGcJwe7IiX0M4SPf0ZvqGjKmAXq_ZxZJTp9UlJhusd23AL37Fz7X0_w8Q-lGQBrweIKBy_8EWGWO_YIy"
-	/>
+	<div className="tabs-banner">
+		<img
+			className="banner-img"
+			src="https://lh5.googleusercontent.com/l3QVeNyXAS6j4t5Z1uAnNlCmqmcv74ZpafoVNqFf8x5L2LEx620QinO6NGcJwe7IiX0M4SPf0ZvqGjKmAXq_ZxZJTp9UlJhusd23AL37Fz7X0_w8Q-lGQBrweIKBy_8EWGWO_YIy"
+		/>
+	</div>
 	<div className="article-page">
 
 		<h1>How Can we Prepare Students for the Future? </h1>
 
 		<p>The world is changing everyday, faster than ever before. As a result, we need to preparing our children for a future that we may not even be able to predict. They will need skills that will equip them for life in the 21st century, commonly referred to as “21st-Century Skills”.</p>
 		<p>Sadly, most of our schools are not teaching these skills. Of the 16 skills in the diagram below, most schools in Pakistan only cover the first three: literacy (English & Urdu), numeracy (Math), and scientific literacy (Science). But there are 13 other critical skills that we need to start teaching our children. </p>
-		
+
 		<div className="urdu">
 			<h1>ایسی مہارتیں جن کی مستقبل میں ضرورت ہے</h1>
 
@@ -24,7 +26,7 @@ export default () => <div>
 
 		<h3> Functional Literacies <span className="urdu">(فنکشنل خواندگی)</span> </h3>
 
-		<ol>		
+		<ol>
 			<li><b>Literacy <span className="urdu">(خواندگی)</span></b></li>
 			<p>The ability to read and write well, and also to know how to learn more things and continue growing throughout life. </p>
 
@@ -59,10 +61,10 @@ export default () => <div>
 			<div className="urdu">
 				<p>طلباء کو یہ جاننے کی ضرورت ہے کہ پیسے کا انتظام کیسے کیا جائے۔ اگرچہ ریاضی کی کلاسوں میں جمع، تفریق، ضرب اور تقسیم کے سوالات سمجھائے جاتے ہیں، لیکن وہ پسِ منظر کے علم کو پورا نہیں کرتے ہیں۔ طلبا کو اپنی پوری زندگی زبردست مالی فیصلے کرنے کی ضرورت ہوتی ہے۔ ہر طالب علم کو، یہاں تک کہ کالج یا یونیورسٹی میں داخلے سے پہلے ہی، بجٹ، بچت اور سرمایہ کاری کرنے کا طریقہ سیکھنا چاہئے۔ انہیں یہ بھی جاننا چاہئے کہ قرض (Loan) کیسے حاصل کیا جائے، دیگر قرضہ جات (debt) سے کیسے بچا جائے، اور ٹیکس کیسے جمع کروایا جائے۔ یہ سب جاننے سے ایک طالب علم زندگی بھر کامیابی کی طرف بڑھ سکتا ہے۔ بس انہیں ایسے ٹولز دینے کی ضرورت ہے جن کی مدد سے وہ ابتدائی طور پر دانشمندی سے رقم کا انتظام کریں۔</p>
 			</div>
-			
+
 			<li><b>Cultural and Civic Literacy <span className="urdu">( ثقافتی اور شہری خواندگی)</span></b></li>
 			<p>There is no society in the world that has overcome inequality and injustice. It is important for students to be aware of the problems facing the communities they live in, from environmental to economic and social problems. Students need to understand why these problems exist and what can be done to overcome them. For example, if they learn about different types of gases in science, they should also learn about the effects these gases have on our climate, the air we breathe and the crops we grow. Students should also become aware of how the government in their country works, as well as what their rights and duties are as good citizens. </p>
-			
+
 			<div className="urdu">
 				<p>دنیا میں ایسا کوئی معاشرہ نہیں جس نے عدمِ مساوات اور ناانصافی پر قابو پالیا ہو۔ طلبا کو ماحولیات سے لیکر معاشی اور معاشرتی مسائل تک ان تمام مسائل کا جاننا ضروری ہے جن کا کسی کمیونٹی کو سامنا کرنا پڑتا ہے۔ طلبا کو یہ سمجھنے کی ضرورت ہے کہ یہ مسائل کیوں موجود ہیں اور ان پر قابو پانے کے لئے کیا کیا جاسکتا ہے۔ مثال کے طور پر، اگر وہ سائنس میں گیسوں کی مختلف اقسام کے بارے میں جانتے ہیں، تو انہیں یہ بھی جاننا چاہئے کہ ان گیسوں کا ہماری آب و ہوا پر، اس ہوا پر جس سے ہم سانس لیتے ہیں اور ان فصلوں پر جن کو ہم اگاتے ہیں، کیا اثرات پڑتے ہیں۔ طلباء کو اس بات سے بھی آگاہ ہونا چاہئے کہ ان کے ملک میں حکومت کیسے کام کرتی ہے، مزید برآں اچھے شہریوں کے طور پر ان کے حقوق اور فرائض کیا ہیں۔</p>
 			</div>
@@ -82,7 +84,7 @@ export default () => <div>
 			<div className="urdu">
 				<p>تخلیقی صلاحیت کی تعریف کرنے کے بہت سارے طریقے ہیں: یہ دنیا میں نئی ​​چیزوں کو دیکھنے کے ساتھ ساتھ خیالی نظریات رکھنے اور پھر انہیں حقیقت میں بدلنے کا عمل ہے۔ تخلیقی صلاحیت فن سے بڑھ کر ہے، یہ ڈرائنگ اور پینٹنگ کے ذریعے طلباء کو خوبصورتی کی قدر کرنے، آس پاس کی چیزوں کی طرف توجہ دینے اور اپنے جذبات کا اظہار کرنے میں مدد دیتی ہے۔ تخلیقی صلاحیت نئے طریقوں سے سوچنے کے قابل بناتی ہے۔ ایسی غیر متعین حد والی سرگرمیوں کی کلاس روموں میں حوصلہ افزائی کی جاسکتی ہے جن کی درجہ بندی نہیں کی جاتی جیسا کہ ان کو روزنامہ جریدہ پڑھوانا، یا اپنے خیالات ونظریات کو پروان چڑھانے کے لئے انہیں وقت دینا اور انہیں غلطیاں کرنے کی اجازت دینا (تا کہ وہ سیکھ سکیں)۔</p>
 			</div>
-			
+
 			<li><b>Communication <span className="urdu">(مواصلت/باہمی ربط و تعلق)</span></b></li>
 			<p>Students need to be able to communicate clearly and effectively. This means that they should be able to speak confidently and write persuasively. However, it also means that they need to listen carefully to others and make sure that they are responding in a way that is attentive and empathetic. Communication is, after all, a two-way street. </p>
 
@@ -92,7 +94,7 @@ export default () => <div>
 
 			<li><b>Collaboration <span className="urdu">(تعاون)</span></b></li>
 			<p>Nobody can change the world alone — we need to be able to work with other people, and this involves listening, understanding, and respecting other people’s ideas. Make students work in groups more often: have students solve problems together, create things together. Let them figure out how to complete assignments together, so that they learn how to divide responsibilities, how to resolve conflicts, and how to support and trust each other. </p>
-			
+
 			<div className="urdu">
 				<p>کوئی بھی دنیا کو تنہا نہیں بدل سکتا - ہمیں دوسرے لوگوں کے ساتھ کام کرنے کے قابل ہونے کی ضرورت ہے، اور اس میں دوسرے لوگوں کے خیالات کو سننا، سمجھنا اور ان کا احترام کرنا شامل ہے۔ طلباء کو کثرت سے گروپوں میں کام کرنے پر آمادہ کریں: طلبا مل کر مسائل حل کریں، مل کر چیزیں بنائیں۔ انہیں اس بات کا پتہ لگانے دیں کہ ایک ساتھ مل کر اسائنمنٹ کیسے مکمل کی جائیں، تاکہ وہ ذمہ داریاں تقسیم کرنے، تنازعات کو حل کرنے اور ایک دوسرے کی مدد اور اعتماد حاصل کرنے کا طریقہ جان سکیں۔</p>
 			</div>

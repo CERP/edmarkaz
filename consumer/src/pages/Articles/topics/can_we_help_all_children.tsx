@@ -3,10 +3,12 @@ import '../style.css'
 
 // eslint-disable-next-line react/display-name
 export default () => <div>
-	<img
-		src="https://lh6.googleusercontent.com/AWdnF3zDePgYD2K77ct85i-lXasGbztxdoNmU8_6anjtBnN-TTuOmaYmwG3waE3729fzLtqiEshKV61lWu9EBb8pCVT66W8BWhD5E-1on94HWMwLK9XrjpVNEGEU3joyKiCmPcPz"
-		className="tabs-banner"
-	/>
+	<div className="tabs-banner">
+		<img
+			className="banner-img"
+			src="https://lh6.googleusercontent.com/AWdnF3zDePgYD2K77ct85i-lXasGbztxdoNmU8_6anjtBnN-TTuOmaYmwG3waE3729fzLtqiEshKV61lWu9EBb8pCVT66W8BWhD5E-1on94HWMwLK9XrjpVNEGEU3joyKiCmPcPz"
+		/>
+	</div>
 	<div className="article-page">
 		<h1> 8 Kinds of Intelligence </h1>
 
@@ -17,18 +19,18 @@ export default () => <div>
 		<p>This idea was first put forward by Howard Gardner, a professor at Harvard University, who said that people have eight kinds of intelligences. This idea is referred to as “the theory of <b> multiple intelligences</b>"". These “multiple intelligences” are:</p>
 
 		<h1></h1>
-		
+
 		<div className="urdu">
 			<h1>ذہانت کی 8 اقسام</h1>
 			<p>انسان کمپیوٹر نہیں ہیں: وہ کسی ایک مشین کی طرح نہیں چلتے۔ بلکہ ، ہمارے ذہن مختلف کمپیوٹرز کی طرح ہیں جو مختلف مشینوں سے بنے ہیں۔ ان میں سے کچھ کمپیوٹر دوسروں سے زیادہ مضبوط ہوسکتے ہیں۔</p>
 			<p>اساتذہ کو آگاہ کرنے کی ضرورت ہے کہ طلباء مختلف طریقوں سے ذہین ہوسکتے ہیں۔ اساتذہ مواد کی وضاحت کرنے اور اسباق کی فراہمی کے لئے مختلف طریقوں کا استعمال کرکے طلباء کی تعلیم کو بہتر بناسکتے ہیں۔ اسی دوران، اگر طلبا کو یہ موقع فراہم کیا جائے کہ انہوں نے جو کچھ سیکھا ہے اس کی عملی مشق پیش کریں، تو اس سےاساتذہ کو یہ بات زیادہ اچھے طریقے سے پتہ چل سکے گی کہ طالب علموں کی مخصوص ذہانت کو کیسے پورا کیا جائے۔</p>
 			<p>یہ تصور سب سے پہلے ہارورڈ یونیورسٹی کے ایک پروفیسر ہاورڈ گارڈنر نے پیش کیا ، جنہوں نے کہا تھا کہ لوگوں میں آٹھ قسم کی ذہانت ہوتی ہے۔ اس تصور کو "ایک سے زیادہ ذہانت کا نظریہ (ملٹی پل انٹیلی جنسز)" کہا جاتا ہے۔ یہ "ملٹی پل انٹیلی جنسز" یہ ہیں:</p>
 		</div>
-		
+
 		<ol>
 			<li> <b> Visual-Spatial Intelligence <span className="urdu">(بصری - مقامی ذہانت)</span></b></li>
 			<p>
-			Students who have visual-spatial intelligence are good at visualizing things, or imagining and forming pictures in their mind. They are good at reading maps, and making charts or pictures. They enjoy reading, writing, drawing and painting, and are good at doing puzzles. 
+				Students who have visual-spatial intelligence are good at visualizing things, or imagining and forming pictures in their mind. They are good at reading maps, and making charts or pictures. They enjoy reading, writing, drawing and painting, and are good at doing puzzles.
 			</p>
 			<p>How can teachers encourage students with visual-spatial intelligence? </p>
 			<ul>

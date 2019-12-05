@@ -3,20 +3,22 @@ import '../style.css'
 
 // eslint-disable-next-line react/display-name
 export default () => <div>
-	<img
-		className="tabs-banner"
-		src="https://lh6.googleusercontent.com/YxeFoAXAWXGmDb6Sl20CcC-b2YXAVLNHQt4p5M6hp9OVNn-TIcbAF9ztTnkD8u4KMtBU13NWTZNvgp9dwZgF4ecVfwhrEX0ruHGFrpUtuUN_duCRsDccT0fCeK4n5mSILESHjzf5"
-	/>
+	<div className="tabs-banner">
+		<img
+			className="banner-img"
+			src="https://lh6.googleusercontent.com/YxeFoAXAWXGmDb6Sl20CcC-b2YXAVLNHQt4p5M6hp9OVNn-TIcbAF9ztTnkD8u4KMtBU13NWTZNvgp9dwZgF4ecVfwhrEX0ruHGFrpUtuUN_duCRsDccT0fCeK4n5mSILESHjzf5"
+		/>
+	</div>
 	<div className="article-page">
 		<h1>Strong Leaders Make Great Schools </h1>
 
 		<p>School leaders are critical in developing high quality schools. If each school leader is responsible for creating a school where the learning environment is rich, then the educational system as a whole can be transformed, and with it so can the future of a nation</p>
 		<p>Research shows that school leaders have a huge impact on student learning: studies have found that a single school principal can account for up to 25% of the impact that schools have on student learning and test scores. Changes in the practices of school principals can make a big difference in how much students learn and good schools generally have great school leaders.</p>
-		
+
 
 		<p>The world is changing everyday, faster than ever before. As a result, we need to preparing our children for a future that we may not even be able to predict. They will need skills that will equip them for life in the 21st century, commonly referred to as “21st-Century Skills”.</p>
 		<p>Sadly, most of our schools are not teaching these skills. Of the 16 skills in the diagram below, most schools in Pakistan only cover the first three: literacy (English & Urdu), numeracy (Math), and scientific literacy (Science). But there are 13 other critical skills that we need to start teaching our children. </p>
-		
+
 		<h5>What roles can school leaders play to improve their schools?</h5>
 
 		<ol>

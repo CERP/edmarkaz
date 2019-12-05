@@ -82,9 +82,10 @@ class LoggedOutHome extends React.Component<P, S> {
 			.sort(([c1,], [c2,]) => getCategoryOrder(c1) - getCategoryOrder(c2))
 
 		return <div className="products">
-			<img className="tabs-banner" src={banner} />
+			<div className="tabs-banner">
+				<img className="banner-img" src={banner} />
+			</div>
 			<div className="tabs-home">
-
 				{
 					sorted
 						.map(([category, suppliers]) => {

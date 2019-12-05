@@ -3,10 +3,12 @@ import '../style.css'
 
 export default () => <div>
 
-	<img
-		className="tabs-banner"
-		src="https://lh5.googleusercontent.com/V9qlXsqwKJykzdiUoL3pNgWJNEtb9xEfg8dUFuu7wEQ2ItW1MBh7GgC9QggXzXt6HG2F8xnw_DEq5E9YjrRkiyZpBbaTv3UbtiExXUxBVGcvmjsndr1WLoBgNBHoNzJ5GvXZ7JHG"
-	/>
+	<div className="tabs-banner">
+		<img
+			className="banner-img"
+			src="https://lh5.googleusercontent.com/V9qlXsqwKJykzdiUoL3pNgWJNEtb9xEfg8dUFuu7wEQ2ItW1MBh7GgC9QggXzXt6HG2F8xnw_DEq5E9YjrRkiyZpBbaTv3UbtiExXUxBVGcvmjsndr1WLoBgNBHoNzJ5GvXZ7JHG"
+		/>
+	</div>
 
 	<div className="article-page">
 
@@ -18,8 +20,7 @@ export default () => <div>
 			<h1>اسکول کا مقصد کیا ہے؟</h1>
 			<p>­اس تصویر کو دیکھیں: کیا آپ کو لگتا ہے کہ یہ اچھا کلاس روم ہے؟ اس تصویر کو  فرانسیسی فنکار ژان مارک کیٹی نے 100 سال قبل (1899ء میں) تیار کیا تھا، جب ان سے پوچھا گیا تھا کہ وہ تصویر کشی کریں کہ دنیا سال 2000ء میں کس طرح دکھائی دے گی۔ اس تصویر میں طلبا معلومات سن رہے ہیں اور اس کے مطابق کارروائی کررہے ہیں ، لیکن ایسا محسوس ہو رہا ہے کہ وہ جو سیکھ رہے ہیں اس میں دلچسپی نہیں لے رہے۔ وہ اساتذہ کے ساتھ یا ایک دوسرے کے ساتھ بھی بات چیت نہیں کررہے ۔ یہ تصویر یہ ظاہر کرنے کے لئے بنائی گئی تھی کہ مستقبل میں کلاس روم کس طرح دکھائی دے سکتا ہے ، لیکن درحقیقت یہ تصویر آج ہمیں یہ دکھاتی ہے کہ چھوٹے کلاس روم کس طرح تیار ہوئے ہیں۔</p>
 		</div>
-		
-		<img className="image" src="https://lh5.googleusercontent.com/V9qlXsqwKJykzdiUoL3pNgWJNEtb9xEfg8dUFuu7wEQ2ItW1MBh7GgC9QggXzXt6HG2F8xnw_DEq5E9YjrRkiyZpBbaTv3UbtiExXUxBVGcvmjsndr1WLoBgNBHoNzJ5GvXZ7JHG" />
+
 
 		<p>If we look at the timeline of human history, schools are a relatively recent invention. Humans lived as hunter-gatherers for hundreds of thousands of years, learning through exploration. It was the Industrial Revolution in the 19th century that created the need for schooling — but this was a very particular kind of schooling. Schools were built to produce workers for the factory floor: workers who would show up on time and follow instructions. Structured classrooms, where students sat at one desk for the entire day, were good preparation for the industrial workforce. However, even though the industrial age is far behind us, many schools still function the way schools used to 200 years ago. </p>
 
@@ -58,7 +59,7 @@ export default () => <div>
 			<p>طلبا کو ہر مضمون میں بنیادی تصورات کی عملی مہارت مہیا کرنے کے بعد ، اساتذہ کو انہیں اس علم کو عملی جامہ پہنانے کے لئے تربیت دینے کی ضرورت ہے۔ علم کو استعمال کرنے کا طریقہ سیکھنا، خود مختار سیکھنے والا بننے کی جانب ایک اہم قدم ہے۔ ایک بار جب آپ کو علم ہو جائے کہ معلومات پر کس طرح عمل کرنا ہے تو ، آپ کسی بھی نئی معلومات پر عملدرآمد کرسکتے ہیں جو آپ کے راستے میں آجائے۔ اس سلسلے میں اساتذہ ایک مددگار ٹول استعمال کرسکتے ہیں جو بلوم ٹکسانومی (Bloom's Taxonomy)ہے۔ یہ تعلیمی نفسیات کے ماہر بینجمن بلوم نے 1956ء میں تیار کیا تھا اور اسے دنیا بھر کے اساتذہ استعمال کرتے ہیں۔</p>
 		</div>
 
-		<img className="image"	src="https://lh4.googleusercontent.com/l9kf8ti1RLCeMiv4cXmiFcZ7xX8w6cLFVWwEl-2St7sfN3nORMD6FGlL0II7FP8BPMiMJxnA8vPizTZz0TIP2TFASYRIuIlWOCUb4faCZkk8H2pqAOYbBwZ0-ufJMUHIpo__wjX7" />
+		<img className="image" src="https://lh4.googleusercontent.com/l9kf8ti1RLCeMiv4cXmiFcZ7xX8w6cLFVWwEl-2St7sfN3nORMD6FGlL0II7FP8BPMiMJxnA8vPizTZz0TIP2TFASYRIuIlWOCUb4faCZkk8H2pqAOYbBwZ0-ufJMUHIpo__wjX7" />
 
 		<ol>
 			<li>Remember: Students learn basic concepts [e.g. definition of a noun, times tables]</li>
@@ -91,7 +92,7 @@ export default () => <div>
 			<p>بلوم ٹکسانومی ہر مضمون پر لاگو ہوسکتی ہے۔ اگر آپ اس بارے میں سوچتے ہیں کہ پاکستان میں زیادہ تر کلاس رومز میں سیکھنے کا طریقِ کار کیا ہوتا ہے تو، یہ عام طور پر پہلے ہی مرحلے پر ختم ہو جاتا ہے۔ طلبا صرف اور صرف اقتباسات، فارمولوں اور مساوات کو ذہن نشین کرتے ہیں اور باقی کے پانچ مراحل کو استعمال میں نہیں لاتے جیسا کہ مواد کو سمجھنا، اس کا اطلاق کرنا، تجزیہ کرنا اور تشخیص کرنا نیز مواد کے بارے میں اپنی اپنی تشریح تخلیق کرنا۔ </p>
 			<p>تعلیم کا مقصد صرف یہ جاننا نہیں ہے کہ جو کچھ پہلے سے موجود ہے وہ فلاں فلاں ہے: بلکہ اس کا مقصد تو پہلے سے موجود چیز کو جان کر مزید علم کی تعمیر کے لیے اسے استعمال کرنا ہے۔ اس کا مقصد یہ سیکھنا بھی ہے کہ دوسرے لوگوں کے ساتھ کیا برتاؤ کیا جائے اور دوسرے لوگوں کے لیے کیا کیا جائے تا کہ زیادہ انصاف پسند معاشرے اور زیادہ پُرامن سیارے کی تشکیل کو یقینی بنایا جا سکے۔</p>
 		</div>
-		
+
 
 	</div>
 </div >
