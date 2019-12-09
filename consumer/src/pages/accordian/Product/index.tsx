@@ -93,7 +93,10 @@ class ProductPage extends React.Component<P, S> {
 			{this.props.connected && !this.props.auth.token && <Link to="/log-in" className="order-button"> Login to Order Online</Link>}
 			{this.props.connected && this.props.auth.token && <div className="order-button" onClick={this.onOrder}> Request Information</div>}
 
-			<div className="description">{product.description}</div>
+			<div className="description">{
+				product.description.split('\n')
+					.map((t, k) => <div key={k}>{t}</div>)
+			}</div>
 			{/* {this.props.connected && !this.props.auth.token && <Link className="button blue" to="/sign-up">Sign up to Order Online</Link>}
 			{this.props.connected && this.props.auth.token && <div className="button blue" onClick={this.onOrder}>Request Information</div>} */}
 		</div>
