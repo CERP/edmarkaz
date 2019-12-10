@@ -25,7 +25,8 @@ module.exports = {
 			}
 		}],
 		"@typescript-eslint/no-explicit-any": [0],
-		"react/no-deprecated": [1]
+		"react/no-deprecated": [1],
+		"@typescript-eslint/no-empty-function": [0]
 	},
 	settings: {
 		react: {

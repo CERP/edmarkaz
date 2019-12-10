@@ -3,19 +3,23 @@ import { connect } from 'react-redux'
 import Dynamic from '@ironbay/dynamic'
 import Former from '@cerp/former'
 
-import { getSchoolProfiles, editSchoolProfile } from '../../actions'
+import { getSchoolProfiles, editSchoolProfile, getSchoolProfileFromNumber } from '../../actions'
 
 import './style.css'
+import { Link, Route } from 'react-router-dom'
 
 interface P {
-	getSchool: (school_id: string) => void
+	getSchoolFromRefcode: (school_id: string) => void
+	getSchoolFromNumber: (phone_number: string) => void
 	saveSchool: (school: CERPSchool) => void
 	school?: CERPSchool
 	caller_id?: string
 }
 
 interface S {
-	refcode: string
+	input: string
+	search_type: "NUMBER" | "REFCODE"
+	subpage: "PROFILE" | "ORDER"
 	loading: boolean
 	school?: CERPSchool
 }
@@ -32,13 +36,22 @@ class SearchPage extends React.Component<P, S> {
 		this.school_former = new Former(this, ["school"])
 
 		this.state = {
-			refcode: "",
+			input: "",
 			loading: false,
+			subpage: "PROFILE",
+			search_type: "NUMBER"
 		}
 	}
 
 	search = () => {
-		this.props.getSchool(this.state.refcode);
+
+		if (this.state.search_type === "REFCODE") {
+			this.props.getSchoolFromRefcode(this.state.input);
+		}
+		else {
+			this.props.getSchoolFromNumber(this.state.input)
+		}
+
 
 		this.setState({
 			loading: true,
@@ -76,11 +89,19 @@ class SearchPage extends React.Component<P, S> {
 	render() {
 
 		const school = this.state.school;
+		const search_type = this.state.search_type
 
 		return <div className="search page">
 			<div className="row">
-				<input type="text" {...this.former.super_handle(["refcode"])} placeholder="refcode" />
+				<input type="text" {...this.former.super_handle(["input"])} placeholder={search_type === "NUMBER" ? "Phone Number" : "Refcode"} />
 				<div className="button" onClick={this.search}>Search</div>
+			</div>
+			<div className="row">
+				<label>Lookup By: </label>
+				<select {...this.former.super_handle(["search_type"])}>
+					<option value="NUMBER">Phone Number</option>
+					<option value="REFCODE">Refcode</option>
+				</select>
 			</div>
 
 			{this.props.caller_id && <div>CallerID: {this.props.caller_id}</div>}
@@ -88,11 +109,26 @@ class SearchPage extends React.Component<P, S> {
 			{this.state.loading && <div>Loading....</div>}
 
 			{
-				this.props.school && <div className="button blue" onClick={this.onSave}>Save</div>
+				this.props.school && <select {...this.former.super_handle(["subpage"])}>
+					<option value="PROFILE">Edit School Profile</option>
+					<option value="ORDER">Place Order for School</option>
+				</select>
 			}
 
 			{
-				this.props.school && <SchoolForm school={this.props.school} former={this.school_former} />
+				this.props.school && this.state.subpage === "PROFILE" && <SchoolForm school={this.props.school} former={this.school_former} />
+			}
+			{
+				this.props.school && this.state.subpage === "ORDER" && <div>Place Order...
+					We list all products
+					Select bar to filter by supplier
+					input to filter product name
+					its own component, own file, connected
+				</div>
+			}
+
+			{
+				this.props.school && <div className="button blue" onClick={this.onSave}>Save</div>
 			}
 
 		</div>
@@ -243,6 +279,7 @@ export default connect((state: RootReducerState) => ({
 	school: state.active_school,
 	caller_id: state.caller_id
 }), (dispatch: Function) => ({
-	getSchool: (school_id: string) => dispatch(getSchoolProfiles([school_id])),
+	getSchoolFromRefcode: (school_id: string) => dispatch(getSchoolProfiles([school_id])),
+	getSchoolFromNumber: (phone_number: string) => dispatch(getSchoolProfileFromNumber(phone_number)),
 	saveSchool: (school: CERPSchool) => dispatch(editSchoolProfile(school.refcode, school))
 }))(SearchPage)

@@ -1,5 +1,5 @@
 import Syncr from '@cerp/syncr'
-import { MergeAction, DeletesAction, QueueAction, sendServerAction, createLoginSucceed, createMerges, createDeletes } from './core'
+import { createLoginSucceed } from './core'
 
 type Dispatch = (action: any) => any;
 type GetState = () => RootReducerState
@@ -26,17 +26,52 @@ export const createLogin = (username: string, password: string) => (dispatch: Di
 		})
 }
 
-export interface AddSchoolAction {
-	type: "ADD_SCHOOLS",
-	schools: { [id: string]: CERPSchool }
-}
-
-export const getSchoolProfileFromNumber = (school_number: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+export const ADD_PRODUCTS = "ADD_PRODUCTS"
+export const getProducts = (filters = {}) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 
 	const state = getState();
 
 	if (!state.connected) {
-		syncr.onNext('connect', () => dispatch(getSchoolProfileFromNumber(school_number)))
+		syncr.onNext('connect', () => dispatch(getProducts(filters)))
+		return;
+	}
+
+	syncr.send({
+		type: "GET_PRODUCTS",
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		id: state.auth.id,
+		payload: {
+			filters
+		},
+		last_sync: 0
+	})
+		.then((res: any) => {
+			// now dispatch an action that 'saves' these products
+
+			dispatch({
+				type: ADD_PRODUCTS,
+				products: res.products
+			})
+
+			return res
+		})
+		.catch(err => {
+			console.error(err)
+		})
+}
+
+export interface AddSchoolAction {
+	type: "ADD_SCHOOLS"
+	schools: { [id: string]: CERPSchool }
+}
+
+export const getSchoolProfileFromNumber = (phone_number: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+
+	const state = getState();
+
+	if (!state.connected) {
+		syncr.onNext('connect', () => dispatch(getSchoolProfileFromNumber(phone_number)))
 		return;
 	}
 
@@ -46,18 +81,21 @@ export const getSchoolProfileFromNumber = (school_number: string) => (dispatch: 
 		client_id: state.auth.id,
 		id: state.auth.id,
 		payload: {
-			school_number
+			phone_number
 		}
 	})
 		.then(res => {
 			console.log(res)
 			dispatch({
 				type: ADD_SCHOOLS,
-				schools: res
+				schools: {
+					[res.id]: res.profile
+				}
 			})
 		})
 		.catch(err => {
-
+			console.error(err)
+			alert(err)
 		})
 
 }
@@ -97,7 +135,7 @@ export const getSchoolProfiles = (school_ids: string[]) => (dispatch: Dispatch, 
 
 export const INCOMING_PHONE_CALL = "INCOMING_PHONE_CALL";
 export interface IncomingPhoneCallAction {
-	type: "INCOMING_PHONE_CALL",
+	type: "INCOMING_PHONE_CALL"
 	number: string
 	dialed: string
 	event: string
