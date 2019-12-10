@@ -24,29 +24,28 @@ defmodule Sarkar.Storage.Google do
 
 	end
 
+	def upload_image_from_url(bucket_id, "https://storage.cloud.google.com/" <> rest) do
+		# now we have to correct these urls...
+		# turn https://storage.cloud.google.com/ilmx-product-images/fatima%20the%20spinner.JPG?authuser=3
+		# into https://storage.googleapis.com/ilmx-product-images/fatima%20the%20spinner.JPG
+
+		IO.puts "calling this method"
+
+		[bucket_and_id | _junk]  = String.split(rest, "?")
+
+		[_bucket_id, id] = String.split(bucket_and_id, "/")
+
+		new_url = "https://storage.googleapis.com/" <> bucket_id <> "/" <> id
+
+		new_url
+
+	end
+
 	def upload_image_from_url(bucket_id, img_url) do
 
 		base = "https://storage.cloud.google.com/"
 		case String.contains?(img_url, bucket_id) do
-			true ->
-				case String.starts_with?(img_url, base <> bucket_id) do
-					true ->
-						# now we have to correct these urls...
-						# turn https://storage.cloud.google.com/ilmx-product-images/fatima%20the%20spinner.JPG?authuser=3
-						# into https://storage.googleapis.com/ilmx-product-images/fatima%20the%20spinner.JPG
-
-						"https://storage.cloud.google.com/" <> rest = img_url
-
-						[bucket_and_id | _junk]  = String.split(rest, "?")
-
-						[_bucket_id, id] = String.split(bucket_and_id, "/")
-
-						new_url = "https://storage.googleapis.com/" <> bucket_id <> "/" <> id
-
-						new_url
-
-					false -> img_url
-				end
+			true -> img_url
 			false ->
 				IO.puts "uploading img_url #{img_url}"
 				%HTTPoison.Response{body: body} = HTTPoison.get!(img_url)
@@ -69,6 +68,8 @@ defmodule Sarkar.Storage.Google do
 				)
 
 				File.rm!(file_path)
+
+				IO.inspect object
 
 				object.mediaLink
 

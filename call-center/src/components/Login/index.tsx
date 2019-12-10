@@ -1,28 +1,28 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
-import { createLogin } from '../../actions'
+import former from '@cerp/former'
 
-import former from '../../utils/former'
+import { createLogin } from '../../actions'
 
 import './style.css'
 
-interface propTypes {
-	connected: boolean,
-	login: (id : string, password : string) => void
-	auth: RootReducerState['auth'],
+interface PropTypes {
+	connected: boolean
+	login: (id: string, password: string) => void
+	auth: RootReducerState['auth']
 }
 
-interface state {
+interface State {
 	username: string
 	password: string
 }
 
-class Login extends Component<propTypes & RouteComponentProps, state>{
+class Login extends Component<PropTypes & RouteComponentProps, State>{
 
 	private former: former
 
-	constructor(props : any) {
+	constructor(props: any) {
 		super(props);
 
 		this.state = {
@@ -37,24 +37,24 @@ class Login extends Component<propTypes & RouteComponentProps, state>{
 		this.props.login(this.state.username, this.state.password)
 	}
 
-	componentWillReceiveProps(nextProps : propTypes) {
+	componentWillReceiveProps(nextProps: PropTypes) {
 
 		console.log(nextProps)
 		console.log("NEXT PROPS")
-		if(nextProps.auth.token && nextProps.auth.token !== this.props.auth.token) {
+		if (nextProps.auth.token && nextProps.auth.token !== this.props.auth.token) {
 			this.props.history.push('/');
 		}
 	}
 
 	render() {
 
-		if(!this.props.connected) {
+		if (!this.props.connected) {
 			return <div>Connecting...</div>
 		}
 
 		return <div className="login page">
 
-			<div className="cover" style={{ }}>
+			<div className="cover" style={{}}>
 				<div className="title" style={{ fontSize: "3rem" }}>Welcome to Call Center</div>
 				<div className="divider"></div>
 				<div className="form">
@@ -74,9 +74,9 @@ class Login extends Component<propTypes & RouteComponentProps, state>{
 /*
 */
 
-export default connect((state : RootReducerState) => ({
+export default connect((state: RootReducerState) => ({
 	connected: state.connected,
 	auth: state.auth
-}), (dispatch : any) => ({
-	login: (username : string, password : string) => dispatch(createLogin(username, password))
+}), (dispatch: any) => ({
+	login: (username: string, password: string) => dispatch(createLogin(username, password))
 }))(withRouter(Login))
