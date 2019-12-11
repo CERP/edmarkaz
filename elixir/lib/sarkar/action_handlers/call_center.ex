@@ -87,6 +87,26 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 
 	end
 
+	def handle_action(%{"type" => "PLACE_ORDER", "payload" => %{"product" => product, "refcode" => refcode, "school_name" => school_name, "school_number" => school_number }}, %{client_id: client_id, id: id} = state) do
+
+		IO.puts "handling order"
+		product_name = Map.get(product, "title")
+		supplier_id = Map.get(product, "supplier_id")
+
+		start_supplier(supplier_id)
+		EdMarkaz.Supplier.place_order(supplier_id, product, refcode, client_id)
+		spawn fn ->
+			EdMarkaz.Slack.send_alert("#{school_name} placed order for #{product_name} by #{supplier_id}. Their number is #{school_number}", "#platform-orders")
+		end
+
+		spawn fn ->
+			EdMarkaz.Contegris.send_sms(id, "You have requested information for #{product_name} and will be contacted soon with more information.")
+		end
+
+		{:reply, succeed(), state}
+
+	end
+
 	def handle_action(%{"type" => "GET_PRODUCTS", "last_sync" => last_sync}, state) do
 
 		dt = DateTime.from_unix!(last_sync, :millisecond)

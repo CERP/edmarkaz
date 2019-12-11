@@ -19,11 +19,51 @@ interface RootReducerState {
 			date: number
 		}
 	}
+	products: {
+		last_sync: number
+		loading: boolean
+		db: {
+			[product_id: string]: Product
+		}
+	}
 	active_school?: CERPSchool
 	caller_id?: string
 	last_snapshot: number
 	accept_snapshot: boolean
 	connected: boolean
+}
+
+interface Product {
+	id: string
+	supplier_id: string
+	title: string
+	description: string
+	phone_number: string
+	img_url: string
+	image?: {
+		id: string
+		url?: string
+	}
+	price: string
+	deleted?: boolean
+	tags: {
+		[tag: string]: boolean
+	}
+	categories: { string: boolean }
+	supplier_profile: {
+		name: string
+		description: string
+		logo?: {
+			id: string
+			url: string
+		}
+		banner?: {
+			id: string
+			url: string
+		}
+		order?: number
+	}
+	order?: number
 }
 
 interface CERPSchool {
@@ -141,7 +181,7 @@ interface CERPSchool {
 	school_facilities_7: string
 	school_facilities_8: string
 	school_fef: string
-	school_name: string 
+	school_name: string
 	school_pef: string
 	school_registration: string
 	school_sef: string

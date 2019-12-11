@@ -1,5 +1,6 @@
 import Syncr from '@cerp/syncr'
 import { createLoginSucceed } from './core'
+import { connect } from 'react-redux';
 
 type Dispatch = (action: any) => any;
 type GetState = () => RootReducerState
@@ -26,6 +27,33 @@ export const createLogin = (username: string, password: string) => (dispatch: Di
 		})
 }
 
+export const placeOrder = (product: Product, school: CERPSchool) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+	const state = getState();
+
+	if (!state.connected) {
+		syncr.onNext('connect', () => dispatch(placeOrder(product, school)))
+		return;
+	}
+
+	syncr.send({
+		type: "PLACE_ORDER",
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		id: state.auth.id,
+		payload: {
+			product,
+			refcode: school.refcode,
+			school_name: school.school_name,
+			school_number: school.phone_number
+		}
+	})
+		.then(res => alert("successfully placed order"))
+		.catch(err => {
+			console.error(err)
+			alert(err)
+		})
+}
+
 export const ADD_PRODUCTS = "ADD_PRODUCTS"
 export const getProducts = (filters = {}) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 
@@ -36,6 +64,10 @@ export const getProducts = (filters = {}) => (dispatch: Dispatch, getState: GetS
 		return;
 	}
 
+	dispatch({
+		type: "LOAD_PRODUCTS"
+	})
+
 	syncr.send({
 		type: "GET_PRODUCTS",
 		client_type: state.auth.client_type,
@@ -44,7 +76,7 @@ export const getProducts = (filters = {}) => (dispatch: Dispatch, getState: GetS
 		payload: {
 			filters
 		},
-		last_sync: 0
+		last_sync: state.products.last_sync
 	})
 		.then((res: any) => {
 			// now dispatch an action that 'saves' these products

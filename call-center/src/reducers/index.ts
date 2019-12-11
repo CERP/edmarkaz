@@ -2,7 +2,7 @@ import Dynamic from '@ironbay/dynamic'
 
 import { MERGES, MergeAction, ON_CONNECT, ON_DISCONNECT, DELETES, DeletesAction, QueueAction, QUEUE, CONFIRM_SYNC_DIFF, ConfirmSyncAction, SnapshotDiffAction, SNAPSHOT_DIFF, RPC_SUCCEED, RPCSucceedAction, LOGIN_SUCCEED, LoginSucceed } from '../actions/core'
 import { AnyAction, Reducer } from 'redux';
-import { ADD_SCHOOLS, AddSchoolAction, INCOMING_PHONE_CALL, IncomingPhoneCallAction } from '../actions';
+import { ADD_PRODUCTS, ADD_SCHOOLS, AddSchoolAction, INCOMING_PHONE_CALL, IncomingPhoneCallAction } from '../actions';
 import { loadDB } from '../utils/localStorage';
 
 const rootReducer: Reducer<RootReducerState, AnyAction> = (state: RootReducerState | undefined, action: AnyAction): RootReducerState => {
@@ -17,7 +17,7 @@ const rootReducer: Reducer<RootReducerState, AnyAction> = (state: RootReducerSta
 
 		case LOGIN_SUCCEED:
 			{
-				const succeed = <LoginSucceed>action
+				const succeed = action as LoginSucceed
 
 				return {
 					...state,
@@ -44,6 +44,37 @@ const rootReducer: Reducer<RootReducerState, AnyAction> = (state: RootReducerSta
 					connected: false
 				}
 			}
+
+		case "LOAD_PRODUCTS":
+			{
+				return {
+					...state,
+					products: {
+						...state.products,
+						loading: true
+					}
+				}
+			}
+
+		case ADD_PRODUCTS:
+			{
+				// @ts-ignore
+				const add_action = action as AddProductsAction
+				console.log(add_action)
+
+				return {
+					...state,
+					products: {
+						last_sync: new Date().getTime(),
+						loading: false,
+						db: {
+							...state.products.db,
+							...add_action.products
+						}
+					}
+				}
+			}
+
 
 		case INCOMING_PHONE_CALL:
 			{

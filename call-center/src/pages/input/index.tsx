@@ -3,15 +3,18 @@ import { connect } from 'react-redux'
 import Dynamic from '@ironbay/dynamic'
 import Former from '@cerp/former'
 
-import { getSchoolProfiles, editSchoolProfile, getSchoolProfileFromNumber } from '../../actions'
+import { getSchoolProfiles, editSchoolProfile, getSchoolProfileFromNumber, getProducts, placeOrder } from '../../actions'
+import OrderPage from './order'
 
 import './style.css'
-import { Link, Route } from 'react-router-dom'
 
 interface P {
 	getSchoolFromRefcode: (school_id: string) => void
 	getSchoolFromNumber: (phone_number: string) => void
+	getProducts: () => void
 	saveSchool: (school: CERPSchool) => void
+	placeOrder: (product: Product, school: CERPSchool) => void
+	products: RootReducerState['products']
 	school?: CERPSchool
 	caller_id?: string
 }
@@ -59,6 +62,10 @@ class SearchPage extends React.Component<P, S> {
 		})
 	}
 
+	componentDidMount() {
+		this.props.getProducts()
+	}
+
 	componentWillReceiveProps(nextProps: P) {
 		console.log("got next props", nextProps)
 
@@ -86,6 +93,18 @@ class SearchPage extends React.Component<P, S> {
 
 	}
 
+	onOrderPlaced = (product: Product) => {
+
+		console.log('ordering ', product)
+		if (this.state.school) {
+			this.props.placeOrder(product, this.state.school)
+		}
+		else {
+			alert("error: no school selected")
+		}
+
+	}
+
 	render() {
 
 		const school = this.state.school;
@@ -93,7 +112,17 @@ class SearchPage extends React.Component<P, S> {
 
 		return <div className="search page">
 			<div className="row">
-				<input type="text" {...this.former.super_handle(["input"])} placeholder={search_type === "NUMBER" ? "Phone Number" : "Refcode"} />
+				<input
+					type="text"
+					{...this.former.super_handle(["input"])}
+					placeholder={search_type === "NUMBER" ? "Phone Number" : "Refcode"}
+
+					onKeyDown={(e) => {
+						if (e.which === 13) {
+							this.search()
+						}
+					}}
+				/>
 				<div className="button" onClick={this.search}>Search</div>
 			</div>
 			<div className="row">
@@ -109,26 +138,25 @@ class SearchPage extends React.Component<P, S> {
 			{this.state.loading && <div>Loading....</div>}
 
 			{
-				this.props.school && <select {...this.former.super_handle(["subpage"])}>
-					<option value="PROFILE">Edit School Profile</option>
-					<option value="ORDER">Place Order for School</option>
-				</select>
-			}
-
-			{
-				this.props.school && this.state.subpage === "PROFILE" && <SchoolForm school={this.props.school} former={this.school_former} />
-			}
-			{
-				this.props.school && this.state.subpage === "ORDER" && <div>Place Order...
-					We list all products
-					Select bar to filter by supplier
-					input to filter product name
-					its own component, own file, connected
+				this.props.school && <div className="row">
+					<label>Action</label>
+					<select {...this.former.super_handle(["subpage"])}>
+						<option value="PROFILE">Edit School Profile</option>
+						<option value="ORDER">Place Order for School</option>
+					</select>
 				</div>
 			}
 
 			{
-				this.props.school && <div className="button blue" onClick={this.onSave}>Save</div>
+				school && this.state.subpage === "PROFILE" && <SchoolForm
+					school={school}
+					former={this.school_former}
+					save={this.onSave} />
+			}
+			{
+				this.props.school && this.state.subpage === "ORDER" && <OrderPage
+					placeOrder={this.onOrderPlaced}
+					products={this.props.products} />
 			}
 
 		</div>
@@ -138,11 +166,14 @@ class SearchPage extends React.Component<P, S> {
 interface SchoolProp {
 	school: CERPSchool
 	former: Former
+	save: () => void
 }
 
-const SchoolForm: React.SFC<SchoolProp> = ({ school, former }) => {
+const SchoolForm: React.SFC<SchoolProp> = ({ school, former, save }) => {
 
 	return <div className="form" style={{ width: "90%" }}>
+
+		<div className="button blue" onClick={save}>Save</div>
 
 		<div className="title">{school.school_name}</div>
 		<div className="divider">School Profile</div>
@@ -277,9 +308,12 @@ const EditSurveyRow: React.StatelessComponent<SurveyRowProp> = ({ label, path, f
 
 export default connect((state: RootReducerState) => ({
 	school: state.active_school,
-	caller_id: state.caller_id
+	caller_id: state.caller_id,
+	products: state.products,
 }), (dispatch: Function) => ({
 	getSchoolFromRefcode: (school_id: string) => dispatch(getSchoolProfiles([school_id])),
 	getSchoolFromNumber: (phone_number: string) => dispatch(getSchoolProfileFromNumber(phone_number)),
-	saveSchool: (school: CERPSchool) => dispatch(editSchoolProfile(school.refcode, school))
+	saveSchool: (school: CERPSchool) => dispatch(editSchoolProfile(school.refcode, school)),
+	getProducts: () => dispatch(getProducts()),
+	placeOrder: (product: Product, school: CERPSchool) => dispatch(placeOrder(product, school))
 }))(SearchPage)

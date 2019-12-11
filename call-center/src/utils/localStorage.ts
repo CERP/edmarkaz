@@ -105,6 +105,13 @@ export const loadDB = (): RootReducerState => {
 		connected: false,
 		sync_state: loadSyncState(),
 		active_school: undefined,
-		caller_id: undefined
+		caller_id: undefined,
+		products: {
+			last_sync: 0,
+			loading: true,
+			db: {
+
+			}
+		}
 	}
 }
