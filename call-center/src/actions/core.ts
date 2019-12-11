@@ -1,5 +1,5 @@
 import { Dispatch, AnyAction } from 'redux'
-import Syncr from '../syncr';
+import Syncr from '@cerp/syncr'
 
 const SYNC = "SYNC"
 
@@ -16,7 +16,7 @@ export interface MergeAction {
 	merges: Merge[]
 }
 
-export const createMerges= (merges : Merge[]) => (dispatch : (a: any) => any, getState: () => RootReducerState, syncr: Syncr) => {
+export const createMerges = (merges: Merge[]) => (dispatch: (a: any) => any, getState: () => RootReducerState, syncr: Syncr) => {
 	// merges is a list of path, value
 
 	const action = {
@@ -39,7 +39,7 @@ export const createMerges= (merges : Merge[]) => (dispatch : (a: any) => any, ge
 	}), {})
 
 	const state = getState();
-	const rationalized_merges = {...state.queued, ...new_merges}
+	const rationalized_merges = { ...state.queued, ...new_merges }
 
 	const payload = {
 		type: SYNC,
@@ -55,7 +55,7 @@ export const createMerges= (merges : Merge[]) => (dispatch : (a: any) => any, ge
 }
 
 export const SMS = "SMS"
-export const sendSMS = (text : string, number : string) => (dispatch : (a: any) => any, getState: () => RootReducerState, syncr: Syncr) => {
+export const sendSMS = (text: string, number: string) => (dispatch: (a: any) => any, getState: () => RootReducerState, syncr: Syncr) => {
 
 	// should i keep a log of all messages sent in the db?
 
@@ -69,8 +69,8 @@ export const sendSMS = (text : string, number : string) => (dispatch : (a: any) 
 			number,
 		}
 	})
-	.then(dispatch)
-	.catch((err : Error) => console.error(err)) // this should backup to sending the sms via the android app?
+		.then(dispatch)
+		.catch((err: Error) => console.error(err)) // this should backup to sending the sms via the android app?
 }
 
 
@@ -91,9 +91,9 @@ export const sendBatchSMS = (messages: SMS[]) => (dispatch: (a: any) => any, get
 			messages
 		}
 	})
-	.catch((err: Error) => {
-		console.error(err) // send via android app?
-	})
+		.catch((err: Error) => {
+			console.error(err) // send via android app?
+		})
 }
 
 interface ServerAction {
@@ -101,7 +101,7 @@ interface ServerAction {
 	payload: any
 }
 
-export const sendServerAction = ( action: ServerAction ) => (dispatch: Dispatch, getState: () => RootReducerState, syncr: Syncr) => {
+export const sendServerAction = (action: ServerAction) => (dispatch: Dispatch, getState: () => RootReducerState, syncr: Syncr) => {
 	const state = getState();
 
 	console.log('send server action...', action)
@@ -112,10 +112,10 @@ export const sendServerAction = ( action: ServerAction ) => (dispatch: Dispatch,
 		id: state.auth.id,
 		payload: action.payload
 	})
-	.then(dispatch)
-	.catch((err : Error) => {
-		console.error(err)
-	})
+		.then(dispatch)
+		.catch((err: Error) => {
+			console.error(err)
+		})
 
 	// should it get queued up....
 }
@@ -130,7 +130,7 @@ export interface DeletesAction {
 	paths: Delete[]
 }
 
-export const createDeletes = (paths : Delete[]) => (dispatch : Dispatch<AnyAction>, getState : () => RootReducerState, syncr : Syncr) => {
+export const createDeletes = (paths: Delete[]) => (dispatch: Dispatch<AnyAction>, getState: () => RootReducerState, syncr: Syncr) => {
 
 	const action = {
 		type: DELETES,
@@ -141,18 +141,18 @@ export const createDeletes = (paths : Delete[]) => (dispatch : Dispatch<AnyActio
 
 	const state = getState();
 	const payload = paths.reduce((agg, curr) => ({
-			...agg, 
-			[curr.path.join(',')]: {
-				action: {
-					type: "DELETE",
-					path: curr.path.map(x => x === undefined ? "" : x),
-					value: 1
-				},
-				date: new Date().getTime()
-			}
-		}), {})
-	
-	const rationalized_deletes = {...state.queued, ...payload}
+		...agg,
+		[curr.path.join(',')]: {
+			action: {
+				type: "DELETE",
+				path: curr.path.map(x => x === undefined ? "" : x),
+				value: 1
+			},
+			date: new Date().getTime()
+		}
+	}), {})
+
+	const rationalized_deletes = { ...state.queued, ...payload }
 
 	syncr.send({
 		type: SYNC,
@@ -161,12 +161,12 @@ export const createDeletes = (paths : Delete[]) => (dispatch : Dispatch<AnyActio
 		last_snapshot: state.last_snapshot,
 		payload: rationalized_deletes
 	})
-	.then(dispatch)
-	.catch((err : Error) => dispatch(QueueUp(payload)))
+		.then(dispatch)
+		.catch((err: Error) => dispatch(QueueUp(payload)))
 
 }
 
-// this is only produced by the server. 
+// this is only produced by the server.
 // it will tell us it hsa confirmed sync up to { date: timestamp }
 export const RPC_SUCCEED = "RPC_SUCCEED"
 export interface RPCSucceedAction {
@@ -206,7 +206,7 @@ export interface SnapshotDiffAction {
 export const QUEUE = "QUEUE"
 // queue up an object where key is path, value is action/date
 interface Queuable {
-	[path: string] : {
+	[path: string]: {
 		action: {
 			type: "MERGE" | "DELETE",
 			path: string[],
@@ -221,7 +221,7 @@ export interface QueueAction {
 	payload: Queuable
 }
 
-export const QueueUp = (action : Queuable) => {
+export const QueueUp = (action: Queuable) => {
 	return {
 		type: QUEUE,
 		payload: action
@@ -230,14 +230,14 @@ export const QueueUp = (action : Queuable) => {
 
 export const ON_CONNECT = "ON_CONNECT"
 export const ON_DISCONNECT = "ON_DISCONNECT"
-export const connected = () => (dispatch: (a : any) => any, getState: () => RootReducerState, syncr: Syncr) => { 
-	const action = {type: ON_CONNECT}
+export const connected = () => (dispatch: (a: any) => any, getState: () => RootReducerState, syncr: Syncr) => {
+	const action = { type: ON_CONNECT }
 
 	dispatch(action)
 
 	const state = getState();
 
-	if(state.auth.id && state.auth.token) {
+	if (state.auth.id && state.auth.token) {
 		syncr
 			.send({
 				type: "VERIFY",
@@ -258,7 +258,7 @@ export const connected = () => (dispatch: (a : any) => any, getState: () => Root
 				})
 			})
 			.then(resp => {
-				if(resp.type) {
+				if (resp.type) {
 					dispatch(resp)
 				}
 			})
@@ -281,7 +281,7 @@ export interface LoginSucceed {
 	token: string,
 	sync_state: RootReducerState['sync_state']
 }
-export const createLoginSucceed = (id : string, token : string, sync_state: RootReducerState['sync_state']) : LoginSucceed => ({ 
+export const createLoginSucceed = (id: string, token: string, sync_state: RootReducerState['sync_state']): LoginSucceed => ({
 	type: LOGIN_SUCCEED,
 	id,
 	token,

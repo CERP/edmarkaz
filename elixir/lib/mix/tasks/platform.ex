@@ -225,9 +225,6 @@ defmodule Mix.Tasks.Platform do
 
 						EdMarkaz.Product.merge(pid, product, sid)
 					has_url ->
-						IO.puts "has url"
-						IO.inspect picture_url
-
 						img_url = try do
 							Sarkar.Storage.Google.upload_image_from_url("ilmx-product-images", picture_url)
 						rescue

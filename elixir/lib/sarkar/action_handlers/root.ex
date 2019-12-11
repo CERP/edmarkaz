@@ -1,6 +1,6 @@
 defmodule EdMarkaz.ActionHandler do
 
-	# TODO: save client_type in connection state 
+	# TODO: save client_type in connection state
 	# don't let people login as one type of user, then switch to another and perform action
 
 	def handle_action(%{"client_type" => "portal_call_center"} = action, state) do

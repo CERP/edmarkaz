@@ -1,5 +1,5 @@
 defmodule EdMarkaz.Server do
-	
+
 	def start_link(_opts) do
 
 		IO.puts "starting server"

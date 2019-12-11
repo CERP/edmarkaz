@@ -4,15 +4,15 @@ defmodule EdMarkaz.Server.Analytics do
 		IO.puts "wowwww"
 		req = :cowboy_req.reply(200, req)
 		{:ok, req, state}
-		
+
 	end
 
 	def init(%{bindings: %{type: "platform-writes.csv"}} = req, state) do
 
 		{:ok, data} = case Postgrex.query(EdMarkaz.DB,
-		"SELECT id, to_timestamp(time/1000)::date as date, count(*) 
+		"SELECT id, to_timestamp(time/1000)::date as date, count(*)
 		FROM platform_writes
-		GROUP BY id, date 
+		GROUP BY id, date
 		ORDER BY date desc",
 		[]) do
 				{:ok, resp} -> {:ok, resp.rows}
@@ -35,11 +35,46 @@ defmodule EdMarkaz.Server.Analytics do
 		{:ok, req, state}
 	end
 
+	def init(%{bindings: %{type: "platform-orders.csv"}} = req, state) do
+		{:ok, data} = case Postgrex.query(EdMarkaz.DB,
+		"SELECT
+			a.id,
+			to_timestamp((a.value->>'time')::bigint/1000)::date as date,
+			a.path[3] as school_id,
+			a.value->>'event' as event,
+			a.value->'meta'->>'product_id' as product_id,
+			b.db->>'phone_number' as number
+		FROM platform_writes a JOIN platform_schools b ON a.path[3]=b.id
+		WHERE path[4] = 'history' and value->>'event' = 'ORDER_PLACED'
+		ORDER BY date desc
+		", []) do
+			{:ok, resp} -> {:ok, resp.rows}
+			{:error, err} ->
+				IO.inspect err
+				{:error, err}
+		end
+
+		formatted = data |> Enum.map(fn [id, d | rest ] -> [id, Date.to_string(d) | rest] end)
+
+		csv = [ ["supplier_id", "date", "school_id", "event", "product_id", "number"] | formatted]
+		|> CSV.encode
+		|> Enum.join()
+
+		req = :cowboy_req.reply(
+			200,
+			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
+			csv,
+			req
+		)
+
+		{:ok, req, state}
+	end
+
 	def init(%{bindings: %{type: "platform-events.csv"}} = req, state) do
 
 		{:ok, data} = case Postgrex.query(EdMarkaz.DB,
-		"SELECT 
-			id, 
+		"SELECT
+			id,
 			to_timestamp((value->>'time')::bigint/1000)::date as date,
 			path[3] as school_id,
 			value->>'event' as event,
@@ -51,12 +86,13 @@ defmodule EdMarkaz.Server.Analytics do
 		",
 		[]) do
 				{:ok, resp} -> {:ok, resp.rows}
-				{:error, err} -> 
+				{:error, err} ->
 					IO.inspect err
 					{:error, err}
 		end
 
 		formatted = data |> Enum.map(fn [id, d | rest ] -> [id, Date.to_string(d) | rest] end)
+
 		csv = [ ["supplier_id", "date", "school_id", "event", "call_status", "duration"] | formatted]
 		|> CSV.encode
 		|> Enum.join()
@@ -73,10 +109,10 @@ defmodule EdMarkaz.Server.Analytics do
 
 	def init(%{bindings: %{type: "platform-call-surveys.csv"}} = req, state) do
 		{:ok, data} = case Postgrex.query(EdMarkaz.DB,
-		"SELECT 
-			id, 
+		"SELECT
+			id,
 			to_timestamp((value->>'time')::bigint/1000)::date as date,
-			value->>'event' as event, 
+			value->>'event' as event,
 			path[3] as school_id,
 			value->'meta'->>'answer_phone' as answer_phone,
 			value->'meta'->>'customer_interest' as customer_interest,
@@ -92,13 +128,13 @@ defmodule EdMarkaz.Server.Analytics do
 		",
 		[]) do
 			{:ok, resp} -> {:ok, resp.rows}
-			{:error, err} -> 
+			{:error, err} ->
 				IO.inspect err
 				{:error, err}
 		end
 
-		formatted = data |> 
-			Enum.map(fn [sid, d | rest] -> [sid, Date.to_string(d) | rest] end)
+		formatted = data
+			|> Enum.map(fn [sid, d | rest] -> [sid, Date.to_string(d) | rest] end)
 
 		csv = [[
 			"supplier_id",
@@ -129,10 +165,10 @@ defmodule EdMarkaz.Server.Analytics do
 
 	def init(%{bindings: %{type: "platform-call-survey-followup.csv"}} = req, state) do
 		{:ok, data} = case Postgrex.query(EdMarkaz.DB,
-		"SELECT 
-			id, 
+		"SELECT
+			id,
 			to_timestamp((value->>'time')::bigint/1000)::date as date,
-			value->>'event' as event, 
+			value->>'event' as event,
 			path[3] as school_id,
 			value->'meta'->>'follow_up_meeting_ocurred' as follow_up_meeting_ocurred,
 			value->'meta'->>'follow_up_meeting_no_reason' as follow_up_meeting_no_reason,
@@ -162,12 +198,12 @@ defmodule EdMarkaz.Server.Analytics do
 		",
 		[]) do
 			{:ok, resp} -> {:ok, resp.rows}
-			{:error, err} -> 
+			{:error, err} ->
 				IO.inspect err
 				{:error, err}
 		end
 
-		formatted = data |> 
+		formatted = data |>
 			Enum.map(fn [sid, d | rest] -> [sid, Date.to_string(d) | rest] end)
 
 		csv = [[
@@ -222,7 +258,7 @@ defmodule EdMarkaz.Server.Analytics do
 		WHERE path[4] = 'history' AND value->>'event' = 'MARK_COMPLETE_SURVEY'
 		ORDER BY date desc", []) do
 			{:ok, resp} -> {:ok, resp.rows}
-			{:error, err} -> 
+			{:error, err} ->
 				IO.inspect err
 				{:error, err}
 		end
@@ -248,7 +284,7 @@ defmodule EdMarkaz.Server.Analytics do
 		{:ok, req, state}
 	end
 
-	def init(req, state) do 
+	def init(req, state) do
 		req = :cowboy_req.reply(404, req)
 		IO.puts "route not found"
 		IO.inspect req
