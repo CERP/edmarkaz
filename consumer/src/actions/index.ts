@@ -1,5 +1,5 @@
 import Syncr from '../syncr'
-import { createLoginSucceed } from './core';
+import { createLoginSucceed, analyticsEvent } from './core';
 
 type Dispatch = (action: any) => any
 type GetState = () => RootReducerState
@@ -217,4 +217,24 @@ export const placeOrder = (product: Product) => (dispatch: Dispatch, getState: G
 		.catch(err => {
 			console.error(err)
 		})
+}
+
+export const trackRoute = (path: string) => (dispatch: Dispatch, getState: () => RootReducerState) => {
+
+	const state = getState()
+
+	const meta = state.auth.token ?
+		{
+			route: path.split("/").splice(1),
+			refcode: state.sync_state.profile.refcode,
+			phone: state.sync_state.profile.phone_number
+		} :
+		{
+			route: path.split("/").splice(1)
+		}
+
+	dispatch(analyticsEvent([{
+		type: "ROUTE",
+		meta
+	}]))
 }

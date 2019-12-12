@@ -7,36 +7,36 @@ interface SyncState {
 type SUPPLIER_TYPE = "TEXTBOOKS" | "OTHER_BOOKS" | "EDTECH" | "STATIONARY" | "SOLAR" | "LEARNING_MATERIALS" | "MIS" | "TESTING_SERVICES" | "FINANCE" | "UNKNOWN"
 
 interface Product {
-	id: string
-	supplier_id: string
-	title: string
-	description: string
-	phone_number: string
-	img_url: string
+	id: string;
+	supplier_id: string;
+	title: string;
+	description: string;
+	phone_number: string;
+	img_url: string;
 	image?: {
-		id: string
-		url?: string
+		id: string;
+		url?: string;
 	};
-	price: string
-	deleted?: boolean
+	price: string;
+	deleted?: boolean;
 	tags: {
-		[tag: string]: boolean
-	}
-	categories: { string: boolean }
+		[tag: string]: boolean;
+	};
+	categories: { string: boolean };
 	supplier_profile: {
-		name: string
-		description: string
+		name: string;
+		description: string;
 		logo?: {
-			id: string
-			url: string
-		}
+			id: string;
+			url: string;
+		};
 		banner?: {
-			id: string
-			url: string
-		}
-		order?: number
-	}
-	order?: number
+			id: string;
+			url: string;
+		};
+		order?: number;
+	};
+	order?: number;
 }
 
 interface RootReducerState {
@@ -55,13 +55,18 @@ interface RootReducerState {
 	};
 	client_id: string;
 	queued: {
-		[path: string]: {
-			action: {
-				path: string[];
-				value?: any;
-				type: "MERGE" | "DELETE";
+		mutations: {
+			[path: string]: {
+				action: {
+					path: string[];
+					value?: any;
+					type: "MERGE" | "DELETE";
+				};
+				date: number;
 			};
-			date: number;
+		};
+		analytics: {
+			[id: string]: RouteAnalyticsEvent;
 		};
 	};
 	last_snapshot: number;
@@ -226,4 +231,13 @@ interface CERPSchool {
 	wrong_number_detail_no: string;
 	wrong_number_detail_sc: string;
 	year_established: string;
+}
+
+interface BaseAnalyticsEvent {
+	type: string;
+	time: number;
+	meta: any;
+}
+interface RouteAnalyticsEvent extends BaseAnalyticsEvent {
+	type: "ROUTE";
 }

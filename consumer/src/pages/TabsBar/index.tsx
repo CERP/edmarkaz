@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { RouteComponentProps, Route } from "react-router";
+import { RouteComponentProps } from "react-router";
 import { Link } from "react-router-dom";
 
 import Header from "../../components/Header";
@@ -16,6 +16,7 @@ import Help from "../Help";
 import contactUs from '../../icons/contactUs.svg'
 import "./style.css";
 import login from "../SignUp/login";
+import TrackedRoute from "../../components/TrackedRoute";
 
 interface S {
 	error: boolean;
@@ -85,15 +86,15 @@ class TabsBar extends Component<propTypes, S> {
 				)}
 
 				<>
-					<Route exact path="/" component={ProductHome} />
-					<Route exact path="/supplier/:supplier_id/:product_id" component={ProductPage} />
-					<Route exact path="/supplier/:supplier_id" component={SupplierHome} />
-					<Route exact path="/log-in" component={login} />
-					<Route path="/sign-up" component={SignUp} />
-					<Route path="/profile" component={Profile} />
-					<Route path="/articles/:article_id" component={ArticleRouter} />
-					<Route exact path="/articles" component={Articles} />
-					<Route path="/help" component={Help} />
+					<TrackedRoute exact path="/" component={ProductHome} />
+					<TrackedRoute exact path="/supplier/:supplier_id/:product_id" component={ProductPage} />
+					<TrackedRoute exact path="/supplier/:supplier_id" component={SupplierHome} />
+					<TrackedRoute exact path="/log-in" component={login} />
+					<TrackedRoute path="/sign-up" component={SignUp} />
+					<TrackedRoute path="/profile" component={Profile} />
+					<TrackedRoute path="/articles/:article_id" component={ArticleRouter} />
+					<TrackedRoute exact path="/articles" component={Articles} />
+					<TrackedRoute path="/help" component={Help} />
 				</>
 				<a className="contact-us" href={callLink}>
 					<img src={contactUs} />
