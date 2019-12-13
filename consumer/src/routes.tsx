@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
-import { BrowserRouter, Switch } from 'react-router-dom'
+import { BrowserRouter, Switch, Route } from 'react-router-dom'
 import { Store } from 'redux'
 
 import Burger from './pages/accordian'
@@ -14,7 +14,7 @@ const Routes = ({ store }: { store: Store }) => (
 			<Switch>
 				{/* <TrackedRoute path="/" component={Burger} /> */}
 				<TrackedRoute path="/auth/:token" component={TokenAuth} />
-				<TrackedRoute path="/" component={TabsBar} />
+				<Route path="/" component={TabsBar} />
 			</Switch>
 		</BrowserRouter>
 	</Provider>

@@ -400,8 +400,10 @@ export const createLoginSucceed = (id: string, token: string, sync_state: RootRe
 })
 
 export const multiAction = (resp: { [key: string]: any }) => (dispatch: Dispatch) => {
+
 	for (const action of Object.values(resp)) {
 		if (action && action.type) {
+			console.log("dispatching", action)
 			dispatch(action)
 		}
 	}

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { RouteComponentProps } from "react-router";
+import { RouteComponentProps, Route } from "react-router";
 import { Link } from "react-router-dom";
 
 import Header from "../../components/Header";
@@ -92,7 +92,7 @@ class TabsBar extends Component<propTypes, S> {
 					<TrackedRoute exact path="/log-in" component={login} />
 					<TrackedRoute path="/sign-up" component={SignUp} />
 					<TrackedRoute path="/profile" component={Profile} />
-					<TrackedRoute path="/articles/:article_id" component={ArticleRouter} />
+					<Route path="/articles/:article_id" component={ArticleRouter} />
 					<TrackedRoute exact path="/articles" component={Articles} />
 					<TrackedRoute path="/help" component={Help} />
 				</>
