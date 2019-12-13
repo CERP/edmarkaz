@@ -190,7 +190,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 		state
 	) do
 
-		mutations_res = %{ "type" => "CONFIRM_SYNC_DIFF", "date" => 0, "new_writes" => %{}}
+		mutations_res = %{"type" => "noop"}
 		analytics_res = Sarkar.Analytics.record(client_id, analytics, last_sync_date)
 
 		res = %{
