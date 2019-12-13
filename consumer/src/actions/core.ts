@@ -100,7 +100,7 @@ export const createMerges = (merges: Merge[]) => (dispatch: (a: any) => any, get
 		}
 	}
 
-	dispatch(QueueUp(new_merges))
+	dispatch(QueueMutations(new_merges))
 
 	const payload = {
 		type: SYNC,
@@ -112,7 +112,7 @@ export const createMerges = (merges: Merge[]) => (dispatch: (a: any) => any, get
 
 	syncr.send(payload)
 		.then(res => dispatch(multiAction(res)))
-		.catch(err => dispatch(QueueUp(new_merges)))
+		.catch(err => dispatch(QueueMutations(new_merges)))
 }
 
 export const SMS = "SMS"
@@ -241,7 +241,7 @@ export const createDeletes = (paths: Delete[]) => (dispatch: (a: any) => any, ge
 		}
 	}
 
-	dispatch(QueueUp(payload))
+	dispatch(QueueMutations(payload))
 
 	syncr.send({
 		type: SYNC,
@@ -251,7 +251,7 @@ export const createDeletes = (paths: Delete[]) => (dispatch: (a: any) => any, ge
 		payload: rationalized_deletes
 	})
 		.then(res => dispatch(multiAction(res)))
-		.catch((err: Error) => dispatch(QueueUp(payload)))
+		.catch((err: Error) => dispatch(QueueMutations(payload)))
 
 }
 
@@ -288,7 +288,7 @@ export interface SnapshotDiffAction {
 
 export const QUEUE = "QUEUE"
 // queue up an object where key is path, value is action/date
-interface Queuable {
+interface MutationsQueueable {
 	[path: string]: {
 		action: {
 			type: "MERGE" | "DELETE";
@@ -315,7 +315,7 @@ export interface QueueAnalyticsAction extends BaseQueueAction {
 
 export interface QueueMutationsAction extends BaseQueueAction {
 	queue_type: "mutations";
-	payload: Queuable;
+	payload: MutationsQueueable;
 }
 export type QueueAction = QueueMutationsAction | QueueAnalyticsAction
 
@@ -324,7 +324,7 @@ export interface ConfirmAnalyticsSync {
 	time: number;
 }
 
-export const QueueUp = (action: Queuable) => {
+export const QueueMutations = (action: MutationsQueueable): QueueMutationsAction => {
 	return {
 		type: QUEUE,
 		payload: action,
@@ -332,7 +332,7 @@ export const QueueUp = (action: Queuable) => {
 	}
 }
 
-export const QueueAnalytics = (action: AnalyticsQueuable) => {
+export const QueueAnalytics = (action: AnalyticsQueuable): QueueAnalyticsAction => {
 	return {
 		type: QUEUE,
 		payload: action,
