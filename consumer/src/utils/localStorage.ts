@@ -116,7 +116,7 @@ const saveQueue = (queue: RootReducerState['queued']) => {
 }
 
 const loadQueue = () => {
-	return JSON.parse(localStorage.getItem("queued") || "{}") as RootReducerState['queued']
+	return JSON.parse(localStorage.getItem("queued") || "{\"analytics\": {}, \"mutations\": {}}") as RootReducerState['queued']
 }
 
 const saveSnapshot = (last_snapshot: number) => {
