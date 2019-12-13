@@ -176,6 +176,25 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 		{:reply, succeed(res), state}
 	end
 
+	def handle_action(
+		%{
+			"type" => "SYNC",
+			"payload" => %{
+				"analytics" => analytics,
+			},
+			"last_snapshot" => last_sync_date
+		} = action,
+		%{ id: id, client_id: client_id } = state
+	) do
+		action = Map.put(action, "payload", %{
+			"analytics" => analytics,
+			"mutations" => %{}
+		})
+
+		handle_action(action, state)
+
+	end
+
 	#logged-out sync
 	def handle_action(
 		%{
@@ -199,6 +218,25 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 		}
 
 		{:reply, succeed(res), state}
+	end
+
+	def handle_action(
+		%{
+			"type" => "SYNC",
+			"payload" => %{
+				"analytics" => analytics,
+			},
+			"last_snapshot" => last_sync_date
+		} = action,
+		state
+	) do
+		action = Map.put(action, "payload", %{
+			"analytics" => analytics,
+			"mutations" => %{}
+		})
+
+		handle_action(action, state)
+
 	end
 
 
