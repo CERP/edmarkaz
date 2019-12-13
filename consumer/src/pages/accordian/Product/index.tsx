@@ -73,7 +73,7 @@ class ProductPage extends React.Component<P, S> {
 
 					<div className="title">Congratulations</div>
 					<div className="subtitle" style={{ margin: "10px 0px" }}>
-						Our Reperesenative will soon contact you with further information.
+						Our Representative will soon contact you with further information.
 					</div>
 
 					<div className="button save" onClick={() => this.closeModal()}>
