@@ -9,6 +9,7 @@ import leaders_make_great from './topics/leaders_make_great'
 import can_we_help_all_children from './topics/can_we_help_all_children'
 
 import banner from './ilmexchange-banner.png'
+import makes_great_leader from './topics/makes_great_leader'
 
 interface RouteInfo {
 	article_id: string;
@@ -65,6 +66,10 @@ export default (props: P) => {
 						<div className="item-image" style={{ backgroundImage: `url(https://lh6.googleusercontent.com/AWdnF3zDePgYD2K77ct85i-lXasGbztxdoNmU8_6anjtBnN-TTuOmaYmwG3waE3729fzLtqiEshKV61lWu9EBb8pCVT66W8BWhD5E-1on94HWMwLK9XrjpVNEGEU3joyKiCmPcPz)` }} />
 						<div className="subtitle">How Can we Help All Children Learn?</div>
 					</Link>
+					<Link className="item-card" to={`/articles/makes_great_leader`}>
+						<div className="item-image" style={{ backgroundImage: `url(https://lh5.googleusercontent.com/JpMXRfA2YvC-xrq9B86V-3H3qidEMjfzKPh_6EOARLj_YnGnCvHaiy8y3wIB-IFe6MEGXvUVlCtKEAGfDKkcQ9YMNXfDmYjloe3cIzNxfimC42kkGwlYIZiU6L4wHkhufw)` }} />
+						<div className="subtitle">What Makes a Great School Leader?</div>
+					</Link>
 				</div>
 			</div>
 		</div>
@@ -88,5 +93,6 @@ export const ArticleRouter = (props: P) => {
 		<Route path="/articles/prepare_students" component={prepare_students} />
 		<Route path="/articles/leaders_make_great" component={leaders_make_great} />
 		<Route path="/articles/can_we_help_all_children" component={can_we_help_all_children} />
+		<Route path="/articles/makes_great_leader" component={makes_great_leader} />
 	</div>
 }
