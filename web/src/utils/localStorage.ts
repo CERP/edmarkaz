@@ -15,7 +15,7 @@ export const saveDB = (db: RootBankState) => {
 		saveProducts(db.products)
 	}
 
-	catch(err) {
+	catch (err) {
 		console.error(err);
 	}
 }
@@ -25,6 +25,7 @@ export const clearDB = () => {
 	localStorage.removeItem("sync_state")
 	localStorage.removeItem("last_snapshot")
 	localStorage.removeItem("school_db")
+	localStorage.removeItem("products")
 }
 
 export const loadAuth = (): RootBankState['auth'] => {
@@ -42,13 +43,13 @@ export const loadAuth = (): RootBankState['auth'] => {
 
 	try {
 		const str = localStorage.getItem("auth")
-		if(str === null) {
+		if (str === null) {
 			return init_auth;
 		}
 
 		return JSON.parse(str);
 	}
-	catch(err) {
+	catch (err) {
 		console.error(err);
 		return init_auth;
 	}
@@ -66,14 +67,14 @@ const loadSyncState = (): RootBankState['sync_state'] => {
 
 	const str = localStorage.getItem("sync_state");
 
-	const masked_numbers = 	mask_number_bank.reduce((agg, curr) => ({
+	const masked_numbers = mask_number_bank.reduce((agg, curr) => ({
 		...agg,
 		[curr]: {
 			status: "FREE"
 		}
 	}), {})
 
-	if(str == undefined || str == "" || str == "null") {
+	if (str == undefined || str == "" || str == "null") {
 		return {
 			matches: {
 
@@ -136,7 +137,7 @@ const loadProducts = () => {
 
 	const initial: RootBankState['products'] = {
 		last_sync: 0,
-		db: { }
+		db: {}
 	}
 
 	try {
@@ -149,9 +150,9 @@ const loadProducts = () => {
 	}
 }
 
-const saveProducts = ( products? : RootBankState['products']) => {
+const saveProducts = (products?: RootBankState['products']) => {
 
-	if(products != undefined) {
+	if (products != undefined) {
 		localStorage.setItem("products", JSON.stringify(products))
 	}
 

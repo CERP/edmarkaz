@@ -26,6 +26,10 @@ class ProductsPage extends React.Component<propTypes> {
 		props.getProducts()
 	}
 
+	componentDidMount() {
+		this.props.getProducts()
+	}
+
 	onAddProduct = () => {
 		this.props.history.push({
 			pathname: this.props.location.pathname,
