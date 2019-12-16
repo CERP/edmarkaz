@@ -370,7 +370,7 @@ export const connected = () => (dispatch: (a: any) => any, getState: () => RootR
 				})
 			})
 			.then(resp => {
-				dispatch(resp)
+				dispatch(multiAction(resp))
 			})
 			.catch(err => {
 				console.error(err)

@@ -22,6 +22,29 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 							IO.inspect msg
 							{:reply, fail(msg), state}
 					end
+
+					spawn fn ->
+						time = :os.system_time(:millisecond)
+						case Sarkar.Analytics.record(
+							client_id,
+							%{ "#{UUID.uuid4}" => %{
+									"type" => "LOGIN",
+									"meta" => %{
+										"number" => phone,
+										"ref_code" => refcode
+									},
+									"time" => time
+								}
+							},
+							time
+						) do
+							%{"type" => "CONFIRM_ANALYTICS_SYNC", "time" => _} ->
+								IO.puts "LOGIN ANALYTICS SUCCESS"
+							%{"type" => "ANALYTICS_SYNC_FAILED"} ->
+								IO.puts "LOGIN ANALYTICS FAILED"
+						end
+					end
+
 				{:error, msg} ->
 					{:reply, fail(msg), state}
 				end
@@ -51,6 +74,29 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 					res = EdMarkaz.Contegris.send_sms(number, "Welcome to ilmExchange. Please go here to login https://ilmexchange.com/auth/#{one_token}")
 					IO.inspect res
 				end
+
+				spawn fn ->
+					time = :os.system_time(:millisecond)
+					case Sarkar.Analytics.record(
+						client_id,
+						%{ "#{UUID.uuid4}" => %{
+								"type" => "SIGNUP",
+								"meta" => %{
+									"number" => number,
+									"ref_code" => refcode
+								},
+								"time" => time
+							}
+						},
+						time
+					) do
+						%{"type" => "CONFIRM_ANALYTICS_SYNC", "time" => _} ->
+							IO.puts "SIGNUP ANALYTICS SUCCESS"
+						%{"type" => "ANALYTICS_SYNC_FAILED"} ->
+							IO.puts "SIGNUP ANALYTICS FAILED"
+					end
+				end
+
 				{:reply, succeed(%{token: token}), %{id: number, client_id: client_id}}
 			{:error, msg} ->
 				{:reply, fail(msg), state}
