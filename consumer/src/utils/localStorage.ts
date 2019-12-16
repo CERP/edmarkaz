@@ -116,7 +116,29 @@ const saveQueue = (queue: RootReducerState['queued']) => {
 }
 
 const loadQueue = () => {
-	return JSON.parse(localStorage.getItem("queued") || "{}") as RootReducerState['queued']
+
+	const current = JSON.parse(localStorage.getItem("queued") || "{\"analytics\": {}, \"mutations\": {}}")
+
+	if (!current.mutations && !current.analytics) {
+		return {
+			mutations: {},
+			analytics: {}
+		}
+	}
+	else if (!current.mutations) {
+		return {
+			...current,
+			mutations: {}
+		}
+	}
+	else if (!current.analytics) {
+		return {
+			...current,
+			analytics: {}
+		}
+	}
+
+	return current
 }
 
 const saveSnapshot = (last_snapshot: number) => {

@@ -22,6 +22,29 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 							IO.inspect msg
 							{:reply, fail(msg), state}
 					end
+
+					spawn fn ->
+						time = :os.system_time(:millisecond)
+						case Sarkar.Analytics.record(
+							client_id,
+							%{ "#{UUID.uuid4}" => %{
+									"type" => "LOGIN",
+									"meta" => %{
+										"number" => phone,
+										"ref_code" => refcode
+									},
+									"time" => time
+								}
+							},
+							time
+						) do
+							%{"type" => "CONFIRM_ANALYTICS_SYNC", "time" => _} ->
+								IO.puts "LOGIN ANALYTICS SUCCESS"
+							%{"type" => "ANALYTICS_SYNC_FAILED"} ->
+								IO.puts "LOGIN ANALYTICS FAILED"
+						end
+					end
+
 				{:error, msg} ->
 					{:reply, fail(msg), state}
 				end
@@ -51,6 +74,29 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 					res = EdMarkaz.Contegris.send_sms(number, "Welcome to ilmExchange. Please go here to login https://ilmexchange.com/auth/#{one_token}")
 					IO.inspect res
 				end
+
+				spawn fn ->
+					time = :os.system_time(:millisecond)
+					case Sarkar.Analytics.record(
+						client_id,
+						%{ "#{UUID.uuid4}" => %{
+								"type" => "SIGNUP",
+								"meta" => %{
+									"number" => number,
+									"ref_code" => refcode
+								},
+								"time" => time
+							}
+						},
+						time
+					) do
+						%{"type" => "CONFIRM_ANALYTICS_SYNC", "time" => _} ->
+							IO.puts "SIGNUP ANALYTICS SUCCESS"
+						%{"type" => "ANALYTICS_SYNC_FAILED"} ->
+							IO.puts "SIGNUP ANALYTICS FAILED"
+					end
+				end
+
 				{:reply, succeed(%{token: token}), %{id: number, client_id: client_id}}
 			{:error, msg} ->
 				{:reply, fail(msg), state}
@@ -148,31 +194,104 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 	end
 
 	# logged-in sync
-	def handle_action(%{"type" => "SYNC", "payload" => payload, "last_snapshot" => last_sync_date}, %{id: id, client_id: client_id} = state) do
+	def handle_action(
+		%{
+			"type" => "SYNC",
+			"payload" => %{
+				"analytics" => analytics,
+				"mutations" => mutations
+			},
+			"last_snapshot" => last_sync_date
+		},
+		%{ id: id, client_id: client_id } = state
+	) do
 
-	# this goes through our normal sync flow, though we need to figure out how to kill the server at a certain point
+		mutations_res = if map_size(mutations) > 0 do
+			EdMarkaz.Consumer.sync_changes(id, client_id, mutations, last_sync_date)
+		else
+			%{ "type" => "CONFIRM_SYNC_DIFF", "date" => 0, "new_writes" => %{}}
+		end
 
-	{:reply, succeed(%{"type" => "noop"}), state}
+		analytics_res = Sarkar.Analytics.record(client_id, analytics, last_sync_date)
+
+		res = %{
+			"mutations" => mutations_res,
+			"analytics" => analytics_res
+		}
+
+		{:reply, succeed(res), state}
+	end
+
+	def handle_action(
+		%{
+			"type" => "SYNC",
+			"payload" => %{
+				"analytics" => analytics,
+			},
+			"last_snapshot" => last_sync_date
+		} = action,
+		%{ id: id, client_id: client_id } = state
+	) do
+		action = Map.put(action, "payload", %{
+			"analytics" => analytics,
+			"mutations" => %{}
+		})
+
+		handle_action(action, state)
 
 	end
 
 	#logged-out sync
-	def handle_action(%{"type" => "SYNC", "payload" => payload, "last_snapshot" => last_sync_date}, state) do
-		# how do we make this less intense.
-		# what are we even syncing in this case... just analytics
-		# so we can parse through the payload for analytics events and write them direct to table
-		# instead of spinning up a genserver for a client and eating memory
+	def handle_action(
+		%{
+			"type" => "SYNC",
+			"payload" => %{
+				"analytics" => analytics,
+				"mutations" => mutations
+			},
+			"last_snapshot" => last_sync_date,
+			"client_id" => client_id
+		},
+		state
+	) do
 
-		# so lets nail down our analytics events client-side first.
+		mutations_res = %{"type" => "noop"}
+		analytics_res = Sarkar.Analytics.record(client_id, analytics, last_sync_date)
 
-		# path: [ "analytics", timestamp], value: { type: "page_view | product_view", time: timestamp, product_id: "" }
-		# can i come up with a path that if i get rid of the device_id key, i can rerun them and create a state....
-		# path: ["analytics", "product_view", product_id, timestamp] value: { time: timestamp }
-		# then this can be forwarded to an analytics genserver which merges and broadcasts to the dashboard
-		# we can add a flag on to the value which means that it will get queued, but not applied to local sync_state
-		# value: { no_local_apply: true }
+		res = %{
+			"mutations" => mutations_res,
+			"analytics" => analytics_res
+		}
 
-	{:reply, succeed(%{"type" => "noop"}), state}
+		{:reply, succeed(res), state}
+	end
+
+	def handle_action(
+		%{
+			"type" => "SYNC",
+			"payload" => %{
+				"analytics" => analytics,
+			},
+			"last_snapshot" => last_sync_date
+		} = action,
+		state
+	) do
+		action = Map.put(action, "payload", %{
+			"analytics" => analytics,
+			"mutations" => %{}
+		})
+
+		handle_action(action, state)
+
+	end
+
+
+
+	#old sync
+	def handle_action(%{"type" => "SYNC", "payload" => payload, "last_snapshot" => last_sync_date}, %{id: id, client_id: client_id} = state) do
+		IO.puts "OLD SYNC"
+
+		{:reply, succeed(%{"type" => "noop"}), state}
 	end
 
 	def handle_action(msg, state) do

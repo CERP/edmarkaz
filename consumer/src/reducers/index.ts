@@ -1,6 +1,6 @@
 import Dynamic from '@ironbay/dynamic'
 
-import { MERGES, MergeAction, ON_CONNECT, ON_DISCONNECT, DELETES, DeletesAction, QueueAction, QUEUE, CONFIRM_SYNC_DIFF, ConfirmSyncAction, SnapshotDiffAction, SNAPSHOT_DIFF, LOGIN_SUCCEED, LoginSucceed } from '../actions/core'
+import { MERGES, MergeAction, ON_CONNECT, ON_DISCONNECT, DELETES, DeletesAction, QUEUE, CONFIRM_SYNC_DIFF, ConfirmSyncAction, SnapshotDiffAction, SNAPSHOT_DIFF, LOGIN_SUCCEED, LoginSucceed, ConfirmAnalyticsSync, QueueAction } from '../actions/core'
 import { ADD_PRODUCTS, LOAD_PROFILE } from '../actions'
 import { AnyAction } from 'redux';
 
@@ -15,6 +15,27 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 					connected: true
 				}
 			}
+
+		case "CONFIRM_ANALYTICS_SYNC": {
+			const newA = Object.entries(state.queued.analytics)
+				.reduce((agg, [key, val]) => {
+					if (val.time > (action as ConfirmAnalyticsSync).time) {
+						return {
+							...agg,
+							[key]: val
+						}
+					}
+					return agg
+				}, {})
+
+			return {
+				...state,
+				queued: {
+					...state.queued,
+					analytics: newA
+				}
+			}
+		}
 
 		case "SENDING_AUTH_SMS":
 			{
@@ -78,11 +99,28 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 
 		case QUEUE:
 			{
+				const queueAction = action as QueueAction;
+
+				if (queueAction.queue_type === "analytics") {
+					return {
+						...state,
+						queued: {
+							...state.queued,
+							analytics: {
+								...state.queued.analytics,
+								...queueAction.payload
+							}
+						}
+					}
+				}
 				return {
 					...state,
 					queued: {
 						...state.queued,
-						...(action as QueueAction).payload
+						mutations: {
+							...state.queued.mutations,
+							...queueAction.payload
+						}
 					}
 				}
 			}
@@ -96,14 +134,19 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 					Object.keys(diff_action.new_writes).length,
 					"changes synced")
 
-				const newQ = Object.keys(state.queued)
+				const newM = Object.keys(state.queued.mutations)
 					.filter(t => {
-						console.log(state.queued[t].date, diff_action.date, state.queued[t].date - diff_action.date)
-						return state.queued[t].date > diff_action.date
+						console.log(state.queued.mutations[t].date, diff_action.date, state.queued.mutations[t].date - diff_action.date)
+						return state.queued.mutations[t].date > diff_action.date
 					})
 					.reduce((agg, curr) => {
-						return Dynamic.put(agg, ["queued", state.queued[curr].action.path], state.queued[curr].action)
+						return Dynamic.put(agg, [state.queued.mutations[curr].action.path], state.queued.mutations[curr])
 					}, {})
+
+				const newQ = {
+					...state.queued,
+					mutations: newM
+				}
 
 				if (Object.keys(diff_action.new_writes).length > 0) {
 					const nextState = Object.values(diff_action.new_writes)
