@@ -4,15 +4,16 @@ import './index.css';
 import * as serviceWorker from './serviceWorker';
 import { applyMiddleware, AnyAction, createStore, Store } from 'redux';
 import thunkMiddleware, { ThunkMiddleware } from 'redux-thunk'
+import Syncr from '@cerp/syncr'
 
 import 'core-js/features/object'
 
 import Routes from './routes'
-import Syncr from './syncr'
 import reducer from './reducers'
 
 import { loadDB, saveDB } from './utils/localStorage'
 import debounce from './utils/debounce';
+import { connected, disconnected } from './actions/core';
 
 
 const debug_url = "wss://5e4f17ae.ngrok.io/ws"
@@ -20,9 +21,16 @@ const debug_url = "wss://5e4f17ae.ngrok.io/ws"
 const host = window.api_url || debug_url;
 
 const initial_state = loadDB()
-const syncr = new Syncr(host, msg => store.dispatch(msg))
+const syncr = new Syncr(host)
+
+//@ts-ignore
+syncr.on('connect', () => store.dispatch(connected()))
+syncr.on('disconnect', () => store.dispatch(disconnected()))
+syncr.on('message', (msg: AnyAction) => store.dispatch(msg))
+
 //@ts-ignore
 const store: Store<RootReducerState> = createStore(reducer, initial_state, applyMiddleware(thunkMiddleware.withExtraArgument(syncr) as ThunkMiddleware<RootReducerState, AnyAction, Syncr>))
+
 
 const saveBounce = debounce(() => {
 	const state = store.getState();

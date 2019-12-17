@@ -1,4 +1,4 @@
-import Syncr from '../syncr'
+import Syncr from '@cerp/syncr'
 import { createLoginSucceed, analyticsEvent } from './core';
 
 type Dispatch = (action: any) => any
@@ -32,7 +32,7 @@ export const SMSAuth = (phone: string) => (dispatch: Dispatch, getState: GetStat
 	const state = getState()
 
 	if (!state.connected) {
-		setTimeout(() => dispatch(SMSAuth(phone)), 2000)
+		syncr.onNext('connect', () => dispatch(SMSAuth(phone)))
 		return
 	}
 
@@ -64,7 +64,7 @@ export const verifyUrlAuth = (token: string) => (dispatch: Dispatch, getState: G
 	const state = getState();
 
 	if (!state.connected) {
-		setTimeout(() => dispatch(verifyUrlAuth(token)), 2000)
+		syncr.onNext('connect', () => dispatch(verifyUrlAuth(token)))
 		return
 	}
 
@@ -96,6 +96,11 @@ export const GET_PRODUCTS = "GET_PRODUCTS"
 export const getProducts = (filters = {}) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 
 	const state = getState();
+
+	if (!state.connected) {
+		syncr.onNext('connect', () => dispatch(getProducts(filters)))
+		return;
+	}
 
 	syncr.send({
 		type: "GET_PRODUCTS",
