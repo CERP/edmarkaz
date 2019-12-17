@@ -4,7 +4,7 @@ import { withRouter, RouteComponentProps } from 'react-router-dom'
 
 import moment from 'moment'
 import Former from '~/src/utils/former'
-import { getSchoolProfiles, reserveMaskedNumber, releaseMaskedNumber, rejectSchool, saveCallEndSurvey, saveSchoolRejectedSurvey, saveSchoolCompletedSurvey, saveCallEndSurveyFollowUp } from '~/src/actions'
+import { getSchoolProfiles, reserveMaskedNumber, releaseMaskedNumber, rejectSchool, saveCallEndSurvey, saveSchoolRejectedSurvey, saveSchoolCompletedSurvey, saveCallEndSurveyFollowUp, getOwnProducts } from '~/src/actions'
 import Modal from '~/src/components/Modal'
 import getUserType from '~/src/utils/getUserType'
 import EstimateMonthlyRevenue from '~/src/utils/estimate_revenue'
@@ -30,10 +30,10 @@ interface StateProps {
 }
 
 // survey is basically going to be an event
-// from our perspective, we want to know from the first call what the customer purchase likelihood is 
+// from our perspective, we want to know from the first call what the customer purchase likelihood is
 // we want to know if they will take a next_step
-	// if they will take a next step, it can appear on home page 
-// 
+// if they will take a next step, it can appear on home page
+//
 
 interface StateType {
 	showSurvey: false | "NOT_INTERESTED" | "CALL_END" | "MARK_COMPLETE";
@@ -45,6 +45,7 @@ interface DispatchProps {
 	releaseNumber: () => void;
 	reserveNumber: () => void;
 	rejectSchool: () => void;
+	getProducts: () => void
 	saveCallEndSurvey: (survey: CallEndSurvey['meta']) => void;
 	saveSchoolRejectedSurvey: (survey: NotInterestedSurvey['meta']) => void;
 	saveSchoolCompletedSurvey: (survey: MarkCompleteSurvey['meta']) => void;
@@ -59,7 +60,7 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 	constructor(props: propTypes) {
 		super(props);
 
-		if(props.school === undefined) {
+		if (props.school === undefined) {
 			props.addSchool()
 		}
 
@@ -72,9 +73,13 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 
 	}
 
+	componentDidMount() {
+		this.props.getProducts()
+	}
+
 	componentWillReceiveProps(nextProps: propTypes) {
 
-		if(nextProps.school === undefined && nextProps.school_id !== this.props.school_id) {
+		if (nextProps.school === undefined && nextProps.school_id !== this.props.school_id) {
 			nextProps.addSchool()
 		}
 
@@ -94,7 +99,7 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 		}
 		*/
 
-		if((current_call_in_progress || next_call) && this.props.school_id === nextProps.school_id) {
+		if ((current_call_in_progress || next_call) && this.props.school_id === nextProps.school_id) {
 			this.setState({
 				showSurvey: "CALL_END"
 			})
@@ -103,7 +108,7 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 		const currently_masked = Boolean(this.props.schoolMatch && this.props.schoolMatch.masked_number)
 		const next_masked = Boolean(nextProps.schoolMatch && nextProps.schoolMatch.masked_number)
 
-		if(this.state.loading && currently_masked != next_masked) {
+		if (this.state.loading && currently_masked != next_masked) {
 			this.setState({
 				loading: false
 			})
@@ -122,7 +127,7 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 
 		const res = confirm('Are you sure you want to Mark as Complete?')
 
-		if(res) {
+		if (res) {
 			this.props.releaseNumber()
 			this.setState({
 				showSurvey: "MARK_COMPLETE",
@@ -155,22 +160,22 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 
 		const call_end_surveys: CallEndSurvey[] = Object.values(this.props.schoolMatch.history || {})
 			.filter(x => x.event === "CALL_END_SURVEY") as CallEndSurvey[]
-		
+
 		const call_number = call_end_surveys.length;
 
-		if(this.state.showSurvey === "CALL_END" && call_number == 0) {
+		if (this.state.showSurvey === "CALL_END" && call_number == 0) {
 			this.props.saveCallEndSurvey(survey as CallEndSurvey['meta'])
 		}
 
-		if(this.state.showSurvey === "CALL_END" && call_number > 0) {
+		if (this.state.showSurvey === "CALL_END" && call_number > 0) {
 			this.props.saveCallEndFollowupSurvey(survey as CallEndSurveyFollowUp['meta'])
 		}
 
-		if(this.state.showSurvey === "NOT_INTERESTED") {
+		if (this.state.showSurvey === "NOT_INTERESTED") {
 			this.props.saveSchoolRejectedSurvey(survey as NotInterestedSurvey['meta'])
 		}
 
-		if(this.state.showSurvey === "MARK_COMPLETE") {
+		if (this.state.showSurvey === "MARK_COMPLETE") {
 			this.props.saveSchoolCompletedSurvey(survey as MarkCompleteSurvey['meta'])
 		}
 
@@ -183,7 +188,7 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 	render() {
 
 		const school = this.props.school;
-		if(school === undefined) {
+		if (school === undefined) {
 			return <div className="loading">Loading School Info...</div>
 		}
 
@@ -193,7 +198,7 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 		const hasHistory = schoolMatch.history && Object.keys(schoolMatch.history).length > 0;
 
 		let estimated_monthly_revenue = ""
-		if(isValid(school.lowest_fee) && isValid(school.highest_fee) && isValid(school.total_enrolment)) {
+		if (isValid(school.lowest_fee) && isValid(school.highest_fee) && isValid(school.total_enrolment)) {
 			estimated_monthly_revenue = EstimateMonthlyRevenue(school).toLocaleString() + " Rs"
 		}
 
@@ -207,10 +212,10 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 			<div className="close" onClick={this.onClose}>Close</div>
 			<div className="title" style={{ marginTop: 0, textAlign: "center" }}>{school.school_name}</div>
 
-			<div className="form" style={{width: "90%"}}>
+			<div className="form" style={{ width: "90%" }}>
 
 				{
-					hasHistory && <SchoolHistory schoolMatch={schoolMatch} products={this.props.products}/>
+					hasHistory && <SchoolHistory schoolMatch={schoolMatch} products={this.props.products} />
 				}
 
 				{
@@ -225,12 +230,12 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 
 				{
 					this.state.showSurvey === "CALL_END" && call_number > 0 && <Modal>
-						<CallEndSurveyFollowUpComponent saveSurvey={this.saveSurvey} call_number={call_number} user_type={getUserType(this.props.username)}/>
+						<CallEndSurveyFollowUpComponent saveSurvey={this.saveSurvey} call_number={call_number} user_type={getUserType(this.props.username)} />
 					</Modal>
 				}
 
 				{
-					this.state.showSurvey === "NOT_INTERESTED" && 
+					this.state.showSurvey === "NOT_INTERESTED" &&
 					<Modal>
 						<NotInterestedSurveyComponent saveSurvey={this.saveSurvey} />
 					</Modal>
@@ -243,29 +248,29 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 					</Modal>
 				}
 
-				{ !this.props.connected && <div style={{textAlign: "center", fontSize: "1.2rem" }}>Connecting....</div> }
-				{ this.state.loading && <div style={{textAlign: "center", fontSize: "1.2rem" }}>Retreiving...</div> }
+				{!this.props.connected && <div style={{ textAlign: "center", fontSize: "1.2rem" }}>Connecting....</div>}
+				{this.state.loading && <div style={{ textAlign: "center", fontSize: "1.2rem" }}>Retreiving...</div>}
 
-				{ this.props.connected && !this.state.loading && !reserved && <div className="save-delete">
-					<div className="red button" onClick={this.onMarkRejected}>Not Interested</div> 
+				{this.props.connected && !this.state.loading && !reserved && <div className="save-delete">
+					<div className="red button" onClick={this.onMarkRejected}>Not Interested</div>
 					<div className="button blue" onClick={this.onShowNumber}>Show Number</div>
 				</div>
 				}
-				{ this.props.connected && reserved && !this.state.loading && <div className="button purple" onClick={this.onMarkComplete}>Mark as Complete</div> }
+				{this.props.connected && reserved && !this.state.loading && <div className="button purple" onClick={this.onMarkComplete}>Mark as Complete</div>}
 
 				<div className="row">
 					<label>Status</label>
 					<div>{this.props.schoolMatch.status}</div>
 				</div>
-				{ 
-					reserved && 
+				{
+					reserved &&
 					<div className="row">
 						<label>Phone Number</label>
-						<a href={`tel:${this.props.schoolMatch.masked_number}`} className="number">{this.props.schoolMatch.masked_number}</a> 
+						<a href={`tel:${this.props.schoolMatch.masked_number}`} className="number">{this.props.schoolMatch.masked_number}</a>
 					</div>
 				}
 
-				{ call_end_surveys.filter(x => x.meta.other_notes).length > 0 && <div className="divider">Notes</div> }
+				{call_end_surveys.filter(x => x.meta.other_notes).length > 0 && <div className="divider">Notes</div>}
 				{
 					call_end_surveys.filter(x => x.meta.other_notes).length > 0 &&
 					<div className="row">
@@ -277,7 +282,7 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 				{
 					call_end_surveys
 						.filter(x => x.meta.other_notes)
-						.map(x => 
+						.map(x =>
 							<div className="row" key={x.time}>
 								<div>{moment(x.time).format("DD/MM")}</div>
 								<div>{x.meta.customer_interest}</div>
@@ -323,7 +328,7 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 
 				<div className="divider">Financing</div>
 				<div className="section">
-					{ /* <SurveyRow label="Financing Interest" val={school.financing_interest} /> */ }
+					{ /* <SurveyRow label="Financing Interest" val={school.financing_interest} /> */}
 					<SurveyRow label="Unmet Need" val={school.unmet_financing_needs} />
 					<SurveyRow label="Current Loan Outstanding" val={school.previous_loan} />
 					<SurveyRow label="Outstanding Loan Amount" val={school.previous_loan_amount} />
@@ -331,10 +336,10 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 
 				<div className="divider">Education Services</div>
 				<div className="section">
-					{ /* <SurveyRow label="Textbook Provider Interest" val={school.textbook_provider_interest} /> */ }
+					{ /* <SurveyRow label="Textbook Provider Interest" val={school.textbook_provider_interest} /> */}
 					<SurveyRow label="Current Textbook Provider" val={map_textbook_providers(school.textbook_publisher)} />
 					<SurveyRow label="Previously Purchased Products" val={map_ess_products(school.ess_current)} />
-					{ /* <SurveyRow label="Current Product Interests" val={map_ess_products(school.ess_interest)} /> */ }
+					{ /* <SurveyRow label="Current Product Interests" val={map_ess_products(school.ess_interest)} /> */}
 				</div>
 
 			</div>
@@ -342,9 +347,9 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 	}
 }
 
-const call_in_progress = ( schoolMatch: SchoolMatch): boolean => {
+const call_in_progress = (schoolMatch: SchoolMatch): boolean => {
 
-	if(schoolMatch.history === undefined) {
+	if (schoolMatch.history === undefined) {
 		return false;
 	}
 
@@ -353,14 +358,14 @@ const call_in_progress = ( schoolMatch: SchoolMatch): boolean => {
 		.sort((a, b) => a.time - b.time)
 
 	const unmatched_call_event = call_events.reduce((agg: SupplierInteractionEvent[], curr) => {
-		if(curr.event === "CALL_START") {
+		if (curr.event === "CALL_START") {
 			return [...agg, curr]
 		}
 
-		if(curr.event === "CALL_END") {
+		if (curr.event === "CALL_END") {
 			// is there a previous call_start event?
 			const prev = agg.pop();
-			if(prev && prev.event === "CALL_START") {
+			if (prev && prev.event === "CALL_START") {
 				return agg;
 			}
 			console.log(prev)
@@ -368,7 +373,7 @@ const call_in_progress = ( schoolMatch: SchoolMatch): boolean => {
 		}
 	}, [])
 
-	if(unmatched_call_event.length > 0) {
+	if (unmatched_call_event.length > 0) {
 		return true;
 	}
 
@@ -385,7 +390,7 @@ const SchoolHistory: React.SFC<SchoolMatchProps> = (props: SchoolMatchProps) => 
 	const combined_events = Object.values(props.schoolMatch.history)
 		.sort((a, b) => a.time - b.time)
 		.reduce((agg, curr) => {
-			if(curr.event == "CALL_START" || curr.event == "CALL_BACK") {
+			if (curr.event == "CALL_START" || curr.event == "CALL_BACK") {
 				return agg;
 			}
 
@@ -408,10 +413,14 @@ const SchoolHistory: React.SFC<SchoolMatchProps> = (props: SchoolMatchProps) => 
 		{
 			combined_events
 				.map(v => {
-					if(v.event === "ORDER_PLACED") {
+
+					let product: Product
+					if (v.event === "ORDER_PLACED") {
 						console.log(v.meta)
 						console.log(props.products[v.meta.product_id])
+						product = props.products[v.meta.product_id]
 					}
+
 
 					return <div className="row" key={v.time}>
 						<div>{moment(v.time).format("DD/MM")}</div>
@@ -421,11 +430,11 @@ const SchoolHistory: React.SFC<SchoolMatchProps> = (props: SchoolMatchProps) => 
 							v.user.name.name || v.user.name
 						}</div>
 						<div>{v.event}</div>
-						<div>{v.meta ? v.meta.call_status || (v.event === "ORDER_PLACED" && props.products[v.meta.product_id].title) : ""}</div>
+						<div>{v.meta ? v.meta.call_status || (v.event === "ORDER_PLACED" && product && product.title) : ""}</div>
 						{
 							v.event === "CALL_END" ? console.log("META:", v.meta) : false
 						}
-						
+
 					</div>
 				})
 		}
@@ -493,7 +502,7 @@ interface SurveyRowProp {
 
 const SurveyRow: React.StatelessComponent<SurveyRowProp> = ({ label, val }) => {
 
-	if(!isValid(val)) {
+	if (!isValid(val)) {
 		return null;
 	}
 
@@ -513,11 +522,12 @@ export default connect<StateProps, DispatchProps, OwnProps>((state: RootBankStat
 	connected: state.connected,
 	username: state.auth.id,
 	products: state.products.db
-}), (dispatch: Function, props: OwnProps ) => ({
+}), (dispatch: Function, props: OwnProps) => ({
 	addSchool: () => dispatch(getSchoolProfiles([props.school_id])),
 	reserveNumber: () => dispatch(reserveMaskedNumber(props.school_id)),
 	releaseNumber: () => dispatch(releaseMaskedNumber(props.school_id)),
 	rejectSchool: () => dispatch(rejectSchool(props.school_id)),
+	getProducts: () => dispatch(getOwnProducts()),
 	saveCallEndSurvey: (survey: CallEndSurvey['meta']) => dispatch(saveCallEndSurvey(props.school_id, survey)),
 	saveSchoolRejectedSurvey: (survey: NotInterestedSurvey['meta']) => dispatch(saveSchoolRejectedSurvey(props.school_id, survey)),
 	saveSchoolCompletedSurvey: (survey: MarkCompleteSurvey['meta']) => dispatch(saveSchoolCompletedSurvey(props.school_id, survey)),
