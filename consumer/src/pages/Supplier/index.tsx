@@ -62,13 +62,31 @@ class SupplierHomePage extends React.Component<P, S>{
 
 								let img_url = ""
 								if (p.image && p.image.url) {
-									const splits = p.image.url.split('.')
 
-									img_url = splits.slice(0, splits.length - 1).join('.') + "_thumb.png"
+									const url = new URL(p.image.url)
+									const splits = url.pathname.split('.')
+
+									const thumb_path = splits.slice(0, splits.length - 1).join('.') + "_thumb.png"
+
+									if (p.image.url.indexOf(" ")) {
+										img_url = p.image.url;
+									}
+									else {
+										img_url = "/img" + decodeURIComponent(thumb_path)
+									}
+									/*
+									console.log('before', p.image.url)
+									console.log('after', img_url)
+									*/
 								}
 
+								const backgroundImage = `url("${img_url}")`
+
 								return <Link className="item-card" to={`/supplier/${supplier_id}/${p.id}`} key={k}>
-									<div className="item-image" style={{ backgroundImage: `url(${img_url})` }} />
+									<div className="item-image" style={{
+										backgroundImage: backgroundImage || "placeholder",
+										fontWeight: "bold"
+									}} />
 									<div className="subtitle">{p.title}</div>
 									<div>{p.price}</div>
 								</Link>

@@ -1,8 +1,26 @@
 {
-    "rewrites": [
-        { "source": "/static/js/:fname", "destination": "/static/js/:fname" },
-        { "source": "/static/css/:fname", "destination": "/static/css/:fname" },
-        { "source": "!static/**", "destination": "/index.html" }
-    ]
+	"redirects": [
+		{
+			"source": "/img/:bucket/:id",
+			"destination": "https://storage.googleapis.com/:bucket/:id"
+		}
+	],
+	"rewrites": [
+		{
+			"source": "/static/js/:fname",
+			"destination": "/static/js/:fname"
+		},
+		{
+			"source": "/static/css/:fname",
+			"destination": "/static/css/:fname"
+		},
+		{
+			"source": "/static/media/:fname",
+			"destination": "/static/media/:fname"
+		},
+		{
+			"source": "(!static|!img)/**",
+			"destination": "/index.html"
+		}
+	]
 }
-
