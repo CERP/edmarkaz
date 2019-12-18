@@ -1,6 +1,5 @@
 import Syncr from '@cerp/syncr'
 import { createLoginSucceed } from './core'
-import { connect } from 'react-redux';
 
 type Dispatch = (action: any) => any;
 type GetState = () => RootReducerState

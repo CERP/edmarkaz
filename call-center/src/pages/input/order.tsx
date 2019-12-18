@@ -17,6 +17,11 @@ const OrderPage = ({ placeOrder, products }: P) => {
 
 	const suppliers = Object.values(products.db)
 		.reduce((agg, curr) => {
+
+			if (!curr.supplier_profile) {
+				return agg;
+			}
+
 			agg[curr.supplier_id] = curr.supplier_profile.name
 			return agg;
 		}, {} as Record<string, string>)
@@ -46,6 +51,7 @@ const OrderPage = ({ placeOrder, products }: P) => {
 		{
 			Object.entries(products.db)
 				.filter(([, p]) => !p.deleted &&
+					p.supplier_profile &&
 					(supplier_filter ? p.supplier_id == supplier_filter : true) &&
 					(product_filter ? p.title.toLowerCase().includes(product_filter) : true)
 				)
