@@ -18,6 +18,7 @@ interface Product {
 		url?: string;
 	};
 	price: string;
+	old_price: string;
 	deleted?: boolean;
 	tags: {
 		[tag: string]: boolean;

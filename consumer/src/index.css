@@ -131,7 +131,7 @@ a.block {
 	.header {
 		display: none;
 	}
-	
+
 	.button {
 		display: none!important;
 	}
@@ -236,7 +236,7 @@ a.block {
 		.form .row>* {
 			width: 100%;
 		}
-		
+
 		.form .row>*:last-child {
 			margin-left: auto;
 		}
@@ -255,7 +255,7 @@ a.block {
 		.form input {
 			min-width: 30%;
 		}
-		
+
 		.form select {
 			min-width: 30%;
 		}
@@ -294,7 +294,7 @@ a.block {
 		width: 30px;
 		height: 30px;
 	}
-	
+
 	input[type="date"] {
 		background-color: initial;
 		height: 40px;
@@ -307,7 +307,7 @@ a.block {
 		display: block;
 		margin: 0;
 		height: 40px;
-		line-height: 40px; 
+		line-height: 40px;
 		font-size: 17px;
 		border: 1px solid #bbb;
 		border-radius: 5px;

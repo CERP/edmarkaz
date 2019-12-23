@@ -43,7 +43,7 @@ class SupplierHomePage extends React.Component<P, S>{
 				height: "300px"
 			}}>
 				<div className="supp-logo-container">
-					<img className="supplier-logo" src={logo && logo.url} />
+					<img className="supplier-logo" crossOrigin="anonymous" src={logo && logo.url} />
 				</div>
 			</div>
 			<div className="tabs-home">
@@ -62,9 +62,7 @@ class SupplierHomePage extends React.Component<P, S>{
 
 								let img_url = ""
 								if (p.image && p.image.url) {
-									const splits = p.image.url.split('.')
-
-									img_url = splits.slice(0, splits.length - 1).join('.') + "_thumb.png"
+									return p.image.url.replace(/\.(png|jpg|jpeg|tif|gif)$/, "_thumb.png")
 								}
 
 								return <Link className="item-card" to={`/supplier/${supplier_id}/${p.id}`} key={k}>

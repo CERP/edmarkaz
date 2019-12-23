@@ -43,4 +43,16 @@ ReactDOM.render(<Routes store={store} />, document.getElementById('root'));
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.register();
+serviceWorker.register({
+	onUpdate: (registration: ServiceWorkerRegistration) => {
+		navigator.serviceWorker.controller && navigator.serviceWorker.controller.postMessage({
+			type: "SKIP_WAITING"
+		})
+	}
+});
+
+if (navigator.serviceWorker) {
+	navigator.serviceWorker.addEventListener('controllerchange', () => {
+		window.location.reload()
+	})
+}

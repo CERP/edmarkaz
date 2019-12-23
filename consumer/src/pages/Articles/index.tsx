@@ -25,7 +25,7 @@ export default (props: P) => {
 	return <div className="articles">
 
 		<div className="tabs-banner">
-			<img className="banner-img" src={banner} />
+			<img crossOrigin="anonymous" className="banner-img" src={banner} />
 		</div>
 
 		<div className="tabs-home">

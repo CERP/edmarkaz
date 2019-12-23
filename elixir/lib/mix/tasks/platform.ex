@@ -202,7 +202,7 @@ defmodule Mix.Tasks.Platform do
 		IO.inspect res
 
 		tasks = products
-		|> Enum.map(fn [sid, pid, name, price, desc, category, picture_url, order | _] ->
+		|> Enum.map(fn [sid, pid, name, price, old_price, desc, category, picture_url, order | _] ->
 			# Task.async fn ->
 
 				case picture_url do
@@ -217,6 +217,7 @@ defmodule Mix.Tasks.Platform do
 							"description" => desc,
 							"phone_number" => "",
 							"price" => price,
+							"old_price" => old_price,
 							"categories" => %{
 								category => true
 							},

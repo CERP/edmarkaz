@@ -83,7 +83,7 @@ class ProductPage extends React.Component<P, S> {
 			</Modal>}
 
 
-			<img src={product.image && product.image.url} className="item-image" alt="Product" />
+			<img crossOrigin="anonymous" src={product.image && product.image.url} className="item-image" alt="Product" />
 			<div className="item-info">
 				<div className="title">{product.title}</div>
 				<div className="subtitle">{supplier_name}</div>
