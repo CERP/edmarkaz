@@ -62,11 +62,11 @@ class SupplierHomePage extends React.Component<P, S>{
 
 								let img_url = ""
 								if (p.image && p.image.url) {
-									return p.image.url.replace(/\.(png|jpg|jpeg|tif|gif)$/, "_thumb.png")
+									img_url = p.image.url.replace(/\.(png|jpg|jpeg|tif|gif)$/, "_thumb.png")
 								}
 
 								return <Link className="item-card" to={`/supplier/${supplier_id}/${p.id}`} key={k}>
-									<div className="item-image" style={{ backgroundImage: `url(${img_url})` }} />
+									<img className="item-image" crossOrigin="anonymous" src={img_url} />
 									<div className="subtitle">{p.title}</div>
 									<div>{p.price}</div>
 								</Link>

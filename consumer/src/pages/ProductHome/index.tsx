@@ -100,7 +100,7 @@ class LoggedOutHome extends React.Component<P, S> {
 										Object.entries(suppliers)
 											.sort(([, s1], [, s2]) => (s1.order || 9999) - (s2.order || 9999))
 											.map(([sid, profile]) => <Link className="item-card" to={`/supplier/${sid}`} key={`${category}-${sid}`}>
-												<div style={{ backgroundImage: `url(${profile.logo && profile.logo.url})` }} className="item-image" />
+												<img crossOrigin="anonymous" src={profile.logo && profile.logo.url} className="item-image" />
 												<div className="subtitle">{profile.name}</div>
 											</Link>)
 									}
