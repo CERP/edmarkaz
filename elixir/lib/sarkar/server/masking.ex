@@ -10,7 +10,7 @@ defmodule EdMarkaz.Server.Masking do
 
 	def init(req, state) do
 
-		query_params = :cowboy_req.parse_qs(req) 
+		query_params = :cowboy_req.parse_qs(req)
 		|> Enum.into(%{})
 
 		# TODO: handle different events with different code blocks inside this case
@@ -19,7 +19,7 @@ defmodule EdMarkaz.Server.Masking do
 
 
 		{school_name, forward, caller} = case query_params do
-			%{"dialed" => dialed, "callerid" => incoming, "event" => event_type, "unique_id" => uid} -> 
+			%{"dialed" => dialed, "callerid" => incoming, "event" => event_type, "unique_id" => uid} ->
 
 				# look up incoming against supplier db.
 				# then query that supplier for the mask pair.
@@ -35,8 +35,8 @@ defmodule EdMarkaz.Server.Masking do
 						school_id = EdMarkaz.Supplier.get_school_from_masked(supplier_id, dialed)
 
 						{:ok, resp2} = Postgrex.query(
-							EdMarkaz.DB, 
-							"SELECT db->'school_name', db->'phone_number' from platform_schools where id=$1", 
+							EdMarkaz.DB,
+							"SELECT db->'school_name', db->'phone_number' from platform_schools where id=$1",
 							[school_id])
 						IO.inspect resp2.rows
 						[[ school_name, outgoing_number ]] = resp2.rows
@@ -56,15 +56,18 @@ defmodule EdMarkaz.Server.Masking do
 								"UNKNOWN"
 						end
 
-						{school_name, "0#{outgoing_number}", "supplier: #{supplier_id}"}
+						case String.starts_with?("0", outgoing_number) do
+							true -> {school_name, "#{outgoing_number}", "supplier: #{supplier_id}"}
+							false -> {school_name, "0#{outgoing_number}", "supplier: #{supplier_id}"}
+						end
 
 					# if supplier not found
-					other -> 
+					other ->
 						IO.puts "number is not from a supplier"
 						# we check if its one of the schools calling back.
 						# if it is, then do a lookup against all the mask_pairs->masked_num->school_id=$1
 						{:ok, resp} = Postgrex.query(EdMarkaz.DB, "
-							SELECT db->'refcode', db->'school_name' FROM platform_schools WHERE 
+							SELECT db->'refcode', db->'school_name' FROM platform_schools WHERE
 								concat('0',db->>'phone_number')=$1 OR
 								db->>'phone_number_1'=$1 OR
 								db->>'phone_number_2'=$1 OR
@@ -72,17 +75,17 @@ defmodule EdMarkaz.Server.Masking do
 								db->>'owner_phonenumber'=$1 OR
 								db->>'pulled_phonenumber'=$1 OR
 								db->>'alt_phone_number'=$1", [incoming])
-						
+
 						case resp.rows do
 							# school matched
-							[[ school_id, school_name ]] -> 
+							[[ school_id, school_name ]] ->
 								# find the supplier
 								{:ok, resp2} = Postgrex.query(EdMarkaz.DB, "
 									SELECT id from suppliers where sync_state->'mask_pairs'->$1->'school_id' = $2
 								", [dialed, school_id])
-								
-								case resp2.rows do 
-									[[ supplier_id ]] -> 
+
+								case resp2.rows do
+									[[ supplier_id ]] ->
 										number = EdMarkaz.Supplier.get_last_caller(supplier_id, school_id)
 
 										case event_type do
@@ -101,7 +104,7 @@ defmodule EdMarkaz.Server.Masking do
 										end
 
 										{supplier_id, number, "school: #{school_name}"}
-									[[ supplier_id ] | more] -> 
+									[[ supplier_id ] | more] ->
 										IO.puts "More than one supplier found"
 										# Should really use the one that called most recently but we just use first result
 										IO.inspect more
@@ -128,7 +131,7 @@ defmodule EdMarkaz.Server.Masking do
 										IO.inspect other
 										{"supplier-not-found: #{incoming} -> #{dialed}", "04238301513", "school: #{school_name}"}
 								end
-							other -> 
+							other ->
 								IO.puts "didn't find a school which has this number listed #{incoming}"
 								IO.inspect other
 								{"not-found: #{incoming} -> #{dialed}", "04238301513", "not-found"}

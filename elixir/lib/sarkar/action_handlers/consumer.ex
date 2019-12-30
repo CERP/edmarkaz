@@ -38,8 +38,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 							},
 							time
 						) do
-							%{"type" => "CONFIRM_ANALYTICS_SYNC", "time" => _} ->
-								IO.puts "LOGIN ANALYTICS SUCCESS"
+							%{"type" => "CONFIRM_ANALYTICS_SYNC", "time" => _} -> {:ok}
 							%{"type" => "ANALYTICS_SYNC_FAILED"} ->
 								IO.puts "LOGIN ANALYTICS FAILED"
 						end
