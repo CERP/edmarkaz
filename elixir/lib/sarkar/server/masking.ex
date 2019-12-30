@@ -1,5 +1,7 @@
 defmodule EdMarkaz.Server.Masking do
 
+	@helpline_number "03228133150"
+
 	def init(%{has_body: true} = req, state) do
 		{:ok, body, _req2} = :cowboy_req.read_body(req)
 
@@ -129,18 +131,18 @@ defmodule EdMarkaz.Server.Masking do
 									other ->
 										IO.puts "didn't find a supplier who has the number that was dialed. #{school_id}: #{dialed}"
 										IO.inspect other
-										{"supplier-not-found: #{incoming} -> #{dialed}", "04238301513", "school: #{school_name}"}
+										{"supplier-not-found: #{incoming} -> #{dialed}", @helpline_number, "school: #{school_name}"}
 								end
 							other ->
 								IO.puts "didn't find a school which has this number listed #{incoming}"
 								IO.inspect other
-								{"not-found: #{incoming} -> #{dialed}", "04238301513", "not-found"}
+								{"not-found: #{incoming} -> #{dialed}", @helpline_number, "not-found"}
 						end
 				end
 			other ->
 				IO.puts "unexpected query params"
 				IO.inspect other
-				{"not-found-at-all", "04238301513", "bah"}
+				{"not-found-at-all", @helpline_number, "bah"}
 		end
 
 		current_time =  DateTime.utc_now
