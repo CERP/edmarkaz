@@ -15,10 +15,6 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 					refcode = Map.get(profile, "refcode")
 					{:ok, one_token} = EdMarkaz.Auth.gen_onetime_token(refcode)
 
-					spawn fn ->
-						login_analytics(phone, refcode, client_id)
-					end
-
 					case EdMarkaz.Contegris.send_sms(phone, "Click here to login https://ilmexchange.com/auth/#{one_token} \nOr enter code #{one_token}") do
 						{:ok, res} ->
 							{:reply, succeed(res), state}
@@ -113,6 +109,9 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 				# and then we can log them in
 				{:ok, res} = Postgrex.query(EdMarkaz.DB, "SELECT db, db->>'phone_number' FROM platform_schools WHERE id=$1", [refcode])
 				[[ profile, number ]] = res.rows
+				spawn fn ->
+					login_analytics(number, refcode, client_id)
+				end
 				{:ok, new_token} = EdMarkaz.Auth.gen_token(number, client_id)
 
 				{:reply, succeed(%{token: new_token, sync_state: %{ "profile" => profile }, id: number }), %{id: number, client_id: client_id}}
