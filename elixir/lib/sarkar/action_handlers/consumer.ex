@@ -15,6 +15,10 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 					refcode = Map.get(profile, "refcode")
 					{:ok, one_token} = EdMarkaz.Auth.gen_onetime_token(refcode)
 
+					spawn fn ->
+						login_analytics(phone, refcode, client_id)
+					end
+
 					case EdMarkaz.Contegris.send_sms(phone, "Click here to login https://ilmexchange.com/auth/#{one_token} \nOr enter code #{one_token}") do
 						{:ok, res} ->
 							{:reply, succeed(res), state}
@@ -23,30 +27,30 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 							{:reply, fail(msg), state}
 					end
 
-					spawn fn ->
-						time = :os.system_time(:millisecond)
-						case Sarkar.Analytics.record(
-							client_id,
-							%{ "#{UUID.uuid4}" => %{
-									"type" => "LOGIN",
-									"meta" => %{
-										"number" => phone,
-										"ref_code" => refcode
-									},
-									"time" => time
-								}
-							},
-							time
-						) do
-							%{"type" => "CONFIRM_ANALYTICS_SYNC", "time" => _} -> {:ok}
-							%{"type" => "ANALYTICS_SYNC_FAILED"} ->
-								IO.puts "LOGIN ANALYTICS FAILED"
-						end
-					end
-
 				{:error, msg} ->
 					{:reply, fail(msg), state}
 				end
+	end
+
+	def login_analytics(phone, refcode, client_id) do
+		time = :os.system_time(:millisecond)
+		case Sarkar.Analytics.record(
+			client_id,
+			%{ "#{UUID.uuid4}" => %{
+					"type" => "LOGIN",
+					"meta" => %{
+						"number" => phone,
+						"ref_code" => refcode
+					},
+					"time" => time
+				}
+			},
+			time
+		) do
+			%{"type" => "CONFIRM_ANALYTICS_SYNC", "time" => _} -> {:ok}
+			%{"type" => "ANALYTICS_SYNC_FAILED"} ->
+				IO.puts "LOGIN ANALYTICS FAILED"
+		end
 	end
 
 	def handle_action(%{
