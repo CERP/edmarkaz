@@ -7,6 +7,60 @@ defmodule EdMarkaz.Server.Analytics do
 
 	end
 
+	def init(%{ bindings: %{ type: "consumer-analytics.csv"}} = req, state ) do
+		{:ok, data} = case Postgrex.query(
+			EdMarkaz.DB,
+			"SELECT
+				client_id,
+				meta -> 'route' as p,
+				meta -> 'refcode' as refcode,
+				to_timestamp(time/1000)::time + interval '5 hour' as t,
+				to_timestamp(time/1000)::date as d
+			FROM consumer_analytics
+			WHERE type='ROUTE'",
+			[]
+		) do
+			{:ok, resp} -> {:ok, resp.rows}
+			{:error, err} -> {:error, err}
+		end
+
+		formatted = data
+			|> Enum.map(
+				fn [id, path, refcode, time, date] ->
+
+					path = case List.first(path) === "" do
+						true -> path |> List.replace_at(0,"bazaar")
+						false -> path
+					end
+
+					path = case length(path) > 1 do
+						true -> path |> Enum.join("/")
+						false -> path
+					end
+
+					refcode = case refcode === nil do
+						true -> "LOGGED_OUT"
+						false -> refcode
+					end
+
+					[id, path, refcode, time, date]
+				end
+			)
+
+		csv = [ ["client_id", "path", "refcode", "time", "date"] | formatted]
+		|> CSV.encode
+		|> Enum.join()
+
+		req = :cowboy_req.reply(
+			200,
+			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
+			csv,
+			req
+		)
+
+		{:ok, req, state}
+	end
+
 	def init(%{bindings: %{type: "platform-writes.csv"}} = req, state) do
 
 		{:ok, data} = case Postgrex.query(EdMarkaz.DB,
