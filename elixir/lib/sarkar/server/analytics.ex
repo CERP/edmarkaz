@@ -13,6 +13,7 @@ defmodule EdMarkaz.Server.Analytics do
 			"SELECT
 				client_id,
 				meta -> 'route' as p,
+				meta -> 'refcode' as refcode,
 				to_timestamp(time/1000)::time + interval '5 hour' as t,
 				to_timestamp(time/1000)::date as d
 			FROM consumer_analytics
@@ -25,7 +26,7 @@ defmodule EdMarkaz.Server.Analytics do
 
 		formatted = data
 			|> Enum.map(
-				fn [id, path, time, date] ->
+				fn [id, path, refcode, time, date] ->
 
 					path = case List.first(path) === "" do
 						true -> path |> List.replace_at(0,"bazaar")
@@ -37,11 +38,16 @@ defmodule EdMarkaz.Server.Analytics do
 						false -> path
 					end
 
-					[id, path, time, date]
+					refcode = case refcode === nil do
+						true -> "LOGGED_OUT"
+						false -> refcode
+					end
+
+					[id, path, refcode, time, date]
 				end
 			)
 
-		csv = [ ["client_id", "path", "time", "date"] | formatted]
+		csv = [ ["client_id", "path", "refcode", "time", "date"] | formatted]
 		|> CSV.encode
 		|> Enum.join()
 
