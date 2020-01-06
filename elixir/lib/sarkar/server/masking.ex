@@ -58,7 +58,7 @@ defmodule EdMarkaz.Server.Masking do
 								"UNKNOWN"
 						end
 
-						case String.starts_with?("0", outgoing_number) do
+						case String.starts_with?(outgoing_number, "0") do
 							true -> {school_name, "#{outgoing_number}", "supplier: #{supplier_id}"}
 							false -> {school_name, "0#{outgoing_number}", "supplier: #{supplier_id}"}
 						end
