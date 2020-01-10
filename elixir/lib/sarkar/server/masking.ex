@@ -71,6 +71,7 @@ defmodule EdMarkaz.Server.Masking do
 						{:ok, resp} = Postgrex.query(EdMarkaz.DB, "
 							SELECT db->'refcode', db->'school_name' FROM platform_schools WHERE
 								concat('0',db->>'phone_number')=$1 OR
+								db->>'phone_number'=$1 OR
 								db->>'phone_number_1'=$1 OR
 								db->>'phone_number_2'=$1 OR
 								db->>'phone_number_3'=$1 OR

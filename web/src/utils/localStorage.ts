@@ -25,6 +25,7 @@ export const clearDB = () => {
 	localStorage.removeItem("sync_state")
 	localStorage.removeItem("last_snapshot")
 	localStorage.removeItem("school_db")
+	localStorage.removeItem("queued")
 	localStorage.removeItem("products")
 }
 
