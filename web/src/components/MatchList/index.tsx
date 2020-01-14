@@ -1,13 +1,9 @@
 import React from 'react'
-import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router-dom'
-
-import { getSchoolProfiles } from '~/src/actions'
 
 type propTypes = {
 	title: string;
 	schools: { [id: string]: CERPSchool };
-	mask_pairs: RootBankState['sync_state']['mask_pairs'];
 	getSchoolProfiles: (school_ids: string[]) => void;
 } & RouteComponentProps;
 
@@ -25,8 +21,8 @@ export default class MatchList extends React.Component<propTypes> {
 
 		const blank = Object.keys(this.props.schools)
 			.filter(k => this.props.schools[k] == undefined)
-		
-		if(blank.length > 0) {
+
+		if (blank.length > 0) {
 			this.props.getSchoolProfiles(blank)
 		}
 	}
@@ -38,11 +34,11 @@ export default class MatchList extends React.Component<propTypes> {
 			<div className="title">{this.props.title}</div>
 
 			<div className="list">
-			{
-				Object.values(this.props.schools)
-					.sort((a, b) => (a.school_name || "").localeCompare(b.school_name))
-					.map(s => <div key={s.refcode} onClick={this.onSchoolClick(s)}>{s.school_name}</div>)
-			}
+				{
+					Object.values(this.props.schools)
+						.sort((a, b) => (a.school_name || "").localeCompare(b.school_name))
+						.map(s => <div key={s.refcode} onClick={this.onSchoolClick(s)}>{s.school_name}</div>)
+				}
 			</div>
 		</div>
 	}

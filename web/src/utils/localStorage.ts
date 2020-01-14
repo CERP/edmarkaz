@@ -83,7 +83,11 @@ const loadSyncState = (): RootBankState['sync_state'] => {
 			numbers: {
 
 			},
-			mask_pairs: masked_numbers
+			mask_pairs: masked_numbers,
+			profile: {
+				description: "",
+				name: ""
+			}
 		}
 	}
 

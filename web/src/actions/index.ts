@@ -23,7 +23,7 @@ export const createLogin = (username: string, password: string, number: string) 
 		.then((res: { token: string; sync_state: RootBankState['sync_state'] }) => {
 
 			if (res.sync_state.matches === undefined || Object.keys(res.sync_state.matches).length === 0) {
-				dispatch(forceSaveFullStatePotentiallyCausingProblems())
+				// dispatch(forceSaveFullStatePotentiallyCausingProblems())
 			}
 
 			dispatch(createLoginSucceed(username, res.token, res.sync_state, number))
@@ -33,12 +33,14 @@ export const createLogin = (username: string, password: string, number: string) 
 export const forceSaveFullStatePotentiallyCausingProblems = () => (dispatch: Dispatch, getState: GetState) => {
 	const state = getState();
 
+	/*
 	dispatch(createMerges([
 		{
 			path: ["sync_state"],
 			value: state.sync_state
 		}
 	]))
+	*/
 }
 
 export const saveProductAction = (product: Product) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
@@ -237,7 +239,6 @@ export const addToSchoolDB = (school: PMIUSchool) => {
 }
 
 export const reserveMaskedNumber = (school_id: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
-	// from the pool in state.mask_pairs select an unused number
 	const state = getState();
 
 	syncr.send({
