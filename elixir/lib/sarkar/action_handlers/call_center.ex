@@ -32,16 +32,47 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 		%{
 			"type" => "MERGE_PRODUCT",
 			"payload" => %{
-				"id" => id,
+				"id" => product_id,
 				"product" => product,
 				"supplier_id" => supplier_id
 			}
 		},
 		%{id: id, client_id: client_id} = state
 	) do
-		IO.puts "Merginhh Prouct"
+		EdMarkaz.Product.merge(product_id, product, supplier_id)
 
-		EdMarkaz.Product.merge(id, product, supplier_id)
+		{:reply, succeed(), state}
+	end
+
+	def handle_action(
+		%{
+			"type" => "MERGE_PRODUCT_IMAGE",
+			"payload" => %{
+				"id" => image_id,
+				"product_id" => product_id,
+				"data_url" => data_url
+				}
+			},
+			%{id: id, client_id: client_id} = state
+	) do
+
+		IO.puts "handling merge product image"
+
+		parent = self()
+
+		spawn fn ->
+			img_url = Sarkar.Storage.Google.upload_image("ilmx-product-images", image_id, data_url)
+
+			IO.inspect img_url
+			EdMarkaz.Product.merge_image(product_id, img_url)
+
+			send(parent, {:broadcast, %{
+				"type" => "PRODUCT_IMAGE_ADDED",
+				"product_id" => product_id,
+				"image_id" => image_id,
+				"img_url" => img_url
+			}})
+		end
 
 		{:reply, succeed(), state}
 	end
@@ -154,7 +185,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 	def handle_action(action, state) do
 		IO.inspect action
 		IO.inspect state
-		IO.puts "NOT YET READY sdsdsds"
+		IO.puts "NOT YET READY"
 		{:ok, state}
 		# {:reply, fail(), state}
 	end

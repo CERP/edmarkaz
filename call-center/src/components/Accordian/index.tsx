@@ -41,11 +41,11 @@ class Accordian extends React.Component<propTypes, S> {
 
 		const current = this.props.location.pathname;
 		const search = this.props.location.search;
+
 		const params = qs.parse(search)
+
 		const supplier_id = params.supplier_id as string
 		const product_id = params.product_id as string
-
-		console.log(this.props, "s", supplier_id, "p", product_id)
 
 		return <div className={`root-page accordian ${this.state.visible ? "" : "minimized"}`}>
 			<div className="header" style={{ justifyContent: "space-between" }}>

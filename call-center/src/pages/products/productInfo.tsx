@@ -32,31 +32,31 @@ interface S {
 	newCategory: string
 }
 
+const newProduct = (supplier_id: string): Product => ({
+	id: v4(),
+	supplier_id,
+	title: "",
+	description: "",
+	img_url: "",
+	price: "",
+	phone_number: "",
+	image: {
+		id: "",
+		url: ""
+	},
+	deleted: false,
+	tags: {},
+	categories: {}
+})
+
 class ProductInfo extends React.Component<propTypes, S> {
 
 	former: Former
 	constructor(props: propTypes) {
 		super(props);
 
-		const newProduct: Product = {
-			id: v4(),
-			supplier_id: "alif-laila", //for now hardcoding
-			title: "",
-			description: "",
-			img_url: "",
-			price: "",
-			phone_number: "",
-			image: {
-				id: "",
-				url: ""
-			},
-			deleted: false,
-			tags: {},
-			categories: {}
-		}
-
 		this.state = {
-			product: this.props.product || newProduct,
+			product: this.props.product || newProduct(props.supplier_id),
 			imageDataString: "",
 			newCategory: ""
 
@@ -73,9 +73,10 @@ class ProductInfo extends React.Component<propTypes, S> {
 	}
 
 	componentWillReceiveProps(nextProps: propTypes) {
-		if (nextProps.product && nextProps.product.id != this.props.product_id) {
+		console.log(this.props.product_id, nextProps.product_id, nextProps.product)
+		if (nextProps.product_id != this.props.product_id) {
 			this.setState({
-				product: nextProps.product
+				product: nextProps.product || newProduct(nextProps.supplier_id)
 			})
 		}
 	}
@@ -85,17 +86,17 @@ class ProductInfo extends React.Component<propTypes, S> {
 		console.log("saving product")
 		this.props.saveProduct(this.state.product, this.props.supplier_id)
 
-		// const current_id = this.state.product.image && this.state.product.image.id || "";
-		// const prev_id = this.props.product && this.props.product.image && this.props.product.image.id;
+		const current_id = this.state.product.image && this.state.product.image.id || "";
+		const prev_id = this.props.product && this.props.product.image && this.props.product.image.id;
 
-		// if (current_id !== prev_id) {
-		// 	console.log('saving new image')
-		// 	this.props.saveProductImage(
-		// 		current_id,
-		// 		this.state.imageDataString,
-		// 		this.state.product
-		// 	)
-		// }
+		if (current_id !== prev_id) {
+			console.log('saving new image')
+			this.props.saveProductImage(
+				current_id,
+				this.state.imageDataString,
+				this.state.product
+			)
+		}
 	}
 
 	onDelete = () => {
