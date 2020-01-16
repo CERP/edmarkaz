@@ -1,7 +1,7 @@
 defmodule EdMarkaz.ActionHandler.CallCenter do
 
 
-	def handle_action(%{"type" => "LOGIN", "client_id" => client_id, "payload" => %{"id" => "cerp-callcenter", "password" => password}}, state) do
+	def handle_action(%{"type" => "LOGIN", "client_id" => client_id, "payload" => %{"id" => id, "password" => password}}, state) do
 		id = "cerp-callcenter"
 		case EdMarkaz.Auth.login({id, client_id, password}) do
 			{:ok, token} ->
@@ -24,6 +24,24 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 
 	def handle_action(%{"type" => "SYNC", "payload" => payload, "last_snapshot" => last_sync_date}, %{id: id, client_id: client_id} = state) do
 		# res = EdMarkaz.Supplier.sync_changes(id, client_id, payload, last_sync_date)
+
+		{:reply, succeed(), state}
+	end
+
+	def handle_action(
+		%{
+			"type" => "MERGE_PRODUCT",
+			"payload" => %{
+				"id" => id,
+				"product" => product,
+				"supplier_id" => supplier_id
+			}
+		},
+		%{id: id, client_id: client_id} = state
+	) do
+		IO.puts "Merginhh Prouct"
+
+		EdMarkaz.Product.merge(id, product, supplier_id)
 
 		{:reply, succeed(), state}
 	end
@@ -136,7 +154,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 	def handle_action(action, state) do
 		IO.inspect action
 		IO.inspect state
-		IO.puts "NOT YET READY"
+		IO.puts "NOT YET READY sdsdsds"
 		{:ok, state}
 		# {:reply, fail(), state}
 	end

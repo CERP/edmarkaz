@@ -220,3 +220,77 @@ export const reserveMaskedNumber = (school_id: string) => (dispatch: Dispatch, g
 		})
 
 }
+
+export interface AddProductsAction {
+	type: "ADD_PRODUCTS"
+	products: {
+		[id: string]: Product
+	}
+}
+
+export const saveProductAction = (product: Product, supplier_id: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+
+	console.log('saving product')
+
+	// save product...
+
+	const state = getState();
+
+	const a: AddProductsAction = {
+		type: "ADD_PRODUCTS",
+		products: {
+			[product.id]: product
+		}
+	}
+
+	dispatch(a)
+
+	syncr.send({
+		type: "MERGE_PRODUCT",
+		payload: {
+			id: product.id,
+			product: product,
+			supplier_id: supplier_id
+		},
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		id: state.auth.id,
+		last_snapshot: state.last_snapshot
+	})
+		.then(res => {
+			console.log('add product action...')
+		})
+		.catch(err => {
+			console.error(err)
+		})
+
+}
+
+export const PRODUCT_IMAGE_ADDED = "PRODUCT_IMAGE_ADDED"
+export interface ProductImageAddedAction {
+	type: "PRODUCT_IMAGE_ADDED"
+	product_id: string
+	image_id: string
+	img_url: string
+}
+
+export const saveProductImage = (imageId: string, dataUrl: string, product: Product) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+
+	const state = getState();
+	syncr.send({
+		type: "MERGE_PRODUCT_IMAGE",
+		payload: {
+			id: imageId,
+			product_id: product.id,
+			data_url: dataUrl
+		},
+		client_type: state.auth.client_type,
+		client_id: state.auth.id
+	})
+		.then(res => {
+		})
+		.catch(err => {
+			console.error(err)
+		})
+
+}

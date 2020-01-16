@@ -7,12 +7,12 @@ const SYNC = "SYNC"
 export const MERGES = "MERGES"
 
 interface Merge {
-	path: string[],
+	path: string[]
 	value: any
 }
 
 export interface MergeAction {
-	type: "MERGES",
+	type: "MERGES"
 	merges: Merge[]
 }
 
@@ -76,7 +76,7 @@ export const sendSMS = (text: string, number: string) => (dispatch: (a: any) => 
 
 export const BATCH_SMS = "BATCH_SMS"
 interface SMS {
-	text: string,
+	text: string
 	number: string
 }
 
@@ -97,7 +97,7 @@ export const sendBatchSMS = (messages: SMS[]) => (dispatch: (a: any) => any, get
 }
 
 interface ServerAction {
-	type: string,
+	type: string
 	payload: any
 }
 
@@ -126,7 +126,7 @@ interface Delete {
 }
 
 export interface DeletesAction {
-	type: "DELETES",
+	type: "DELETES"
 	paths: Delete[]
 }
 
@@ -177,16 +177,16 @@ export interface RPCSucceedAction {
 export const CONFIRM_SYNC = "CONFIRM_SYNC"
 export const CONFIRM_SYNC_DIFF = "CONFIRM_SYNC_DIFF"
 export interface ConfirmSyncAction {
-	type: "CONFIRM_SYNC_DIFF",
-	date: number,
+	type: "CONFIRM_SYNC_DIFF"
+	date: number
 	new_writes: Write[]
 }
 
 export interface Write {
-	date: number,
-	value: any,
-	path: string[],
-	type: "MERGE" | "DELETE",
+	date: number
+	value: any
+	path: string[]
+	type: "MERGE" | "DELETE"
 	client_id: string
 }
 
@@ -196,8 +196,8 @@ export const SNAPSHOT_DIFF = "SNAPSHOT_DIFF"
 export interface SnapshotDiffAction {
 	new_writes: {
 		[path_string: string]: {
-			type: "MERGE" | "DELETE",
-			path: string[],
+			type: "MERGE" | "DELETE"
+			path: string[]
 			value?: any
 		}
 	}
@@ -208,16 +208,16 @@ export const QUEUE = "QUEUE"
 interface Queuable {
 	[path: string]: {
 		action: {
-			type: "MERGE" | "DELETE",
-			path: string[],
+			type: "MERGE" | "DELETE"
+			path: string[]
 			value?: any
-		},
+		}
 		date: number
 	}
 }
 
 export interface QueueAction {
-	type: "QUEUE",
+	type: "QUEUE"
 	payload: Queuable
 }
 
@@ -276,9 +276,9 @@ export const createLoginFail = () => ({ type: LOGIN_FAIL })
 
 export const LOGIN_SUCCEED = "LOGIN_SUCCEED"
 export interface LoginSucceed {
-	type: "LOGIN_SUCCEED",
-	id: string,
-	token: string,
+	type: "LOGIN_SUCCEED"
+	id: string
+	token: string
 	sync_state: RootReducerState['sync_state']
 }
 export const createLoginSucceed = (id: string, token: string, sync_state: RootReducerState['sync_state']): LoginSucceed => ({

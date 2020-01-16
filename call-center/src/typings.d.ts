@@ -49,8 +49,8 @@ interface Product {
 	tags: {
 		[tag: string]: boolean
 	}
-	categories: { string: boolean }
-	supplier_profile: {
+	categories: { [id: string]: boolean }
+	supplier_profile?: {
 		name: string
 		description: string
 		logo?: {

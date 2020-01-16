@@ -111,6 +111,8 @@ class SearchPage extends React.Component<P, S> {
 		const search_type = this.state.search_type
 
 		return <div className="search page">
+
+			<div className="divider"> Search </div>
 			<div className="row">
 				<input
 					type="text"

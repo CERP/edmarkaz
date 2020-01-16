@@ -8,9 +8,9 @@ interface StateProps {
 
 type propTypes = StateProps & RouteProps
 
-const AuthedRoute = ({ component, auth: { id, token }, ...rest } : propTypes) => {
+const AuthedRoute = ({ component, auth: { id, token }, ...rest }: propTypes) => {
 
-	if(token && id) {
+	if (token && id) {
 
 		return <Route component={component} {...rest} />
 	}
@@ -18,6 +18,6 @@ const AuthedRoute = ({ component, auth: { id, token }, ...rest } : propTypes) =>
 	return <Redirect to="/login" />
 }
 
-export default connect((state : RootReducerState) => ({
+export default connect((state: RootReducerState) => ({
 	auth: state.auth
 }))(AuthedRoute);
