@@ -1,7 +1,7 @@
 defmodule EdMarkaz.ActionHandler.CallCenter do
 
 
-	def handle_action(%{"type" => "LOGIN", "client_id" => client_id, "payload" => %{"id" => "cerp-callcenter", "password" => password}}, state) do
+	def handle_action(%{"type" => "LOGIN", "client_id" => client_id, "payload" => %{"id" => id, "password" => password}}, state) do
 		id = "cerp-callcenter"
 		case EdMarkaz.Auth.login({id, client_id, password}) do
 			{:ok, token} ->
@@ -24,6 +24,55 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 
 	def handle_action(%{"type" => "SYNC", "payload" => payload, "last_snapshot" => last_sync_date}, %{id: id, client_id: client_id} = state) do
 		# res = EdMarkaz.Supplier.sync_changes(id, client_id, payload, last_sync_date)
+
+		{:reply, succeed(), state}
+	end
+
+	def handle_action(
+		%{
+			"type" => "MERGE_PRODUCT",
+			"payload" => %{
+				"id" => product_id,
+				"product" => product,
+				"supplier_id" => supplier_id
+			}
+		},
+		%{id: id, client_id: client_id} = state
+	) do
+		EdMarkaz.Product.merge(product_id, product, supplier_id)
+
+		{:reply, succeed(), state}
+	end
+
+	def handle_action(
+		%{
+			"type" => "MERGE_PRODUCT_IMAGE",
+			"payload" => %{
+				"id" => image_id,
+				"product_id" => product_id,
+				"data_url" => data_url
+				}
+			},
+			%{id: id, client_id: client_id} = state
+	) do
+
+		IO.puts "handling merge product image"
+
+		parent = self()
+
+		spawn fn ->
+			img_url = Sarkar.Storage.Google.upload_image("ilmx-product-images", image_id, data_url)
+
+			IO.inspect img_url
+			EdMarkaz.Product.merge_image(product_id, img_url)
+
+			send(parent, {:broadcast, %{
+				"type" => "PRODUCT_IMAGE_ADDED",
+				"product_id" => product_id,
+				"image_id" => image_id,
+				"img_url" => img_url
+			}})
+		end
 
 		{:reply, succeed(), state}
 	end

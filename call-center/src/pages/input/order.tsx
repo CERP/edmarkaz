@@ -61,7 +61,7 @@ const OrderPage = ({ placeOrder, products }: P) => {
 						<div className="left">
 							<div className="id">{id}</div>
 							<div className="name">{p.title}</div>
-							<div className="supplier">{p.supplier_profile.name}</div>
+							<div className="supplier">{p.supplier_profile && p.supplier_profile.name}</div>
 						</div>
 						<div className="right">
 							<div className="order button blue" onClick={() => placeOrder(p)}>Place Order</div>

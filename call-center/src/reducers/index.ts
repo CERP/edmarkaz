@@ -2,7 +2,7 @@ import Dynamic from '@ironbay/dynamic'
 
 import { MERGES, MergeAction, ON_CONNECT, ON_DISCONNECT, DELETES, DeletesAction, QueueAction, QUEUE, CONFIRM_SYNC_DIFF, ConfirmSyncAction, SnapshotDiffAction, SNAPSHOT_DIFF, RPC_SUCCEED, RPCSucceedAction, LOGIN_SUCCEED, LoginSucceed } from '../actions/core'
 import { AnyAction, Reducer } from 'redux';
-import { ADD_PRODUCTS, ADD_SCHOOLS, AddSchoolAction, INCOMING_PHONE_CALL, IncomingPhoneCallAction } from '../actions';
+import { ADD_PRODUCTS, ADD_SCHOOLS, AddSchoolAction, INCOMING_PHONE_CALL, IncomingPhoneCallAction, PRODUCT_IMAGE_ADDED, ProductImageAddedAction } from '../actions';
 import { loadDB } from '../utils/localStorage';
 
 const rootReducer: Reducer<RootReducerState, AnyAction> = (state: RootReducerState | undefined, action: AnyAction): RootReducerState => {
@@ -52,6 +52,31 @@ const rootReducer: Reducer<RootReducerState, AnyAction> = (state: RootReducerSta
 					products: {
 						...state.products,
 						loading: true
+					}
+				}
+			}
+
+		case PRODUCT_IMAGE_ADDED:
+			{
+				// @ts-ignore
+				const image_action = action as ProductImageAddedAction
+
+				console.log(image_action)
+
+				return {
+					...state,
+					products: {
+						...state.products,
+						db: {
+							...state.products.db,
+							[image_action.product_id]: {
+								...(state.products.db[image_action.product_id]),
+								image: {
+									url: image_action.img_url,
+									id: image_action.image_id
+								}
+							}
+						}
 					}
 				}
 			}
