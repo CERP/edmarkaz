@@ -70,7 +70,9 @@ class Settings extends React.Component<propTypes, stateType> {
 
 	onLogout = () => {
 		clearDB();
-		window.location.reload();
+		setTimeout(() => {
+			window.location.reload();
+		}, 1000)
 	}
 
 
