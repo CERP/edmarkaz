@@ -2,7 +2,7 @@ import Dynamic from '@ironbay/dynamic'
 
 import { MERGES, MergeAction, ON_CONNECT, ON_DISCONNECT, DELETES, DeletesAction, QueueAction, QUEUE, CONFIRM_SYNC_DIFF, ConfirmSyncAction, SnapshotDiffAction, SNAPSHOT_DIFF, RPC_SUCCEED, RPCSucceedAction, LOGIN_SUCCEED, LoginSucceed } from '../actions/core'
 import { AnyAction, Reducer } from 'redux';
-import { ADD_PRODUCTS, ADD_SCHOOLS, AddSchoolAction, INCOMING_PHONE_CALL, IncomingPhoneCallAction, PRODUCT_IMAGE_ADDED, ProductImageAddedAction } from '../actions';
+import { ADD_PRODUCTS, ADD_SCHOOLS, AddSchoolAction, INCOMING_PHONE_CALL, IncomingPhoneCallAction, PRODUCT_IMAGE_ADDED, ProductImageAddedAction, AddOrdersAction } from '../actions';
 import { loadDB } from '../utils/localStorage';
 
 const rootReducer: Reducer<RootReducerState, AnyAction> = (state: RootReducerState | undefined, action: AnyAction): RootReducerState => {
@@ -96,6 +96,34 @@ const rootReducer: Reducer<RootReducerState, AnyAction> = (state: RootReducerSta
 							...state.products.db,
 							...add_action.products
 						}
+					}
+				}
+			}
+
+		case "ADD_ORDERS":
+			{
+				// @ts-ignore
+				const add_action = action as AddOrdersAction
+				return {
+					...state,
+					orders: {
+						last_sync: new Date().getTime(),
+						loading: false,
+						db: {
+							...state.orders.db,
+							...add_action.orders
+						}
+					}
+				}
+			}
+
+		case "LOAD_ORDERS":
+			{
+				return {
+					...state,
+					orders: {
+						...state.orders,
+						loading: true
 					}
 				}
 			}

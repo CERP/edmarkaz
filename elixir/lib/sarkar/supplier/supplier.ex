@@ -186,7 +186,7 @@ defmodule EdMarkaz.Supplier do
 			"user" => %{
 				"name" => "",
 				"number" => ""
-			}
+			},
 		}
 
 		writes = [
@@ -200,6 +200,47 @@ defmodule EdMarkaz.Supplier do
 			%{
 				type: "MERGE",
 				path: ["sync_state", "matches", school_code, "history", "#{time}"],
+				value: event,
+				date: :os.system_time(:millisecond),
+				client_id: client_id
+			}
+		]
+
+		changes = prepare_changes(writes)
+
+		GenServer.call(via(supplier_id), {:sync_changes, client_id, changes, :os.system_time(:millisecond)})
+
+	end
+
+	def verify_order(supplier_id, product, school_code, client_id, order_time) do
+
+		time = :os.system_time(:millisecond)
+
+		event = %{
+			"event" => "ORDER_PLACED",
+			"time" => order_time,
+			"meta" => %{
+				"school_id" => school_code,
+				"product_id" => Map.get(product, "id"),
+			},
+			"user" => %{
+				"name" => "",
+				"number" => ""
+			},
+			verified: true
+		}
+
+		writes = [
+			%{
+				type: "MERGE",
+				path: ["sync_state", "matches", school_code, "status"],
+				value: "ORDERED",
+				date: :os.system_time(:millisecond),
+				client_id: client_id
+			},
+			%{
+				type: "MERGE",
+				path: ["sync_state", "matches", school_code, "history", "#{order_time}"],
 				value: event,
 				date: :os.system_time(:millisecond),
 				client_id: client_id

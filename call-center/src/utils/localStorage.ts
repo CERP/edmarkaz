@@ -112,6 +112,13 @@ export const loadDB = (): RootReducerState => {
 			db: {
 
 			}
+		},
+		orders: {
+			last_sync: 0,
+			loading: true,
+			db: {
+
+			}
 		}
 	}
 }

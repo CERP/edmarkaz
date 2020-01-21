@@ -75,7 +75,7 @@ const Products = ({ products, getProducts }: P) => {
 								Object.entries(products)
 									.map(([pid, product]) => {
 										return <div className="list" key={pid}>
-											<Link to={`/products?supplier_id=${sid}&product_id=${product.id}`} onClick={setHooksToDeaultValue}> {product.title} </Link>
+											<Link to={`/products?p_supplier_id=${sid}&p_product_id=${product.id}`} onClick={setHooksToDeaultValue}> {product.title} </Link>
 										</div>
 									})
 							}
