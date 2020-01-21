@@ -1,6 +1,6 @@
 defmodule EdMarkaz.Server.Masking do
 
-	@helpline_number "03228133150"
+	@helpline_number "03481119119"
 
 	def init(%{has_body: true} = req, state) do
 		{:ok, body, _req2} = :cowboy_req.read_body(req)
@@ -58,7 +58,7 @@ defmodule EdMarkaz.Server.Masking do
 								"UNKNOWN"
 						end
 
-						case String.starts_with?("0", outgoing_number) do
+						case String.starts_with?(outgoing_number, "0") do
 							true -> {school_name, "#{outgoing_number}", "supplier: #{supplier_id}"}
 							false -> {school_name, "0#{outgoing_number}", "supplier: #{supplier_id}"}
 						end
@@ -71,6 +71,7 @@ defmodule EdMarkaz.Server.Masking do
 						{:ok, resp} = Postgrex.query(EdMarkaz.DB, "
 							SELECT db->'refcode', db->'school_name' FROM platform_schools WHERE
 								concat('0',db->>'phone_number')=$1 OR
+								db->>'phone_number'=$1 OR
 								db->>'phone_number_1'=$1 OR
 								db->>'phone_number_2'=$1 OR
 								db->>'phone_number_3'=$1 OR

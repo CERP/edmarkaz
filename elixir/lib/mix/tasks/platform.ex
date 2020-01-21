@@ -1,6 +1,45 @@
 defmodule Mix.Tasks.Platform do
 	use Mix.Task
 
+	def run(["regenerate_supplier_from_writes", supplier_id]) do
+
+		Application.ensure_all_started(:edmarkaz)
+		IO.puts "querying out writes"
+		{:ok, res} = Postgrex.query(EdMarkaz.DB,
+			"SELECT client_id, type, path, value, time
+			FROM platform_writes
+			WHERE id=$1
+			order by time asc
+			",
+			[supplier_id]
+		)
+
+		state = res.rows
+		|> Enum.reduce(%{}, fn [client_id, type, [_ | path], value, time], agg ->
+			case type do
+				"MERGE" -> Dynamic.put(agg, path, value)
+				"DELETE" -> Dynamic.delete(agg, path)
+			end
+		end)
+
+		IO.inspect state
+
+		{:ok, res} = Postgrex.query(EdMarkaz.DB, "
+			INSERT INTO suppliers(id, sync_state)
+			VALUES ($1, $2)
+			ON CONFLICT(id) DO UPDATE SET sync_state=$2", [supplier_id, state])
+		IO.puts "inserted"
+
+		case Registry.lookup(EdMarkaz.SupplierRegistry, supplier_id) do
+			[{_, _}] ->
+				IO.puts "reloading supplier..."
+				EdMarkaz.Supplier.reload(supplier_id)
+				IO.puts "supplier reloaded"
+			[] -> IO.puts "supplier not started."
+		end
+
+	end
+
 	def run(["ingest_data"]) do
 		Application.ensure_all_started(:edmarkaz)
 

@@ -25,6 +25,7 @@ export const clearDB = () => {
 	localStorage.removeItem("sync_state")
 	localStorage.removeItem("last_snapshot")
 	localStorage.removeItem("school_db")
+	localStorage.removeItem("queued")
 	localStorage.removeItem("products")
 }
 
@@ -82,7 +83,11 @@ const loadSyncState = (): RootBankState['sync_state'] => {
 			numbers: {
 
 			},
-			mask_pairs: masked_numbers
+			mask_pairs: masked_numbers,
+			profile: {
+				description: "",
+				name: ""
+			}
 		}
 	}
 
