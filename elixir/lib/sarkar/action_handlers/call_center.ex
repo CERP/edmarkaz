@@ -2,8 +2,8 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 
 
 	def handle_action(%{"type" => "LOGIN", "client_id" => client_id, "payload" => %{"id" => "cerp-callcenter", "password" => password}}, state) do
-
-		case EdMarkaz.Auth.login({"cerp-callcenter", client_id, password}) do
+		id = "cerp-callcenter"
+		case EdMarkaz.Auth.login({ id, client_id, password}) do
 			{:ok, token} ->
 				register_connection(id, client_id)
 				{:reply, succeed(%{token: token, sync_state: %{}}), %{id: id, client_id: client_id}}
