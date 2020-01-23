@@ -86,23 +86,32 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 	) do
 
 		case Postgrex.query(EdMarkaz.DB,
-			"SELECT
-				DISTINCT ON (value ->> 'time') time,
+			"WITH verified AS (
+				SELECT
+					value ->> 'time',
+					id,
+					value
+				FROM platform_writes
+				WHERE path[4]='history'
+				AND value ->> 'event' ='ORDER_PLACED'
+				AND value ->> 'verified' = 'true'
+			)
+			SELECT * FROM verified
+			UNION ALL
+			SELECT
+				value ->> 'time',
 				id,
 				value
 			FROM platform_writes
-			WHERE path[4]='history' AND value ->> 'event' ='ORDER_PLACED' AND value ->> 'verified' = 'true'
-			UNION ALL
-			SELECT
-				DISTINCT ON(value ->> 'time') time,
-				id, value
-			FROM platform_writes
-			WHERE path[4]='history' AND value ->> 'event' ='ORDER_PLACED' AND value ->> 'time'
-			NOT IN (
+			WHERE path[4]='history'
+			AND value ->> 'event' ='ORDER_PLACED'
+			AND value ->> 'time' NOT IN (
 				SELECT
-					DISTINCT value ->> 'time'
-				FROM platform_writes
-				WHERE path[4]='history' AND value ->> 'event' ='ORDER_PLACED' AND value ->> 'verified' = 'true'
+					value ->> 'time'
+				FROM verified
+				WHERE path[4]='history'
+				AND value ->> 'event' ='ORDER_PLACED'
+				AND value ->> 'verified' = 'true'
 			)",
 			[]
 		) do
@@ -209,11 +218,10 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 		%{
 			"type" => "VERIFY_ORDER",
 			"payload" => %{
+				"order" => order,
 				"product" => product,
-				"refcode" => refcode,
 				"school_name" => school_name,
 				"school_number" => school_number,
-				"order_time" => order_time
 			}
 		},
 		%{client_id: client_id, id: id} = state
@@ -223,7 +231,8 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 		supplier_id = Map.get(product, "supplier_id")
 
 		start_supplier(supplier_id)
-		EdMarkaz.Supplier.verify_order(supplier_id, product, refcode, client_id, order_time)
+		{:ok, resp} = EdMarkaz.Supplier.verify_order(order, supplier_id, client_id)
+
 		spawn fn ->
 			EdMarkaz.Slack.send_alert("Order by #{school_name} for #{product_name} by #{supplier_id} has been verified. Their number is #{school_number}", "#platform-orders")
 		end
@@ -232,7 +241,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 			EdMarkaz.Contegris.send_sms(id, "Your order for for #{product_name} has been verified.")
 		end
 
-		{:reply, succeed(), state}
+		{:reply, succeed(resp), state}
 
 	end
 

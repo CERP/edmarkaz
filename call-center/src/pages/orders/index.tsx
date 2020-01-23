@@ -33,10 +33,10 @@ const Orders = ({ orders, products, getOrders, getProducts }: P) => {
 
 	const filterOrder = (order: Order) => {
 		if (verified === "ORDER_VERIFIED") {
-			return order.verified ? order.verified : false
+			return Boolean(order.verified)
 		}
 		else if (verified === "NOT_VERIFIED") {
-			return order.verified ? !order.verified : true
+			return !Boolean(order.verified)
 		}
 		else
 			return true

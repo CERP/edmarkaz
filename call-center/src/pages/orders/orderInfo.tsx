@@ -11,7 +11,7 @@ interface P {
 	active_school: RootReducerState["active_school"]
 	products: RootReducerState["products"]
 	orders: RootReducerState["orders"]
-	verifyOrder: (product: Product, school: CERPSchool, order_time: number) => any
+	verifyOrder: (order: Order, product: Product, school: CERPSchool) => any
 	getSchoolProfiles: (school_ids: string[]) => any
 }
 
@@ -58,7 +58,7 @@ const OrderInfo = ({ product_id, supplier_id, order_time, school_id, active_scho
 				<label>Order time</label>
 				<div>{new Date(order_time).toLocaleString()}</div>
 			</div>
-			{(verified && active_school) && <div className="button blue" onClick={() => verifyOrder(ordered_product, active_school, order_time)}> Verify Order</div>}
+			{(verified && active_school && order_details) && <div className="button blue" onClick={() => verifyOrder(order_details, ordered_product, active_school)}> Verify Order</div>}
 		</div>
 	</div >
 }
@@ -68,6 +68,6 @@ export default connect((state: RootReducerState) => ({
 	orders: state.orders,
 	active_school: state.active_school
 }), (dispatch: Function) => ({
-	verifyOrder: (product: Product, school: CERPSchool, order_time: number) => dispatch(verifyOrder(product, school, order_time)),
+	verifyOrder: (order: Order, product: Product, school: CERPSchool) => dispatch(verifyOrder(order, product, school)),
 	getSchoolProfiles: (school_ids: string[]) => dispatch(getSchoolProfiles(school_ids))
 }))(withRouter(OrderInfo));

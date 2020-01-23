@@ -53,11 +53,11 @@ export const placeOrder = (product: Product, school: CERPSchool) => (dispatch: D
 		})
 }
 
-export const verifyOrder = (product: Product, school: CERPSchool, order_time: number) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+export const verifyOrder = (order: Order, product: Product, school: CERPSchool) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 	const state = getState();
 
 	if (!state.connected) {
-		syncr.onNext('connect', () => dispatch(verifyOrder(product, school, order_time)))
+		syncr.onNext('connect', () => dispatch(verifyOrder(order, product, school)))
 		return;
 	}
 
@@ -67,15 +67,15 @@ export const verifyOrder = (product: Product, school: CERPSchool, order_time: nu
 		client_id: state.client_id,
 		id: state.auth.id,
 		payload: {
+			order,
 			product,
-			refcode: school.refcode,
 			school_name: school.school_name,
-			school_number: school.phone_number,
-			order_time
+			school_number: school.phone_number
 		}
 	})
 		.then(res => {
 			dispatch(getOrders())
+			alert(res)
 		})
 		.catch(err => {
 			console.error(err)
