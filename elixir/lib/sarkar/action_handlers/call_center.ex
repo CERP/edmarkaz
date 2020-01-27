@@ -88,7 +88,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 		case Postgrex.query(EdMarkaz.DB,
 			"WITH verified AS (
 				SELECT
-					value ->> 'time',
+					value ->> 'time' as time,
 					id,
 					value
 				FROM platform_writes
@@ -105,14 +105,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 			FROM platform_writes
 			WHERE path[4]='history'
 			AND value ->> 'event' ='ORDER_PLACED'
-			AND value ->> 'time' NOT IN (
-				SELECT
-					value ->> 'time'
-				FROM verified
-				WHERE path[4]='history'
-				AND value ->> 'event' ='ORDER_PLACED'
-				AND value ->> 'verified' = 'true'
-			)",
+			AND value ->> 'time' NOT IN ( SELECT time FROM verified)",
 			[]
 		) do
 			{:ok, resp} ->
