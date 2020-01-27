@@ -1,9 +1,9 @@
 defmodule EdMarkaz.ActionHandler.CallCenter do
 
 
-	def handle_action(%{"type" => "LOGIN", "client_id" => client_id, "payload" => %{"id" => id, "password" => password}}, state) do
+	def handle_action(%{"type" => "LOGIN", "client_id" => client_id, "payload" => %{"id" => "cerp-callcenter", "password" => password}}, state) do
 		id = "cerp-callcenter"
-		case EdMarkaz.Auth.login({id, client_id, password}) do
+		case EdMarkaz.Auth.login({ id, client_id, password}) do
 			{:ok, token} ->
 				register_connection(id, client_id)
 				{:reply, succeed(%{token: token, sync_state: %{}}), %{id: id, client_id: client_id}}
@@ -75,6 +75,57 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 		end
 
 		{:reply, succeed(), state}
+	end
+
+	def handle_action(
+		%{
+			"type" => "GET_ORDERS",
+			"payload" => payload
+		},
+		%{ id: id, client_id: client_id } = state
+	) do
+
+		case Postgrex.query(EdMarkaz.DB,
+			"WITH verified AS (
+				SELECT
+					value ->> 'time' as time,
+					id,
+					value
+				FROM platform_writes
+				WHERE path[4]='history'
+				AND value ->> 'event' ='ORDER_PLACED'
+				AND value ->> 'verified' = 'true'
+			)
+			SELECT * FROM verified
+			UNION ALL
+			SELECT
+				value ->> 'time',
+				id,
+				value
+			FROM platform_writes
+			WHERE path[4]='history'
+			AND value ->> 'event' ='ORDER_PLACED'
+			AND value ->> 'time' NOT IN ( SELECT time FROM verified)",
+			[]
+		) do
+			{:ok, resp} ->
+				mapped = resp.rows |> Enum.reduce(
+					%{},
+					fn ([time, sid, order], acc) ->
+						case Map.get(acc, sid) do
+							nil ->
+								Map.put(acc, sid, %{ "#{time}" => order })
+							val ->
+								Map.put(acc, sid, Map.put(val, "#{time}", order))
+						end
+					end
+				)
+				{:reply, succeed(mapped), state}
+			{:error, err} ->
+				IO.puts "error getting orders"
+				IO.inspect err
+				{:reply, fail("error getting orders"), state}
+		end
 	end
 
 	def handle_action(%{"type" => "GET_SCHOOL_PROFILES", "payload" => payload}, %{id: id, client_id: client_id} = state) do
@@ -153,6 +204,37 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 		end
 
 		{:reply, succeed(), state}
+
+	end
+
+	def handle_action(
+		%{
+			"type" => "VERIFY_ORDER",
+			"payload" => %{
+				"order" => order,
+				"product" => product,
+				"school_name" => school_name,
+				"school_number" => school_number,
+			}
+		},
+		%{client_id: client_id, id: id} = state
+	) do
+
+		product_name = Map.get(product, "title")
+		supplier_id = Map.get(product, "supplier_id")
+
+		start_supplier(supplier_id)
+		{:ok, resp} = EdMarkaz.Supplier.verify_order(order, supplier_id, client_id)
+
+		spawn fn ->
+			EdMarkaz.Slack.send_alert("Order by #{school_name} for #{product_name} by #{supplier_id} has been verified. Their number is #{school_number}", "#platform-orders")
+		end
+
+		spawn fn ->
+			EdMarkaz.Contegris.send_sms(id, "Your order for for #{product_name} has been verified.")
+		end
+
+		{:reply, succeed(resp), state}
 
 	end
 

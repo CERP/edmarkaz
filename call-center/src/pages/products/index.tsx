@@ -64,7 +64,7 @@ const Products = ({ products, getProducts }: P) => {
 					</select>
 				</div>
 			}
-			{supplier_id && <Link className="button green" to={`/products?supplier_id=${supplier_id}&product_id=new`} onClick={setHooksToDeaultValue}> + </Link>}
+			{supplier_id && <Link className="button green" to={`/products?p_supplier_id=${supplier_id}&p_product_id=new`} onClick={setHooksToDeaultValue}> + </Link>}
 			<div className="divider"> Product List </div>
 			{
 				Object.entries(categories).map(
@@ -75,7 +75,7 @@ const Products = ({ products, getProducts }: P) => {
 								Object.entries(products)
 									.map(([pid, product]) => {
 										return <div className="list" key={pid}>
-											<Link to={`/products?supplier_id=${sid}&product_id=${product.id}`} onClick={setHooksToDeaultValue}> {product.title} </Link>
+											<Link to={`/products?p_supplier_id=${sid}&p_product_id=${product.id}`} onClick={setHooksToDeaultValue}> {product.title} </Link>
 										</div>
 									})
 							}

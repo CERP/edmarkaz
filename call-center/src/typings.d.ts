@@ -26,6 +26,15 @@ interface RootReducerState {
 			[product_id: string]: Product
 		}
 	}
+	orders: {
+		last_sync: number
+		loading: boolean
+		db: {
+			[supplier_id: string]: {
+				[id: string]: Order
+			}
+		}
+	}
 	active_school?: CERPSchool
 	caller_id?: string
 	last_snapshot: number
@@ -64,6 +73,20 @@ interface Product {
 		order?: number
 	}
 	order?: number
+}
+
+interface Order {
+	event: "ORDER_PLACED"
+	meta: {
+		product_id: string
+		school_id: string
+	}
+	time: number
+	user: {
+		name: string
+		number: string
+	}
+	verified?: boolean
 }
 
 interface CERPSchool {

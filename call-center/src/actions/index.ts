@@ -53,6 +53,76 @@ export const placeOrder = (product: Product, school: CERPSchool) => (dispatch: D
 		})
 }
 
+export const verifyOrder = (order: Order, product: Product, school: CERPSchool) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+	const state = getState();
+
+	if (!state.connected) {
+		syncr.onNext('connect', () => dispatch(verifyOrder(order, product, school)))
+		return;
+	}
+
+	syncr.send({
+		type: "VERIFY_ORDER",
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		id: state.auth.id,
+		payload: {
+			order,
+			product,
+			school_name: school.school_name,
+			school_number: school.phone_number
+		}
+	})
+		.then(res => {
+			dispatch(getOrders())
+			alert(res)
+		})
+		.catch(err => {
+			console.error(err)
+			alert(err)
+		})
+}
+
+export const getOrders = () => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+	const state = getState();
+
+	if (!state.connected) {
+		syncr.onNext('connect', () => dispatch(getOrders()))
+		return;
+	}
+
+	dispatch({
+		type: "LOAD_ORDERS"
+	})
+
+	syncr.send({
+		type: "GET_ORDERS",
+		payload: {
+			id: state.auth.id
+		},
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		id: state.auth.id
+	})
+		.then(res => {
+			dispatch({
+				type: "ADD_ORDERS",
+				orders: res
+			})
+			return res
+		})
+		.catch(err => console.error("ERROR FROM GET ORDERS", err))
+}
+
+export interface AddOrdersAction {
+	type: "ADD_ORDERS"
+	orders: {
+		[supplier_id: string]: {
+			[id: string]: Order
+		}
+	}
+}
+
 export const ADD_PRODUCTS = "ADD_PRODUCTS"
 export const getProducts = (filters = {}) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 
