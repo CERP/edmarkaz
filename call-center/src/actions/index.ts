@@ -123,6 +123,38 @@ export interface AddOrdersAction {
 	}
 }
 
+export const getLogs = (start_date: number, end_date: number) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+
+	const state = getState()
+
+	if (!state.connected) {
+		syncr.onNext("connect", () => dispatch(getLogs(start_date, end_date)))
+		return
+	}
+
+	dispatch({
+		type: "LOAD_LOGS"
+	})
+
+	syncr.send({
+		type: "GET_LOGS",
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		id: state.auth.id,
+		payload: {
+			start_date,
+			end_date
+		}
+	})
+		.then(res => {
+			dispatch({
+				type: "ADD_LOGS",
+				logs: res
+			})
+		})
+		.catch(err => console.error("ERROR GETTING LOGS", err))
+}
+
 export const ADD_PRODUCTS = "ADD_PRODUCTS"
 export const getProducts = (filters = {}) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 

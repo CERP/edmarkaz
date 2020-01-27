@@ -19,7 +19,6 @@ type propTypes = P & RouteComponentProps
 const OrderInfo = ({ product_id, supplier_id, order_time, school_id, active_school, products, orders, verifyOrder, getSchoolProfiles, history }: propTypes) => {
 
 	useEffect(() => {
-		console.log("SSID", school_id)
 		getSchoolProfiles([school_id])
 	}, [school_id])
 
