@@ -1,7 +1,7 @@
 defmodule EdMarkaz.ActionHandler.CallCenter do
 
 
-	def handle_action(%{"type" => "LOGIN", "client_id" => client_id, "payload" => %{"id" => "cerp-callcenter", "password" => password}}, state) do
+	def handle_action(%{"type" => "LOGIN", "client_id" => client_id, "payload" => %{"id" => "cerp-callcenter", "password" => password}}, _state) do
 		id = "cerp-callcenter"
 		case EdMarkaz.Auth.login({ id, client_id, password}) do
 			{:ok, token} ->
@@ -22,7 +22,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 		end
 	end
 
-	def handle_action(%{"type" => "SYNC", "payload" => payload, "last_snapshot" => last_sync_date}, %{id: id, client_id: client_id} = state) do
+	def handle_action(%{"type" => "SYNC", "payload" => _payload, "last_snapshot" => _last_sync_date}, state) do
 		# res = EdMarkaz.Supplier.sync_changes(id, client_id, payload, last_sync_date)
 
 		{:reply, succeed(), state}
@@ -37,7 +37,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 				"supplier_id" => supplier_id
 			}
 		},
-		%{id: id, client_id: client_id} = state
+		state
 	) do
 		EdMarkaz.Product.merge(product_id, product, supplier_id)
 
@@ -53,7 +53,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 				"data_url" => data_url
 				}
 			},
-			%{id: id, client_id: client_id} = state
+			state
 	) do
 
 		IO.puts "handling merge product image"
@@ -80,9 +80,9 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 	def handle_action(
 		%{
 			"type" => "GET_ORDERS",
-			"payload" => payload
+			"payload" => _payload
 		},
-		%{ id: id, client_id: client_id } = state
+		state
 	) do
 
 		case Postgrex.query(EdMarkaz.DB,
@@ -128,7 +128,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 		end
 	end
 
-	def handle_action(%{"type" => "GET_SCHOOL_PROFILES", "payload" => payload}, %{id: id, client_id: client_id} = state) do
+	def handle_action(%{"type" => "GET_SCHOOL_PROFILES", "payload" => payload}, state) do
 
 		ids = Map.get(payload, "school_ids", [])
 
@@ -151,10 +151,10 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 		end
 	end
 
-	def handle_action(%{"type" => "SAVE_SCHOOL", "payload" => %{"school_id" => school_id, "school" => school}, "last_snapshot" => last_sync_date}, %{id: id, client_id: client_id} = state) do
+	def handle_action(%{"type" => "SAVE_SCHOOL", "payload" => %{"school_id" => school_id, "school" => school}, "last_snapshot" => _last_sync_date}, %{id: id, client_id: client_id} = state) do
 
 		case Postgrex.query(EdMarkaz.DB, "UPDATE platform_schools set db = $1 where id=$2", [school, school_id]) do
-			{:ok, res} ->
+			{:ok, _res} ->
 				{:reply, succeed(), %{id: id, client_id: client_id}}
 			{:error, msg} ->
 				IO.inspect msg
@@ -162,7 +162,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 		end
 	end
 
-	def handle_action(%{"type" => "FIND_SCHOOL", "payload" => %{"refcode" => refcode}}, %{id: id, client_id: client_id} = state) do
+	def handle_action(%{"type" => "FIND_SCHOOL", "payload" => %{"refcode" => refcode}}, state) do
 
 		IO.puts "FIND SCHOOL"
 		case Postgrex.query(EdMarkaz.DB, "SELECT db FROM platform_schools WHERE id=$1", [refcode]) do
@@ -176,7 +176,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 		end
 	end
 
-	def handle_action(%{"type" => "GET_SCHOOL_FROM_NUMBER", "payload" => %{"phone_number" => phone_number }}, %{id: id, client_id: client_id} = state) do
+	def handle_action(%{"type" => "GET_SCHOOL_FROM_NUMBER", "payload" => %{"phone_number" => phone_number }}, state) do
 
 		case EdMarkaz.School.get_profile(phone_number) do
 			{:ok, school_id, profile} ->
@@ -191,12 +191,13 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 
 		IO.puts "handling order"
 		product_name = Map.get(product, "title")
+		product_id = Map.get(product,"id")
 		supplier_id = Map.get(product, "supplier_id")
 
 		start_supplier(supplier_id)
 		EdMarkaz.Supplier.place_order(supplier_id, product, refcode, client_id)
 		spawn fn ->
-			EdMarkaz.Slack.send_alert("#{school_name} placed order for #{product_name} by #{supplier_id}. Their number is #{school_number}", "#platform-orders")
+			EdMarkaz.Slack.send_alert("#{school_name} placed order for #{product_id} by #{supplier_id}. Their number is #{school_number}", "#platform-orders")
 		end
 
 		spawn fn ->
@@ -240,7 +241,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 
 	def handle_action(%{"type" => "GET_PRODUCTS", "last_sync" => last_sync}, state) do
 
-		dt = DateTime.from_unix!(last_sync, :millisecond)
+		_dt = DateTime.from_unix!(last_sync, :millisecond)
 
 		case Postgrex.query(EdMarkaz.DB, "
 			SELECT
@@ -253,7 +254,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 			WHERE extract(epoch from sync_time) > $1 ", [0]) do
 			{:ok, resp} ->
 				mapped = resp.rows
-					|> Enum.map(fn [id, supplier_id, product, sync_time, supplier_profile] -> {id, Map.put(product, "supplier_profile", supplier_profile)} end)
+					|> Enum.map(fn [id, _supplier_id, product, _sync_time, supplier_profile] -> {id, Map.put(product, "supplier_profile", supplier_profile)} end)
 					|> Enum.into(%{})
 
 				{:reply, succeed(%{products: mapped}), state}
@@ -261,6 +262,42 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 				IO.puts "error getting product"
 				IO.inspect err
 				{:reply, fail("error getting products"), state}
+		end
+	end
+
+	def handle_action(
+		%{
+			"type" => "GET_LOGS",
+			"payload" => %{
+				"start_date" => start_date,
+				"end_date" => end_date
+			}
+		},
+		state
+	) do
+
+		case Postgrex.query(EdMarkaz.DB,
+			"SELECT
+				id,
+				value,
+				time
+			FROM platform_writes
+			WHERE value ->> 'event' IN('CALL_START','CALL_END','CALL_BACK','CALL_BACK_END')
+			AND time BETWEEN $1 AND $2
+			ORDER BY time DESC",
+			[start_date, end_date]
+		) do
+			{:ok, resp} ->
+				mapped = resp.rows |> Enum.reduce(
+					%{},
+					fn ([id, value, time], acc) ->
+						Map.put(acc, "#{id}-#{time}", %{ "id" => id, "value" => value})
+					end
+				)
+				{:reply, succeed(mapped), state}
+			{:error, err} ->
+				IO.inspect err
+				IO.puts "ERROR GETTING LOGS"
 		end
 	end
 
