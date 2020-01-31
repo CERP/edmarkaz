@@ -429,7 +429,7 @@ const SchoolHistory: React.SFC<SchoolMatchProps> = (props: SchoolMatchProps) => 
 							// @ts-ignore
 							v.user.name.name || v.user.name
 						}</div>
-						<div>{v.event}</div>
+						<div>{v.event === "ORDER_PLACED" ? Boolean(v.verified) ? `${v.event} (verified)` : `${v.event} (pending)` : v.event}</div>
 						<div>{v.meta ? v.meta.call_status || (v.event === "ORDER_PLACED" && product && product.title) : ""}</div>
 						{
 							v.event === "CALL_END" ? console.log("META:", v.meta) : false
