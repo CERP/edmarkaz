@@ -31,7 +31,10 @@ interface RootReducerState {
 		loading: boolean
 		db: {
 			[supplier_id: string]: {
-				[id: string]: Order
+				[id: string]: {
+					order: Order
+					school: CERPSchool
+				}
 			}
 		}
 	}

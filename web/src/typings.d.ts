@@ -50,6 +50,7 @@ declare global {
 			school_id: string;
 			product_id: string;
 		};
+		verified?: boolean
 	}
 
 	interface CallEndSurvey extends PlatformInteractionEvent {

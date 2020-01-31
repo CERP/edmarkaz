@@ -118,7 +118,10 @@ export interface AddOrdersAction {
 	type: "ADD_ORDERS"
 	orders: {
 		[supplier_id: string]: {
-			[id: string]: Order
+			[id: string]: {
+				order: Order
+				school: CERPSchool
+			}
 		}
 	}
 }

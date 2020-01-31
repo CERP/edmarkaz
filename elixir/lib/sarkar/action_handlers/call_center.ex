@@ -94,29 +94,31 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 				FROM platform_writes
 				WHERE path[4]='history'
 				AND value ->> 'event' ='ORDER_PLACED'
-				AND value ->> 'verified' = 'true'
-			)
-			SELECT * FROM verified
-			UNION ALL
-			SELECT
-				value ->> 'time',
-				id,
-				value
-			FROM platform_writes
-			WHERE path[4]='history'
-			AND value ->> 'event' ='ORDER_PLACED'
-			AND value ->> 'time' NOT IN ( SELECT time FROM verified)",
+				AND value ->> 'verified' = 'true')
+			SELECT orders.time, orders.id, orders.value, platform_schools.db
+			FROM (SELECT * FROM verified
+				UNION ALL
+				SELECT
+					value ->> 'time',
+					id,
+					value
+				FROM platform_writes
+				WHERE path[4]='history'
+				AND value ->> 'event' ='ORDER_PLACED'
+				AND value ->> 'time' NOT IN ( SELECT time FROM verified)) as orders
+			JOIN platform_schools ON orders.value->'meta'->>'school_id' = platform_schools.id
+			",
 			[]
 		) do
 			{:ok, resp} ->
 				mapped = resp.rows |> Enum.reduce(
 					%{},
-					fn ([time, sid, order], acc) ->
+					fn ([time, sid, order, school], acc) ->
 						case Map.get(acc, sid) do
 							nil ->
-								Map.put(acc, sid, %{ "#{time}" => order })
+								Map.put(acc, sid, %{ "#{time}" => %{ "order" => order, "school" => school} })
 							val ->
-								Map.put(acc, sid, Map.put(val, "#{time}", order))
+								Map.put(acc, sid, Map.put(val, "#{time}", %{ "order" => order, "school" => school}))
 						end
 					end
 				)

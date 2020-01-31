@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { connect } from 'react-redux';
-import { getSchoolProfiles, verifyOrder } from '../../actions';
+import { verifyOrder } from '../../actions';
 import { RouteComponentProps, withRouter } from 'react-router';
 
 interface P {
@@ -8,19 +8,13 @@ interface P {
 	order_time: number
 	school_id: string
 	supplier_id: string
-	active_school: RootReducerState["active_school"]
 	products: RootReducerState["products"]
 	orders: RootReducerState["orders"]
 	verifyOrder: (order: Order, product: Product, school: CERPSchool) => any
-	getSchoolProfiles: (school_ids: string[]) => any
 }
 
 type propTypes = P & RouteComponentProps
-const OrderInfo = ({ product_id, supplier_id, order_time, school_id, active_school, products, orders, verifyOrder, getSchoolProfiles, history }: propTypes) => {
-
-	useEffect(() => {
-		getSchoolProfiles([school_id])
-	}, [school_id])
+const OrderInfo = ({ product_id, supplier_id, order_time, school_id, products, orders, verifyOrder, history }: propTypes) => {
 
 	const onClose = () => {
 		history.push({
@@ -29,12 +23,15 @@ const OrderInfo = ({ product_id, supplier_id, order_time, school_id, active_scho
 		})
 	}
 
-	const ordered_product = products.db[product_id]
-	const order_details = orders.db[supplier_id] ? orders.db[supplier_id][order_time] : false
+	const active_school = orders.db[supplier_id] ? orders.db[supplier_id][order_time].school : false
 	const school_name = active_school ? active_school.school_name : ""
 	const school_number = active_school ? active_school.phone_number : ""
-	const verified = order_details && !order_details.verified
+
+	const ordered_product = products.db[product_id]
 	const product_title = ordered_product ? ordered_product.title : ""
+
+	const order_details = orders.db[supplier_id] ? orders.db[supplier_id][order_time].order : false
+	const verified = order_details && !order_details.verified
 
 	return <div className="order-info page">
 		<div className="section form">
@@ -65,8 +62,6 @@ const OrderInfo = ({ product_id, supplier_id, order_time, school_id, active_scho
 export default connect((state: RootReducerState) => ({
 	products: state.products,
 	orders: state.orders,
-	active_school: state.active_school
 }), (dispatch: Function) => ({
 	verifyOrder: (order: Order, product: Product, school: CERPSchool) => dispatch(verifyOrder(order, product, school)),
-	getSchoolProfiles: (school_ids: string[]) => dispatch(getSchoolProfiles(school_ids))
 }))(withRouter(OrderInfo));
