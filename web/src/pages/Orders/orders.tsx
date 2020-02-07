@@ -5,11 +5,12 @@ import moment from 'moment'
 
 import './style.css'
 import Former from '~src/utils/former'
-import { reserveMaskedNumber, releaseMaskedNumber } from '~src/actions'
+import { reserveMaskedNumber, releaseMaskedNumber, getOwnProducts } from '~src/actions'
 
 interface P {
 	reserveNumber: (school_id: string) => any
 	releaseNumber: (school_id: string) => any
+	getProducts: () => void
 	sync_state: RootBankState["sync_state"]
 	schools: RootBankState["new_school_db"]
 	products: RootBankState["products"]
@@ -40,6 +41,10 @@ class Orders extends Component<propTypes, S> {
 			}
 		}
 		this.former = new Former(this, [])
+	}
+
+	componentDidMount() {
+		this.props.getProducts()
 	}
 
 	setActive = (school_id: string) => {
@@ -74,6 +79,9 @@ class Orders extends Component<propTypes, S> {
 		const { sync_state, schools, products } = this.props
 		const { filterMenu, activeSchool } = this.state
 
+		const loading_products = Object.keys(products.db).length === 0
+		const schoolMatch = sync_state.matches[activeSchool]
+
 		const items = Object.entries(sync_state.matches)
 			.filter(([sid, { status, history }]) =>
 				(status !== "REJECTED" && status !== "NEW") && Object.values(history).find((e) => e.event === "ORDER_PLACED")
@@ -84,7 +92,6 @@ class Orders extends Component<propTypes, S> {
 			})
 			.map(([sid, event]) => ({ ...event, school: schools[sid] }))
 
-		const schoolMatch = sync_state.matches[activeSchool]
 
 		return <div className="order page">
 			<div className="title">Orders</div>
@@ -173,20 +180,22 @@ class Orders extends Component<propTypes, S> {
 											</>
 										}
 										{status === "IN_PROGRESS" && <div className="button green" onClick={this.onMarkComplete}>Mark Complete</div>}
-										{orders_length && <div className="divider">Orders</div>}
+										{(orders_length && !loading_products) && <div className="divider">Orders</div>}
 										{
-											orders_length && <div className="newtable">
+											(orders_length && !loading_products) && <div className="newtable">
 												<div className="newtable-row heading">
 													<div>Date </div>
 													<div>Product</div>
+													<div>Order Status</div>
 												</div>
 												{
 													orders
 														.map(e => {
-															const product_id = e.event === "ORDER_PLACED" && e.meta.product_id
+															const order = e.event === "ORDER_PLACED" && e
 															return <div className="newtable-row">
-																<div>{moment(e.time).format("DD-MM-YY")}</div>
-																<div>{products.db[product_id].title}</div>
+																<div>{moment(order.time).format("DD-MM-YY")}</div>
+																<div>{products.db[order.meta.product_id].title}</div>
+																<div>{order.verified ? "Verified" : "Not Verified"}</div>
 															</div>
 														})
 												}
@@ -209,5 +218,6 @@ export default connect((state: RootBankState) => ({
 	products: state.products,
 }), (dispatch: Function) => ({
 	reserveNumber: (school_id: string) => dispatch(reserveMaskedNumber(school_id)),
-	releaseNumber: (school_id: string) => dispatch(releaseMaskedNumber(school_id))
+	releaseNumber: (school_id: string) => dispatch(releaseMaskedNumber(school_id)),
+	getProducts: () => dispatch(getOwnProducts()),
 }))(Orders)
