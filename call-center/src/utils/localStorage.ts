@@ -119,6 +119,12 @@ export const loadDB = (): RootReducerState => {
 			db: {
 
 			}
+		},
+		logs: {
+			loading: true,
+			db: {
+
+			}
 		}
 	}
 }

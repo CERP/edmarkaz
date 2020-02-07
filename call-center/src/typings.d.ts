@@ -31,7 +31,19 @@ interface RootReducerState {
 		loading: boolean
 		db: {
 			[supplier_id: string]: {
-				[id: string]: Order
+				[id: string]: {
+					order: Order
+					school: CERPSchool
+				}
+			}
+		}
+	}
+	logs: {
+		loading: boolean
+		db: {
+			[key: string]: {
+				id: string
+				value: CallStartEvent | CallEndEvent
 			}
 		}
 	}
@@ -248,3 +260,29 @@ interface CERPSchool {
 	year_established: string
 
 }
+
+interface PlatformInteractionEvent {
+	event: string
+	time: number
+	user: {
+		name: string
+		number?: string
+	}
+}
+
+interface CallEndEvent extends PlatformInteractionEvent {
+	event: "CALL_END" | "CALL_BACK_END"
+	meta: {
+		call_status: "ANSWER" | "NO ANSWER" | "BUSY" | "CANCEL" | "FAILED" | "CONGESTION"
+		duration: string
+		unique_id: string
+	}
+}
+interface CallStartEvent extends PlatformInteractionEvent {
+	event: "CALL_START" | "CALL_BACK"
+}
+
+// interface AddLogsAction {
+// 	type: "ADD_LOGS",
+// 	val:
+// }

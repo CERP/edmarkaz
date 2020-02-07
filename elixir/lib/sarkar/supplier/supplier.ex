@@ -310,6 +310,10 @@ defmodule EdMarkaz.Supplier do
 				}
 		end
 
+		spawn fn ->
+			EdMarkaz.CallCenter.broadcast("CALL", Enum.join(path,"-"), value )
+		end
+
 		changes = %{
 			Enum.join(path, ",") => %{
 				"action" => %{

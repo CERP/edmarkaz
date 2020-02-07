@@ -45,6 +45,31 @@ const rootReducer: Reducer<RootReducerState, AnyAction> = (state: RootReducerSta
 				}
 			}
 
+		case "ADD_LOGS":
+			{
+				return {
+					...state,
+					logs: {
+						...state.logs,
+						db: {
+							...state.logs.db,
+							...action.logs
+						},
+						loading: false,
+					}
+				}
+			}
+		case "LOAD_LOGS":
+			{
+				return {
+					...state,
+					logs: {
+						...state.logs,
+						loading: true
+					}
+				}
+			}
+
 		case "LOAD_PRODUCTS":
 			{
 				return {
