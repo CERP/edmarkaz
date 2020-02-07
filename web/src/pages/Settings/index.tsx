@@ -128,7 +128,7 @@ class Settings extends React.Component<propTypes, stateType> {
 				</div>
 
 				<div className="row">
-					<div className="button save" onClick={this.save}>Save</div>
+					<div className="button green" onClick={this.save}>Save</div>
 				</div>
 
 				<div className="row">
