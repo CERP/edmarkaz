@@ -159,7 +159,7 @@ class Orders extends Component<propTypes, S> {
 											<label> Enrollment </label>
 											<div> {school.enrolment_range} </div>
 										</div>
-										{(status === "DONE" || status === "ORDERED") && <div className="button blue" onClick={this.onShowNumber}>Show Number</div>}
+										{(status === "DONE" || status === "ORDERED") && <div className="button green" onClick={this.onShowNumber}>Show Number</div>}
 										{
 											reserved && <>
 												<div className="divider"> Contact Information </div>
