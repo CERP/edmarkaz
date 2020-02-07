@@ -12,12 +12,14 @@ defmodule EdMarkaz.Server.Analytics do
 			EdMarkaz.DB,
 			"SELECT
 				client_id,
-				meta -> 'route' as p,
 				meta -> 'refcode' as refcode,
-				to_timestamp(time/1000)::time + interval '5 hour' as t,
-				to_timestamp(time/1000)::date as d
+				meta -> 'route' as p,
+				to_timestamp(time/1000)::date as d,
+				count(*) as cnt
 			FROM consumer_analytics
-			WHERE type='ROUTE'",
+			WHERE type='ROUTE'
+			GROUP BY client_id, meta->'refcode', d, meta->'route'
+			",
 			[]
 		) do
 			{:ok, resp} -> {:ok, resp.rows}
@@ -26,7 +28,7 @@ defmodule EdMarkaz.Server.Analytics do
 
 		formatted = data
 			|> Enum.map(
-				fn [id, path, refcode, time, date] ->
+				fn [id, refcode, path, date, count] ->
 
 					path = case List.first(path) === "" do
 						true -> path |> List.replace_at(0,"bazaar")
@@ -43,11 +45,11 @@ defmodule EdMarkaz.Server.Analytics do
 						false -> refcode
 					end
 
-					[id, path, refcode, time, date]
+					[date, refcode, id, path, count]
 				end
 			)
 
-		csv = [ ["client_id", "path", "refcode", "time", "date"] | formatted]
+		csv = [ ["date", "refcode", "client_id", "url", "count"] | formatted]
 		|> CSV.encode
 		|> Enum.join()
 
