@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import Arrow from '../../icons/arrow.svg'
 import { getProducts } from '../../actions';
 import banner from './Banner.png'
+import CarousalComponent from '../../components/Carousel'
 
 import './style.css'
 
@@ -34,6 +35,13 @@ const getCategoryOrder = (category: string) => {
 	return 999;
 }
 
+const CarousalItems = [
+	{
+		title: "",
+		caption: "",
+		url: banner
+	}
+]
 class LoggedOutHome extends React.Component<P, S> {
 
 	componentDidMount() {
@@ -82,9 +90,10 @@ class LoggedOutHome extends React.Component<P, S> {
 			.sort(([c1,], [c2,]) => getCategoryOrder(c1) - getCategoryOrder(c2))
 
 		return <div className="products">
-			<div className="tabs-banner">
+			<CarousalComponent items={CarousalItems} />
+			{/* <div className="tabs-banner">
 				<img className="banner-img" src={banner} />
-			</div>
+			</div> */}
 			<div className="tabs-home">
 				{
 					sorted

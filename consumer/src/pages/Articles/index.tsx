@@ -8,7 +8,7 @@ import prepare_students from './topics/prepare_students'
 import leaders_make_great from './topics/leaders_make_great'
 import can_we_help_all_children from './topics/can_we_help_all_children'
 import TrackedRoute from '../../components/TrackedRoute'
-
+import CarousalComponent from '../../components/Carousel'
 import banner from './ilmexchange-banner.png'
 import makes_great_leader from './topics/makes_great_leader'
 
@@ -20,14 +20,23 @@ type P = {
 
 } & RouteComponentProps<RouteInfo>
 
+const CarousalItems = [
+	{
+		title: "",
+		caption: "",
+		url: banner
+	}
+]
+
 // eslint-disable-next-line react/display-name
 export default (props: P) => {
 
 	return <div className="articles">
 
-		<div className="tabs-banner">
+		<CarousalComponent items={CarousalItems} />
+		{/* <div className="tabs-banner">
 			<img crossOrigin="anonymous" className="banner-img" src={banner} />
-		</div>
+		</div> */}
 
 		<div className="tabs-home">
 
