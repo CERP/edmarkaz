@@ -1,5 +1,4 @@
 import React from 'react';
-import { withRouter, RouteComponentProps } from 'react-router';
 import { Carousel } from 'react-bootstrap'
 import './style.css'
 
@@ -11,9 +10,8 @@ interface P {
 		url: string
 	}[]
 }
-type propTypes = RouteComponentProps & P
 
-const CarouselComponent: React.FC<propTypes> = ({ items }) => {
+const CarouselComponent: React.FC<P> = ({ items }) => {
 
 	return <div className="carousel-comp">
 		<Carousel>
@@ -36,4 +34,4 @@ const CarouselComponent: React.FC<propTypes> = ({ items }) => {
 		</Carousel>
 	</div>
 }
-export default withRouter(CarouselComponent)
+export default CarouselComponent
