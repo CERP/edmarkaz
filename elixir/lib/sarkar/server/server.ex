@@ -1,38 +1,14 @@
-defmodule EdMarkaz.Server do
+defmodule EdMarkaz.Router do
+	use Plug.Router
 
-	def start_link(_opts) do
+	plug :match
+	plug :dispatch
 
-		IO.puts "starting server"
+	forward "/analytics", to: EdMarkaz.Server.Analytics
+	forward "/masking", to: EdMarkaz.Server.Masking
 
-		{:ok, _} = :cowboy.start_clear(
-			:http,
-			[{ :port, 8080 }],
-			%{
-				:env => %{ :dispatch => config() }
-			}
-		)
+	match "/" do
+		send_resp(conn, 200, "hello from plug")
 	end
 
-	def config do
-		:cowboy_router.compile([
-			{:_, [
-				{"/ws", EdMarkaz.Websocket, []},
-				{"/", EdMarkaz.Server.OK, []},
-				{"/analytics/:type", EdMarkaz.Server.Analytics, []},
-				{"/masking", EdMarkaz.Server.Masking, []}
-			]}
-		])
-	end
-
-	def child_spec(_opts) do
-		import Supervisor.Spec
-		worker(__MODULE__, [12_000])
-	end
-end
-
-defmodule EdMarkaz.Server.OK do
-	def init(req, state) do
-		req = :cowboy_req.reply(200, req)
-		{:ok, req, state}
-	end
 end

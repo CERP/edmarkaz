@@ -1,4 +1,8 @@
 defmodule EdMarkaz.Server.Masking do
+	use Plug.Router
+
+	plug :match
+	plug :dispatch
 
 	@helpline_number "03481119119"
 
@@ -10,10 +14,9 @@ defmodule EdMarkaz.Server.Masking do
 		{:ok, :cowboy_req.reply(200, req), state}
 	end
 
-	def init(req, state) do
+	match _ do
 
-		query_params = :cowboy_req.parse_qs(req)
-		|> Enum.into(%{})
+		query_params = fetch_query_params(conn).params
 
 		# TODO: handle different events with different code blocks inside this case
 		# i.e. if we are passing call_end or call_start events
@@ -165,11 +168,9 @@ defmodule EdMarkaz.Server.Masking do
 
 		IO.puts "#{current_time}: forwarding #{caller} to #{school_name}: #{forward}"
 
-		{:ok, :cowboy_req.reply(
-			200,
-			%{"content-type" => "text/plain"},
-			forward,
-			req), state}
+		conn
+		|> put_resp_header("content-type", "text/plain")
+		|> send_resp(200, forward)
 	end
 
 	defp start_supplier(id) do

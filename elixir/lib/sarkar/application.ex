@@ -26,12 +26,29 @@ defmodule EdMarkaz.Application do
 					pool_size: 10,
 					timeout: 60000
 			},
-			EdMarkaz.Server
+			# EdMarkaz.Server
+			Plug.Adapters.Cowboy.child_spec(
+				scheme: :http,
+				plug: EdMarkaz.Router,
+				dispatch: dispatch,
+				port: 8080)
 		]
 
 		# See https://hexdocs.pm/elixir/Supervisor.html
 		# for other strategies and supported options
 		opts = [strategy: :one_for_one, name: EdMarkaz.Supervisor]
 		Supervisor.start_link(children, opts)
+	end
+
+	defp dispatch do
+		[
+			{:_, [
+				{"/ws", EdMarkaz.Websocket, []},
+				{:_, Plug.Cowboy.Handler, {EdMarkaz.Router, []}}
+				# {"/", EdMarkaz.Server.OK, []},
+				# {"/analytics/:type", EdMarkaz.Server.Analytics, []},
+				# {"/masking", EdMarkaz.Server.Masking, []}
+			]}
+		]
 	end
 end

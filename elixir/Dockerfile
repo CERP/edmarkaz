@@ -4,6 +4,7 @@ RUN apk add --no-cache alpine-sdk
 RUN apk add --no-cache bash
 
 ENV MIX_ENV=prod
+ENV REPLACE_OS_VARS
 RUN mix local.hex --force
 RUN mix local.rebar
 

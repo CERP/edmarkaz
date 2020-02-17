@@ -1,13 +1,19 @@
 defmodule EdMarkaz.Server.Analytics do
 
-	def init(%{bindings: %{type: "hi"}} = req, state) do
+	use Plug.Router
+
+	plug BasicAuth, use_config: {:edmarkaz, :basic_auth}
+
+	plug :match
+	plug :dispatch
+
+	match "/hi" do
 		IO.puts "wowwww"
-		req = :cowboy_req.reply(200, req)
-		{:ok, req, state}
+		send_resp(conn, 200, "hello")
 
 	end
 
-	def init(%{ bindings: %{ type: "consumer-signups.csv"}} = req, state) do
+	match "/consumer-signups.csv" do
 		{:ok, data} = case Postgrex.query(
 			EdMarkaz.DB,
 			"SELECT
@@ -21,8 +27,7 @@ defmodule EdMarkaz.Server.Analytics do
 				db->>'respondent_owner',
 				db->>'phone_number'
 			FROM platform_schools
-			WHERE length(id) = 36
-			",
+			WHERE length(id) = 36",
 			[]
 		) do
 			{:ok, resp} -> {:ok, resp.rows}
@@ -46,17 +51,13 @@ defmodule EdMarkaz.Server.Analytics do
 		|> CSV.encode()
 		|> Enum.join()
 
-		req = :cowboy_req.reply(
-			200,
-			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
-			csv,
-			req
-		)
-
-		{:ok, req, state}
+		conn
+		|> put_resp_header("content-type", "text/csv")
+		|> put_resp_header("cache-control", "no-cache")
+		|> send_resp( 200, csv)
 	end
 
-	def init(%{ bindings: %{ type: "consumer-analytics.csv"}} = req, state ) do
+	match "/consumer-analytics.csv" do
 		{:ok, data} = case Postgrex.query(
 			EdMarkaz.DB,
 			"SELECT
@@ -101,17 +102,13 @@ defmodule EdMarkaz.Server.Analytics do
 		|> CSV.encode
 		|> Enum.join()
 
-		req = :cowboy_req.reply(
-			200,
-			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
-			csv,
-			req
-		)
-
-		{:ok, req, state}
+		conn
+		|> put_resp_header("content-type", "text/csv")
+		|> put_resp_header("cache-control", "no-cache")
+		|> send_resp( 200, csv)
 	end
 
-	def init(%{bindings: %{type: "platform-writes.csv"}} = req, state) do
+	match "/platform-writes.csv" do
 
 		{:ok, data} = case Postgrex.query(EdMarkaz.DB,
 		"SELECT id, to_timestamp(time/1000)::date as date, count(*)
@@ -129,17 +126,14 @@ defmodule EdMarkaz.Server.Analytics do
 		|> CSV.encode
 		|> Enum.join()
 
-		req = :cowboy_req.reply(
-			200,
-			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
-			csv,
-			req
-		)
+		conn
+		|> put_resp_header("content-type", "text/csv")
+		|> put_resp_header("cache-control", "no-cache")
+		|> send_resp( 200, csv)
 
-		{:ok, req, state}
 	end
 
-	def init(%{bindings: %{type: "platform-orders.csv"}} = req, state) do
+	match "/platform-orders.csv" do
 		{:ok, data} = case Postgrex.query(EdMarkaz.DB,
 		"SELECT
 			a.id,
@@ -164,17 +158,14 @@ defmodule EdMarkaz.Server.Analytics do
 		|> CSV.encode
 		|> Enum.join()
 
-		req = :cowboy_req.reply(
-			200,
-			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
-			csv,
-			req
-		)
+		conn
+		|> put_resp_header("content-type", "text/csv")
+		|> put_resp_header("cache-control", "no-cache")
+		|> send_resp( 200, csv)
 
-		{:ok, req, state}
 	end
 
-	def init(%{bindings: %{type: "platform-events.csv"}} = req, state) do
+	match "/platform-events.csv" do
 
 		{:ok, data} = case Postgrex.query(EdMarkaz.DB,
 		"SELECT
@@ -201,17 +192,13 @@ defmodule EdMarkaz.Server.Analytics do
 		|> CSV.encode
 		|> Enum.join()
 
-		req = :cowboy_req.reply(
-			200,
-			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
-			csv,
-			req
-		)
-
-		{:ok, req, state}
+		conn
+		|> put_resp_header("content-type", "text/csv")
+		|> put_resp_header("cache-control", "no-cache")
+		|> send_resp( 200, csv)
 	end
 
-	def init(%{bindings: %{type: "platform-call-surveys.csv"}} = req, state) do
+	match "/platform-call-surveys.csv" do
 		{:ok, data} = case Postgrex.query(EdMarkaz.DB,
 		"SELECT
 			id,
@@ -256,18 +243,14 @@ defmodule EdMarkaz.Server.Analytics do
 		|> CSV.encode
 		|> Enum.join()
 
-		req = :cowboy_req.reply(
-			200,
-			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
-			csv,
-			req
-		)
-
-		{:ok, req, state}
+		conn
+		|> put_resp_header("content-type", "text/csv")
+		|> put_resp_header("cache-control", "no-cache")
+		|> send_resp( 200, csv)
 	end
 
 
-	def init(%{bindings: %{type: "platform-call-survey-followup.csv"}} = req, state) do
+	match "/platform-call-survey-followup.csv" do
 		{:ok, data} = case Postgrex.query(EdMarkaz.DB,
 		"SELECT
 			id,
@@ -341,17 +324,13 @@ defmodule EdMarkaz.Server.Analytics do
 		|> CSV.encode
 		|> Enum.join()
 
-		req = :cowboy_req.reply(
-			200,
-			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
-			csv,
-			req
-		)
-
-		{:ok, req, state}
+		conn
+		|> put_resp_header("content-type", "text/csv")
+		|> put_resp_header("cache-control", "no-cache")
+		|> send_resp( 200, csv)
 	end
 
-	def init(%{bindings: %{type: "platform-completed-survey.csv"}} = req, state) do
+	match "/platform-completed-survey.csv" do
 		{:ok, data} = case Postgrex.query(EdMarkaz.DB,
 		"SELECT
 			id, to_timestamp((value->>'time')::bigint/1000)::date as date,
@@ -378,21 +357,14 @@ defmodule EdMarkaz.Server.Analytics do
 		|> CSV.encode
 		|> Enum.join()
 
-		req = :cowboy_req.reply(
-			200,
-			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
-			csv,
-			req
-		)
-
-		{:ok, req, state}
+		conn
+		|> put_resp_header("content-type", "text/csv")
+		|> put_resp_header("cache-control", "no-cache")
+		|> send_resp( 200, csv)
 	end
 
-	def init(req, state) do
-		req = :cowboy_req.reply(404, req)
-		IO.puts "route not found"
-		IO.inspect req
-		{:ok, req, state}
+	match _ do
+		send_resp(conn, 404, "not found")
 	end
 
 end
