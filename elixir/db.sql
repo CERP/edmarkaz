@@ -21,19 +21,16 @@ create table one_time_tokens
 create table platform_writes
 (
 	id text,
-	path text
-	[],
-		value jsonb,
-		time bigint,
-		type text,
-		client_id text,
-		sync_time timestamp default current_timestamp
-	);
+	path text [],
+	value jsonb,
+	time bigint,
+	type text,
+	client_id text,
+	sync_time timestamp default current_timestamp
+);
 
-	create index on platform_writes
-	(id);
-	create index on platform_writes
-	(time);
+	create index on platform_writes (id);
+	create index on platform_writes (time);
 
 	create table suppliers
 	(

@@ -7,19 +7,67 @@ defmodule EdMarkaz.Server.Analytics do
 
 	end
 
+	def init(%{ bindings: %{ type: "consumer-signups.csv"}} = req, state) do
+		{:ok, data} = case Postgrex.query(
+			EdMarkaz.DB,
+			"SELECT
+				db->>'school_name',
+				db->>'school_address',
+				db->>'school_district',
+				db->>'school_tehsil',
+				db->>'total_enrolment',
+				db->>'lowest_fee',
+				db->>'highest_fee',
+				db->>'respondent_owner',
+				db->>'phone_number'
+			FROM platform_schools
+			WHERE length(id) = 36
+			",
+			[]
+		) do
+			{:ok, resp} -> {:ok, resp.rows}
+			{:error, err} -> {:error, err}
+		end
+
+		csv = [
+			[
+				"school_name",
+				"school_address",
+				"school_district",
+				"school_tehsil",
+				"total_enrolment",
+				"lowest_fee",
+				"highest_fee",
+				"respondent_owner",
+				"phone_number"
+			] |
+			data
+		]
+		|> CSV.encode()
+		|> Enum.join()
+
+		req = :cowboy_req.reply(
+			200,
+			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
+			csv,
+			req
+		)
+
+		{:ok, req, state}
+	end
+
 	def init(%{ bindings: %{ type: "consumer-analytics.csv"}} = req, state ) do
 		{:ok, data} = case Postgrex.query(
 			EdMarkaz.DB,
 			"SELECT
 				client_id,
 				meta -> 'refcode' as refcode,
-				meta -> 'route' as p,
+				meta -> 'route' as route,
 				to_timestamp(time/1000)::date as d,
 				count(*) as cnt
 			FROM consumer_analytics
 			WHERE type='ROUTE'
-			GROUP BY client_id, meta->'refcode', d, meta->'route'
-			",
+			GROUP BY client_id, refcode, d, route",
 			[]
 		) do
 			{:ok, resp} -> {:ok, resp.rows}
