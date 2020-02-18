@@ -17,6 +17,7 @@ defmodule EdMarkaz.Server.Analytics do
 		{:ok, data} = case Postgrex.query(
 			EdMarkaz.DB,
 			"SELECT
+				id,
 				db->>'school_name',
 				db->>'school_address',
 				db->>'school_district',
@@ -36,6 +37,7 @@ defmodule EdMarkaz.Server.Analytics do
 
 		csv = [
 			[
+				"refcode",
 				"school_name",
 				"school_address",
 				"school_district",
@@ -54,7 +56,7 @@ defmodule EdMarkaz.Server.Analytics do
 		conn
 		|> put_resp_header("content-type", "text/csv")
 		|> put_resp_header("cache-control", "no-cache")
-		|> send_resp( 200, csv)
+		|> send_resp(200, csv)
 	end
 
 	match "/consumer-analytics.csv" do
