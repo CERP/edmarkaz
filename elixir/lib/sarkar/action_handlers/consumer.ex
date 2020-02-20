@@ -49,23 +49,33 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 		end
 	end
 
-	def handle_action(%{
-		"type" => "SIGN_UP",
-		"client_id" => client_id,
-		"payload" => %{"number" => number, "password" => password, "profile" => profile}}, state) do
+	def handle_action(
+		%{
+			"type" => "SIGN_UP",
+			"client_id" => client_id,
+			"payload" => %{
+				"number" => number,
+				"password" => password,
+				"profile" => profile
+			}
+		}, state
+	) do
 
 		IO.puts "handling sign up for #{number}"
-
 		refcode = Map.get(profile, "refcode")
 
 		# we aren't syncing platform schools
 		# if someone saves some bogus value here, we aren't able to undo
-		{:ok, res} = Postgrex.query(EdMarkaz.DB, "INSERT INTO platform_schools (id, db)
-			VALUES ($1, $2)
-			ON CONFLICT (id) DO UPDATE set db=excluded.db", [refcode, profile])
 
 		case EdMarkaz.Auth.create({ number, password }) do
 			{:ok, text} ->
+				{:ok, res} = Postgrex.query(
+					EdMarkaz.DB,
+					"INSERT INTO platform_schools (id, db)
+					VALUES ($1, $2)
+					ON CONFLICT (id) DO UPDATE set db=excluded.db",
+					[refcode, profile]
+				)
 				{:ok, token} = EdMarkaz.Auth.login({number, client_id, password})
 				{:ok, one_token} = EdMarkaz.Auth.gen_onetime_token(refcode)
 

@@ -26,7 +26,8 @@ defmodule EdMarkaz.Server.Analytics do
 				db->>'lowest_fee',
 				db->>'highest_fee',
 				db->>'respondent_owner',
-				db->>'phone_number'
+				db->>'phone_number',
+				time
 			FROM platform_schools
 			WHERE length(id) = 36",
 			[]
@@ -46,7 +47,8 @@ defmodule EdMarkaz.Server.Analytics do
 				"lowest_fee",
 				"highest_fee",
 				"respondent_owner",
-				"phone_number"
+				"phone_number",
+				"time"
 			] |
 			data
 		]
