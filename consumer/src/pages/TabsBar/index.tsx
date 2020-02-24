@@ -17,6 +17,7 @@ import contactUs from '../../icons/contactUs.svg'
 import "./style.css";
 import login from "../SignUp/login";
 import TrackedRoute from "../../components/TrackedRoute";
+import SinUpSurvey from "../SignUp/survey";
 
 interface S {
 	error: boolean;
@@ -95,6 +96,7 @@ class TabsBar extends Component<propTypes, S> {
 					<Route path="/articles/:article_id" component={ArticleRouter} />
 					<TrackedRoute exact path="/articles" component={Articles} />
 					<TrackedRoute path="/help" component={Help} />
+					<TrackedRoute path="/survey" component={SinUpSurvey} />
 				</>
 				<a className="contact-us" href={callLink}>
 					<img src={contactUs} />
