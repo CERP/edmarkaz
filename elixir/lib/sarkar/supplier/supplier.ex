@@ -187,6 +187,7 @@ defmodule EdMarkaz.Supplier do
 				"name" => "",
 				"number" => ""
 			},
+			"verified" => "NOT_VERIFIED"
 		}
 
 		writes = [
@@ -216,13 +217,12 @@ defmodule EdMarkaz.Supplier do
 
 		order_time = Map.get(order, "time")
 		school_code = get_in(order, ["meta", "school_id"])
-		event = Map.put(order, "verified", true)
-		path = ["sync_state", "matches", school_code, "history", "#{order_time}"]
+		path = ["sync_state", "matches", school_code, "history", "#{order_time}", "verified"]
 
 		case Postgrex.query(EdMarkaz.DB,
 			"SELECT *
 			FROM platform_writes
-			WHERE path=$1 AND value ->> 'event'= 'ORDER_PLACED' AND value ->> 'verified' = 'true' AND id=$2",
+			WHERE path=$1 AND value ->> 'event'= 'ORDER_PLACED' AND value ->> 'verified' = 'VERIFIED' AND id=$2",
 			[ path, supplier_id ]
 		) do
 			{:ok, %Postgrex.Result{ num_rows: 0 }} ->
@@ -231,7 +231,7 @@ defmodule EdMarkaz.Supplier do
 					%{
 						type: "MERGE",
 						path: path,
-						value: event,
+						value: "VERIFIED",
 						date: :os.system_time(:millisecond),
 						client_id: client_id
 					}
@@ -248,6 +248,46 @@ defmodule EdMarkaz.Supplier do
 				IO.puts "ERROR IN VERIFY QUERY"
 				IO.inspect err
 				{:ok, "Error Verifying Order"}
+		end
+	end
+
+	def reject_order(order, supplier_id, client_id) do
+		order_time = Map.get(order, "time")
+		school_code = get_in(order, ["meta", "school_id"])
+		path = ["sync_state", "matches", school_code, "history", "#{order_time}", "verified"]
+
+		case Postgrex.query(
+			EdMarkaz.DB,
+			"SELECT *
+			FROM platform_writes
+			WHERE path=$1 AND id=$2 AND value ->> 'event'= 'ORDER_PLACED' AND value ->> 'verified' = 'REJECTED'",
+			[path, supplier_id]
+		) do
+			{:ok, %Postgrex.Result{ num_rows: 0 }} ->
+				writes = [
+					%{
+						type: "MERGE",
+						path: path,
+						value: "REJECTED",
+						date: :os.system_time(:millisecond),
+						client_id: client_id
+					}
+				]
+
+				changes = prepare_changes(writes)
+				GenServer.call(
+					via(supplier_id),
+					{:sync_changes, client_id, changes, :os.system_time(:millisecond)}
+				)
+
+				{:ok, "Rejected Successfully"}
+
+			{:ok, _} ->
+				{:ok, "Already Rejected"}
+			{:error, err} ->
+				IO.puts "ERROR IN Deleting QUERY"
+				IO.inspect err
+				{:ok, "Error Deleting Order"}
 		end
 	end
 

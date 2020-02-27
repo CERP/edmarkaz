@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux';
-import { verifyOrder } from '../../actions';
+import { verifyOrder, rejectOrder } from '../../actions';
 import { RouteComponentProps, withRouter } from 'react-router';
 
 interface P {
@@ -11,16 +11,24 @@ interface P {
 	products: RootReducerState["products"]
 	orders: RootReducerState["orders"]
 	verifyOrder: (order: Order, product: Product, school: CERPSchool) => any
+	rejectOrder: (order: Order, product: Product) => any
 }
 
 type propTypes = P & RouteComponentProps
-const OrderInfo = ({ product_id, supplier_id, order_time, school_id, products, orders, verifyOrder, history }: propTypes) => {
+const OrderInfo = ({ product_id, supplier_id, order_time, school_id, products, orders, verifyOrder, rejectOrder, history }: propTypes) => {
 
 	const onClose = () => {
 		history.push({
 			pathname: window.location.pathname,
 			search: ''
 		})
+	}
+
+	const reject_order = (order_details: Order, ordered_product: Product) => {
+		if (!window.confirm("Are you sure, you want to delete the current Order?")) {
+			return
+		}
+		rejectOrder(order_details, ordered_product)
 	}
 
 	const active_school = orders.db[supplier_id] ? orders.db[supplier_id][order_time].school : false
@@ -31,7 +39,7 @@ const OrderInfo = ({ product_id, supplier_id, order_time, school_id, products, o
 	const product_title = ordered_product ? ordered_product.title : ""
 
 	const order_details = orders.db[supplier_id] ? orders.db[supplier_id][order_time].order : false
-	const verified = order_details && !order_details.verified
+	const verified = order_details && order_details.verified ? order_details.verified === "VERIFIED" : false
 
 	return <div className="order-info page">
 		<div className="section form">
@@ -54,7 +62,8 @@ const OrderInfo = ({ product_id, supplier_id, order_time, school_id, products, o
 				<label>Order time</label>
 				<div>{new Date(order_time).toLocaleString()}</div>
 			</div>
-			{(verified && active_school && order_details) && <div className="button blue" onClick={() => verifyOrder(order_details, ordered_product, active_school)}> Verify Order</div>}
+			{(!verified && active_school && order_details) && <div className="button blue" onClick={() => verifyOrder(order_details, ordered_product, active_school)}> Verify Order</div>}
+			{(!verified && active_school && order_details) && <div className="button blue" onClick={() => reject_order(order_details, ordered_product)}> Reject Order</div>}
 		</div>
 	</div >
 }
@@ -64,4 +73,5 @@ export default connect((state: RootReducerState) => ({
 	orders: state.orders,
 }), (dispatch: Function) => ({
 	verifyOrder: (order: Order, product: Product, school: CERPSchool) => dispatch(verifyOrder(order, product, school)),
+	rejectOrder: (order: Order, product: Product) => dispatch(rejectOrder(order, product)),
 }))(withRouter(OrderInfo));

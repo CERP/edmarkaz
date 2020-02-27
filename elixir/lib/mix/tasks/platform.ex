@@ -1,6 +1,65 @@
 defmodule Mix.Tasks.Platform do
 	use Mix.Task
 
+	def run(["update_verified_bool_to_string"]) do
+		Application.ensure_all_started(:edmarkaz)
+
+		{:ok, writes} = case Postgrex.query(
+			EdMarkaz.DB,
+			"SELECT
+				value ->> 'time' as time,
+				id,
+				value,
+				client_id
+			FROM platform_writes
+			WHERE path[4]='history' AND
+				value ->> 'event' ='ORDER_PLACED' AND
+				value ->> 'verified' = 'true'",[]
+		)do
+			{:ok, resp} ->
+				mapped = resp.rows |> Enum.reduce(
+					%{},
+					fn([time, sup_id, order, client_id], agg) ->
+						order_time = Map.get(order, "time")
+						school_code = get_in(order, ["meta", "school_id"])
+						path = ["sync_state", "matches", school_code, "history", "#{order_time}", "verified"]
+
+						write = %{
+							"action" => %{
+								"path" => path,
+								"value" => "VERIFIED",
+								"type" => "MERGE"
+							},
+							"date" => :os.system_time(:millisecond)
+						}
+						case Map.get(agg, sup_id) do
+							nil ->
+								Map.put(agg, sup_id, %{ "#{Enum.join(path, ",")}" => write })
+							val ->
+								Map.put(agg, sup_id, Map.put(val, "#{Enum.join(path, ",")}", write))
+						end
+					end
+				)
+				{:ok, mapped}
+			{:error, err} ->
+				IO.puts "ERROR"
+				IO.inspect err
+				{:ok, %{}}
+		end
+
+		writes |> Enum.each(
+			fn ({ sid, writes}) ->
+				start_supplier(sid)
+				EdMarkaz.Supplier.sync_changes(
+					sid,
+					"backend-task",
+					writes,
+					:os.system_time(:millisecond)
+				)
+			end
+		)
+	end
+
 	def run(["regenerate_supplier_from_writes", supplier_id]) do
 
 		Application.ensure_all_started(:edmarkaz)

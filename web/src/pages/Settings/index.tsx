@@ -4,14 +4,17 @@ import Former from '~/src/utils/former'
 
 import { clearDB } from '~/src/utils/localStorage'
 
-import { addSupplierNumber, deleteSupplierNumber, saveSupplierLogo, saveSupplierBanner, saveSupplierProfile } from '~/src/actions'
+import { makeSupplierMainNumber, addSupplierNumber, deleteSupplierNumber, saveSupplierLogo, saveSupplierBanner, saveSupplierProfile } from '~/src/actions'
 import { getDownsizedImage, getImageString } from '~src/utils/image'
+import Crown from './crown.svg'
+import './style.css'
 import { v4 } from 'node-uuid'
 
 interface propTypes {
 	numbers: RootBankState['sync_state']['numbers']
 	profile: RootBankState['sync_state']['profile']
 	addNumber: (number: string, name: string) => void
+	makeMainNumber: (number: string) => void
 	removeNumber: (number: string) => void
 	saveLogo: (imageId: string, dataUrl: string) => void
 	saveBanner: (imageId: string, dataUrl: string) => void
@@ -52,13 +55,22 @@ class Settings extends React.Component<propTypes, stateType> {
 	}
 
 	addNumber = () => {
-
+		if (this.props.numbers[this.state.current_number]) {
+			window.alert("Number Already Exists")
+			return
+		}
 		this.props.addNumber(this.state.current_number, this.state.current_name)
 
 		this.setState({
 			current_name: "",
 			current_number: ""
 		})
+	}
+	makeMainNumber = (number: string) => () => {
+		if (!window.confirm("Are you sure, You want to make this number main? It will receive all of the SMS Notifications.")) {
+			return
+		}
+		this.props.makeMainNumber(number)
 	}
 
 	removeNumber = (number: string) => () => {
@@ -112,7 +124,7 @@ class Settings extends React.Component<propTypes, stateType> {
 		const curr_banner_url = profile.banner && profile.banner.url
 		const curr_logo_url = profile.logo && profile.logo.url
 
-		return <div className="page">
+		return <div className="settings page">
 			<div className="title">Settings</div>
 
 			<div className="form" style={{ width: "90%" }}>
@@ -167,13 +179,18 @@ class Settings extends React.Component<propTypes, stateType> {
 					Object.entries(this.props.numbers)
 						.map(([number, info]) => {
 							return <div className="row" key={number}>
-								<div>{info.name}</div>
-								<div>{number}</div>
+								<div className="row" style={{ flexDirection: "row" }}>
+									<div>{info.name}</div>
+									<div>{number}</div>
+									{info.type && info.type === "MAIN" && <img src={Crown} style={{ width: "50px" }} />}
+								</div>
 								<div className="button red" onClick={this.removeNumber(number)} style={{
 									padding: "5px 10px",
 									borderRadius: "50%",
-									width: "initial"
+									width: "initial",
+									backgroundColor: "rgb(240, 89, 103)"
 								}}>X</div>
+								{!info.type && <div className="button red main" onClick={this.makeMainNumber(number)}>Make Main</div>}
 							</div>
 						})
 				}
@@ -190,6 +207,7 @@ export default connect((state: RootBankState) => ({
 	profile: state.sync_state.profile || {}
 }), (dispatch: (x: any) => void) => ({
 	addNumber: (number: string, name: string) => dispatch(addSupplierNumber(number, name)),
+	makeMainNumber: (number: string) => dispatch(makeSupplierMainNumber(number)),
 	removeNumber: (number: string) => dispatch(deleteSupplierNumber(number)),
 	saveLogo: (imageId: string, dataUrl: string) => dispatch(saveSupplierLogo(imageId, dataUrl)),
 	saveBanner: (imageId: string, dataUrl: string) => dispatch(saveSupplierBanner(imageId, dataUrl)),

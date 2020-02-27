@@ -1,5 +1,6 @@
 import Syncr from '@cerp/syncr'
 import { createLoginSucceed } from './core'
+import moment from 'moment';
 
 type Dispatch = (action: any) => any;
 type GetState = () => RootReducerState
@@ -83,11 +84,39 @@ export const verifyOrder = (order: Order, product: Product, school: CERPSchool) 
 		})
 }
 
-export const getOrders = () => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+export const rejectOrder = (order: Order, product: Product) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+	const state = getState()
+
+	if (!state.connected) {
+		syncr.onNext('connect', () => dispatch(rejectOrder(order, product)))
+		return
+	}
+
+	syncr.send({
+		type: "REJECT_ORDER",
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		id: state.auth.id,
+		payload: {
+			order,
+			product
+		}
+	})
+		.then(res => {
+			dispatch(getOrders())
+			alert(res)
+		})
+		.catch(err => {
+			console.log(err)
+			alert(err)
+		})
+}
+
+export const getOrders = (start_date = moment().subtract(3, "days").valueOf()) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 	const state = getState();
 
 	if (!state.connected) {
-		syncr.onNext('connect', () => dispatch(getOrders()))
+		syncr.onNext('connect', () => dispatch(getOrders(start_date)))
 		return;
 	}
 
@@ -98,7 +127,7 @@ export const getOrders = () => (dispatch: Dispatch, getState: GetState, syncr: S
 	syncr.send({
 		type: "GET_ORDERS",
 		payload: {
-			id: state.auth.id
+			start_date,
 		},
 		client_type: state.auth.client_type,
 		client_id: state.client_id,
