@@ -114,6 +114,13 @@ export default () => {
 		{
 			selectedQuestion === 7 && answer(selectedQuestion)
 		}
+		<div className="q-bar" onClick={() => selectedQuestion !== 8 ? setSelectedQuestion(8) : setSelectedQuestion(0)}>
+			<div className="q-title">What is my device ID?</div>
+			<div className={`q-img ${selectedQuestion === 8 ? "rot" : ""}`} style={{ backgroundImage: `url(${DownArrow})` }} />
+		</div>
+		{
+			selectedQuestion === 8 && localStorage.getItem("client_id")
+		}
 
 	</div>
 }
