@@ -27,7 +27,8 @@ defmodule EdMarkaz.Server.Analytics do
 				db->>'highest_fee',
 				db->>'respondent_owner',
 				db->>'phone_number',
-				time
+				time:: time,
+				time::date as date
 			FROM platform_schools
 			WHERE length(id) = 36",
 			[]
