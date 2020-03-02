@@ -88,7 +88,8 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 	) do
 
 		case Postgrex.query(EdMarkaz.DB,
-			"SELECT orders.supplier_id, orders.school_id, orders.event as order, platform_schools.db as school FROM(
+			"SELECT orders.supplier_id, orders.school_id, orders.event as order, platform_schools.db as school
+			FROM(
 				SELECT filtered_histories.supplier_id, filtered_histories.school_id, jsonb_extract_path(
 					sync_state->'matches',
 					filtered_histories.school_id, 'history', filtered_histories.timestamp) as event

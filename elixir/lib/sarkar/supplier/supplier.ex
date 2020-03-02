@@ -219,35 +219,21 @@ defmodule EdMarkaz.Supplier do
 		school_code = get_in(order, ["meta", "school_id"])
 		path = ["sync_state", "matches", school_code, "history", "#{order_time}", "verified"]
 
-		case Postgrex.query(EdMarkaz.DB,
-			"SELECT *
-			FROM platform_writes
-			WHERE path=$1 AND value ->> 'event'= 'ORDER_PLACED' AND value ->> 'verified' = 'VERIFIED' AND id=$2",
-			[ path, supplier_id ]
-		) do
-			{:ok, %Postgrex.Result{ num_rows: 0 }} ->
-				IO.puts "VERIFYING ORDER"
-				writes = [
-					%{
-						type: "MERGE",
-						path: path,
-						value: "VERIFIED",
-						date: :os.system_time(:millisecond),
-						client_id: client_id
-					}
-				]
+		writes = [
+			%{
+				type: "MERGE",
+				path: path,
+				value: "VERIFIED",
+				date: :os.system_time(:millisecond),
+				client_id: client_id
+			}
+		]
 
-				changes = prepare_changes(writes)
-				GenServer.call(via(supplier_id), {:sync_changes, client_id, changes, :os.system_time(:millisecond)})
+		changes = prepare_changes(writes)
+		GenServer.call(via(supplier_id), {:sync_changes, client_id, changes, :os.system_time(:millisecond)})
 
-				{:ok, "Verified Successfully"}
+		{:ok, "Verified Successfully"}
 
-			{:ok, _} ->
-				{:ok, "Already Verified"}
-			{:error, err} ->
-				IO.puts "ERROR IN VERIFY QUERY"
-				IO.inspect err
-				{:ok, "Error Verifying Order"}
 		end
 	end
 
@@ -256,39 +242,23 @@ defmodule EdMarkaz.Supplier do
 		school_code = get_in(order, ["meta", "school_id"])
 		path = ["sync_state", "matches", school_code, "history", "#{order_time}", "verified"]
 
-		case Postgrex.query(
-			EdMarkaz.DB,
-			"SELECT *
-			FROM platform_writes
-			WHERE path=$1 AND id=$2 AND value ->> 'event'= 'ORDER_PLACED' AND value ->> 'verified' = 'REJECTED'",
-			[path, supplier_id]
-		) do
-			{:ok, %Postgrex.Result{ num_rows: 0 }} ->
-				writes = [
-					%{
-						type: "MERGE",
-						path: path,
-						value: "REJECTED",
-						date: :os.system_time(:millisecond),
-						client_id: client_id
-					}
-				]
+		writes = [
+			%{
+				type: "MERGE",
+				path: path,
+				value: "REJECTED",
+				date: :os.system_time(:millisecond),
+				client_id: client_id
+			}
+		]
 
-				changes = prepare_changes(writes)
-				GenServer.call(
-					via(supplier_id),
-					{:sync_changes, client_id, changes, :os.system_time(:millisecond)}
-				)
+		changes = prepare_changes(writes)
+		GenServer.call(
+			via(supplier_id),
+			{:sync_changes, client_id, changes, :os.system_time(:millisecond)}
+		)
 
-				{:ok, "Rejected Successfully"}
-
-			{:ok, _} ->
-				{:ok, "Already Rejected"}
-			{:error, err} ->
-				IO.puts "ERROR IN Deleting QUERY"
-				IO.inspect err
-				{:ok, "Error Deleting Order"}
-		end
+		{:ok, "Rejected Successfully"}
 	end
 
 	def prepare_changes(changes) do

@@ -17,7 +17,8 @@ defmodule Mix.Tasks.Platform do
 				value ->> 'verified' = 'true'",[]
 		)do
 			{:ok, resp} ->
-				mapped = resp.rows |> Enum.reduce(
+				mapped = resp.rows
+				|> Enum.reduce(
 					%{},
 					fn([time, sup_id, order, client_id], agg) ->
 						order_time = Map.get(order, "time")
