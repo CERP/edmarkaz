@@ -89,7 +89,8 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 
 		case Postgrex.query(EdMarkaz.DB,
 			"SELECT orders.supplier_id, orders.school_id, orders.event as order, platform_schools.db as school
-			FROM(
+			FROM
+			(
 				SELECT filtered_histories.supplier_id, filtered_histories.school_id, jsonb_extract_path(
 					sync_state->'matches',
 					filtered_histories.school_id, 'history', filtered_histories.timestamp) as event
@@ -116,21 +117,18 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 				WHERE jsonb_extract_path(
 					sync_state->'matches',
 					filtered_histories.school_id, 'history', filtered_histories.timestamp)->>'event' = 'ORDER_PLACED'
-				ORDER BY filtered_histories.timestamp desc) as orders
+				ORDER BY filtered_histories.timestamp desc
+			) as orders
 			JOIN platform_schools ON orders.school_id = platform_schools.id",
 			[start_date]
 		) do
 			{:ok, resp} ->
-				mapped = resp.rows |> Enum.reduce(
+				mapped = resp.rows
+				|> Enum.reduce(
 					%{},
 					fn ([supplier_id, school_id, order, school], acc) ->
 						time = Map.get(order, "time")
-						case Map.get(acc, school_id) do
-							nil ->
-								Map.put(acc, school_id, %{ "#{time}" => %{ "order" => order, "school" => school} })
-							val ->
-								Map.put(acc, school_id, Map.put(val, "#{time}", %{ "order" => order, "school" => school}))
-						end
+						Dynamic.put(acc, [school_id, "#{time}"], %{"order" => order, "school" => school})
 					end
 				)
 				{:reply, succeed(mapped), state}
@@ -238,26 +236,10 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 		supplier_id = Map.get(product, "supplier_id")
 
 		start_supplier(supplier_id)
-		{:ok, resp} = EdMarkaz.Supplier.verify_order(order, supplier_id, client_id)
-		sync_state = EdMarkaz.Supplier.get_sync_state(supplier_id)
-
-		numbers = Dynamic.get(sync_state,["numbers"])
-		if numbers !== nil do
-			[number | _] = numbers
-				|> Enum.filter( fn ({key, val}) -> val["type"] !== nil end )
-				|> Enum.map(fn {k,v} -> k end)
-
-			spawn fn ->
-				EdMarkaz.Contegris.send_sms(number, "An order has been placed for #{product_name}. Please visit https://supplier.ilmexchange.com for more details.")
-			end
-		end
+		{:ok, resp} = EdMarkaz.Supplier.verify_order(order, supplier_id, client_id, product)
 
 		spawn fn ->
 			EdMarkaz.Slack.send_alert("Order by #{school_name} for #{product_name} by #{supplier_id} has been verified. Their number is #{school_number}", "#platform-orders")
-		end
-
-		spawn fn ->
-			EdMarkaz.Contegris.send_sms(id, "Your order for for #{product_name} has been verified.")
 		end
 
 		{:reply, succeed(resp), state}

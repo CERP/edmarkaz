@@ -17,7 +17,7 @@ defmodule Mix.Tasks.Platform do
 				value ->> 'verified' = 'true'",[]
 		)do
 			{:ok, resp} ->
-				mapped = resp.rows
+				writes = resp.rows
 				|> Enum.reduce(
 					%{},
 					fn([time, sup_id, order, client_id], agg) ->
@@ -41,14 +41,15 @@ defmodule Mix.Tasks.Platform do
 						end
 					end
 				)
-				{:ok, mapped}
+				{:ok, writes}
 			{:error, err} ->
 				IO.puts "ERROR"
 				IO.inspect err
 				{:ok, %{}}
 		end
 
-		writes |> Enum.each(
+		writes
+		|> Enum.each(
 			fn ({ sid, writes}) ->
 				start_supplier(sid)
 				EdMarkaz.Supplier.sync_changes(

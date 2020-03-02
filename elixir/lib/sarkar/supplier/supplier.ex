@@ -213,7 +213,7 @@ defmodule EdMarkaz.Supplier do
 
 	end
 
-	def verify_order( order, supplier_id, client_id) do
+	def verify_order( order, supplier_id, client_id, product) do
 
 		order_time = Map.get(order, "time")
 		school_code = get_in(order, ["meta", "school_id"])
@@ -232,9 +232,21 @@ defmodule EdMarkaz.Supplier do
 		changes = prepare_changes(writes)
 		GenServer.call(via(supplier_id), {:sync_changes, client_id, changes, :os.system_time(:millisecond)})
 
-		{:ok, "Verified Successfully"}
+		product_name = Map.get(product, "title")
+		sync_state = EdMarkaz.Supplier.get_sync_state(supplier_id)
+		numbers = Dynamic.get(sync_state,["numbers"])
 
+		if numbers !== nil do
+			[number | _] = numbers
+			|> Enum.filter( fn ({key, val}) -> val["type"] !== nil end )
+			|> Enum.map(fn {k,v} -> k end)
+
+			spawn fn ->
+				EdMarkaz.Contegris.send_sms(number, "An order has been placed for #{product_name}. Please visit https://supplier.ilmexchange.com for more details.")
+			end
 		end
+
+		{:ok, "Verified Successfully"}
 	end
 
 	def reject_order(order, supplier_id, client_id) do
