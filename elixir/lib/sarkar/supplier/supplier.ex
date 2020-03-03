@@ -213,8 +213,9 @@ defmodule EdMarkaz.Supplier do
 
 	end
 
-	def verify_order( order, supplier_id, client_id, product) do
+	def manage_order( type, order, supplier_id, client_id, product) do
 
+		product_name = Map.get(product, "title")
 		order_time = Map.get(order, "time")
 		school_code = get_in(order, ["meta", "school_id"])
 		path = ["sync_state", "matches", school_code, "history", "#{order_time}", "verified"]
@@ -223,7 +224,7 @@ defmodule EdMarkaz.Supplier do
 			%{
 				type: "MERGE",
 				path: path,
-				value: "VERIFIED",
+				value: type,
 				date: :os.system_time(:millisecond),
 				client_id: client_id
 			}
@@ -232,8 +233,16 @@ defmodule EdMarkaz.Supplier do
 		changes = prepare_changes(writes)
 		GenServer.call(via(supplier_id), {:sync_changes, client_id, changes, :os.system_time(:millisecond)})
 
-		product_name = Map.get(product, "title")
-		sync_state = EdMarkaz.Supplier.get_sync_state(supplier_id)
+		if type === "VERIFIED" do
+			notify_main(supplier_id ,"An order has been placed for #{product_name}. Please visit https://supplier.ilmexchange.com for more details.")
+		end
+
+		{:ok, "ORDER #{type} Successfully"}
+	end
+
+	def notify_main(id, message) do
+
+		sync_state = get_sync_state(id)
 		numbers = Dynamic.get(sync_state,["numbers"])
 
 		if numbers !== nil do
@@ -242,35 +251,9 @@ defmodule EdMarkaz.Supplier do
 			|> Enum.map(fn {k,v} -> k end)
 
 			spawn fn ->
-				EdMarkaz.Contegris.send_sms(number, "An order has been placed for #{product_name}. Please visit https://supplier.ilmexchange.com for more details.")
+				EdMarkaz.Contegris.send_sms(number, message)
 			end
 		end
-
-		{:ok, "Verified Successfully"}
-	end
-
-	def reject_order(order, supplier_id, client_id) do
-		order_time = Map.get(order, "time")
-		school_code = get_in(order, ["meta", "school_id"])
-		path = ["sync_state", "matches", school_code, "history", "#{order_time}", "verified"]
-
-		writes = [
-			%{
-				type: "MERGE",
-				path: path,
-				value: "REJECTED",
-				date: :os.system_time(:millisecond),
-				client_id: client_id
-			}
-		]
-
-		changes = prepare_changes(writes)
-		GenServer.call(
-			via(supplier_id),
-			{:sync_changes, client_id, changes, :os.system_time(:millisecond)}
-		)
-
-		{:ok, "Rejected Successfully"}
 	end
 
 	def prepare_changes(changes) do

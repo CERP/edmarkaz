@@ -236,7 +236,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 		supplier_id = Map.get(product, "supplier_id")
 
 		start_supplier(supplier_id)
-		{:ok, resp} = EdMarkaz.Supplier.verify_order(order, supplier_id, client_id, product)
+		{:ok, resp} = EdMarkaz.Supplier.manage_order("VERIFIED", order, supplier_id, client_id, product)
 
 		spawn fn ->
 			EdMarkaz.Slack.send_alert("Order by #{school_name} for #{product_name} by #{supplier_id} has been verified. Their number is #{school_number}", "#platform-orders")
@@ -259,7 +259,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 		supplier_id = Map.get(product, "supplier_id")
 
 		start_supplier(supplier_id)
-		{:ok, resp} = EdMarkaz.Supplier.reject_order(order, supplier_id, client_id)
+		{:ok, resp} = EdMarkaz.Supplier.manage_order("REJECTED", order, supplier_id, client_id, product)
 
 		{:reply, succeed(resp), state}
 	end
