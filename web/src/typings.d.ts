@@ -50,7 +50,7 @@ declare global {
 			school_id: string;
 			product_id: string;
 		};
-		verified?: boolean
+		verified?: "VERIFIED" | "NOT_VERIFIED" | "REJECTED"
 	}
 
 	interface CallEndSurvey extends PlatformInteractionEvent {
@@ -167,6 +167,7 @@ declare global {
 			numbers: {
 				[number: string]: {
 					name: string
+					type?: "MAIN"
 				}
 			};
 			mask_pairs: {

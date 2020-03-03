@@ -67,10 +67,14 @@ class Orders extends Component<propTypes, S> {
 			this.props.releaseNumber(this.state.activeSchool)
 		}
 	}
-	filterItem = (item_status: "IN_PROGRESS" | "DONE" | "ORDERED" | "") => {
+	filterStatus = (item_status: "IN_PROGRESS" | "DONE" | "ORDERED" | "") => {
 		const { status } = this.state.filters
 
 		return status ? status === item_status : true
+	}
+	filterSchool = (school: CERPSchool) => {
+		const { text } = this.state.filters
+		return text === "" || school.school_name.toLowerCase().includes(text.toLowerCase())
 	}
 
 	getLatestDate = (orders: SchoolMatch["history"]): number => Object.values(orders).reduce((prev, curr) => prev > curr.time ? prev : curr.time, 0)
@@ -85,25 +89,24 @@ class Orders extends Component<propTypes, S> {
 		const items = Object.entries(sync_state.matches)
 			.filter(([sid, { status, history }]) =>
 				(status !== "REJECTED" && status !== "NEW") && Object.values(history).find((e) => e.event === "ORDER_PLACED")
-				&& this.filterItem(status)
+				&& this.filterStatus(status) && this.filterSchool(schools[sid])
 			)
 			.sort(([, event_a], [, event_b]) => {
 				return this.getLatestDate(event_b.history) - this.getLatestDate(event_a.history)
 			})
 			.map(([sid, event]) => ({ ...event, school: schools[sid] }))
 
-
 		return <div className="order page">
 			<div className="title">Orders</div>
 			<div className="form" style={{ width: "90%", marginBottom: "20px" }}>
 
+				<div className="row">
+					<label>Search</label>
+					<input type="text" placeholder="By School or Status" {...this.former.super_handle(["filters", "text"])} />
+				</div>
 				<div className="button blue" onClick={() => this.setState({ filterMenu: !filterMenu })}>Filters</div>
 				{
 					filterMenu && <>
-						{/* <div className="row">
-							<label>Search</label>
-							<input type="text" />
-						</div> */}
 						<div className="row">
 							<label>Status</label>
 							<select {...this.former.super_handle(["filters", "status"])}>
@@ -129,7 +132,8 @@ class Orders extends Component<propTypes, S> {
 						const school_id = school.refcode
 						const reserved = schoolMatch && schoolMatch.status === "IN_PROGRESS"
 						const orders = Object.values(history)
-							.filter(e => e.event === "ORDER_PLACED")
+							.filter(e => e.event === "ORDER_PLACED" && e.verified === "VERIFIED")
+							.sort((event_a, event_b) => event_b.time - event_a.time)
 						const orders_length = orders.length > 0
 
 						return <div key={school_id}>
@@ -186,7 +190,6 @@ class Orders extends Component<propTypes, S> {
 												<div className="newtable-row heading">
 													<div>Date </div>
 													<div>Product</div>
-													<div>Order Status</div>
 												</div>
 												{
 													orders
@@ -195,7 +198,6 @@ class Orders extends Component<propTypes, S> {
 															return <div className="newtable-row">
 																<div>{moment(order.time).format("DD-MM-YY")}</div>
 																<div>{products.db[order.meta.product_id].title}</div>
-																<div>{order.verified ? "Verified" : "Not Verified"}</div>
 															</div>
 														})
 												}

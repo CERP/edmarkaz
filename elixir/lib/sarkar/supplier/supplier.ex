@@ -187,6 +187,7 @@ defmodule EdMarkaz.Supplier do
 				"name" => "",
 				"number" => ""
 			},
+			"verified" => "NOT_VERIFIED"
 		}
 
 		writes = [
@@ -212,42 +213,46 @@ defmodule EdMarkaz.Supplier do
 
 	end
 
-	def verify_order( order, supplier_id, client_id) do
+	def manage_order( type, order, supplier_id, client_id, product) do
 
+		product_name = Map.get(product, "title")
 		order_time = Map.get(order, "time")
 		school_code = get_in(order, ["meta", "school_id"])
-		event = Map.put(order, "verified", true)
-		path = ["sync_state", "matches", school_code, "history", "#{order_time}"]
+		path = ["sync_state", "matches", school_code, "history", "#{order_time}", "verified"]
 
-		case Postgrex.query(EdMarkaz.DB,
-			"SELECT *
-			FROM platform_writes
-			WHERE path=$1 AND value ->> 'event'= 'ORDER_PLACED' AND value ->> 'verified' = 'true' AND id=$2",
-			[ path, supplier_id ]
-		) do
-			{:ok, %Postgrex.Result{ num_rows: 0 }} ->
-				IO.puts "VERIFYING ORDER"
-				writes = [
-					%{
-						type: "MERGE",
-						path: path,
-						value: event,
-						date: :os.system_time(:millisecond),
-						client_id: client_id
-					}
-				]
+		writes = [
+			%{
+				type: "MERGE",
+				path: path,
+				value: type,
+				date: :os.system_time(:millisecond),
+				client_id: client_id
+			}
+		]
 
-				changes = prepare_changes(writes)
-				GenServer.call(via(supplier_id), {:sync_changes, client_id, changes, :os.system_time(:millisecond)})
+		changes = prepare_changes(writes)
+		GenServer.call(via(supplier_id), {:sync_changes, client_id, changes, :os.system_time(:millisecond)})
 
-				{:ok, "Verified Successfully"}
+		if type === "VERIFIED" do
+			notify_main(supplier_id ,"An order has been placed for #{product_name}. Please visit https://supplier.ilmexchange.com for more details.")
+		end
 
-			{:ok, _} ->
-				{:ok, "Already Verified"}
-			{:error, err} ->
-				IO.puts "ERROR IN VERIFY QUERY"
-				IO.inspect err
-				{:ok, "Error Verifying Order"}
+		{:ok, "ORDER #{type} Successfully"}
+	end
+
+	def notify_main(id, message) do
+
+		sync_state = get_sync_state(id)
+		numbers = Dynamic.get(sync_state,["numbers"])
+
+		if numbers !== nil do
+			[number | _] = numbers
+			|> Enum.filter( fn ({key, val}) -> val["type"] !== nil end )
+			|> Enum.map(fn {k,v} -> k end)
+
+			spawn fn ->
+				EdMarkaz.Contegris.send_sms(number, message)
+			end
 		end
 	end
 

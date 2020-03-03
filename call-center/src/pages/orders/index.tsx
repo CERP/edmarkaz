@@ -7,22 +7,22 @@ import moment from 'moment'
 interface P {
 	orders: RootReducerState["orders"]
 	products: RootReducerState["products"]
-	getOrders: () => any
+	getOrders: (start_date?: number) => any
 	getProducts: () => any
 }
 
 const Orders = ({ orders, products, getOrders, getProducts }: P) => {
 
+	const [start_date, setStartDate] = useState(moment().subtract(3, "days").format("YYYY-MM-DD"))
 	useEffect(() => {
 		getProducts()
-		getOrders()
-	}, [])
+		getOrders(moment(start_date).valueOf())
+	}, [start_date])
 	const [viewBy, setViewBy] = useState("SCHOOL")
 	const [showFilters, setShowFilters] = useState(false)
 	const [verified, setVerified] = useState("NOT_VERIFIED")
 	const [supplierFilter, setSupplierFilter] = useState("")
 	const [schoolFilter, setSchoolFilter] = useState("")
-	const [start_date, setStartDate] = useState(moment().subtract(1, "week").format("YYYY-MM-DD"))
 	const [end_date, setEndDate] = useState(moment().add(1, "day").format("YYYY-MM-DD"))
 
 	const { loading, db } = orders
@@ -84,10 +84,10 @@ const Orders = ({ orders, products, getOrders, getProducts }: P) => {
 
 	const filterOrder = (order: Order) => {
 		if (verified === "ORDER_VERIFIED") {
-			return Boolean(order.verified)
+			return Boolean(order.verified === "VERIFIED")
 		}
 		else if (verified === "NOT_VERIFIED") {
-			return !Boolean(order.verified)
+			return order.verified === undefined || order.verified === "NOT_VERIFIED"
 		}
 		else
 			return true
@@ -147,7 +147,6 @@ const Orders = ({ orders, products, getOrders, getProducts }: P) => {
 		{
 			(loading && product_loading) ? <div> Loading...</div> :
 				viewBy === "SUPPLIER" ? <div className="section form" style={{ width: "75%" }}>
-					{console.log("Orders", db)}
 					{
 						Object.entries(db)
 							.filter(([sid]) => supplierFilter ? sid === supplierFilter : true)
@@ -205,6 +204,6 @@ export default connect((state: RootReducerState) => ({
 	orders: state.orders,
 	products: state.products
 }), (dispatch: Function) => ({
-	getOrders: () => dispatch(getOrders()),
+	getOrders: (start_date?: number) => dispatch(getOrders(start_date)),
 	getProducts: () => dispatch(getProducts())
 }))(Orders);

@@ -1,0 +1,13 @@
+
+.settings .form {
+	padding: 15px ;
+}
+
+.settings .row .button.main {
+	width: 30%;
+}
+@media only screen and (max-width: 767px) {
+	.settings .row .button.main {
+		width: calc(100% - 30px);
+	}
+}

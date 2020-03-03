@@ -98,7 +98,7 @@ interface Order {
 		name: string
 		number: string
 	}
-	verified?: boolean
+	verified?: "VERIFIED" | "NOT_VERIFIED" | "REJECTED"
 }
 
 interface CERPSchool {

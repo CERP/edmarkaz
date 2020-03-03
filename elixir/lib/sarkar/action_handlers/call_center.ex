@@ -37,7 +37,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 				"supplier_id" => supplier_id
 			}
 		},
-		state
+		%{id: _id, client_id: _client_id} = state
 	) do
 		EdMarkaz.Product.merge(product_id, product, supplier_id)
 
@@ -53,7 +53,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 				"data_url" => data_url
 				}
 			},
-			state
+			%{id: _id, client_id: _client_id} = state
 	) do
 
 		IO.puts "handling merge product image"
@@ -80,46 +80,55 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 	def handle_action(
 		%{
 			"type" => "GET_ORDERS",
-			"payload" => _payload
+			"payload" => %{
+				"start_date" => start_date
+			}
 		},
-		state
+		%{id: _id, client_id: _client_id} = state
 	) do
 
 		case Postgrex.query(EdMarkaz.DB,
-			"WITH verified AS (
-				SELECT
-					value ->> 'time' as time,
-					id,
-					value
-				FROM platform_writes
-				WHERE path[4]='history'
-				AND value ->> 'event' ='ORDER_PLACED'
-				AND value ->> 'verified' = 'true')
-			SELECT orders.time, orders.id, orders.value, platform_schools.db
-			FROM (SELECT * FROM verified
-				UNION ALL
-				SELECT
-					value ->> 'time',
-					id,
-					value
-				FROM platform_writes
-				WHERE path[4]='history'
-				AND value ->> 'event' ='ORDER_PLACED'
-				AND value ->> 'time' NOT IN ( SELECT time FROM verified)) as orders
-			JOIN platform_schools ON orders.value->'meta'->>'school_id' = platform_schools.id
-			",
-			[]
+			"SELECT orders.supplier_id, orders.school_id, orders.event as order, platform_schools.db as school
+			FROM
+			(
+				SELECT filtered_histories.supplier_id, filtered_histories.school_id, jsonb_extract_path(
+					sync_state->'matches',
+					filtered_histories.school_id, 'history', filtered_histories.timestamp) as event
+				FROM
+				(
+					SELECT histories.supplier_id, histories.school_id, histories.timestamp
+					FROM (
+						SELECT suppliers.id as supplier_id, matches.sid as school_id, jsonb_object_keys(
+							jsonb_extract_path(sync_state->'matches', matches.sid)->'history'
+						) as timestamp
+						FROM
+							suppliers
+							JOIN
+							(
+								SELECT id, jsonb_object_keys(sync_state->'matches') as sid
+								FROM suppliers
+							) as matches
+							ON suppliers.id=matches.id
+					) as histories
+					WHERE histories.timestamp::bigint > $1
+				) as filtered_histories
+				JOIN suppliers
+				ON filtered_histories.supplier_id=suppliers.id
+				WHERE jsonb_extract_path(
+					sync_state->'matches',
+					filtered_histories.school_id, 'history', filtered_histories.timestamp)->>'event' = 'ORDER_PLACED'
+				ORDER BY filtered_histories.timestamp desc
+			) as orders
+			JOIN platform_schools ON orders.school_id = platform_schools.id",
+			[start_date]
 		) do
 			{:ok, resp} ->
-				mapped = resp.rows |> Enum.reduce(
+				mapped = resp.rows
+				|> Enum.reduce(
 					%{},
-					fn ([time, sid, order, school], acc) ->
-						case Map.get(acc, sid) do
-							nil ->
-								Map.put(acc, sid, %{ "#{time}" => %{ "order" => order, "school" => school} })
-							val ->
-								Map.put(acc, sid, Map.put(val, "#{time}", %{ "order" => order, "school" => school}))
-						end
+					fn ([supplier_id, school_id, order, school], acc) ->
+						time = Map.get(order, "time")
+						Dynamic.put(acc, [school_id, "#{time}"], %{"order" => order, "school" => school})
 					end
 				)
 				{:reply, succeed(mapped), state}
@@ -130,7 +139,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 		end
 	end
 
-	def handle_action(%{"type" => "GET_SCHOOL_PROFILES", "payload" => payload}, state) do
+	def handle_action(%{"type" => "GET_SCHOOL_PROFILES", "payload" => payload}, %{id: _id, client_id: _client_id} = state) do
 
 		ids = Map.get(payload, "school_ids", [])
 
@@ -164,7 +173,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 		end
 	end
 
-	def handle_action(%{"type" => "FIND_SCHOOL", "payload" => %{"refcode" => refcode}}, state) do
+	def handle_action(%{"type" => "FIND_SCHOOL", "payload" => %{"refcode" => refcode}}, %{id: _id, client_id: _client_id} = state) do
 
 		IO.puts "FIND SCHOOL"
 		case Postgrex.query(EdMarkaz.DB, "SELECT db FROM platform_schools WHERE id=$1", [refcode]) do
@@ -178,7 +187,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 		end
 	end
 
-	def handle_action(%{"type" => "GET_SCHOOL_FROM_NUMBER", "payload" => %{"phone_number" => phone_number }}, state) do
+	def handle_action(%{"type" => "GET_SCHOOL_FROM_NUMBER", "payload" => %{"phone_number" => phone_number }}, %{id: _id, client_id: _client_id} = state) do
 
 		case EdMarkaz.School.get_profile(phone_number) do
 			{:ok, school_id, profile} ->
@@ -227,21 +236,35 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 		supplier_id = Map.get(product, "supplier_id")
 
 		start_supplier(supplier_id)
-		{:ok, resp} = EdMarkaz.Supplier.verify_order(order, supplier_id, client_id)
+		{:ok, resp} = EdMarkaz.Supplier.manage_order("VERIFIED", order, supplier_id, client_id, product)
 
 		spawn fn ->
 			EdMarkaz.Slack.send_alert("Order by #{school_name} for #{product_name} by #{supplier_id} has been verified. Their number is #{school_number}", "#platform-orders")
-		end
-
-		spawn fn ->
-			EdMarkaz.Contegris.send_sms(id, "Your order for for #{product_name} has been verified.")
 		end
 
 		{:reply, succeed(resp), state}
 
 	end
 
-	def handle_action(%{"type" => "GET_PRODUCTS", "last_sync" => last_sync}, state) do
+	def handle_action(
+		%{
+			"type" => "REJECT_ORDER",
+			"payload" => %{
+				"order" => order,
+				"product" => product
+			}
+		},
+		%{ client_id: client_id, id: id} = state
+	) do
+		supplier_id = Map.get(product, "supplier_id")
+
+		start_supplier(supplier_id)
+		{:ok, resp} = EdMarkaz.Supplier.manage_order("REJECTED", order, supplier_id, client_id, product)
+
+		{:reply, succeed(resp), state}
+	end
+
+	def handle_action(%{"type" => "GET_PRODUCTS", "last_sync" => last_sync}, %{id: _id, client_id: _client_id} = state) do
 
 		_dt = DateTime.from_unix!(last_sync, :millisecond)
 
@@ -275,7 +298,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 				"end_date" => end_date
 			}
 		},
-		state
+		%{id: _id, client_id: _client_id} = state
 	) do
 
 		case Postgrex.query(EdMarkaz.DB,

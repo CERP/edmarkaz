@@ -422,11 +422,65 @@ export const rejectSchool = (school_id: string) => (dispatch: Dispatch, getState
 
 export const addSupplierNumber = (number: string, name: string) => (dispatch: Dispatch, getState: GetState) => {
 
+	const state = getState()
+	const numbers = state.sync_state.numbers
+	const main_already_exists = Object.entries(numbers).find(([, n]) => n.type && n.type === "MAIN")
+
+	if (!main_already_exists) {
+		dispatch(createMerges([
+			{
+				path: ["sync_state", "numbers", number],
+				value: {
+					name,
+					type: "MAIN"
+				}
+			}
+		]))
+		return
+	}
+
 	dispatch(createMerges([
 		{
 			path: ["sync_state", "numbers", number],
 			value: {
 				name
+			}
+		}
+	]))
+}
+
+export const makeSupplierMainNumber = (number: string) => (dispatch: Dispatch, getState: GetState) => {
+
+	const state = getState()
+	const numbers = state.sync_state.numbers
+	const main_already_exists = Object.entries(numbers).find(([, n]) => n.type && n.type === "MAIN")
+
+	if (main_already_exists) {
+		dispatch(createMerges([
+			{
+				path: ["sync_state", "numbers", main_already_exists[0]],
+				value: {
+					name: numbers[main_already_exists[0]].name,
+				}
+			},
+			{
+				path: ["sync_state", "numbers", number],
+				value: {
+					...numbers[number],
+					type: "MAIN"
+				}
+			}
+		]))
+
+		return
+	}
+
+	dispatch(createMerges([
+		{
+			path: ["sync_state", "numbers", number],
+			value: {
+				...numbers[number],
+				type: "MAIN"
 			}
 		}
 	]))
