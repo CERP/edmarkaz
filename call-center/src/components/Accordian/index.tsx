@@ -10,7 +10,7 @@ import Products from '../../pages/products';
 import Orders from '../../pages/orders';
 import Logs from '../../pages/logs';
 import ProductInfo from '../../pages/products/productInfo';
-import OrderInfo from '../../pages/orders/orderInfo';
+import OrderInfo from '../../pages/orders/order_info';
 
 interface P {
 	user: string | undefined

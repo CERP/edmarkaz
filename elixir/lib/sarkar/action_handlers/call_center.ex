@@ -264,6 +264,21 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 		{:reply, succeed(resp), state}
 	end
 
+	def handle_action(
+		%{
+			"type" => "UPDATE_ORDER_META"
+			"payload" => %{
+				"order" => order
+				"meta" => meta
+			}
+		},
+		%{client_id: client_id, id: id } = state
+	) do
+		IO.puts "IN UPDATE ORDER META"
+		IO.puts "META"
+		IO.inspect meta
+	end
+
 	def handle_action(%{"type" => "GET_PRODUCTS", "last_sync" => last_sync}, %{id: _id, client_id: _client_id} = state) do
 
 		_dt = DateTime.from_unix!(last_sync, :millisecond)

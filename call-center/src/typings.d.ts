@@ -92,6 +92,16 @@ interface Order {
 	meta: {
 		product_id: string
 		school_id: string
+		cancellation_reason: string
+		call_one: string
+		call_two: string
+		actual_product_ordered: string
+		quantity: string
+		expected_completion_date: string
+		expected_date_of_delivery: string
+		actual_date_of_delivery: string
+		total_amount: string
+		payment_received: string
 	}
 	time: number
 	user: {
@@ -99,6 +109,8 @@ interface Order {
 		number: string
 	}
 	verified?: "VERIFIED" | "NOT_VERIFIED" | "REJECTED"
+	cancelled?: "SCHOOL_CANCELLED" | "SUPPLIER_CANCELLED"
+	status?: "ORDER_PLACED" | "IN_PROGRESS" | "COMPLETED"
 }
 
 interface CERPSchool {
