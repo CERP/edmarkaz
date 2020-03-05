@@ -128,7 +128,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 					%{},
 					fn ([supplier_id, school_id, order, school], acc) ->
 						time = Map.get(order, "time")
-						Dynamic.put(acc, [school_id, "#{time}"], %{"order" => order, "school" => school})
+						Dynamic.put(acc, [supplier_id, "#{time}"], %{"order" => order, "school" => school})
 					end
 				)
 				{:reply, succeed(mapped), state}
