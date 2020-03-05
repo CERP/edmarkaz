@@ -14,6 +14,8 @@ import OrderInfo from '../../pages/orders/order_info';
 
 interface P {
 	user: string | undefined
+	loading_orders: boolean
+	loading_products: boolean
 }
 
 type propTypes = RouteComponentProps & P
@@ -39,9 +41,10 @@ class Accordian extends React.Component<propTypes, S> {
 	}
 
 	render() {
+		const { loading_orders, loading_products, location, user } = this.props
 
-		const current = this.props.location.pathname;
-		const search = this.props.location.search;
+		const current = location.pathname;
+		const search = location.search;
 
 		const params = qs.parse(search)
 
@@ -59,7 +62,7 @@ class Accordian extends React.Component<propTypes, S> {
 		return <div className={`root-page accordian ${this.state.visible ? "" : "minimized"}`}>
 			<div className="header" style={{ justifyContent: "space-between" }}>
 				<div>IlmExchange Call Center</div>
-				<div>{this.props.user}</div>
+				<div>{user}</div>
 			</div>
 
 			<div className="burger">
@@ -78,13 +81,13 @@ class Accordian extends React.Component<propTypes, S> {
 			</div>
 
 			{
-				(product_page) && <ProductInfo
+				(product_page && !loading_products) && <ProductInfo
 					product_id={p_product_id}
 					supplier_id={p_supplier_id}
 				/>
 			}
 			{
-				(order_page) && <OrderInfo
+				(order_page && !loading_orders) && <OrderInfo
 					school_id={o_school_id}
 					product_id={o_product_id}
 					supplier_id={o_supplier_id}
@@ -97,5 +100,7 @@ class Accordian extends React.Component<propTypes, S> {
 }
 
 export default connect((state: RootReducerState) => ({
+	loading_orders: state.orders.loading,
+	loading_products: state.products.loading,
 	user: state.auth.id
 }))(withRouter(Accordian));

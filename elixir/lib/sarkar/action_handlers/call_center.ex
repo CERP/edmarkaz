@@ -128,7 +128,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 					%{},
 					fn ([supplier_id, school_id, order, school], acc) ->
 						time = Map.get(order, "time")
-						Dynamic.put(acc, [school_id, "#{time}"], %{"order" => order, "school" => school})
+						Dynamic.put(acc, [supplier_id, "#{time}"], %{"order" => order, "school" => school})
 					end
 				)
 				{:reply, succeed(mapped), state}
@@ -266,17 +266,20 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 
 	def handle_action(
 		%{
-			"type" => "UPDATE_ORDER_META"
+			"type" => "UPDATE_ORDER_META",
 			"payload" => %{
-				"order" => order
-				"meta" => meta
+				"order" => order,
+				"meta" => meta,
+				"supplier_id" => supplier_id
 			}
 		},
 		%{client_id: client_id, id: id } = state
 	) do
-		IO.puts "IN UPDATE ORDER META"
-		IO.puts "META"
-		IO.inspect meta
+
+		start_supplier(supplier_id)
+		{:ok, resp} = EdMarkaz.Supplier.update_order_meta(order, meta, supplier_id, client_id)
+
+		{:reply, succeed(resp), state}
 	end
 
 	def handle_action(%{"type" => "GET_PRODUCTS", "last_sync" => last_sync}, %{id: _id, client_id: _client_id} = state) do

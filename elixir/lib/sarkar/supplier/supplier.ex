@@ -213,6 +213,30 @@ defmodule EdMarkaz.Supplier do
 
 	end
 
+	def update_order_meta( order, meta, supplier_id, client_id) do
+
+		order_time = Map.get(order, "time")
+		school_code = get_in(order, ["meta", "school_id"])
+		path = ["sync_state", "matches", school_code, "history", "#{order_time}", "meta"]
+
+		writes = meta
+			|> Enum.reduce(
+				[],
+				fn ({key, val}, acc) ->
+					write = %{
+						type: "MERGE",
+						path: path ++ ["#{key}"],
+						value: val,
+					}
+					[ write | acc ]
+				end
+			)
+		changes = prepare_changes(writes)
+		GenServer.call(via(supplier_id), {:sync_changes, client_id, changes, :os.system_time(:millisecond)})
+
+		{:ok, "UPDATE SUCCESSFULL"}
+	end
+
 	def manage_order( type, order, supplier_id, client_id, product) do
 
 		product_name = Map.get(product, "title")
@@ -246,12 +270,16 @@ defmodule EdMarkaz.Supplier do
 		numbers = Dynamic.get(sync_state,["numbers"])
 
 		if numbers !== nil do
-			[number | _] = numbers
+			main_number = numbers
 			|> Enum.filter( fn ({key, val}) -> val["type"] !== nil end )
-			|> Enum.map(fn {k,v} -> k end)
 
-			spawn fn ->
-				EdMarkaz.Contegris.send_sms(number, message)
+			if main_number !== [] do
+				[number | _] = main_number
+				|> Enum.map(fn {k,v} -> k end)
+
+				spawn fn ->
+					EdMarkaz.Contegris.send_sms(number, message)
+				end
 			end
 		end
 	end

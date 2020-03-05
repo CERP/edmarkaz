@@ -2,22 +2,13 @@ import React, { Component } from 'react'
 import Former from '@cerp/former'
 import { RouteComponentProps, withRouter } from 'react-router'
 import { connect } from 'react-redux'
-import { verifyOrder, rejectOrder } from '../../actions'
+import { verifyOrder, rejectOrder, updateOrderMeta } from '../../actions'
+import moment from 'moment'
 
 
 interface S {
-	order_meta: {
-		call_one: string
-		call_two: string
-		actual_product_ordered: string
-		quantity: string
-		expected_completion_date: string
-		expected_date_of_delivery: string
-		actual_date_of_delivery: string
-		total_amount: string
-		payment_received: string
-		cancellation_reason: string
-	}
+	order: Order
+	school: CERPSchool
 }
 
 interface SelfProps {
@@ -34,35 +25,78 @@ interface P {
 	supplier_id: string
 	products: RootReducerState["products"]
 	orders: RootReducerState["orders"]
+	updateOrderMeta: (order: Order, meta: any, supplier_id: string) => any
 	verifyOrder: (order: Order, product: Product, school: CERPSchool) => any
 	rejectOrder: (order: Order, product: Product) => any
 }
 
 type propTypes = P & SelfProps & RouteComponentProps
 
+const default_meta_fields = {
+	sales_rep: "",
+	call_one: "",
+	call_two: "",
+	actual_product_ordered: "",
+	quantity: "1",
+	expected_completion_date: moment.now(),
+	expected_date_of_delivery: moment.now(),
+	actual_date_of_delivery: moment.now(),
+	total_amount: "0",
+	payment_received: "NO",
+	cancellation_reason: ""
+}
+const sales_rep_list = {
+	ALI_HASNAIN: "Ali Hasnain",
+	ASIM_ZAHEER: "Asim Zaheer",
+	AWAIS_SAKHAWAT: "Awais Sakhawat",
+	KALEEM_MAJEED: "Kaleem Majeed",
+	MUHAMMAD_ZOHAIB: "Muhammad Zohaib",
+	NASIR_SAEED: "Nasir Saeed"
+}
 class OrderInfo extends Component<propTypes, S> {
 
 	former: Former
 	constructor(props: propTypes) {
 		super(props)
 
-		this.state = {
-			order_meta: {
-				call_one: "",
-				call_two: "",
-				actual_product_ordered: "",
-				quantity: "",
-				expected_completion_date: "",
-				expected_date_of_delivery: "",
-				actual_date_of_delivery: "",
-				total_amount: "",
-				payment_received: "",
-				cancellation_reason: ""
+		const { order, school } = props.orders.db[props.supplier_id][props.order_time]
+
+		const updated_order = {
+			...order,
+			meta: {
+				...default_meta_fields,
+				...order.meta,
 			}
+		} as Order
+
+		this.state = {
+			order: updated_order,
+			school,
 		}
 
 		this.former = new Former(this, [])
 	}
+
+	UNSAFE_componentWillReceiveProps(newProps: propTypes) {
+		if (newProps.order_time !== this.props.order_time) {
+
+			const { order, school } = newProps.orders.db[newProps.supplier_id][newProps.order_time]
+
+			const updated_order = {
+				...order,
+				meta: {
+					...default_meta_fields,
+					...order.meta,
+				}
+			} as Order
+
+			this.setState({
+				order: updated_order,
+				school,
+			})
+		}
+	}
+
 	onClose = () => {
 		this.props.history.push({
 			pathname: window.location.pathname,
@@ -77,36 +111,58 @@ class OrderInfo extends Component<propTypes, S> {
 		this.props.rejectOrder(order_details, ordered_product)
 	}
 	save_meta = () => {
-		console.log("SAVING", this.state.order_meta)
+		const { meta } = this.state.order
+		if (isNaN(parseFloat(meta.total_amount)) || parseFloat(meta.total_amount) < 0) {
+			alert("Amount can't be less than zero")
+			return
+		}
+
+		if (isNaN(parseFloat(meta.quantity)) || parseFloat(meta.quantity) < 1) {
+			alert("Quantity can't be less than 1")
+			return
+		}
+
+		const old_meta = this.props.orders.db[this.props.supplier_id][this.props.order_time].order.meta
+		const changes = Object.entries(meta)
+			.reduce((agg, [key, val]) => {
+				//@ts-ignore
+				if (old_meta[key] === undefined || val !== old_meta[key]) {
+					return {
+						...agg,
+						[key]: val
+					}
+				}
+				return agg
+			}, {})
+
+		if (Object.keys(changes).length > 0) {
+			this.props.updateOrderMeta(this.state.order, changes, this.props.supplier_id)
+		}
 	}
 
 	render() {
 
-		const { product_id, supplier_id, order_time, school_id, products, orders } = this.props
-
-		const active_school = orders.db[supplier_id] ? orders.db[supplier_id][order_time].school : false
-		const school_name = active_school ? active_school.school_name : ""
-		const school_number = active_school ? active_school.phone_number : ""
+		const { product_id, order_time, products } = this.props
+		const { order, school } = this.state
 
 		const ordered_product = products.db[product_id]
 		const product_title = ordered_product ? ordered_product.title : ""
 
-		const order_details = orders.db[supplier_id] ? orders.db[supplier_id][order_time].order : false
-		const verified = order_details && order_details.verified ? order_details.verified === "VERIFIED" : false
+		const verified = order.verified ? order.verified === "VERIFIED" : false
 
 		return <div className="order-info page">
-			<div className="section form">
+			<div className="section form" style={{ width: "90%" }}>
 				<div className="button red" onClick={() => this.onClose()} style={{ backgroundColor: "red" }}>Close</div>
-				<div className="title">School Info</div>
+				<div className="divider">School Info</div>
 				<div className="row">
 					<label>School Name</label>
-					<div>{school_name}</div>
+					<div>{school.school_name}</div>
 				</div>
 				<div className="row">
 					<label>School Number</label>
-					<div>{school_number}</div>
+					<div>{school.phone_number}</div>
 				</div>
-				<div className="title">Order Info</div>
+				<div className="divider">Order Info</div>
 				<div className="row">
 					<label>Product title</label>
 					<div>{product_title}</div>
@@ -115,19 +171,42 @@ class OrderInfo extends Component<propTypes, S> {
 					<label>Order time</label>
 					<div>{new Date(order_time).toLocaleString()}</div>
 				</div>
-				{(!verified && active_school && order_details) && <div className="button blue" onClick={() => this.props.verifyOrder(order_details, ordered_product, active_school)}> Verify Order</div>}
-				{(!verified && active_school && order_details) && <div className="button blue" onClick={() => this.reject_order(order_details, ordered_product)}> Reject Order</div>}
+				<div className="row">
+					<label>Order Status</label>
+					<div>{order.status ? order.status : "Not Set"}</div>
+				</div>
+
+				{
+					!verified && <div className="button blue" onClick={() => this.props.verifyOrder(order, ordered_product, school)}>
+						Verify Order
+					</div>
+				}
+				{
+					!verified && <div className="button blue" onClick={() => this.reject_order(order, ordered_product)}>
+						Reject Order
+					</div>
+				}
 
 				{
 					//VERIFIED
 					verified && <>
 						<div className="row">
+							<label>Sales Rep</label>
+							<select {...this.former.super_handle(["order", "meta", "sales_rep"])}>
+								<option value="">Select</option>
+								{
+									Object.entries(sales_rep_list)
+										.map(([val, name]) => <option key={val} value={val}>{name}</option>)
+								}
+							</select>
+						</div>
+						<div className="row">
 							<label>Call 1</label>
-							<input type="text" {...this.former.super_handle(["order_meta", "call_one"])} />
+							<input type="text" placeholder="status" {...this.former.super_handle(["order", "meta", "call_one"])} />
 						</div>
 						<div className="row">
 							<label>Call 2</label>
-							<input type="text" {...this.former.super_handle(["order_meta", "call_two"])} />
+							<input type="text" placeholder="status" {...this.former.super_handle(["order", "meta", "call_two"])} />
 						</div>
 					</>
 				}
@@ -135,62 +214,75 @@ class OrderInfo extends Component<propTypes, S> {
 				{
 					//IN_PROGRESS
 					verified && <>
-						<div className="row">
+						{/* <div className="row">
 							<label>Call 1</label>
-							<input type="text" {...this.former.super_handle(["order_meta", "call_one"])} />
+							<input type="text" {...this.former.super_handle(["order", "meta", "call_one"])} />
 						</div>
 						<div className="row">
 							<label>Call 2</label>
-							<input type="text" {...this.former.super_handle(["order_meta", "call_two"])} />
-						</div>
+							<input type="text" {...this.former.super_handle(["order", "meta", "call_two"])} />
+						</div> */}
 						<div className="row">
 							<label>Actual Product Ordered</label>
-							<input type="text" {...this.former.super_handle(["order_meta", "actual_product_ordered"])} />
+							<input type="text" placeholder="product name" {...this.former.super_handle(["order", "meta", "actual_product_ordered"])} />
 						</div>
 						<div className="row">
 							<label>Quantity</label>
-							<input type="text" {...this.former.super_handle(["order_meta", "quantity"])} />
+							<input type="number" {...this.former.super_handle(["order", "meta", "quantity"])} />
 						</div>
 						<div className="row">
 							<label>Expected Completion Date</label>
-							<input type="date" {...this.former.super_handle(["order_meta", "expected_completion_date"])} />
+							<input
+								type="date"
+								value={moment(this.state.order.meta.expected_completion_date).format("YYYY-MM-DD")}
+								onChange={this.former.handle(["order", "meta", "expected_completion_date"])}
+							/>
 						</div>
 					</>
 				}
 				{
 					//COMPLETED
 					verified && <>
-						<div className="row">
+						{/* <div className="row">
 							<label>Actual Product Ordered</label>
-							<input type="text" {...this.former.super_handle(["order_meta", "actual_product_ordered"])} />
+							<input type="text" {...this.former.super_handle(["order", "meta", "actual_product_ordered"])} />
 						</div>
 						<div className="row">
 							<label>Quantity</label>
-							<input type="text" {...this.former.super_handle(["order_meta", "quantity"])} />
-						</div>
+							<input type="text" {...this.former.super_handle(["order", "meta", "quantity"])} />
+						</div> */}
 						<div className="row">
 							<label>Expected Date of Delivery</label>
-							<input type="text" {...this.former.super_handle(["order_meta", "expected_date_of_delivery"])} />
+							<input
+								type="date"
+
+								value={moment(this.state.order.meta.expected_date_of_delivery).format("YYYY-MM-DD")}
+								onChange={this.former.handle(["order", "meta", "expected_date_of_delivery"])}
+							/>
 						</div>
 						<div className="row">
 							<label>Date of Delivery</label>
-							<input type="date" {...this.former.super_handle(["order_meta", "actual_date_of_delivery"])} />
+							<input
+								type="date"
+								value={moment(this.state.order.meta.actual_date_of_delivery).format("YYYY-MM-DD")}
+								onChange={this.former.handle(["order", "meta", "actual_date_of_delivery"])}
+							/>
 						</div>
 						<div className="row">
 							<label>Total Amount</label>
-							<input type="text" {...this.former.super_handle(["order_meta", "total_amount"])} />
+							<input
+								type="number" {...this.former.super_handle(["order", "meta", "total_amount"])} />
 						</div>
 						<div className="row">
 							<label>Payment Received</label>
-							<select {...this.former.super_handle(["order_meta", "payment_received"])}>
-								<option value="">Select</option>
+							<select {...this.former.super_handle(["order", "meta", "payment_received"])}>
 								<option value="YES">Yes</option>
 								<option value="NO">No</option>
 							</select>
 						</div>
 					</>
 				}
-				<div className="button blue" onClick={() => this.save_meta()}>Save</div>
+				{verified && <div className="button blue" onClick={() => this.save_meta()}>Save</div>}
 			</div>
 		</div>
 	}
@@ -199,6 +291,7 @@ export default connect((state: RootReducerState) => ({
 	products: state.products,
 	orders: state.orders
 }), (dispatch: Function) => ({
+	updateOrderMeta: (order: Order, meta: any, supplier_id: string) => dispatch(updateOrderMeta(order, meta, supplier_id)),
 	verifyOrder: (order: Order, product: Product, school: CERPSchool) => dispatch(verifyOrder(order, product, school)),
 	rejectOrder: (order: Order, product: Product) => dispatch(rejectOrder(order, product))
 }))(withRouter(OrderInfo))
