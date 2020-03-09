@@ -117,6 +117,7 @@ export const updateOrderMeta = (order: Order, meta: any, supplier_id: string) =>
 
 	if (!state.connected) {
 		syncr.onNext('connect', () => dispatch(updateOrderMeta(order, meta, supplier_id)))
+		return
 	}
 
 	syncr.send({
