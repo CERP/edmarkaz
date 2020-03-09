@@ -182,6 +182,18 @@ defmodule EdMarkaz.Supplier do
 			"meta" => %{
 				"school_id" => school_code,
 				"product_id" => Map.get(product, "id"),
+				"sales_rep" => "",
+				"call_one" => "",
+				"call_two" => "",
+				"actual_product_ordered" => "",
+				"quantity" => "1",
+				"expected_completion_date" => time,
+				"expected_date_of_delivery" => time,
+				"actual_date_of_delivery" => time,
+				"total_amount" => "0",
+				"payment_received" => "NO",
+				"cancellation_reason" => "",
+				"status" => "ORDER_PLACED"
 			},
 			"user" => %{
 				"name" => "",
@@ -211,6 +223,30 @@ defmodule EdMarkaz.Supplier do
 
 		GenServer.call(via(supplier_id), {:sync_changes, client_id, changes, :os.system_time(:millisecond)})
 
+	end
+
+	def update_order_meta( order, meta, supplier_id, client_id) do
+
+		order_time = Map.get(order, "time")
+		school_code = get_in(order, ["meta", "school_id"])
+		path = ["sync_state", "matches", school_code, "history", "#{order_time}", "meta"]
+
+		writes = meta
+			|> Enum.reduce(
+				[],
+				fn ({key, val}, acc) ->
+					write = %{
+						type: "MERGE",
+						path: path ++ ["#{key}"],
+						value: val,
+					}
+					[ write | acc ]
+				end
+			)
+		changes = prepare_changes(writes)
+		GenServer.call(via(supplier_id), {:sync_changes, client_id, changes, :os.system_time(:millisecond)})
+
+		{:ok, "UPDATE SUCCESSFULL"}
 	end
 
 	def manage_order( type, order, supplier_id, client_id, product) do
@@ -246,12 +282,16 @@ defmodule EdMarkaz.Supplier do
 		numbers = Dynamic.get(sync_state,["numbers"])
 
 		if numbers !== nil do
-			[number | _] = numbers
+			main_number = numbers
 			|> Enum.filter( fn ({key, val}) -> val["type"] !== nil end )
-			|> Enum.map(fn {k,v} -> k end)
 
-			spawn fn ->
-				EdMarkaz.Contegris.send_sms(number, message)
+			if main_number !== [] do
+				[number | _] = main_number
+				|> Enum.map(fn {k,v} -> k end)
+
+				spawn fn ->
+					EdMarkaz.Contegris.send_sms(number, message)
+				end
 			end
 		end
 	end
