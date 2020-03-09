@@ -182,6 +182,18 @@ defmodule EdMarkaz.Supplier do
 			"meta" => %{
 				"school_id" => school_code,
 				"product_id" => Map.get(product, "id"),
+				"sales_rep" => "",
+				"call_one" => "",
+				"call_two" => "",
+				"actual_product_ordered" => "",
+				"quantity" => "1",
+				"expected_completion_date" => time,
+				"expected_date_of_delivery" => time,
+				"actual_date_of_delivery" => time,
+				"total_amount" => "0",
+				"payment_received" => "NO",
+				"cancellation_reason" => "",
+				"status" => "ORDER_PLACED"
 			},
 			"user" => %{
 				"name" => "",

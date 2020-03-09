@@ -102,6 +102,7 @@ interface Order {
 		actual_date_of_delivery: number
 		total_amount: string
 		payment_received: string
+		status: "ORDER_PLACED" | "IN_PROGRESS" | "COMPLETED" | "SCHOOL_CANCELLED" | "SUPPLIER_CANCELLED"
 	}
 	time: number
 	user: {
@@ -109,7 +110,6 @@ interface Order {
 		number: string
 	}
 	verified?: "VERIFIED" | "NOT_VERIFIED" | "REJECTED"
-	status?: "ORDER_PLACED" | "IN_PROGRESS" | "COMPLETED" | "SCHOOL_CANCELLED" | "SUPPLIER_CANCELLED"
 }
 
 interface CERPSchool {
