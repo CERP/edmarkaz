@@ -51,6 +51,7 @@ class OrderInfo extends Component<propTypes, S> {
 		const { order, school } = props.orders.db[props.supplier_id][props.order_time]
 
 		const updated_order: Order = {
+			status: "ORDER_PLACED",
 			...order,
 			meta: {
 				...default_meta_fields(),
@@ -79,44 +80,77 @@ class OrderInfo extends Component<propTypes, S> {
 		}
 		this.props.rejectOrder(order_details, ordered_product)
 	}
+
 	save_meta = () => {
-		const { meta } = this.state.order
-		if (isNaN(parseFloat(meta.total_amount)) || parseFloat(meta.total_amount) < 0) {
+		const { order } = this.state
+		if (isNaN(parseFloat(order.meta.total_amount)) || parseFloat(order.meta.total_amount) < 0) {
 			alert("Amount can't be less than zero")
 			return
 		}
 
-		if (isNaN(parseFloat(meta.quantity)) || parseFloat(meta.quantity) < 1) {
+		if (isNaN(parseFloat(order.meta.quantity)) || parseFloat(order.meta.quantity) < 1) {
 			alert("Quantity can't be less than 1")
 			return
 		}
 
-		const old_meta = this.props.orders.db[this.props.supplier_id][this.props.order_time].order.meta
-		const changes = Object.entries(meta)
+		const old_order = this.props.orders.db[this.props.supplier_id][this.props.order_time].order
+		const changes = Object.entries(order)
 			.reduce((agg, [key, val]) => {
+
 				//@ts-ignore
-				if (old_meta[key] === undefined || val !== old_meta[key]) {
+				if (old_order[key] === undefined) {
 					return {
 						...agg,
 						[key]: val
 					}
 				}
-				return agg
+
+				if (typeof (val) === "object") {
+					const nested_changes = Object.entries(val)
+						.reduce((agg, [c_key, c_val]) => {
+							//@ts-ignore
+							if (old_order[key][c_key] === undefined || c_val !== old_order[key][c_key]) {
+								return {
+									...agg,
+									[`${key},${c_key}`]: c_val
+								}
+							}
+							return agg
+						}, {})
+
+					return {
+						...agg,
+						...nested_changes
+					}
+
+				}
+				//@ts-ignore
+				if (val !== old_order[key]) {
+					return {
+						...agg,
+						[key]: val
+					}
+				}
+
+				return {
+					...agg,
+				}
 			}, {})
 
-		if (Object.keys(changes).length > 0) {
-			this.props.updateOrderMeta(this.state.order, changes, this.props.supplier_id)
+		if (Object.keys(changes).length < 1) {
+			alert("No Changes to Save !")
+			return
 		}
+
+		this.props.updateOrderMeta(this.state.order, changes, this.props.supplier_id)
 	}
 
 	render() {
 
 		const { product_id, order_time, products } = this.props
 		const { order, school } = this.state
-
 		const ordered_product = products.db[product_id]
 		const product_title = ordered_product ? ordered_product.title : ""
-
 		const verified = order.verified ? order.verified === "VERIFIED" : false
 
 		return <div className="order-info page">
@@ -142,11 +176,18 @@ class OrderInfo extends Component<propTypes, S> {
 				</div>
 				<div className="row">
 					<label>Order Status</label>
-					<div>{order.status ? order.status : "Not Set"}</div>
+					<select {...this.former.super_handle(["order", "status"])} disabled={!verified}>
+						<option value="">Select</option>
+						<option value="ORDER_PLACED">Order Placed</option>
+						<option value="IN_PROGRESS">In Progress</option>
+						<option value="COMPLETED">Completed</option>
+						<option value="SCHOOL_CANCELLED">School Cancelled</option>
+						<option value="SUPPLIER_CANCELLED">Supplier Cancelled</option>
+					</select>
 				</div>
 
 				{
-					!verified && <div className="button blue" onClick={() => this.props.verifyOrder(order, ordered_product, school)}>
+					!verified && <div style={{ marginBottom: "5px" }} className="button blue" onClick={() => this.props.verifyOrder(order, ordered_product, school)}>
 						Verify Order
 					</div>
 				}
@@ -169,6 +210,12 @@ class OrderInfo extends Component<propTypes, S> {
 								}
 							</select>
 						</div>
+					</>
+				}
+
+				{
+					//IN_PROGRESS
+					(verified && order.status === "IN_PROGRESS") && <>
 						<div className="row">
 							<label>Call 1</label>
 							<input type="text" placeholder="status" {...this.former.super_handle(["order", "meta", "call_one"])} />
@@ -177,20 +224,6 @@ class OrderInfo extends Component<propTypes, S> {
 							<label>Call 2</label>
 							<input type="text" placeholder="status" {...this.former.super_handle(["order", "meta", "call_two"])} />
 						</div>
-					</>
-				}
-
-				{
-					//IN_PROGRESS
-					verified && <>
-						{/* <div className="row">
-							<label>Call 1</label>
-							<input type="text" {...this.former.super_handle(["order", "meta", "call_one"])} />
-						</div>
-						<div className="row">
-							<label>Call 2</label>
-							<input type="text" {...this.former.super_handle(["order", "meta", "call_two"])} />
-						</div> */}
 						<div className="row">
 							<label>Actual Product Ordered</label>
 							<input type="text" placeholder="product name" {...this.former.super_handle(["order", "meta", "actual_product_ordered"])} />
@@ -211,20 +244,19 @@ class OrderInfo extends Component<propTypes, S> {
 				}
 				{
 					//COMPLETED
-					verified && <>
-						{/* <div className="row">
+					(verified && order.status === "COMPLETED") && <>
+						<div className="row">
 							<label>Actual Product Ordered</label>
-							<input type="text" {...this.former.super_handle(["order", "meta", "actual_product_ordered"])} />
+							<input type="text" placeholder="product name" {...this.former.super_handle(["order", "meta", "actual_product_ordered"])} />
 						</div>
 						<div className="row">
 							<label>Quantity</label>
-							<input type="text" {...this.former.super_handle(["order", "meta", "quantity"])} />
-						</div> */}
+							<input type="number" {...this.former.super_handle(["order", "meta", "quantity"])} />
+						</div>
 						<div className="row">
 							<label>Expected Date of Delivery</label>
 							<input
 								type="date"
-
 								value={moment(this.state.order.meta.expected_date_of_delivery).format("YYYY-MM-DD")}
 								onChange={this.former.handle(["order", "meta", "expected_date_of_delivery"])}
 							/>

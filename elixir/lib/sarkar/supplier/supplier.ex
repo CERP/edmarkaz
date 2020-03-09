@@ -187,7 +187,8 @@ defmodule EdMarkaz.Supplier do
 				"name" => "",
 				"number" => ""
 			},
-			"verified" => "NOT_VERIFIED"
+			"verified" => "NOT_VERIFIED",
+			"status" => "ORDER_PLACED"
 		}
 
 		writes = [
@@ -217,7 +218,7 @@ defmodule EdMarkaz.Supplier do
 
 		order_time = Map.get(order, "time")
 		school_code = get_in(order, ["meta", "school_id"])
-		path = ["sync_state", "matches", school_code, "history", "#{order_time}", "meta"]
+		path = ["sync_state", "matches", school_code, "history", "#{order_time}"]
 
 		writes = meta
 			|> Enum.reduce(
@@ -225,12 +226,13 @@ defmodule EdMarkaz.Supplier do
 				fn ({key, val}, acc) ->
 					write = %{
 						type: "MERGE",
-						path: path ++ ["#{key}"],
+						path: path ++ String.split(key,","),
 						value: val,
 					}
 					[ write | acc ]
 				end
 			)
+
 		changes = prepare_changes(writes)
 		GenServer.call(via(supplier_id), {:sync_changes, client_id, changes, :os.system_time(:millisecond)})
 
