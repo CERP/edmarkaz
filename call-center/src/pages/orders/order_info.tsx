@@ -108,9 +108,12 @@ class OrderInfo extends Component<propTypes, S> {
 				return agg
 			}, {})
 
-		if (Object.keys(changes).length > 0) {
-			this.props.updateOrderMeta(this.state.order, changes, this.props.supplier_id)
+		if (Object.keys(changes).length < 1) {
+			alert("No Changes to Save !")
+			return
 		}
+
+		this.props.updateOrderMeta(this.state.order, changes, this.props.supplier_id)
 	}
 
 	render() {
