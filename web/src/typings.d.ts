@@ -49,6 +49,17 @@ declare global {
 		meta: {
 			school_id: string;
 			product_id: string;
+			cancellation_reason: string
+			call_one: string
+			call_two: string
+			actual_product_ordered: string
+			quantity: string
+			expected_completion_date: number
+			expected_date_of_delivery: number
+			actual_date_of_delivery: number
+			total_amount: string
+			payment_received: string
+			status: "ORDER_PLACED" | "IN_PROGRESS" | "COMPLETED" | "SCHOOL_CANCELLED" | "SUPPLIER_CANCELLED"
 		};
 		verified?: "VERIFIED" | "NOT_VERIFIED" | "REJECTED"
 	}

@@ -10,6 +10,7 @@ import Rejected from '../Rejected'
 import Settings from '../Settings'
 import Products from '../Products'
 import Orders from '../Orders/orders'
+import Orders_Two from '../Orders/orders_two'
 import icon from './icon.svg'
 import SchoolInfo from '~/src/components/SchoolInfo'
 import ProductInfo from '~/src/components/ProductInfo'
@@ -90,6 +91,7 @@ class Burger extends React.Component<propTypes, S> {
 				<Link to={{ pathname: "/products", search }} className={current === '/products' ? "active" : ""}>Products</Link>
 				<Link to="/dashboard/activities" className={current === '/dashboard' ? "active" : ""}>Dashboard</Link>
 				<Link to="/settings" className={current === '/settings' ? "active" : ""}>Settings</Link>
+				<Link to={{ pathname: "/o_two", search }} className={current === '/o_two' ? "active" : ""}>Orders_Two</Link>
 			</div>}
 
 			{!panel_exists && <div className={visible ? "burger-stub" : "burger-stub full-view"}>
@@ -102,6 +104,7 @@ class Burger extends React.Component<propTypes, S> {
 				<Route path="/orders" component={Orders} />
 				<Route path="/dashboard" component={Dashboard} />
 				<Route path="/settings" component={Settings} />
+				<Route path="/o_two" component={Orders_Two} />
 			</div>}
 			{
 				selected_id && <div className={visible ? "info-panel" : "info-panel full-view"}>
