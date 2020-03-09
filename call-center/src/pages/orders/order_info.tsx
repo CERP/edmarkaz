@@ -4,7 +4,7 @@ import { RouteComponentProps, withRouter } from 'react-router'
 import { connect } from 'react-redux'
 import { verifyOrder, rejectOrder, updateOrderMeta } from '../../actions'
 import moment from 'moment'
-
+import { getSalesReps } from '../../utils/sales_rep'
 
 interface S {
 	order: Order
@@ -19,10 +19,6 @@ interface SelfProps {
 }
 
 interface P {
-	product_id: string
-	order_time: number
-	school_id: string
-	supplier_id: string
 	products: RootReducerState["products"]
 	orders: RootReducerState["orders"]
 	updateOrderMeta: (order: Order, meta: any, supplier_id: string) => any
@@ -32,7 +28,7 @@ interface P {
 
 type propTypes = P & SelfProps & RouteComponentProps
 
-const default_meta_fields = {
+const default_meta_fields = () => ({
 	sales_rep: "",
 	call_one: "",
 	call_two: "",
@@ -44,15 +40,8 @@ const default_meta_fields = {
 	total_amount: "0",
 	payment_received: "NO",
 	cancellation_reason: ""
-}
-const sales_rep_list = {
-	ALI_HASNAIN: "Ali Hasnain",
-	ASIM_ZAHEER: "Asim Zaheer",
-	AWAIS_SAKHAWAT: "Awais Sakhawat",
-	KALEEM_MAJEED: "Kaleem Majeed",
-	MUHAMMAD_ZOHAIB: "Muhammad Zohaib",
-	NASIR_SAEED: "Nasir Saeed"
-}
+})
+
 class OrderInfo extends Component<propTypes, S> {
 
 	former: Former
@@ -61,13 +50,13 @@ class OrderInfo extends Component<propTypes, S> {
 
 		const { order, school } = props.orders.db[props.supplier_id][props.order_time]
 
-		const updated_order = {
+		const updated_order: Order = {
 			...order,
 			meta: {
-				...default_meta_fields,
+				...default_meta_fields(),
 				...order.meta,
 			}
-		} as Order
+		}
 
 		this.state = {
 			order: updated_order,
@@ -75,26 +64,6 @@ class OrderInfo extends Component<propTypes, S> {
 		}
 
 		this.former = new Former(this, [])
-	}
-
-	UNSAFE_componentWillReceiveProps(newProps: propTypes) {
-		if (newProps.order_time !== this.props.order_time) {
-
-			const { order, school } = newProps.orders.db[newProps.supplier_id][newProps.order_time]
-
-			const updated_order = {
-				...order,
-				meta: {
-					...default_meta_fields,
-					...order.meta,
-				}
-			} as Order
-
-			this.setState({
-				order: updated_order,
-				school,
-			})
-		}
 	}
 
 	onClose = () => {
@@ -195,7 +164,7 @@ class OrderInfo extends Component<propTypes, S> {
 							<select {...this.former.super_handle(["order", "meta", "sales_rep"])}>
 								<option value="">Select</option>
 								{
-									Object.entries(sales_rep_list)
+									Object.entries(getSalesReps())
 										.map(([val, name]) => <option key={val} value={val}>{name}</option>)
 								}
 							</select>

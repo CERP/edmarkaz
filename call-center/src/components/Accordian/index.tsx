@@ -92,6 +92,7 @@ class Accordian extends React.Component<propTypes, S> {
 					product_id={o_product_id}
 					supplier_id={o_supplier_id}
 					order_time={parseFloat(o_order_time)}
+					key={o_order_time}
 				/>
 			}
 

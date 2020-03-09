@@ -97,9 +97,9 @@ interface Order {
 		call_two: string
 		actual_product_ordered: string
 		quantity: string
-		expected_completion_date: string
-		expected_date_of_delivery: string
-		actual_date_of_delivery: string
+		expected_completion_date: number
+		expected_date_of_delivery: number
+		actual_date_of_delivery: number
 		total_amount: string
 		payment_received: string
 	}
@@ -109,8 +109,7 @@ interface Order {
 		number: string
 	}
 	verified?: "VERIFIED" | "NOT_VERIFIED" | "REJECTED"
-	cancelled?: "SCHOOL_CANCELLED" | "SUPPLIER_CANCELLED"
-	status?: "ORDER_PLACED" | "IN_PROGRESS" | "COMPLETED"
+	status?: "ORDER_PLACED" | "IN_PROGRESS" | "COMPLETED" | "SCHOOL_CANCELLED" | "SUPPLIER_CANCELLED"
 }
 
 interface CERPSchool {
