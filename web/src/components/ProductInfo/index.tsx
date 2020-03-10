@@ -168,6 +168,15 @@ class ProductInfo extends React.Component<propTypes, S> {
 	}
 
 	render() {
+		const categories = [
+			"Library Books & Co-curricular Activities",
+			"Education Technology",
+			"School Loans",
+			"Textbooks",
+			"Stationery and Printing",
+			"Learning Materials",
+			"Solar Power"
+		]
 		return <div className="product-info page">
 			<div className="close" onClick={this.onClose}>Close</div>
 			<div className="title">Product Info</div>
@@ -200,9 +209,9 @@ class ProductInfo extends React.Component<propTypes, S> {
 					<div className="row" style={{ flexDirection: "row" }}>
 						<select {...this.former.super_handle(["newCategory"])}>
 							<option value="">Select a Category</option>
-							<option>Library and Reference Books</option>
-							<option>EdTech</option>
-							<option>Co-curricular</option>
+							{
+								categories.map(category => <option>{category}</option>)
+							}
 						</select>
 
 						<div className="button green" onClick={this.addCategory} style={{ width: "24px", height: "24px", marginLeft: "10px" }}>+</div>

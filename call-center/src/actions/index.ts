@@ -112,6 +112,35 @@ export const rejectOrder = (order: Order, product: Product) => (dispatch: Dispat
 		})
 }
 
+export const updateOrderMeta = (order: Order, meta: any, supplier_id: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+	const state = getState()
+
+	if (!state.connected) {
+		syncr.onNext('connect', () => dispatch(updateOrderMeta(order, meta, supplier_id)))
+		return
+	}
+
+	syncr.send({
+		type: "UPDATE_ORDER_META",
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		id: state.auth.id,
+		payload: {
+			order,
+			meta,
+			supplier_id
+		}
+	})
+		.then(res => {
+			dispatch(getOrders())
+			alert(res)
+		})
+		.catch(err => {
+			alert(err)
+		})
+
+}
+
 export const getOrders = (start_date = moment().subtract(3, "days").valueOf()) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 	const state = getState();
 
