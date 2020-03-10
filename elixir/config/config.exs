@@ -7,6 +7,8 @@ config :edmarkaz, basic_auth: [
 	password: {:system, "AUTH_PASS"}
 ]
 
+config :goth, json: {:system, "GCP_CREDENTIALS"}
+
 # This configuration is loaded before any dependency and is restricted
 # to this project. If another project depends on this project, this
 # file won't be loaded nor affect the parent project. For this reason,
