@@ -196,6 +196,10 @@ export const getOwnProducts = (filters = {}) => (dispatch: Dispatch, getState: G
 
 	const state = getState();
 
+	dispatch({
+		type: "LOAD_PRODUCTS"
+	})
+
 	syncr.send({
 		type: "GET_OWN_PRODUCTS",
 		client_type: state.auth.client_type,
@@ -485,6 +489,20 @@ export const makeSupplierMainNumber = (number: string) => (dispatch: Dispatch, g
 		}
 	]))
 }
+
+export const updateOrderMeta = (order: OrderPlacedEvent, meta: any) => (dispatch: Dispatch) => {
+
+	const school_id = order.meta.school_id
+	const time = order.time
+
+	const merges = Object.entries(meta).map(([key, val]) => ({
+		path: ["sync_state", "matches", school_id, "history", `${time}`, "meta", key],
+		value: val
+	}))
+
+	dispatch(createMerges(merges))
+}
+
 
 export const deleteSupplierNumber = (number: string) => (dispatch: Dispatch, getState: GetState) => {
 	dispatch(createDeletes([

@@ -142,6 +142,7 @@ const loadProducts = () => {
 
 	const initial: RootBankState['products'] = {
 		last_sync: 0,
+		loading: true,
 		db: {}
 	}
 

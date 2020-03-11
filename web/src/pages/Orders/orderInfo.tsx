@@ -2,8 +2,13 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import Former from '~src/utils/former'
 import moment from 'moment'
-
+import { reserveMaskedNumber, releaseMaskedNumber, updateOrderMeta } from '~src/actions'
+import { sendSlackAlert } from '~src/actions/core'
 interface P {
+	reserveNumber: (school_id: string) => any
+	releaseNumber: (school_id: string) => any
+	updateOrderMeta: (order: OrderPlacedEvent, meta: any) => any
+	sendSlackAlert: (message: string, channel: string) => any
 	products: RootBankState["products"]
 }
 
@@ -14,6 +19,7 @@ interface SelfProps {
 	product: Product
 	school: CERPSchool
 	order: OrderPlacedEvent
+	schoolMatch: SchoolMatch
 }
 
 type propTypes = P & SelfProps
@@ -52,14 +58,79 @@ class OrderInfo extends Component<propTypes, S> {
 
 		this.former = new Former(this, [])
 	}
+
+	componentDidUpdate(prevProps: propTypes) {
+		if (JSON.stringify(prevProps.order.meta) !== JSON.stringify(this.props.order.meta)) {
+
+			const updated_order: OrderPlacedEvent = {
+				...this.props.order,
+				meta: {
+					...default_meta_fields(),
+					...this.props.order.meta
+				}
+			}
+
+			this.setState({
+				order: updated_order
+			})
+		}
+	}
+
+	onShowNumber = () => {
+		this.props.reserveNumber(this.props.school.refcode)
+	}
+
+	onMarkComplete = () => {
+
+		const res = confirm('Are you sure you want to Mark as Complete?')
+
+		if (res) {
+			this.props.releaseNumber(this.props.school.refcode)
+		}
+	}
+
 	save_meta = () => {
-		console.log("SAVING")
+		const { meta } = this.state.order
+
+		if (isNaN(parseFloat(meta.total_amount)) || parseFloat(meta.total_amount) < 0) {
+			alert("Amount can't be less than zero")
+			return
+		}
+
+		if (isNaN(parseFloat(meta.quantity)) || parseFloat(meta.quantity) < 1) {
+			alert("Quantity can't be less than 1")
+			return
+		}
+
+		const old_meta = this.props.order.meta
+		const changes = Object.entries(meta)
+			.reduce((agg, [key, val]) => {
+				//@ts-ignore
+				if (old_meta[key] === undefined || val !== old_meta[key]) {
+					return {
+						...agg,
+						[key]: val
+					}
+				}
+				return agg
+			}, {})
+
+		if (Object.keys(changes).length < 1) {
+			alert("No Changes to Save !")
+			return
+		}
+
+		this.props.updateOrderMeta(this.state.order, changes)
+		this.props.sendSlackAlert(`Supplier Updated the Order(for Product_id: ${this.props.order.meta.product_id}) information by ${this.props.school.school_name} school.`, "ilmx-supplier-updates")
+		alert("Order Updated")
 	}
 
 	render() {
 
-		const { product, school } = this.props
+		const { product, school, schoolMatch } = this.props
 		const { order } = this.state
+
+		const reserved = schoolMatch && schoolMatch.status === "IN_PROGRESS"
 
 		return <div className="more">
 			<div className="form">
@@ -92,6 +163,25 @@ class OrderInfo extends Component<propTypes, S> {
 					<label> Enrollment </label>
 					<div> {school.enrolment_range} </div>
 				</div>
+				{
+					(schoolMatch.status === "DONE" || schoolMatch.status === "ORDERED") && <div className="button green" onClick={this.onShowNumber}>Show Number</div>
+				}
+				{
+					reserved && <>
+						<div className="divider"> Contact Information </div>
+						<div className="row">
+							<label>Phone Number</label>
+							<div className="row" style={{ flexDirection: "row" }}>
+								<div style={{ width: "70%" }}> {schoolMatch.masked_number}</div>
+								<a href={`tel:${schoolMatch.masked_number}`} className="button green" style={{ width: "20%", marginRight: "10px" }}>Call</a>
+							</div>
+						</div>
+					</>
+				}
+				{
+					schoolMatch.status === "IN_PROGRESS" && <div className="button green" onClick={this.onMarkComplete}>Mark Complete</div>
+				}
+
 				<div className="divider">Order Info</div>
 				<div className="row">
 					<label>Order Status</label>
@@ -135,7 +225,7 @@ class OrderInfo extends Component<propTypes, S> {
 				}
 				{
 					//COMPLETED
-					(order.meta.status === "COMPLETED") && <>
+					(order.meta.status === "COMPLETED") && <div>
 						<div className="row">
 							<label>Actual Product Ordered</label>
 							<input type="text" placeholder="product name" {...this.former.super_handle(["order", "meta", "actual_product_ordered"])} />
@@ -171,7 +261,7 @@ class OrderInfo extends Component<propTypes, S> {
 								<option value="NO">No</option>
 							</select>
 						</div>
-					</>
+					</div>
 				}
 
 				{
@@ -190,4 +280,9 @@ class OrderInfo extends Component<propTypes, S> {
 }
 export default connect((state: RootBankState) => ({
 	products: state.products
+}), (dispatch: Function) => ({
+	reserveNumber: (school_id: string) => dispatch(reserveMaskedNumber(school_id)),
+	releaseNumber: (school_id: string) => dispatch(releaseMaskedNumber(school_id)),
+	updateOrderMeta: (order: OrderPlacedEvent, meta: any) => dispatch(updateOrderMeta(order, meta)),
+	sendSlackAlert: (message: string, channel: string) => dispatch(sendSlackAlert(message, channel))
 }))(OrderInfo)

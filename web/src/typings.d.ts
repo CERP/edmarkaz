@@ -167,6 +167,7 @@ declare global {
 		}
 		products: {
 			last_sync: number
+			loading: boolean
 			db: {
 				[product_id: string]: Product
 			}

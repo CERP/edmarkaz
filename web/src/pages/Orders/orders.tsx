@@ -1,16 +1,17 @@
 import React, { Component } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
-import { connect } from 'react-redux'
-import moment from 'moment'
-
-import './style.css'
 import Former from '~src/utils/former'
 import { reserveMaskedNumber, releaseMaskedNumber, getOwnProducts } from '~src/actions'
+import { sendSlackAlert } from '~src/actions/core'
+import { connect } from 'react-redux'
+import moment from 'moment'
+import OrderInfo from './orderInfo'
 
 interface P {
 	reserveNumber: (school_id: string) => any
 	releaseNumber: (school_id: string) => any
 	getProducts: () => void
+	sendSlackAlert: (message: string, channel: string) => any
 	sync_state: RootBankState["sync_state"]
 	schools: RootBankState["new_school_db"]
 	products: RootBankState["products"]
@@ -18,28 +19,34 @@ interface P {
 
 interface S {
 	filterMenu: boolean
-	activeSchool: string
+	activeOrder: string
 	filters: {
 		status: "IN_PROGRESS" | "DONE" | "ORDERED" | ""
 		text: string
+		start_date: number
+		end_date: number
 	}
 }
 
 type propTypes = RouteComponentProps & P
 
 class Orders extends Component<propTypes, S> {
+
 	former: Former
 	constructor(props: propTypes) {
 		super(props)
 
 		this.state = {
 			filterMenu: false,
-			activeSchool: "",
+			activeOrder: "",
 			filters: {
 				status: "",
-				text: ""
+				text: "",
+				start_date: moment().subtract(3, "days").valueOf(),
+				end_date: moment().add(1, "day").valueOf()
 			}
 		}
+
 		this.former = new Former(this, [])
 	}
 
@@ -47,64 +54,56 @@ class Orders extends Component<propTypes, S> {
 		this.props.getProducts()
 	}
 
-	setActive = (school_id: string) => {
-		const activeSchool = this.state.activeSchool === school_id ? "" : school_id
+	setActive = (order_id: string) => {
+		const activeOrder = this.state.activeOrder === order_id ? "" : order_id
 
 		this.setState({
-			activeSchool
+			activeOrder
 		})
 	}
-
-	onShowNumber = () => {
-		this.props.reserveNumber(this.state.activeSchool)
-	}
-
-	onMarkComplete = () => {
-
-		const res = confirm('Are you sure you want to Mark as Complete?')
-
-		if (res) {
-			this.props.releaseNumber(this.state.activeSchool)
-		}
-	}
-	filterStatus = (item_status: "IN_PROGRESS" | "DONE" | "ORDERED" | "") => {
-		const { status } = this.state.filters
-
-		return status ? status === item_status : true
-	}
-	filterSchool = (school: CERPSchool) => {
+	textfilter = (e: OrderPlacedEvent) => {
 		const { text } = this.state.filters
-		return text === "" || school.school_name.toLowerCase().includes(text.toLowerCase())
-	}
+		const school = this.props.schools[e.meta.school_id]
+		const product = this.props.products.db[e.meta.product_id]
 
-	getLatestDate = (orders: SchoolMatch["history"]): number => Object.values(orders).reduce((prev, curr) => prev > curr.time ? prev : curr.time, 0)
+		if (text !== "") {
+			return school.school_name.toLowerCase().includes(text.toLowerCase()) ||
+				product.title.toLowerCase().includes(text.toLowerCase())
+		}
+		return true
+	}
+	dateFilter = (time: number) => {
+		return time > this.state.filters.start_date && time < this.state.filters.end_date
+	}
 
 	render() {
 		const { sync_state, schools, products } = this.props
-		const { filterMenu, activeSchool } = this.state
+		const { filterMenu, activeOrder, filters } = this.state
+		console.log("HAHAAHHAAHAH")
+		const events = Object.entries(sync_state.matches)
+			.filter(([sid, { status, history }]) => (status !== "REJECTED" && status !== "NEW") && Object.values(history).find((e) => e.event === "ORDER_PLACED"))
+			.reduce((agg, [sid, { status, history }]) => ({ ...agg, ...history }), {} as SchoolMatch["history"])
 
-		const loading_products = Object.keys(products.db).length === 0
-		const schoolMatch = sync_state.matches[activeSchool]
+		const orders = Object.entries(events)
+			.filter(([id, e]) => e.event === "ORDER_PLACED" && e.verified && (this.textfilter(e) && this.dateFilter(e.time)))
+			.sort(([, a_e], [, b_e]) => b_e.time - a_e.time) as [string, OrderPlacedEvent][]
 
-		const items = Object.entries(sync_state.matches)
-			.filter(([sid, { status, history }]) =>
-				(status !== "REJECTED" && status !== "NEW") && Object.values(history).find((e) => e.event === "ORDER_PLACED")
-				&& this.filterStatus(status) && this.filterSchool(schools[sid])
-			)
-			.sort(([, event_a], [, event_b]) => {
-				return this.getLatestDate(event_b.history) - this.getLatestDate(event_a.history)
-			})
-			.map(([sid, event]) => ({ ...event, school: schools[sid] }))
-
-		return <div className="order page">
+		return products.loading ? <div> Loading </div> : <div className="orders page">
 			<div className="title">Orders</div>
 			<div className="form" style={{ width: "90%", marginBottom: "20px" }}>
-
 				<div className="row">
 					<label>Search</label>
-					<input type="text" placeholder="By School or Status" {...this.former.super_handle(["filters", "text"])} />
+					<input type="text" placeholder="By School or Product" {...this.former.super_handle(["filters", "text"])} />
 				</div>
-				<div className="button blue" onClick={() => this.setState({ filterMenu: !filterMenu })}>Filters</div>
+				<div className="row">
+					<label>Start Date</label>
+					<input type="date" value={moment(filters.start_date).format("YYYY-MM-DD")} onChange={this.former.handle(["filters", "start_date"])} />
+				</div>
+				<div className="row">
+					<label>End Date</label>
+					<input type="date" value={moment(filters.end_date).format("YYYY-MM-DD")} onChange={this.former.handle(["filters", "end_date"])} />
+				</div>
+				{/* <div className="button blue" onClick={() => this.setState({ filterMenu: !filterMenu })}>Filters</div>
 				{
 					filterMenu && <>
 						<div className="row">
@@ -117,103 +116,38 @@ class Orders extends Component<propTypes, S> {
 							</select>
 						</div>
 					</>
-				}
+				} */}
 			</div>
-
 			<div className="section newtable" style={{ width: "90%", padding: "5px" }}>
 				<div className="newtable-row heading">
 					<div>Date</div>
+					<div>Product</div>
 					<div>School</div>
 					<div>Status</div>
 				</div>
 				{
-					items.map(({ history, school, status }) => {
-						const latest_order = Object.values(history).reduce((prev, curr) => prev > curr.time ? prev : curr.time, 0)
-						const school_id = school.refcode
-						const reserved = schoolMatch && schoolMatch.status === "IN_PROGRESS"
-						const orders = Object.values(history)
-							.filter(e => e.event === "ORDER_PLACED" && e.verified === "VERIFIED")
-							.sort((event_a, event_b) => event_b.time - event_a.time)
-						const orders_length = orders.length > 0
-
-						return <div key={school_id}>
+					orders.map(([id, order]) => {
+						const school = schools[order.meta.school_id]
+						const product = products.db[order.meta.product_id]
+						const schoolMatch = sync_state.matches[order.meta.school_id]
+						return <div key={id}>
 							<div className="newtable-row">
-								<div> {moment(latest_order).format("DD-MM-YY")} </div>
-								<div className="clickable" onClick={() => this.setActive(school_id)}>{school.school_name}</div>
-								<div> {status}</div>
+								<div> {moment(order.time).format("DD-MM-YY")} </div>
+								<div className="clickable" onClick={() => this.setActive(id)}>{product.title}</div>
+								<div> {school.school_name} </div>
+								<div> {order.meta.status ? order.meta.status : "-"}</div>
 							</div>
 							{
-								activeSchool === school_id && <div className="more">
-									<div className="form">
-										<div className="divider">School Info</div>
-										<div className="row">
-											<label>Address</label>
-											<div> {school.school_address} </div>
-										</div>
-										<div className="row">
-											<label>Tehsil</label>
-											<div> {school.school_tehsil} </div>
-										</div>
-										<div className="row">
-											<label> District</label>
-											<div> {school.school_district} </div>
-										</div>
-										<div className="row">
-											<label> Lowest Fee</label>
-											<div> {school.lowest_fee} </div>
-										</div>
-										<div className="row">
-											<label> Highest Fee</label>
-											<div> {school.highest_fee} </div>
-										</div>
-										<div className="row">
-											<label> Enrollment </label>
-											<div> {school.enrolment_range} </div>
-										</div>
-										{(status === "DONE" || status === "ORDERED") && <div className="button green" onClick={this.onShowNumber}>Show Number</div>}
-										{
-											reserved && <>
-												<div className="divider"> Contact Information </div>
-												<div className="row">
-													<label>Phone Number</label>
-													<div className="row" style={{ flexDirection: "row" }}>
-														<div style={{ width: "70%" }}> {schoolMatch.masked_number}</div>
-														<a href={`tel:${schoolMatch.masked_number}`} className="button green" style={{ width: "20%", marginRight: "10px" }}>Call</a>
-													</div>
-												</div>
-											</>
-										}
-										{status === "IN_PROGRESS" && <div className="button green" onClick={this.onMarkComplete}>Mark Complete</div>}
-										{(orders_length && !loading_products) && <div className="divider">Orders</div>}
-										{
-											(orders_length && !loading_products) && <div className="newtable">
-												<div className="newtable-row heading">
-													<div>Date </div>
-													<div>Product</div>
-												</div>
-												{
-													orders
-														.map(e => {
-															const order = e.event === "ORDER_PLACED" && e
-															return <div className="newtable-row">
-																<div>{moment(order.time).format("DD-MM-YY")}</div>
-																<div>{products.db[order.meta.product_id].title}</div>
-															</div>
-														})
-												}
-											</div>
-										}
-									</div>
-								</div>
+								activeOrder === id && <OrderInfo key={id} order={order} product={product} school={school} schoolMatch={schoolMatch} />
 							}
 						</div>
 					})
 				}
 			</div>
+
 		</div>
 	}
 }
-
 export default connect((state: RootBankState) => ({
 	sync_state: state.sync_state,
 	schools: state.new_school_db,
@@ -222,4 +156,5 @@ export default connect((state: RootBankState) => ({
 	reserveNumber: (school_id: string) => dispatch(reserveMaskedNumber(school_id)),
 	releaseNumber: (school_id: string) => dispatch(releaseMaskedNumber(school_id)),
 	getProducts: () => dispatch(getOwnProducts()),
+	sendSlackAlert: (message: string, channel: string) => dispatch(sendSlackAlert(message, channel))
 }))(Orders)
