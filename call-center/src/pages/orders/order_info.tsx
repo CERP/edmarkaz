@@ -136,6 +136,10 @@ class OrderInfo extends Component<propTypes, S> {
 					<label>School Number</label>
 					<div>{school.phone_number}</div>
 				</div>
+				<div className="row">
+					<label>School Address</label>
+					<div>{school.school_address}</div>
+				</div>
 				<div className="divider">Order Info</div>
 				<div className="row">
 					<label>Product title</label>
