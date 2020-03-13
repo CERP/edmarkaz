@@ -119,13 +119,19 @@ const Orders = ({ orders, products, getOrders, getProducts }: P) => {
 				</div>}
 				{viewBy === "SCHOOL" && <div className="row">
 					<label>School</label>
-					<select onChange={(e) => setSchoolFilter(e.target.value)} value={schoolFilter}>
+					<input list="schools" onChange={(e) => setSchoolFilter(e.target.value)} value={schoolFilter} />
+					{/* <select onChange={(e) => setSchoolFilter(e.target.value)} value={schoolFilter}>
 						<option value="">All</option>
 						{
 							Object.keys(order_by_school || {}).map(sid => <option key={sid} value={sid}>{sid}</option>)
 						}
-					</select>
+					</select> */}
 				</div>}
+				<datalist id="schools">
+					{
+						Object.keys(order_by_school || {}).map(sid => <option key={sid} value={sid}>{sid}</option>)
+					}
+				</datalist>
 				<div className="row">
 					<label>Type</label>
 					<select onChange={(e) => setVerified(e.target.value)} value={verified}>
@@ -153,15 +159,29 @@ const Orders = ({ orders, products, getOrders, getProducts }: P) => {
 							.map(([sid, orders]) => {
 								return <div key={sid}>
 									<div className="title">{sid}</div>
-									<div> Total: {Object.entries(orders).filter(([time, { order }]) => filterTime(parseFloat(time)) && filterOrder(order)).length} </div>
-									<div className="list">
+									<div className="section newtable">
+										<div className="newtable-row heading">
+											<div>Date</div>
+											<div>School</div>
+											<div>Status</div>
+											<div>Contact</div>
+											<div>Address </div>
+										</div>
 										{
 											Object.entries(orders)
 												.filter(([time, { order }]) => filterTime(parseFloat(time)) && filterOrder(order))
-												.map(([time, { order }]) => {
-													return <Link to={`/orders?o_school_id=${order.meta.school_id}&o_supplier_id=${sid}&o_order_time=${time}&o_product_id=${order.meta.product_id}`} key={order.time}>
-														{`${product_db[order.meta.product_id].title} - ${new Date(order.time).toLocaleString()}`}
-													</Link>
+												.map(([time, { order, school }]) => {
+													return <div className="newtable-row" key={order.time}>
+														<div>{moment(order.time).format("DD-MM-YY")}</div>
+														<div>
+															<Link to={`/orders?o_school_id=${order.meta.school_id}&o_supplier_id=${sid}&o_order_time=${time}&o_product_id=${order.meta.product_id}`} key={order.time}>
+																{school.school_name}
+															</Link>
+														</div>
+														<div>{order.meta.status}</div>
+														<div>{school.phone_number}</div>
+														<div>{school.school_address}</div>
+													</div>
 												})
 										}
 									</div>
