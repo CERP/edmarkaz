@@ -103,7 +103,7 @@ class OrderInfo extends Component<propTypes, S> {
 		}
 
 		const old_meta = this.props.orders.db[this.props.supplier_id][this.props.order_time].order.meta
-		const changes = compareObjects(old_meta, meta)
+		const changes = compareObjects<Order["meta"]>(old_meta, meta)
 
 		if (Object.keys(changes).length < 1) {
 			alert("No Changes to Save !")

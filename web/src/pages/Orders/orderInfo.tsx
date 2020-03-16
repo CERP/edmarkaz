@@ -88,7 +88,7 @@ class OrderInfo extends Component<propTypes, S> {
 		}
 
 		const old_meta = this.props.order.meta
-		const changes = compareObjects(old_meta, meta)
+		const changes = compareObjects<OrderPlacedEvent["meta"]>(old_meta, meta)
 
 		if (Object.keys(changes).length < 1) {
 			alert("No Changes to Save !")
