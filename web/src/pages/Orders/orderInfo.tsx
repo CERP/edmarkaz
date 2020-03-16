@@ -4,6 +4,7 @@ import Former from '~src/utils/former'
 import moment from 'moment'
 import { reserveMaskedNumber, releaseMaskedNumber, updateOrderMeta } from '~src/actions'
 import { sendSlackAlert } from '~src/actions/core'
+import compareObjects from '~src/utils/compareObjects'
 interface P {
 	reserveNumber: (school_id: string) => any
 	releaseNumber: (school_id: string) => any
@@ -35,7 +36,8 @@ const default_meta_fields = () => ({
 	actual_date_of_delivery: moment.now(),
 	total_amount: "0",
 	payment_received: "NO",
-	status: "ORDER_PLACED"
+	status: "ORDER_PLACED",
+	notes: ""
 })
 
 class OrderInfo extends Component<propTypes, S> {
@@ -57,23 +59,6 @@ class OrderInfo extends Component<propTypes, S> {
 		}
 
 		this.former = new Former(this, [])
-	}
-
-	componentDidUpdate(prevProps: propTypes) {
-		if (JSON.stringify(prevProps.order.meta) !== JSON.stringify(this.props.order.meta)) {
-
-			const updated_order: OrderPlacedEvent = {
-				...this.props.order,
-				meta: {
-					...default_meta_fields(),
-					...this.props.order.meta
-				}
-			}
-
-			this.setState({
-				order: updated_order
-			})
-		}
 	}
 
 	onShowNumber = () => {
@@ -103,17 +88,7 @@ class OrderInfo extends Component<propTypes, S> {
 		}
 
 		const old_meta = this.props.order.meta
-		const changes = Object.entries(meta)
-			.reduce((agg, [key, val]) => {
-				//@ts-ignore
-				if (old_meta[key] === undefined || val !== old_meta[key]) {
-					return {
-						...agg,
-						[key]: val
-					}
-				}
-				return agg
-			}, {})
+		const changes = compareObjects(old_meta, meta)
 
 		if (Object.keys(changes).length < 1) {
 			alert("No Changes to Save !")
@@ -191,20 +166,20 @@ class OrderInfo extends Component<propTypes, S> {
 						<option value="IN_PROGRESS">In Progress</option>
 						<option value="COMPLETED">Completed</option>
 						<option value="SCHOOL_CANCELLED">School Cancelled</option>
-						<option value="SUPPLIER_CANCELLED">Supplier Cancelled</option>
+						<option value="SUPPLIER_CANCELLED">Cancelled</option>
 					</select>
 				</div>
 				{
 					//IN_PROGRESS
 					(order.meta.status === "IN_PROGRESS") && <>
-						<div className="row">
+						{/* <div className="row">
 							<label>Call 1</label>
 							<input type="text" placeholder="status" {...this.former.super_handle(["order", "meta", "call_one"])} />
 						</div>
 						<div className="row">
 							<label>Call 2</label>
 							<input type="text" placeholder="status" {...this.former.super_handle(["order", "meta", "call_two"])} />
-						</div>
+						</div> */}
 						<div className="row">
 							<label>Actual Product Ordered</label>
 							<input type="text" placeholder="product name" {...this.former.super_handle(["order", "meta", "actual_product_ordered"])} />
@@ -221,11 +196,15 @@ class OrderInfo extends Component<propTypes, S> {
 								onChange={this.former.handle(["order", "meta", "expected_completion_date"])}
 							/>
 						</div>
+						<div className="row">
+							<label>Notes</label>
+							<textarea placeholder="notes" {...this.former.super_handle(["order", "meta", "notes"])} />
+						</div>
 					</>
 				}
 				{
 					//COMPLETED
-					(order.meta.status === "COMPLETED") && <div>
+					(order.meta.status === "COMPLETED") && <>
 						<div className="row">
 							<label>Actual Product Ordered</label>
 							<input type="text" placeholder="product name" {...this.former.super_handle(["order", "meta", "actual_product_ordered"])} />
@@ -261,7 +240,11 @@ class OrderInfo extends Component<propTypes, S> {
 								<option value="NO">No</option>
 							</select>
 						</div>
-					</div>
+						<div className="row">
+							<label>Notes</label>
+							<textarea placeholder="notes" {...this.former.super_handle(["order", "meta", "notes"])} />
+						</div>
+					</>
 				}
 
 				{

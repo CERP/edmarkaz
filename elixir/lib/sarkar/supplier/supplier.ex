@@ -193,7 +193,8 @@ defmodule EdMarkaz.Supplier do
 				"total_amount" => "0",
 				"payment_received" => "NO",
 				"cancellation_reason" => "",
-				"status" => "ORDER_PLACED"
+				"status" => "ORDER_PLACED",
+				"notes" => ""
 			},
 			"user" => %{
 				"name" => "",

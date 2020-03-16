@@ -79,7 +79,6 @@ class Orders extends Component<propTypes, S> {
 	render() {
 		const { sync_state, schools, products } = this.props
 		const { filterMenu, activeOrder, filters } = this.state
-		console.log("HAHAAHHAAHAH")
 		const events = Object.entries(sync_state.matches)
 			.filter(([sid, { status, history }]) => (status !== "REJECTED" && status !== "NEW") && Object.values(history).find((e) => e.event === "ORDER_PLACED"))
 			.reduce((agg, [sid, { status, history }]) => ({ ...agg, ...history }), {} as SchoolMatch["history"])
@@ -138,7 +137,7 @@ class Orders extends Component<propTypes, S> {
 								<div> {order.meta.status ? order.meta.status : "-"}</div>
 							</div>
 							{
-								activeOrder === id && <OrderInfo key={id} order={order} product={product} school={school} schoolMatch={schoolMatch} />
+								activeOrder === id && <OrderInfo key={`${id}-${JSON.stringify(order.meta)}`} order={order} product={product} school={school} schoolMatch={schoolMatch} />
 							}
 						</div>
 					})

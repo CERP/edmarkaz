@@ -33,7 +33,7 @@ export const sendSlackAlert = (message: string, channel: string) => (dispatch: (
 	}
 	syncr.send(payload)
 		.then(res => console.log("Alert Successful", res))
-		.catch(err => console.log("Alert Successful", err))
+		.catch(err => console.log("Alert Failed", err))
 }
 
 export const createMerges = (merges: Merge[]) => (dispatch: (a: any) => any, getState: () => RootBankState, syncr: Syncr) => {
