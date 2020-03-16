@@ -16,14 +16,16 @@ interface SelfProps {
 	order_time: number
 	school_id: string
 	supplier_id: string
+	start_date: string
+	end_date: string
 }
 
 interface P {
 	products: RootReducerState["products"]
 	orders: RootReducerState["orders"]
-	updateOrderMeta: (order: Order, meta: any, supplier_id: string) => any
-	verifyOrder: (order: Order, product: Product, school: CERPSchool) => any
-	rejectOrder: (order: Order, product: Product) => any
+	updateOrderMeta: (order: Order, meta: any, supplier_id: string, start_date: number) => any
+	verifyOrder: (order: Order, product: Product, school: CERPSchool, start_date: number) => any
+	rejectOrder: (order: Order, product: Product, start_date: number) => any
 }
 
 type propTypes = P & SelfProps & RouteComponentProps
@@ -78,12 +80,15 @@ class OrderInfo extends Component<propTypes, S> {
 		if (!window.confirm("Are you sure, you want to delete the current Order?")) {
 			return
 		}
-		this.props.rejectOrder(order_details, ordered_product)
+
+		const { start_date, end_date } = this.props
+		this.props.rejectOrder(order_details, ordered_product, moment(start_date).valueOf())
 	}
 
 	save_meta = () => {
 
 		const { meta } = this.state.order
+		const { start_date, end_date } = this.props
 
 		if (isNaN(parseFloat(meta.total_amount)) || parseFloat(meta.total_amount) < 0) {
 			alert("Amount can't be less than zero")
@@ -113,12 +118,12 @@ class OrderInfo extends Component<propTypes, S> {
 			return
 		}
 
-		this.props.updateOrderMeta(this.state.order, changes, this.props.supplier_id)
+		this.props.updateOrderMeta(this.state.order, changes, this.props.supplier_id, moment(start_date).valueOf())
 	}
 
 	render() {
 
-		const { product_id, order_time, products } = this.props
+		const { product_id, order_time, products, start_date, end_date } = this.props
 		const { order, school } = this.state
 		const ordered_product = products.db[product_id]
 		const product_title = ordered_product ? ordered_product.title : ""
@@ -135,6 +140,10 @@ class OrderInfo extends Component<propTypes, S> {
 				<div className="row">
 					<label>School Number</label>
 					<div>{school.phone_number}</div>
+				</div>
+				<div className="row">
+					<label>School Address</label>
+					<div>{school.school_address}</div>
 				</div>
 				<div className="divider">Order Info</div>
 				<div className="row">
@@ -157,7 +166,7 @@ class OrderInfo extends Component<propTypes, S> {
 					</select>
 				</div>
 				{
-					!verified && <div style={{ marginBottom: "5px" }} className="button blue" onClick={() => this.props.verifyOrder(order, ordered_product, school)}>
+					!verified && <div style={{ marginBottom: "5px" }} className="button blue" onClick={() => this.props.verifyOrder(order, ordered_product, school, moment(start_date).valueOf())}>
 						Verify Order
 					</div>
 				}
@@ -267,7 +276,7 @@ export default connect((state: RootReducerState) => ({
 	products: state.products,
 	orders: state.orders
 }), (dispatch: Function) => ({
-	updateOrderMeta: (order: Order, meta: any, supplier_id: string) => dispatch(updateOrderMeta(order, meta, supplier_id)),
-	verifyOrder: (order: Order, product: Product, school: CERPSchool) => dispatch(verifyOrder(order, product, school)),
-	rejectOrder: (order: Order, product: Product) => dispatch(rejectOrder(order, product))
+	updateOrderMeta: (order: Order, meta: any, supplier_id: string, start_date: number) => dispatch(updateOrderMeta(order, meta, supplier_id, start_date)),
+	verifyOrder: (order: Order, product: Product, school: CERPSchool, start_date: number) => dispatch(verifyOrder(order, product, school, start_date)),
+	rejectOrder: (order: Order, product: Product, start_date: number) => dispatch(rejectOrder(order, product, start_date))
 }))(withRouter(OrderInfo))

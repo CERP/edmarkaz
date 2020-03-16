@@ -7,13 +7,12 @@ interface P {
 
 const OrderPage = ({ placeOrder, products }: P) => {
 
-	if (products.loading) {
-		return <div>Loading products...</div>
-	}
-
 	const [supplier_filter, setSupplier] = useState("")
 	const [product_filter, setProductFilter] = useState("")
 
+	if (products.loading) {
+		return <div>Loading products...</div>
+	}
 
 	const suppliers = Object.values(products.db)
 		.reduce((agg, curr) => {

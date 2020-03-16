@@ -95,9 +95,17 @@ const Orders = ({ orders, products, getOrders, getProducts }: P) => {
 
 	const order_by_school = viewBy === "SCHOOL" ? getOrdersBySchool() : {}
 
+	const getOrderStatus = (order: Order) => {
+
+		if (order.verified && order.verified === "VERIFIED") {
+			return order.meta.status ? order.meta.status : "NOT_SET"
+		}
+		return "NOT_VERIFIED"
+	}
+
 	return <div className="order page">
 		<div className="title">Order List</div>
-		<div className="section form" style={{ width: "75%" }}>
+		<div className="section form" style={{ width: "85%" }}>
 
 			<div className="row">
 				<label>View By</label>
@@ -119,18 +127,24 @@ const Orders = ({ orders, products, getOrders, getProducts }: P) => {
 				</div>}
 				{viewBy === "SCHOOL" && <div className="row">
 					<label>School</label>
-					<select onChange={(e) => setSchoolFilter(e.target.value)} value={schoolFilter}>
+					<input list="schools" onChange={(e) => setSchoolFilter(e.target.value)} value={schoolFilter} />
+					{/* <select onChange={(e) => setSchoolFilter(e.target.value)} value={schoolFilter}>
 						<option value="">All</option>
 						{
 							Object.keys(order_by_school || {}).map(sid => <option key={sid} value={sid}>{sid}</option>)
 						}
-					</select>
+					</select> */}
 				</div>}
+				<datalist id="schools">
+					{
+						Object.keys(order_by_school || {}).map(sid => <option key={sid} value={sid}>{sid}</option>)
+					}
+				</datalist>
 				<div className="row">
 					<label>Type</label>
 					<select onChange={(e) => setVerified(e.target.value)} value={verified}>
 						<option value="">All</option>
-						<option value="ORDER_VERIFIED" >Verified</option>
+						<option value="ORDER_VERIFIED">Verified</option>
 						<option value="NOT_VERIFIED">Not Verified</option>
 					</select>
 				</div>
@@ -146,22 +160,36 @@ const Orders = ({ orders, products, getOrders, getProducts }: P) => {
 		</div>
 		{
 			(loading && product_loading) ? <div> Loading...</div> :
-				viewBy === "SUPPLIER" ? <div className="section form" style={{ width: "75%" }}>
+				viewBy === "SUPPLIER" ? <div className="section form" style={{ width: "85%" }}>
 					{
 						Object.entries(db)
 							.filter(([sid]) => supplierFilter ? sid === supplierFilter : true)
 							.map(([sid, orders]) => {
 								return <div key={sid}>
 									<div className="title">{sid}</div>
-									<div> Total: {Object.entries(orders).filter(([time, { order }]) => filterTime(parseFloat(time)) && filterOrder(order)).length} </div>
-									<div className="list">
+									<div className="section newtable" style={{ width: "inherit" }}>
+										<div className="newtable-row heading">
+											<div>Date</div>
+											<div>School</div>
+											<div>Status</div>
+											<div>Contact</div>
+											<div>Address </div>
+										</div>
 										{
 											Object.entries(orders)
 												.filter(([time, { order }]) => filterTime(parseFloat(time)) && filterOrder(order))
-												.map(([time, { order }]) => {
-													return <Link to={`/orders?o_school_id=${order.meta.school_id}&o_supplier_id=${sid}&o_order_time=${time}&o_product_id=${order.meta.product_id}`} key={order.time}>
-														{`${product_db[order.meta.product_id].title} - ${new Date(order.time).toLocaleString()}`}
-													</Link>
+												.map(([time, { order, school }]) => {
+													return <div className="newtable-row" key={order.time}>
+														<div>{moment(order.time).format("DD-MM-YY")}</div>
+														<div>
+															<Link to={`/orders?o_school_id=${order.meta.school_id}&o_supplier_id=${sid}&o_order_time=${time}&o_product_id=${order.meta.product_id}&start_date=${start_date}&end_date=${end_date}`} key={order.time}>
+																{school.school_name}
+															</Link>
+														</div>
+														<div>{getOrderStatus(order)}</div>
+														<div>{school.phone_number}</div>
+														<div>{school.school_address}</div>
+													</div>
 												})
 										}
 									</div>
@@ -170,21 +198,36 @@ const Orders = ({ orders, products, getOrders, getProducts }: P) => {
 							)
 
 					}
-				</div> : <div className="section form" style={{ width: "75%" }}>
+				</div> : <div className="section form" style={{ width: "85%" }}>
 						{
 							Object.entries(order_by_school)
 								.filter(([school_id]) => schoolFilter ? school_id === schoolFilter : true)
 								.map(([school_id, orders]) => {
 									return <div key={school_id}>
 										<div className="title">{school_id}</div>
-										<div> Total: {Object.entries(orders).filter(([time, order]) => filterTime(parseFloat(time)) && filterOrder(order)).length} </div>
-										<div className="list">
+										<div className="newtable section" style={{ width: "inherit" }}>
+											<div className="newtable-row heading">
+												<div>Date</div>
+												<div>Supplier</div>
+												<div>Status</div>
+												<div>Contact</div>
+												<div>Address </div>
+											</div>
 											{
 												Object.entries(orders)
 													.map(([time, order]) => {
-														return <Link to={`/orders?o_school_id=${school_id}&o_supplier_id=${order.supplier_id}&o_order_time=${time}&o_product_id=${order.meta.product_id}`} key={order.time}>
-															{`${product_db[order.meta.product_id].title} - ${new Date(order.time).toLocaleString()}`}
-														</Link>
+														const school = order.school
+														return <div key={time} className="newtable-row">
+															<div>{moment(order.time).format("DD-MM-YY")}</div>
+															<div>
+																<Link to={`/orders?o_school_id=${school_id}&o_supplier_id=${order.supplier_id}&o_order_time=${time}&o_product_id=${order.meta.product_id}&start_date=${start_date}&end_date=${end_date}`} key={order.time}>
+																	{order.supplier_id}
+																</Link>
+															</div>
+															<div>{getOrderStatus(order)}</div>
+															<div>{school.phone_number}</div>
+															<div>{school.school_address}</div>
+														</div>
 													})
 											}
 										</div>
