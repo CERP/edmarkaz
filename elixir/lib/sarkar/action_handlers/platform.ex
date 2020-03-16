@@ -28,6 +28,24 @@ defmodule EdMarkaz.ActionHandler.Platform do
 		end
 	end
 
+	def handle_action(
+		%{
+			"type" => "SLACK_ALERT",
+			"payload" => %{
+				"message" => message,
+				"channel" => channel
+			}
+		},
+		%{id: supplier_id, client_id: client_id} = state
+	) do
+
+		spawn fn ->
+			EdMarkaz.Slack.send_alert(message, channel)
+		end
+
+		{:reply, succeed(), state}
+	end
+
 	def handle_action(%{"type" => "MERGE_PRODUCT", "payload" => %{"id" => id, "product" => product}}, %{id: supplier_id, client_id: client_id} = state) do
 
 		EdMarkaz.Product.merge(id, product, supplier_id)

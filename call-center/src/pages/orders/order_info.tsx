@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import { verifyOrder, rejectOrder, updateOrderMeta } from '../../actions'
 import moment from 'moment'
 import { getSalesReps } from '../../utils/sales_rep'
+import compareObjects from '../../utils/compareObjects'
 
 interface S {
 	order: Order
@@ -42,7 +43,8 @@ const default_meta_fields = () => ({
 	total_amount: "0",
 	payment_received: "NO",
 	cancellation_reason: "",
-	status: "ORDER_PLACED"
+	status: "ORDER_PLACED",
+	notes: ""
 })
 
 class OrderInfo extends Component<propTypes, S> {
@@ -81,14 +83,14 @@ class OrderInfo extends Component<propTypes, S> {
 			return
 		}
 
-		const { start_date, end_date } = this.props
+		const { start_date } = this.props
 		this.props.rejectOrder(order_details, ordered_product, moment(start_date).valueOf())
 	}
 
 	save_meta = () => {
 
 		const { meta } = this.state.order
-		const { start_date, end_date } = this.props
+		const { start_date } = this.props
 
 		if (isNaN(parseFloat(meta.total_amount)) || parseFloat(meta.total_amount) < 0) {
 			alert("Amount can't be less than zero")
@@ -101,17 +103,7 @@ class OrderInfo extends Component<propTypes, S> {
 		}
 
 		const old_meta = this.props.orders.db[this.props.supplier_id][this.props.order_time].order.meta
-		const changes = Object.entries(meta)
-			.reduce((agg, [key, val]) => {
-				//@ts-ignore
-				if (old_meta[key] === undefined || val !== old_meta[key]) {
-					return {
-						...agg,
-						[key]: val
-					}
-				}
-				return agg
-			}, {})
+		const changes = compareObjects<Order["meta"]>(old_meta, meta)
 
 		if (Object.keys(changes).length < 1) {
 			alert("No Changes to Save !")
@@ -123,7 +115,7 @@ class OrderInfo extends Component<propTypes, S> {
 
 	render() {
 
-		const { product_id, order_time, products, start_date, end_date } = this.props
+		const { product_id, order_time, products, start_date } = this.props
 		const { order, school } = this.state
 		const ordered_product = products.db[product_id]
 		const product_title = ordered_product ? ordered_product.title : ""
@@ -217,6 +209,10 @@ class OrderInfo extends Component<propTypes, S> {
 								onChange={this.former.handle(["order", "meta", "expected_completion_date"])}
 							/>
 						</div>
+						<div className="row">
+							<label>Notes</label>
+							<textarea placeholder="notes" {...this.former.super_handle(["order", "meta", "notes"])} />
+						</div>
 					</>
 				}
 				{
@@ -256,6 +252,10 @@ class OrderInfo extends Component<propTypes, S> {
 								<option value="YES">Yes</option>
 								<option value="NO">No</option>
 							</select>
+						</div>
+						<div className="row">
+							<label>Notes</label>
+							<textarea placeholder="notes" {...this.former.super_handle(["order", "meta", "notes"])} />
 						</div>
 					</>
 				}

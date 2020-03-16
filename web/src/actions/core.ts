@@ -18,6 +18,24 @@ export interface MergeAction {
 	merges: Merge[];
 }
 
+export const sendSlackAlert = (message: string, channel: string) => (dispatch: (a: any) => any, getState: () => RootBankState, syncr: Syncr) => {
+
+	const state = getState()
+	const payload = {
+		type: "SLACK_ALERT",
+		id: state.auth.id,
+		client_type: state.auth.client_type,
+		last_snapshot: state.last_snapshot,
+		payload: {
+			message,
+			channel
+		}
+	}
+	syncr.send(payload)
+		.then(res => console.log("Alert Successful", res))
+		.catch(err => console.log("Alert Failed", err))
+}
+
 export const createMerges = (merges: Merge[]) => (dispatch: (a: any) => any, getState: () => RootBankState, syncr: Syncr) => {
 	// merges is a list of path, value
 
@@ -95,11 +113,11 @@ export const createImageMerges = (imageMerges: ImageMerges) => (dispatch: Dispat
 		B [product, id, image]: { id: 1000 }
 		C [product, id, image, id]: 1000
 
-		then this image merge: 
+		then this image merge:
 		[product, id, image]: { id: [img id]}
 
 		this overwrites C BUT does the same thing. have to ensure C doesnt come second
-		C and B should never happen because if you are only altering the image, it should 
+		C and B should never happen because if you are only altering the image, it should
 		only be an image write
 	*/
 
@@ -110,7 +128,7 @@ export const createImageMerges = (imageMerges: ImageMerges) => (dispatch: Dispat
 		last_snapshot: state.last_snapshot,
 		payload: rationalized_merges
 	})
-		.then(dispatch) // should return a series of merges with an image url 
+		.then(dispatch) // should return a series of merges with an image url
 		.catch((err: Error) => {
 			console.error(err)
 			dispatch(QueueUp(merges))
@@ -230,7 +248,7 @@ export const createDeletes = (paths: Delete[]) => (dispatch: Dispatch, getState:
 
 }
 
-// this is only produced by the server. 
+// this is only produced by the server.
 // it will tell us it hsa confirmed sync up to { date: timestamp }
 export const RPC_SUCCEED = "RPC_SUCCEED"
 export interface RPCSucceedAction {
