@@ -55,6 +55,8 @@ class Accordian extends React.Component<propTypes, S> {
 		const o_product_id = params.o_product_id as string
 		const o_order_time = params.o_order_time as string
 		const o_supplier_id = params.o_supplier_id as string
+		const start_date = params.start_date as string
+		const end_date = params.end_date as string
 
 		const product_page = current === "/products" && p_supplier_id && p_product_id
 		const order_page = current === "/orders" && o_order_time && o_product_id && o_school_id && o_supplier_id
@@ -92,6 +94,8 @@ class Accordian extends React.Component<propTypes, S> {
 					product_id={o_product_id}
 					supplier_id={o_supplier_id}
 					order_time={parseFloat(o_order_time)}
+					start_date={start_date}
+					end_date={end_date}
 					key={o_order_time}
 				/>
 			}

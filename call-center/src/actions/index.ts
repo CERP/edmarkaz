@@ -54,11 +54,11 @@ export const placeOrder = (product: Product, school: CERPSchool) => (dispatch: D
 		})
 }
 
-export const verifyOrder = (order: Order, product: Product, school: CERPSchool) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+export const verifyOrder = (order: Order, product: Product, school: CERPSchool, start_date: number) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 	const state = getState();
 
 	if (!state.connected) {
-		syncr.onNext('connect', () => dispatch(verifyOrder(order, product, school)))
+		syncr.onNext('connect', () => dispatch(verifyOrder(order, product, school, start_date)))
 		return;
 	}
 
@@ -75,7 +75,7 @@ export const verifyOrder = (order: Order, product: Product, school: CERPSchool) 
 		}
 	})
 		.then(res => {
-			dispatch(getOrders())
+			dispatch(getOrders(start_date))
 			alert(res)
 		})
 		.catch(err => {
@@ -84,11 +84,11 @@ export const verifyOrder = (order: Order, product: Product, school: CERPSchool) 
 		})
 }
 
-export const rejectOrder = (order: Order, product: Product) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+export const rejectOrder = (order: Order, product: Product, start_date: number) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 	const state = getState()
 
 	if (!state.connected) {
-		syncr.onNext('connect', () => dispatch(rejectOrder(order, product)))
+		syncr.onNext('connect', () => dispatch(rejectOrder(order, product, start_date)))
 		return
 	}
 
@@ -103,7 +103,7 @@ export const rejectOrder = (order: Order, product: Product) => (dispatch: Dispat
 		}
 	})
 		.then(res => {
-			dispatch(getOrders())
+			dispatch(getOrders(start_date))
 			alert(res)
 		})
 		.catch(err => {
@@ -112,11 +112,11 @@ export const rejectOrder = (order: Order, product: Product) => (dispatch: Dispat
 		})
 }
 
-export const updateOrderMeta = (order: Order, meta: any, supplier_id: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+export const updateOrderMeta = (order: Order, meta: any, supplier_id: string, start_date: number) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 	const state = getState()
 
 	if (!state.connected) {
-		syncr.onNext('connect', () => dispatch(updateOrderMeta(order, meta, supplier_id)))
+		syncr.onNext('connect', () => dispatch(updateOrderMeta(order, meta, supplier_id, start_date)))
 		return
 	}
 
@@ -132,7 +132,7 @@ export const updateOrderMeta = (order: Order, meta: any, supplier_id: string) =>
 		}
 	})
 		.then(res => {
-			dispatch(getOrders())
+			dispatch(getOrders(start_date))
 			alert(res)
 		})
 		.catch(err => {
