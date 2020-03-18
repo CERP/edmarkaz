@@ -2,8 +2,9 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import Dynamic from '@ironbay/dynamic'
 import Former from '@cerp/former'
+import moment from 'moment'
 
-import { getSchoolProfiles, editSchoolProfile, getSchoolProfileFromNumber, getProducts, placeOrder } from '../../actions'
+import { getSchoolProfiles, editSchoolProfile, getSchoolProfileFromNumber, getProducts, placOrderWithMeta } from '../../actions'
 import OrderPage from './order'
 
 import './style.css'
@@ -13,7 +14,7 @@ interface P {
 	getSchoolFromNumber: (phone_number: string) => void
 	getProducts: () => void
 	saveSchool: (school: CERPSchool) => void
-	placeOrder: (product: Product, school: CERPSchool) => void
+	placOrderWithMeta: (product: Product, school: CERPSchool, meta: Order["meta"]) => void
 	products: RootReducerState['products']
 	school?: CERPSchool
 	caller_id?: string
@@ -93,11 +94,33 @@ class SearchPage extends React.Component<P, S> {
 
 	}
 
-	onOrderPlaced = (product: Product) => {
+	onOrderPlaced = (product: Product, meta: Partial<Order["meta"]>) => {
 
+		const time = moment.now()
 		console.log('ordering ', product)
+
 		if (this.state.school) {
-			this.props.placeOrder(product, this.state.school)
+			const updated_meta: Order["meta"] = {
+				school_id: this.state.school.refcode,
+				product_id: product.id,
+				sales_rep: "",
+				call_one: "",
+				call_two: "",
+				actual_product_ordered: "",
+				quantity: "1",
+				expected_completion_date: time,
+				expected_date_of_delivery: time,
+				actual_date_of_delivery: time,
+				total_amount: "0",
+				payment_received: "NO",
+				cancellation_reason: "",
+				status: "ORDER_PLACED",
+				notes: "",
+				strategy: "ONLINE",
+				...meta
+			}
+
+			this.props.placOrderWithMeta(product, this.state.school, updated_meta)
 		}
 		else {
 			alert("error: no school selected")
@@ -317,5 +340,5 @@ export default connect((state: RootReducerState) => ({
 	getSchoolFromNumber: (phone_number: string) => dispatch(getSchoolProfileFromNumber(phone_number)),
 	saveSchool: (school: CERPSchool) => dispatch(editSchoolProfile(school.refcode, school)),
 	getProducts: () => dispatch(getProducts()),
-	placeOrder: (product: Product, school: CERPSchool) => dispatch(placeOrder(product, school))
+	placOrderWithMeta: (product: Product, school: CERPSchool, meta: Order["meta"]) => dispatch(placOrderWithMeta(product, school, meta))
 }))(SearchPage)

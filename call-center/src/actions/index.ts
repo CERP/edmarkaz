@@ -54,6 +54,34 @@ export const placeOrder = (product: Product, school: CERPSchool) => (dispatch: D
 		})
 }
 
+export const placOrderWithMeta = (product: Product, school: CERPSchool, meta: Order["meta"]) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+	const state = getState();
+
+	if (!state.connected) {
+		syncr.onNext('connect', () => dispatch(placOrderWithMeta(product, school, meta)))
+		return;
+	}
+
+	syncr.send({
+		type: "PLACE_ORDER_WITH_META",
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		id: state.auth.id,
+		payload: {
+			product,
+			refcode: school.refcode,
+			school_name: school.school_name,
+			school_number: school.phone_number,
+			meta
+		}
+	})
+		.then(res => alert("successfully placed order"))
+		.catch(err => {
+			console.error(err)
+			alert(err)
+		})
+}
+
 export const verifyOrder = (order: Order, product: Product, school: CERPSchool, start_date: number) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 	const state = getState();
 

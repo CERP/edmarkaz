@@ -92,6 +92,7 @@ interface Order {
 	meta: {
 		product_id: string
 		school_id: string
+		sales_rep: string
 		cancellation_reason: string
 		call_one: string
 		call_two: string
@@ -103,6 +104,7 @@ interface Order {
 		total_amount: string
 		payment_received: string
 		status: "ORDER_PLACED" | "IN_PROGRESS" | "COMPLETED" | "SCHOOL_CANCELLED" | "SUPPLIER_CANCELLED"
+		strategy: "ONLINE" | "HELPLINE" | "SALES_REP"
 		notes: string
 	}
 	time: number

@@ -165,7 +165,6 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 		product_name = Map.get(product, "title")
 		product_id = Map.get(product,"id")
 		supplier_id = Map.get(product, "supplier_id")
-		product_id = Map.get(product, "id")
 
 		start_supplier(supplier_id)
 		EdMarkaz.Supplier.place_order(supplier_id, product, refcode, client_id)

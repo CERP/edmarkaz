@@ -44,6 +44,7 @@ const default_meta_fields = () => ({
 	payment_received: "NO",
 	cancellation_reason: "",
 	status: "ORDER_PLACED",
+	strategy: "ONLINE",
 	notes: ""
 })
 
@@ -157,6 +158,14 @@ class OrderInfo extends Component<propTypes, S> {
 						<option value="SUPPLIER_CANCELLED">Supplier Cancelled</option>
 					</select>
 				</div>
+				{/* <div className="row"> //In case they want to be able to set strategy for prev orders
+					<label>Strategy</label>
+					<select {...this.former.super_handle(["order", "meta", "strategy"])}>
+						<option value="ONLINE">Online</option>
+						<option value="HELPLINE">Helpline</option>
+						<option value="SALES_REP">Sales Rep</option>
+					</select>
+				</div> */}
 				{
 					!verified && <div style={{ marginBottom: "5px" }} className="button blue" onClick={() => this.props.verifyOrder(order, ordered_product, school, moment(start_date).valueOf())}>
 						Verify Order

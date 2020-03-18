@@ -172,6 +172,44 @@ defmodule EdMarkaz.Supplier do
 
 	end
 
+	def place_order_with_meta( supplier_id, school_code, meta, client_id ) do
+
+		time = :os.system_time(:millisecond)
+
+		event = %{
+			"event" => "ORDER_PLACED",
+			"time" => time,
+			"meta" => meta,
+			"user" => %{
+				"name" => "",
+				"number" => ""
+			},
+			"verified" => "NOT_VERIFIED"
+		}
+
+		writes = [
+			%{
+				type: "MERGE",
+				path: ["sync_state", "matches", school_code, "status"],
+				value: "ORDERED",
+				date: :os.system_time(:millisecond),
+				client_id: client_id
+			},
+			%{
+				type: "MERGE",
+				path: ["sync_state", "matches", school_code, "history", "#{time}"],
+				value: event,
+				date: :os.system_time(:millisecond),
+				client_id: client_id
+			}
+		]
+
+		changes = prepare_changes(writes)
+
+		GenServer.call(via(supplier_id), {:sync_changes, client_id, changes, :os.system_time(:millisecond)})
+
+	end
+
 	def place_order(supplier_id, product, school_code, client_id) do
 
 		time = :os.system_time(:millisecond)
@@ -194,6 +232,7 @@ defmodule EdMarkaz.Supplier do
 				"payment_received" => "NO",
 				"cancellation_reason" => "",
 				"status" => "ORDER_PLACED",
+				"strategy" => "ONLINE",
 				"notes" => ""
 			},
 			"user" => %{

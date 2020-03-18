@@ -60,6 +60,7 @@ declare global {
 			total_amount: string
 			payment_received: string
 			status: "ORDER_PLACED" | "IN_PROGRESS" | "COMPLETED" | "SCHOOL_CANCELLED" | "SUPPLIER_CANCELLED"
+			strategy: "ONLINE" | "HELPLINE" | "SALES_REP"
 			notes: string
 		};
 		verified?: "VERIFIED" | "NOT_VERIFIED" | "REJECTED"
