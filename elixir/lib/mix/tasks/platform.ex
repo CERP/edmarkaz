@@ -1,6 +1,39 @@
 defmodule Mix.Tasks.Platform do
 	use Mix.Task
 
+	def run(["ingest_student_portal", fname ]) do
+		Application.ensure_all_started(:edmarkaz)
+
+		csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) do
+			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) |> CSV.decode!
+			false -> File.stream!("priv/#{fname}.csv") |> CSV.decode!
+		end
+
+		#schema: medium, grade, subject, chapter no, chapter Name,lesson no, lesson name, module no, module name-(video title), leson_type, video_link
+
+		[ _ | lectures] = csv
+		|> Enum.map(fn row -> row end)
+
+		IO.puts "INGESTING STUDENT PORTAL DATA"
+
+		tasks = lectures
+			|> Enum.map(
+				fn [medium,grade,subject,chapter_id, chapter, lesson_id, lesson, module_no, module_name, lesson_type, video_link] ->
+
+					lesson_map = %{
+						"name" => lesson,
+						"type" => lesson_type,
+						"link" => video_link,
+						"module_name" => module_name,
+						"module_id" => module_no
+					}
+
+					EdMarkaz.StudentPortal.merge(medium, grade, subject, chapter_id, chapter, lesson_id, lesson_map)
+				end
+			)
+		IO.inspect tasks
+	end
+
 	def run(["update_verified_bool_to_string"]) do
 		Application.ensure_all_started(:edmarkaz)
 
