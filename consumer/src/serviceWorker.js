@@ -74,7 +74,11 @@ function registerValidSW(swUrl, config) {
 								'tabs for this page are closed. See https://bit.ly/CRA-PWA.'
 							);
 
-							alert("An update is available! Close all tabs for this page to see it.")
+							alert("An update is available! Refresh this page to see it.")
+
+							installingWorker.postMessage({
+								type: 'SKIP_WAITING'
+							})
 
 							// Execute callback
 							if (config && config.onUpdate) {
