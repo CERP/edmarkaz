@@ -40,6 +40,21 @@ interface Product {
 	order?: number;
 }
 
+interface Lesson {
+	medium: string
+	class: string
+	subject: string
+	chapter_id: string
+	lesson_id: string
+	meta: {
+		type: string
+		name: string
+		module_name: string
+		module_id: string
+		link: string
+		chapter_name: string
+	}
+}
 interface RootReducerState {
 	sync_state: SyncState;
 	auth: {
@@ -54,6 +69,20 @@ interface RootReducerState {
 			[product_id: string]: Product;
 		};
 	};
+	lessons: {
+		last_sync: number
+		db: {
+			[medium: string]: {
+				[grade: string]: {
+					[subject: string]: {
+						[chapter_id: string]: {
+							[lesson_id: string]: Lesson
+						}
+					}
+				}
+			}
+		}
+	}
 	client_id: string;
 	queued: {
 		mutations: {

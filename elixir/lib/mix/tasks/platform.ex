@@ -9,26 +9,27 @@ defmodule Mix.Tasks.Platform do
 			false -> File.stream!("priv/#{fname}.csv") |> CSV.decode!
 		end
 
-		#schema: medium, grade, subject, chapter no, chapter Name,lesson no, lesson name, module no, module name-(video title), leson_type, video_link
+		# Csv-Schema: medium, grade, subject, chapter no, chapter Name,lesson no, lesson name, module no, module name-(video title), leson_type, video_link
 
 		[ _ | lectures] = csv
 		|> Enum.map(fn row -> row end)
 
 		IO.puts "INGESTING STUDENT PORTAL DATA"
-
 		tasks = lectures
 			|> Enum.map(
 				fn [medium,grade,subject,chapter_id, chapter, lesson_id, lesson, module_no, module_name, lesson_type, video_link] ->
 
+					id = "#{medium}-#{grade}-#{subject}-#{chapter_id}-#{lesson_id}"
 					lesson_map = %{
 						"name" => lesson,
 						"type" => lesson_type,
 						"link" => video_link,
 						"module_name" => module_name,
-						"module_id" => module_no
+						"module_id" => module_no,
+						"chapter_name" => chapter
 					}
 
-					EdMarkaz.StudentPortal.merge(medium, grade, subject, chapter_id, chapter, lesson_id, lesson_map)
+					EdMarkaz.StudentPortal.merge(id, medium, grade, subject, chapter_id, lesson_id, lesson_map)
 				end
 			)
 		IO.inspect tasks

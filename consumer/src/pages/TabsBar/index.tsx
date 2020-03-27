@@ -17,7 +17,9 @@ import contactUs from '../../icons/contactUs.svg'
 import "./style.css";
 import login from "../SignUp/login";
 import TrackedRoute from "../../components/TrackedRoute";
-
+import School from "../School";
+import LessonPage from "../../pages/School/Lesson/";
+import StudentPortalOptions from '../School/options';
 interface S {
 	error: boolean;
 	err?: Error;
@@ -25,6 +27,7 @@ interface S {
 }
 
 interface P {
+	token: RootReducerState["auth"]["token"]
 	connected: boolean;
 	sendError: (err: Error, errInfo: React.ErrorInfo) => void;
 }
@@ -55,8 +58,14 @@ class TabsBar extends Component<propTypes, S> {
 	}
 
 	render() {
-		const current = this.props.location.pathname;
-		const search = this.props.location.search;
+
+		const { location, token } = this.props
+		const current = location.pathname;
+		const search = location.search;
+
+		const school = location.pathname.split("/").some(i => i === "school")
+
+		console.log("search", school, current)
 
 		if (this.state.error && this.state.err && this.state.errInfo) {
 			return (
@@ -76,8 +85,11 @@ class TabsBar extends Component<propTypes, S> {
 						<Link to="/articles" className={current === "/articles" ? "cell active" : "cell"}>
 							Library
 						</Link>
-						<Link to={{ pathname: "/", search }} className={current === "/" ? "cell active" : "cell"}>
+						{token && <Link to={{ pathname: "/", search }} className={current === "/" ? "cell active" : "cell"}>
 							Bazaar
+						</Link>}
+						<Link to="/school" className={school ? "cell active" : "cell"}>
+							School
 						</Link>
 						<Link to="/help" className={current === "/help" ? "cell active" : "cell"}>
 							Help
@@ -95,18 +107,21 @@ class TabsBar extends Component<propTypes, S> {
 					<Route path="/articles/:article_id" component={ArticleRouter} />
 					<TrackedRoute exact path="/articles" component={Articles} />
 					<TrackedRoute path="/help" component={Help} />
+					<TrackedRoute exact path="/school" component={StudentPortalOptions} />
+					<TrackedRoute exact path="/school/:medium/:grade/:subject" component={School} />
 				</>
-				<a className="contact-us" href={callLink}>
+				{!school && <a className="contact-us" href={callLink}>
 					<img src={contactUs} />
 					<div className="title">Contact-Us</div>
-				</a>
+				</a>}
 			</div>
 		);
 	}
 }
 export default connect(
 	(state: RootReducerState) => ({
-		connected: state.connected
+		connected: state.connected,
+		token: state.auth.token
 	}),
 	(dispatch: Function) => ({
 		sendError: (err: Error, errInfo: React.ErrorInfo) =>

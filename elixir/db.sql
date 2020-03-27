@@ -76,15 +76,15 @@ create table platform_writes
 
 	create table student_portal
 	(
+		id text unique not null,
 		medium text not null,
 		class text not null,
 		subject text not null,
 		chapter_id text not null,
-		chapter text not null,
 		lesson_id text not null,
 		lesson jsonb,
 		date timestamp default current_timestamp
 	);
 
 	create index on student_portal
-	(medium);
+	(id);

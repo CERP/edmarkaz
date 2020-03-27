@@ -1,9 +1,40 @@
 defmodule EdMarkaz.ActionHandler.Consumer do
 
-	# def handle_action(%{"type" => "LOGIN", "client_id" => client_id, "payload" => %{"id" => id, "password" => password}}, state) do
+	def handle_action(
+		%{
+			"type" => "GET_ALL_COURSES",
+			"payload" => payload
+		},
+		state
+	) do
+		case Postgrex.query(
+			EdMarkaz.DB,
+			"SELECT * FROM student_portal",
+		[]
+		) do
+			{:ok, resp} ->
+				mapped = resp.rows
+				|> Enum.reduce(
+					%{},
+					fn ([_id, medium, class, subject, chapter_id, lesson_id, lesson, _date], acc) ->
+						val = %{
+							"medium" => medium,
+							"class" => class,
+							"subject" => subject,
+							"chapter_id" => chapter_id,
+							"lesson_id" => lesson_id,
+							"meta" => lesson,
+						}
+						Dynamic.put(acc,[medium, class, subject, chapter_id, lesson_id], val)
+					end
+				)
+				{:reply, succeed(mapped), state}
+			{:error, msg} ->
+				IO.inspect msg
+				{:reply, fail(msg), state}
 
-	# end
-
+		end
+	end
 	def handle_action(%{ "type" => "SMS_AUTH_CODE",
 		"client_id" => client_id,
 		"payload" => %{ "phone" => phone }}, state) do

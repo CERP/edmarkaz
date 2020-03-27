@@ -129,6 +129,56 @@ export const getProducts = (filters = {}) => (dispatch: Dispatch, getState: GetS
 		})
 }
 
+export const trackVideoAnalytics = (path: string, chapter_id: string, lessons_id: string, time: number) => (dispatch: Dispatch, getState: GetState) => {
+	const state = getState()
+
+	const meta = state.auth.token ?
+		{
+			route: path.split("/").splice(1),
+			refcode: state.sync_state.profile.refcode,
+			phone: state.sync_state.profile.phone_number,
+			chapter_id,
+			lessons_id,
+			time
+		} :
+		{
+			route: path.split("/").splice(1),
+			chapter_id,
+			lessons_id,
+			time
+		}
+
+	dispatch(analyticsEvent([{
+		type: "VIDEO",
+		meta
+	}]))
+}
+
+export const ADD_COURSES = "ADD_COURSES"
+export const getLessons = () => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+
+	const state = getState();
+
+	syncr.send({
+		type: "GET_ALL_COURSES",
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		payload: {}
+	})
+		.then((resp: RootReducerState["lessons"]["db"]) => {
+			dispatch({
+				type: ADD_COURSES,
+				lessons: resp
+			})
+			return resp
+		})
+		.catch(err => console.error("Somethins happened while getting lessons", err))
+}
+export interface ADD_COURSES_ACTION {
+	type: "ADD_COURSES",
+	lessons: RootReducerState["lessons"]["db"]
+}
+
 export const LOAD_PROFILE = "LOAD_PROFILE"
 export const loadProfile = (number: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 

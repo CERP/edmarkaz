@@ -6,6 +6,7 @@
 		"@cerp/syncr": "^1.1.0",
 		"@ironbay/dynamic": "^1.0.10",
 		"@types/qrcode.react": "^1.0.0",
+		"@types/react-youtube": "^7.6.2",
 		"former": "git+https://git@github.com/CERP/former.git",
 		"moment": "^2.24.0",
 		"qrcode.react": "^1.0.0",
@@ -15,6 +16,7 @@
 		"react-router": "^5.0.0",
 		"react-router-dom": "^5.0.0",
 		"react-scripts": "^3.3.0",
+		"react-youtube": "^7.9.0",
 		"redux": "^4.0.1",
 		"redux-thunk": "^2.3.0",
 		"uuid": "^3.3.2"

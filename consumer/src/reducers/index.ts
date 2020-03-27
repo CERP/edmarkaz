@@ -1,7 +1,7 @@
 import Dynamic from '@ironbay/dynamic'
 
 import { MERGES, MergeAction, ON_CONNECT, ON_DISCONNECT, DELETES, DeletesAction, QUEUE, CONFIRM_SYNC_DIFF, ConfirmSyncAction, SnapshotDiffAction, SNAPSHOT_DIFF, LOGIN_SUCCEED, LoginSucceed, ConfirmAnalyticsSync, QueueAction } from '../actions/core'
-import { ADD_PRODUCTS, LOAD_PROFILE } from '../actions'
+import { ADD_PRODUCTS, LOAD_PROFILE, ADD_COURSES, ADD_COURSES_ACTION } from '../actions'
 import { AnyAction } from 'redux';
 
 const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerState => {
@@ -224,6 +224,21 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 				}
 			}
 
+		case ADD_COURSES:
+			{
+				const { lessons } = action as ADD_COURSES_ACTION
+				return {
+					...state,
+					lessons: {
+						last_sync: new Date().getTime(),
+						db: {
+							...state.lessons.db,
+							...lessons
+						}
+
+					}
+				}
+			}
 		case LOGIN_SUCCEED:
 			{
 				const login_action = action as LoginSucceed
