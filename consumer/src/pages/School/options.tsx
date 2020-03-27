@@ -54,7 +54,7 @@ const StudentPortalOptions: React.FC<P> = ({ getLessons, lessons }) => {
 				}
 			</div>
 			{
-				showLessons && <Link to={`/school/${medium}/${grade}/${subject}`} className="next-button">Find Resources</Link>
+				showLessons && <Link to={`/library/${medium}/${grade}/${subject}`} className="next-button">Find Resources</Link>
 			}
 		</div>}
 	</div>

@@ -63,9 +63,7 @@ class TabsBar extends Component<propTypes, S> {
 		const current = location.pathname;
 		const search = location.search;
 
-		const school = location.pathname.split("/").some(i => i === "school")
-
-		console.log("search", school, current)
+		const library = location.pathname.split("/").some(i => i === "library")
 
 		if (this.state.error && this.state.err && this.state.errInfo) {
 			return (
@@ -82,14 +80,14 @@ class TabsBar extends Component<propTypes, S> {
 
 				{current !== "sign-up" && (
 					<div className="tabs-bar subtitle">
-						<Link to="/articles" className={current === "/articles" ? "cell active" : "cell"}>
+						{/* <Link to="/articles" className={current === "/articles" ? "cell active" : "cell"}>
+							Library
+						</Link> */}
+						<Link to="/library" className={library ? "cell active" : "cell"}>
 							Library
 						</Link>
-						{token && <Link to={{ pathname: "/", search }} className={current === "/" ? "cell active" : "cell"}>
+						<Link to={{ pathname: "/", search }} className={current === "/" ? "cell active" : "cell"}>
 							Bazaar
-						</Link>}
-						<Link to="/school" className={school ? "cell active" : "cell"}>
-							School
 						</Link>
 						<Link to="/help" className={current === "/help" ? "cell active" : "cell"}>
 							Help
@@ -107,10 +105,10 @@ class TabsBar extends Component<propTypes, S> {
 					<Route path="/articles/:article_id" component={ArticleRouter} />
 					<TrackedRoute exact path="/articles" component={Articles} />
 					<TrackedRoute path="/help" component={Help} />
-					<TrackedRoute exact path="/school" component={StudentPortalOptions} />
-					<TrackedRoute exact path="/school/:medium/:grade/:subject" component={School} />
+					<TrackedRoute exact path="/library" component={StudentPortalOptions} />
+					<TrackedRoute exact path="/library/:medium/:grade/:subject" component={School} />
 				</>
-				{!school && <a className="contact-us" href={callLink}>
+				{!library && <a className="contact-us" href={callLink}>
 					<img src={contactUs} />
 					<div className="title">Contact-Us</div>
 				</a>}
