@@ -28,9 +28,11 @@ defmodule EdMarkaz.StudentPortal do
 				date=current_timestamp",
 			[id, medium, class, subject, chapter_id, lesson_id, lesson]
 		) do
-			{:ok, resp} -> {:ok}
+			{:ok, resp} ->
+				IO.puts "OK #{id}"
+				{:ok}
 			{:error, err} ->
-				IO.puts "lesson merge failed"
+				IO.puts "lesson merge failed #{id}"
 				IO.inspect err
 				{:error, err}
 		end
