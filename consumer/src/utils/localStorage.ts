@@ -9,6 +9,7 @@ export const saveDB = (db: RootReducerState) => {
 		saveSnapshot(db.last_snapshot)
 		saveQueue(db.queued)
 		saveProducts(db.products)
+		saveLessons(db.lessons)
 	}
 
 	catch (err) {
@@ -65,6 +66,29 @@ const loadProducts = () => {
 		// @ts-ignore
 		const prods = JSON.parse(localStorage.getItem("products")) || initial
 		return prods
+	}
+	catch (e) {
+		console.log('returning initial')
+		return initial
+	}
+}
+
+const saveLessons = (lessons?: RootReducerState["lessons"]) => {
+	if (lessons !== undefined) {
+		localStorage.setItem("lessons", JSON.stringify(lessons))
+	}
+}
+
+const loadLessons = () => {
+	const initial: RootReducerState["lessons"] = {
+		last_sync: 0,
+		db: {}
+	}
+
+	try {
+		// @ts-ignore
+		const lessons: RootReducerState["lessons"] = JSON.parse(localStorage.getItem("lessons")) || initial
+		return lessons
 	}
 	catch (e) {
 		console.log('returning initial')
@@ -161,6 +185,7 @@ export const loadDB = (): RootReducerState => {
 		last_snapshot: loadSnapshot(),
 		connected: false,
 		sync_state: loadSyncState(),
-		products: loadProducts()
+		products: loadProducts(),
+		lessons: loadLessons()
 	}
 }
