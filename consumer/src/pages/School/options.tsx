@@ -17,8 +17,8 @@ const StudentPortalOptions: React.FC<P> = ({ getLessons, lessons }) => {
 	const [medium, setMedium] = useState("Urdu");
 	const [grade, setGrade] = useState("");
 	const [subject, setSubject] = useState("");
-
 	const showLessons = grade !== "" && subject !== ""
+
 	return <div className="student-portal-op">
 		{/* <div className="row">
 			<div className="title">Select language of Instruction</div>
@@ -33,26 +33,36 @@ const StudentPortalOptions: React.FC<P> = ({ getLessons, lessons }) => {
 		</div> */}
 		<div className="row">
 			<div className="title">Select Class/Grade</div>
-			<div className="content">
-				{
-					Object.keys(lessons["Urdu"] || {})
-						.sort((a, b) => parseFloat(a) - parseFloat(b))
-						.map(g => {
-							return <div className={grade === g ? "bg-blue oval " : "oval"} key={g} onClick={(e) => setGrade(g)}>{`Class ${g}`}</div>
-						})
-				}
-			</div>
+			{
+				grade === "" ? <div className="content">
+					{
+						Object.keys(lessons["Urdu"] || {})
+							.sort((a, b) => parseFloat(a) - parseFloat(b))
+							.map(g => {
+								return <div className={grade === g ? "bg-blue oval " : "oval"} key={g} onClick={(e) => setGrade(g)}>{`Class ${g}`}</div>
+							})
+					}
+				</div> : <div className="content selected">
+						<div className="bg-blue oval">{`Class ${grade}`}</div>
+						<div style={{ textDecoration: "underline", color: "blue" }} onClick={(e) => setGrade("")}>Change</div>
+					</div>
+			}
 		</div>
 		{grade && <div className="row">
 			<div className="title">Select Subject</div>
-			<div className="content">
-				{
-					Object.keys(lessons["Urdu"][grade])
-						.map(s => {
-							return <div className={subject === s ? "bg-bluish square " : "square"} key={s} onClick={() => setSubject(s)}>{s}</div>
-						})
-				}
-			</div>
+			{
+				subject === "" ? <div className="content">
+					{
+						Object.keys(lessons["Urdu"][grade])
+							.map(s => {
+								return <div className={subject === s ? "bg-bluish square " : "square"} key={s} onClick={() => setSubject(s)}>{s}</div>
+							})
+					}
+				</div> : <div className="content selected">
+						<div className="bg-bluish square">{subject}</div>
+						<div style={{ textDecoration: "underline", color: "blue" }} onClick={(e) => setSubject("")}>Change</div>
+					</div>
+			}
 			{
 				showLessons && <Link to={`/library/${medium}/${grade}/${subject}`} className="next-button">Find Resources</Link>
 			}

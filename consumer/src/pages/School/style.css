@@ -4,7 +4,7 @@
 	padding: 10px 40px;
 	margin: 20px 0px;
 	flex-direction: column;
-	align-items: flex-start;
+	align-items: center;
 }
 	.student-portal-op .row .title {
 		display: flex;
@@ -16,6 +16,11 @@
 		padding: 10px 0px;
 		flex-direction: row;
 		flex-wrap: wrap;
+	}
+	.student-portal-op .row .content.selected {
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
 	}
 	.student-portal-op .row .content > * {
 		margin: 10px 5px;
@@ -195,17 +200,22 @@
 				font-weight: bold;
 			}
 			.lesson-box .list-container .lb-list {
+				overflow-y: auto;
+				max-height: 30vh;
+				box-shadow: inset 0 0 5px #bebebe;
+				border-radius: 5px;
 				display: flex;
 				flex-direction: column;
 				width: 100%;
-				padding: 10px 0px;
+				margin: 10px 0px;
+				padding: 5px 0px;
 			}
 				.lesson-box .list-container .lb-list .item {
 					display: flex;
 					flex-direction: row;
 					justify-content: flex-start;
 					align-items: center;
-					padding: 5px;
+					padding: 5px 10px;
 					cursor: pointer;
 				}
 				.lesson-box .list-container .lb-list .item .play-icon {

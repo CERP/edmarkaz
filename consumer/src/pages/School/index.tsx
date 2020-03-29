@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { getLessons, trackVideoAnalytics } from '../../actions'
 import Youtube from 'react-youtube'
 import Plus from '../../icons/plus.svg'
+import Minus from '../../icons/minus.svg'
 import Play from '../../icons/play.svg'
 import { Link, RouteComponentProps } from 'react-router-dom'
 import './style.css'
@@ -192,9 +193,12 @@ const School: React.FC<Props> = ({ trackVideoAnalytics, getLessons, lessons, mat
 						}
 
 					}}
-				/> : <div>No Internet Connection Available</div>}
+				/> : <div>
+						<div className="heading">Something Went Wrong</div>
+						<div className="subtitle"><a href={`https://youtube.com/watch?v=${videoId}`} target="_blank">Click Here</a> to watch this on your browser</div>
+					</div>}
 
-				<div className="button" style={{ marginTop: '5px' }} onClick={() => onBack()}>Back</div>
+				<div className="button" style={{ marginTop: '5px', backgroundColor: "#f05967" }} onClick={() => onBack()}>Back</div>
 				{/* <div className="next-container">
 					<div className="button" onClick={() => onPrev()}>{'<'}</div>
 					<div className="button" onClick={() => onNext()}>{'>'}</div>
@@ -217,8 +221,8 @@ const School: React.FC<Props> = ({ trackVideoAnalytics, getLessons, lessons, mat
 					.map(([chapter_id, val]) => {
 						return <div key={chapter_id} className={activeChapter === chapter_id ? `lesson-box ${getRandomColorBorder(chapter_id)} active` : `lesson-box ${getRandomColorBorder(chapter_id)}`}>
 							<div className="info" onClick={() => setChapter(chapter_id)}>
-								<div className="title">{`Chapter ${chapter_id}`}</div>
-								<img className="icon" src={Plus} alt="arrow" />
+								<div className="title">{`Unit ${chapter_id}`}</div>
+								<img className="icon" src={activeChapter === chapter_id ? Minus : Plus} alt="arrow" />
 							</div>
 							<div className="list-container">
 								<div className="header">{`${val.meta.chapter_name}`}</div>
