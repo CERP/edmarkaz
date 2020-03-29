@@ -195,7 +195,7 @@ const School: React.FC<Props> = ({ trackVideoAnalytics, getLessons, lessons, mat
 					}}
 				/> : <div>
 						<div className="heading">Something Went Wrong</div>
-						<div className="subtitle"><a href={`https://youtube.com/watch?v=${videoId}`} target="_blank">Click Here</a> to watch this on your browser</div>
+						<div className="subtitle">Try again or <a href={`https://youtube.com/watch?v=${videoId}`} target="_blank">Click Here</a> to watch this on your browser</div>
 					</div>}
 
 				<div className="button" style={{ marginTop: '5px', backgroundColor: "#f05967" }} onClick={() => onBack()}>Back</div>
@@ -219,7 +219,7 @@ const School: React.FC<Props> = ({ trackVideoAnalytics, getLessons, lessons, mat
 				Object.entries(items)
 					.filter(([chapter_id, val]) => searchText === "" || `${val.meta.chapter_name}-${chapter_id}`.toLowerCase().includes(searchText.toLowerCase()))
 					.map(([chapter_id, val]) => {
-						return <div key={chapter_id} className={activeChapter === chapter_id ? `lesson-box ${getRandomColorBorder(chapter_id)} active` : `lesson-box ${getRandomColorBorder(chapter_id)}`}>
+						return <div key={chapter_id} className={activeChapter === chapter_id ? `lesson-box ${getRandomColorBorder(val.meta.chapter_name)} active` : `lesson-box ${getRandomColorBorder(val.meta.chapter_name)}`}>
 							<div className="info" onClick={() => setChapter(chapter_id)}>
 								<div className="title">{`Unit ${chapter_id}`}</div>
 								<img className="icon" src={activeChapter === chapter_id ? Minus : Plus} alt="arrow" />
