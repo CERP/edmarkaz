@@ -75,20 +75,25 @@ const loadProducts = () => {
 
 const saveLessons = (lessons?: RootReducerState["lessons"]) => {
 	if (lessons !== undefined) {
-		localStorage.setItem("lessons", JSON.stringify(lessons))
+		const { loading, ...rest } = lessons
+		localStorage.setItem("lessons", JSON.stringify(rest))
 	}
 }
 
 const loadLessons = () => {
 	const initial: RootReducerState["lessons"] = {
 		last_sync: 0,
+		loading: true,
 		db: {}
 	}
 
 	try {
 		// @ts-ignore
 		const lessons: RootReducerState["lessons"] = JSON.parse(localStorage.getItem("lessons")) || initial
-		return lessons
+		return {
+			...lessons,
+			loading: false
+		}
 	}
 	catch (e) {
 		console.log('returning initial')

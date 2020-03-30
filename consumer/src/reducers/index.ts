@@ -224,6 +224,17 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 				}
 			}
 
+		case "LOAD_COURSES":
+			{
+				return {
+					...state,
+					lessons: {
+						...state.lessons,
+						loading: true
+					}
+				}
+			}
+
 		case ADD_COURSES:
 			{
 				const { lessons } = action as ADD_COURSES_ACTION
@@ -231,6 +242,7 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 					...state,
 					lessons: {
 						last_sync: new Date().getTime(),
+						loading: false,
 						db: {
 							...state.lessons.db,
 							...lessons

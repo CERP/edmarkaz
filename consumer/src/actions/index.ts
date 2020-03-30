@@ -159,6 +159,16 @@ export const getLessons = () => (dispatch: Dispatch, getState: GetState, syncr: 
 
 	const state = getState();
 
+	if (!state.connected) {
+		syncr.onNext('connect', () => dispatch(getLessons()))
+	}
+
+	if (Object.keys(state.lessons.db).length === 0) {
+		dispatch({
+			type: "LOAD_COURSES"
+		})
+	}
+
 	syncr.send({
 		type: "GET_ALL_COURSES",
 		client_type: state.auth.client_type,

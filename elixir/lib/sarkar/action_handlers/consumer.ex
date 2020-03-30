@@ -166,7 +166,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 
 		%{ "name" => name, "message" => message } = error
 
-		EdMarkaz.Slack.send_alert("#{name}: #{message}\n #{errInfo}", "#platform-dev")
+		EdMarkaz.Slack.send_alert("#{name}: #{message}\n #{errInfo}", "#ilmx-errors")
 
 		{:reply, succeed(), state}
 	end
