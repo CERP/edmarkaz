@@ -7,6 +7,7 @@ import Burger from './pages/accordian'
 import TabsBar from './pages/TabsBar'
 import TokenAuth from './pages/TokenAuth'
 import TrackedRoute from './components/TrackedRoute'
+import FrontPage from './pages/Front'
 
 const Routes = ({ store }: { store: Store }) => (
 	<Provider store={store}>
@@ -14,7 +15,8 @@ const Routes = ({ store }: { store: Store }) => (
 			<Switch>
 				{/* <TrackedRoute path="/" component={Burger} /> */}
 				<TrackedRoute path="/auth/:token" component={TokenAuth} />
-				<Route path="/" component={TabsBar} />
+				<Route exact path="/" component={TabsBar} />
+				<Route path="/landing" component={FrontPage} />
 			</Switch>
 		</BrowserRouter>
 	</Provider>

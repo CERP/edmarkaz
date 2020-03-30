@@ -1,0 +1,78 @@
+.front {
+	background-color: #ffffff;
+	display: flex;
+	flex-direction: column;
+}
+
+.front .partition {
+	display: flex;
+	flex-direction: column;
+	padding: 60px 20px;
+	justify-content: center;
+	border: 1px solid #bebebe;
+}
+	.partition.main .info-container {
+		align-items: flex-start;
+		text-align: left;
+	}
+	.partition.main .img-container .img {
+		width: 80%;
+		height: auto;
+		border-radius: unset;
+	}
+	.partition .info-container {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+	}
+		.info-container .heading {
+			margin-top: 5px;
+			padding: 10px 0px;
+			font-size: 3 20px;
+		}
+		.info-container .para {
+			margin: 10px 0px;
+		}
+		.info-container .pill {
+			border-radius: 20px;
+			text-align: center;
+			width: fit-content;
+			padding: 10px 40px;
+			color: #222;
+			background-color: #FFEB3B;
+			font-weight: bold;
+			margin: 10px 0px;
+			cursor: pointer;
+		}
+
+	.partition .img-container {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+	}
+		.img-container .img {
+			width: 100%;
+			border-radius: 50%;
+		}
+
+.bg-blue {
+	background-color: rgb(5, 5, 70);
+	color: #ffffff;
+}
+.bg-yellow {
+	background-color: #FFEB3B;
+	color: rgb(5, 5, 70);
+}
+
+
+@media only screen and (min-width: 768px) {
+
+	.front .partition {
+		flex-direction: row;
+	}
+	.front .reverse {
+		flex-direction: row-reverse;
+	}
+}
