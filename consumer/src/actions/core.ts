@@ -157,7 +157,7 @@ export const sendBatchSMS = (messages: SMS[]) => (dispatch: (a: any) => any, get
 		})
 }
 
-export const submitError = (err: Error, errInfo: React.ErrorInfo) => (dispatch: Function, getState: GetState, syncr: Syncr) => {
+export const submitError = (err: Error, errInfo?: React.ErrorInfo) => (dispatch: Function, getState: GetState, syncr: Syncr) => {
 
 	const state = getState();
 
@@ -170,7 +170,7 @@ export const submitError = (err: Error, errInfo: React.ErrorInfo) => (dispatch: 
 				name: err.name,
 				message: err.message
 			},
-			errInfo: errInfo.componentStack,
+			errInfo: errInfo ? errInfo.componentStack : err.stack,
 			date: new Date().getTime()
 		}
 	})

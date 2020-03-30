@@ -1,5 +1,5 @@
 import Syncr from '@cerp/syncr'
-import { createLoginSucceed, analyticsEvent } from './core';
+import { createLoginSucceed, analyticsEvent, submitError } from './core';
 
 type Dispatch = (action: any) => any
 type GetState = () => RootReducerState
@@ -160,7 +160,7 @@ export const getLessons = () => (dispatch: Dispatch, getState: GetState, syncr: 
 	const state = getState();
 
 	syncr.send({
-		type: "GET_ALL_COURSES",
+		type: "GET_ALL_COURSESs",
 		client_type: state.auth.client_type,
 		client_id: state.client_id,
 		payload: {}
@@ -172,7 +172,15 @@ export const getLessons = () => (dispatch: Dispatch, getState: GetState, syncr: 
 			})
 			return resp
 		})
-		.catch(err => console.error("Somethins happened while getting lessons", err))
+		.catch((err: Error) => {
+			if (!state.connected) {
+				console.error("No connection while getting lessons", err)
+				return err
+			}
+			console.error("Somethins happened while getting lessons", err)
+			dispatch(submitError(err))
+			return err
+		})
 }
 export interface ADD_COURSES_ACTION {
 	type: "ADD_COURSES",
