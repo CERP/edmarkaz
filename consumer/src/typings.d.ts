@@ -71,6 +71,7 @@ interface RootReducerState {
 	};
 	lessons: {
 		last_sync: number
+		loading: boolean
 		db: {
 			[medium: string]: {
 				[grade: string]: {
