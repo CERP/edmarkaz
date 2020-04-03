@@ -36,7 +36,7 @@ const StudentPortalOptions: React.FC<P> = ({ getLessons, lessons, lesson_loading
 			</div>
 		</div> */}
 			<div className="row">
-				<div className="title">Select Class/Grade</div>
+				<div className="title">Select Class</div>
 				{
 					grade === "" ? <div className="content">
 						{
@@ -48,7 +48,7 @@ const StudentPortalOptions: React.FC<P> = ({ getLessons, lessons, lesson_loading
 						}
 					</div> : <div className="content selected">
 							<div className="bg-blue oval">{`Class ${grade}`}</div>
-							<div style={{ textDecoration: "underline", color: "blue" }} onClick={(e) => setGrade("")}>Change Subject</div>
+							<div style={{ textDecoration: "underline", color: "blue" }} onClick={(e) => setGrade("")}>Change Class</div>
 						</div>
 				}
 			</div>
@@ -64,11 +64,11 @@ const StudentPortalOptions: React.FC<P> = ({ getLessons, lessons, lesson_loading
 						}
 					</div> : <div className="content selected">
 							<div className="bg-bluish square">{subject}</div>
-							<div style={{ textDecoration: "underline", color: "blue" }} onClick={(e) => setSubject("")}>Change Class</div>
+							<div style={{ textDecoration: "underline", color: "blue" }} onClick={(e) => setSubject("")}>Change Subject</div>
 						</div>
 				}
 				{
-					showLessons && <Link to={`/library/${medium}/${grade}/${subject}`} className="next-button">Let's Study</Link>
+					showLessons && <Link to={`/library/${medium}/${grade}/${subject}`} className="next-button">Let's Learn</Link>
 				}
 			</div>}
 		</div>
