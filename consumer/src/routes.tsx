@@ -15,8 +15,7 @@ const Routes = ({ store }: { store: Store }) => (
 			<Switch>
 				{/* <TrackedRoute path="/" component={Burger} /> */}
 				<TrackedRoute path="/auth/:token" component={TokenAuth} />
-				<Route exact path="/" component={TabsBar} />
-				<Route path="/landing" component={FrontPage} />
+				<Route path="/" component={TabsBar} />
 			</Switch>
 		</BrowserRouter>
 	</Provider>

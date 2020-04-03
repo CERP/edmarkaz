@@ -1,11 +1,11 @@
 .heading .logo {
-	/*
-	background-image: url('./ilmexchange-01.svg');
-	*/
+	background-image: url('./ilmx.svg');
 	background-position: 0% 50%;
 	background-repeat: no-repeat;
 	color: var(--blue);
 	text-decoration: none;
+	height: 80%;
+	width: 100%;
 }
 
 .heading .logo .ilm {

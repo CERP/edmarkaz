@@ -1,25 +1,23 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, withRouter, RouteComponentProps } from 'react-router-dom'
 import { connect } from 'react-redux'
+import BackIcon from '../../icons/back.svg'
+
 import './style.css'
 
 type Props = {
 	auth: RootReducerState['auth'];
 	path: string;
-}
+} & RouteComponentProps
 
-const Header = ({ path, auth }: Props) => {
+const Header = ({ path, auth, history }: Props) => {
 	return <div className="header-tabs heading">
-		<Link to="" className="logo"><span className="ilm">ilm</span>exchange</Link>
 		{
-			auth.token === undefined ?
-				(
-					path !== "/log-in" ?
-						<Link to="/log-in" style={{ textDecoration: "none", color: "#222", fontSize: "18px", alignSelf: "center" }} className="">
-							Log In
-					</Link> : <Link to="/">X</Link>
-				)
-				: <Link to="/profile" style={{ textDecoration: "none", color: "#000000" }}> Profile</Link>
+			path !== "/" && <img src={BackIcon} style={{ width: "20px", marginRight: "10px" }} onClick={() => history.goBack()} />
+		}
+		<Link to="" className="logo" />
+		{
+			auth.token !== undefined && <Link to="/profile" style={{ textDecoration: "none", color: "#000000" }}> Profile</Link>
 		}
 	</div>
 }
@@ -28,4 +26,4 @@ const Header = ({ path, auth }: Props) => {
 			</Link> */}
 export default connect((state: RootReducerState) => ({
 	auth: state.auth
-}))(Header);
+}))(withRouter(Header));

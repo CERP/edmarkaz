@@ -62,6 +62,7 @@ interface RootReducerState {
 		token?: string;
 		client_type: "consumer";
 		sms_sent: boolean;
+		user?: "SCHOOL" | "TEACHER" | "STUDENT" | "GUEST_STUDENT" | "GUEST_TEACHER"
 	};
 	products: {
 		last_sync: number;

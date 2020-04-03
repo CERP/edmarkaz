@@ -169,9 +169,9 @@ class SignUp extends React.Component<P, S> {
 			</div>
 			<SchoolForm school={this.state.school} former={this.former} base_path={["school"]} />
 
-			<div className="center" style={{ marginTop: "10px" }}>
+			{/* <div className="center" style={{ marginTop: "10px" }}>
 				{this.state.school.refcode && <QRCode value={this.state.school.refcode} size={256} fgColor="#f05967" bgColor="#F5F5F5" />}
-			</div>
+			</div> */}
 
 			<div className="tabs-button" style={{ marginTop: "10px", marginBottom: "10px" }} onClick={this.onSave}>Sign Up</div>
 		</div>

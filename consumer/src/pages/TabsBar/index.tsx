@@ -17,9 +17,13 @@ import contactUs from '../../icons/contactUs.svg'
 import "./style.css";
 import login from "../SignUp/login";
 import TrackedRoute from "../../components/TrackedRoute";
+import Library from "../Library";
+import LessonPage from "../Library/Lesson";
+import StudentPortalOptions from '../Library/options';
+import FrontPage from "../Front";
+import OptionsMobile from "../Front/front_mob";
 import School from "../School";
-import LessonPage from "../../pages/School/Lesson/";
-import StudentPortalOptions from '../School/options';
+
 interface S {
 	error: boolean;
 	err?: Error;
@@ -29,6 +33,7 @@ interface S {
 interface P {
 	token: RootReducerState["auth"]["token"]
 	connected: boolean;
+	user: RootReducerState["auth"]["user"]
 	sendError: (err: Error, errInfo: React.ErrorInfo) => void;
 }
 
@@ -59,7 +64,7 @@ class TabsBar extends Component<propTypes, S> {
 
 	render() {
 
-		const { location, token } = this.props
+		const { location, token, user } = this.props
 		const current = location.pathname;
 		const search = location.search;
 
@@ -78,7 +83,7 @@ class TabsBar extends Component<propTypes, S> {
 			<div className="tabs-page">
 				<Header path={current} />
 
-				{current !== "sign-up" && (
+				{(current !== "/" && current !== "/start-mob" && current !== "/sign-up" && current !== "/log-in") && (
 					<div className="tabs-bar subtitle">
 						{/* <Link to="/articles" className={current === "/articles" ? "cell active" : "cell"}>
 							Library
@@ -86,9 +91,11 @@ class TabsBar extends Component<propTypes, S> {
 						<Link to="/library" className={library ? "cell active" : "cell"}>
 							Library
 						</Link>
-						<Link to={{ pathname: "/", search }} className={current === "/" ? "cell active" : "cell"}>
-							Bazaar
-						</Link>
+						{
+							token && <Link to="/bazaar" className={current === "/bazaar" ? "cell active" : "cell"}>
+								Bazaar
+							</Link>
+						}
 						<Link to="/help" className={current === "/help" ? "cell active" : "cell"}>
 							Help
 						</Link>
@@ -96,21 +103,23 @@ class TabsBar extends Component<propTypes, S> {
 				)}
 
 				<>
-					<TrackedRoute exact path="/" component={ProductHome} />
+					<TrackedRoute exact path="/" component={FrontPage} />
+					<TrackedRoute exact path="/school" component={School} />
 					<TrackedRoute exact path="/supplier/:supplier_id/:product_id" component={ProductPage} />
 					<TrackedRoute exact path="/supplier/:supplier_id" component={SupplierHome} />
 					<TrackedRoute exact path="/log-in" component={login} />
-					<TrackedRoute path="/sign-up" component={SignUp} />
 					<TrackedRoute path="/profile" component={Profile} />
 					<Route path="/articles/:article_id" component={ArticleRouter} />
 					<TrackedRoute exact path="/articles" component={Articles} />
 					<TrackedRoute path="/help" component={Help} />
 					<TrackedRoute exact path="/library" component={StudentPortalOptions} />
-					<TrackedRoute exact path="/library/:medium/:grade/:subject" component={School} />
+					<TrackedRoute exact path="/library/:medium/:grade/:subject" component={Library} />
+					<TrackedRoute exact path="/start-mob" component={OptionsMobile} />
+					<TrackedRoute exact path="/sign-up" component={SignUp} />
+					<TrackedRoute exact path="/bazaar" component={ProductHome} />
 				</>
 				{!library && <a className="contact-us" href={callLink}>
 					<img src={contactUs} />
-					<div className="title">Contact-Us</div>
 				</a>}
 			</div>
 		);
@@ -119,7 +128,8 @@ class TabsBar extends Component<propTypes, S> {
 export default connect(
 	(state: RootReducerState) => ({
 		connected: state.connected,
-		token: state.auth.token
+		token: state.auth.token,
+		user: state.auth.user
 	}),
 	(dispatch: Function) => ({
 		sendError: (err: Error, errInfo: React.ErrorInfo) =>

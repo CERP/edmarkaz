@@ -7,16 +7,20 @@
 .front .partition {
 	display: flex;
 	flex-direction: column;
-	padding: 60px 20px;
 	justify-content: center;
-	border: 1px solid #bebebe;
+	height: fit-content;
+	padding: 60px 40px;
+	width: calc(100% - 80px);
 }
 	.partition.main .info-container {
 		align-items: flex-start;
 		text-align: left;
 	}
+	.partition.main .info-container .heading {
+		font-size: 40px;
+	}
 	.partition.main .img-container .img {
-		width: 80%;
+		width: 60%;
 		height: auto;
 		border-radius: unset;
 	}
@@ -25,25 +29,30 @@
 		flex-direction: column;
 		align-items: center;
 		text-align: center;
+		justify-content: center;
+		width: 100%;
 	}
 		.info-container .heading {
 			margin-top: 5px;
 			padding: 10px 0px;
-			font-size: 3 20px;
+			font-size: 30px;
 		}
 		.info-container .para {
 			margin: 10px 0px;
+			font-size: 18px;
 		}
-		.info-container .pill {
+		.pill {
 			border-radius: 20px;
 			text-align: center;
 			width: fit-content;
 			padding: 10px 40px;
-			color: #222;
-			background-color: #FFEB3B;
+			color: #ffffff;
+			background-color: #f05967;
 			font-weight: bold;
 			margin: 10px 0px;
 			cursor: pointer;
+			font-size: 25px;
+			text-decoration: none;
 		}
 
 	.partition .img-container {
@@ -51,11 +60,19 @@
 		flex-direction: row;
 		align-items: center;
 		justify-content: center;
+		width: 100%;
 	}
+		.img-container .circle-frame {
+			height: 300px;
+    		width: 300px;
+		}
 		.img-container .img {
 			width: 100%;
+			height: 100%;
 			border-radius: 50%;
 		}
+
+.front .footer {}
 
 .bg-blue {
 	background-color: rgb(5, 5, 70);
@@ -65,14 +82,125 @@
 	background-color: #FFEB3B;
 	color: rgb(5, 5, 70);
 }
+.bg-teal {
+	background-color: #1BB4BB;
+	color: #ffffff;
+}
+.front .partition.main .image-card {
+	display: none;
+}
+.white {
+	color: #ffffff;
+}
+
+.start-mob {
+	display: flex;
+	flex-direction: column;
+	margin: 15% auto;
+}
+	.card-container {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+	}
+	.card {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		width: 200px;
+		padding: 20px;
+		margin: 20px;
+		box-shadow: 0px 0px 8px 0px #bebebe;
+		border-radius: 5px;
+	}
+		.card .icon {
+			width: 50%;
+		}
+	.coming-soon {
+		opacity: 40%;
+	}
 
 
 @media only screen and (min-width: 768px) {
 
+	.card-container {
+		flex-direction: row;
+
+	}
+	.front .partition.main {
+		height: 70vh;
+	}
 	.front .partition {
 		flex-direction: row;
+		justify-content: space-between;
+		padding: 60px 80px;
+		width: calc(100% - 160px);
+		height: 70vh;
 	}
 	.front .reverse {
 		flex-direction: row-reverse;
 	}
+	.front .info-container {
+		align-items: flex-start;
+		text-align: left;
+		width: 50%;
+	}
+	.front .img-container {
+		width: 40%;
+	}
+		.img-container .circle-frame {
+			height: 500px;
+			width: 500px;
+		}
+		.front .info-container .heading {
+			font-size: 50px;
+		}
+		.front .info-container .para {
+			font-size: 25px;
+		}
+
+	.front .partition.main .info-container .pill.mob {
+		display: none;
+	}
+
+	.front .partition.main .info-container .heading {
+		font-size: 80px;
+	}
+
+	.front .partition.main .image-card {
+		display: flex;
+		padding: 10px 10px;
+		flex-direction: column;
+		justify-content: center;
+		width: 100%;
+		align-items: center;
+	}
+		.front .partition.main .image-card .img {
+			width: 150px;
+			border-radius: 50%;
+		}
+
+}
+
+@media only screen and (max-width: 1280px) {
+
+	.front .partition.main {
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		height: fit-content;
+	}
+
+	.front .partition.main .info-container {
+		width: 100%;
+	}
+	.front .partition.main .img-container {
+		margin-top: 20px;
+		width: 100%;
+	}
+	/* .front .partition.main .img-container {
+		flex-direction: column;
+	} */
+
 }
