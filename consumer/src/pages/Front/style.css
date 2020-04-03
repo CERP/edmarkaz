@@ -44,7 +44,7 @@
 		.pill {
 			border-radius: 20px;
 			text-align: center;
-			width: fit-content;
+			min-width: 120px;
 			padding: 10px 40px;
 			color: #ffffff;
 			background-color: #f05967;
@@ -179,6 +179,11 @@
 		.front .partition.main .image-card .img {
 			width: 150px;
 			border-radius: 50%;
+		}
+		.front .partition.main .image-card .img.cen {
+			width: 200px;
+			height: 200px;
+			background-color: #2b8a9c;
 		}
 
 }
