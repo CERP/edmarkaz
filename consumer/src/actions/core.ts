@@ -389,13 +389,15 @@ export interface LoginSucceed {
 	type: "LOGIN_SUCCEED";
 	id: string;
 	token: string;
+	user: RootReducerState["auth"]["user"];
 	sync_state: RootReducerState['sync_state'];
 }
 
-export const createLoginSucceed = (id: string, token: string, sync_state: RootReducerState['sync_state']): LoginSucceed => ({
+export const createLoginSucceed = (id: string, token: string, user: RootReducerState["auth"]["user"], sync_state: RootReducerState['sync_state']): LoginSucceed => ({
 	type: LOGIN_SUCCEED,
 	id,
 	token,
+	user,
 	sync_state
 })
 

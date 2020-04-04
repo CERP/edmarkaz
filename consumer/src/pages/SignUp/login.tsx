@@ -68,7 +68,7 @@ class Login extends Component<propTypes, S> {
 
 		if (this.props.token) {
 			setTimeout(() => {
-				window.location.replace("/")
+				window.location.replace("/school")
 			}, 700);
 		}
 

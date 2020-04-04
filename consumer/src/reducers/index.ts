@@ -262,6 +262,7 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 						...state.auth,
 						id: login_action.id,
 						token: login_action.token,
+						user: login_action.user
 					}
 				}
 			}

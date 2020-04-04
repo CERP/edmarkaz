@@ -18,8 +18,8 @@ export const createLogin = (username: string, password: string, number: string) 
 			password
 		}
 	})
-		.then((res: { token: string; sync_state: SyncState }) => {
-			dispatch(createLoginSucceed(username, res.token, res.sync_state))
+		.then((res: { token: string; user: RootReducerState["auth"]["user"]; sync_state: SyncState }) => {
+			dispatch(createLoginSucceed(username, res.token, res.user, res.sync_state))
 		})
 		.catch(res => {
 			console.error(res)
@@ -76,8 +76,8 @@ export const verifyUrlAuth = (token: string) => (dispatch: Dispatch, getState: G
 			token
 		}
 	})
-		.then((res: { id: string; token: string; sync_state: SyncState }) => {
-			dispatch(createLoginSucceed(res.id, res.token, res.sync_state))
+		.then((res: { id: string; token: string; user: RootReducerState["auth"]["user"]; sync_state: SyncState }) => {
+			dispatch(createLoginSucceed(res.id, res.token, res.user, res.sync_state))
 		})
 		.catch(res => {
 			console.error(res)
@@ -251,12 +251,12 @@ export const signUp = (number: string, password: string, profile: Partial<CERPSc
 			profile
 		}
 	})
-		.then(res => {
+		.then((res: { token: string; user: RootReducerState["auth"]["user"] }) => {
 			// get token back
 			console.log(res)
 			const token: string = res.token;
 
-			dispatch(createLoginSucceed(number, token, { profile }))
+			dispatch(createLoginSucceed(number, token, res.user, { profile }))
 			// set auth
 		})
 		.catch(err => {

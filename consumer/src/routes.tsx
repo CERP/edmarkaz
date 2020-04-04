@@ -7,6 +7,7 @@ import Burger from './pages/accordian'
 import TabsBar from './pages/TabsBar'
 import TokenAuth from './pages/TokenAuth'
 import TrackedRoute from './components/TrackedRoute'
+import FrontPage from './pages/Front'
 
 const Routes = ({ store }: { store: Store }) => (
 	<Provider store={store}>

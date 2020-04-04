@@ -9,7 +9,7 @@
 	.student-portal-op .row .title {
 		display: flex;
 		flex-direction: row;
-		font-size: 15px;
+		font-size: 25px;
 	}
 	.student-portal-op .row .content {
 		display: flex;

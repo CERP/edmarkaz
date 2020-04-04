@@ -30,7 +30,8 @@ export const loadAuth = (): RootReducerState['auth'] => {
 		id: undefined,
 		token: undefined,
 		client_type: "consumer",
-		sms_sent: false
+		sms_sent: false,
+		user: undefined
 	};
 
 	try {
@@ -39,7 +40,16 @@ export const loadAuth = (): RootReducerState['auth'] => {
 			return init_auth;
 		}
 
-		return JSON.parse(str);
+		const auth: RootReducerState["auth"] = JSON.parse(str)
+
+		if (auth.token && auth.id && auth.user === undefined) {
+			return {
+				...auth,
+				user: "SCHOOL"
+			}
+		}
+
+		return auth
 	}
 	catch (err) {
 		console.error(err);
