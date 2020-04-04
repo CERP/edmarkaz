@@ -23,6 +23,7 @@ import StudentPortalOptions from '../Library/options';
 import FrontPage from "../Front";
 import OptionsMobile from "../Front/front_mob";
 import School from "../School";
+import AboutUs from "../Front/aboutUs";
 
 interface S {
 	error: boolean;
@@ -83,7 +84,7 @@ class TabsBar extends Component<propTypes, S> {
 			<div className="tabs-page">
 				<Header path={current} />
 
-				{(current !== "/" && current !== "/start-mob" && current !== "/sign-up" && current !== "/log-in") && (
+				{(current !== "/" && current !== "/about-us" && current !== "/start-mob" && current !== "/sign-up" && current !== "/log-in") && (
 					<div className="tabs-bar subtitle">
 						{/* <Link to="/articles" className={current === "/articles" ? "cell active" : "cell"}>
 							Library
@@ -104,6 +105,7 @@ class TabsBar extends Component<propTypes, S> {
 
 				<>
 					<TrackedRoute exact path="/" component={FrontPage} />
+					<TrackedRoute exact path="/about-us" component={AboutUs} />
 					<TrackedRoute exact path="/school" component={School} />
 					<TrackedRoute exact path="/supplier/:supplier_id/:product_id" component={ProductPage} />
 					<TrackedRoute exact path="/supplier/:supplier_id" component={SupplierHome} />
@@ -120,7 +122,14 @@ class TabsBar extends Component<propTypes, S> {
 				</>
 				{!library && <a className="contact-us" href={callLink}>
 					<img src={contactUs} />
+					<div>Contact Us</div>
 				</a>}
+
+				{(current !== "/" && current !== "/about-us") && <div className="tabs-footer">
+					{/* <div className="bttn">Forums</div> */}
+					<Link className="bttn" to="/about-us">About-Us</Link>
+					<a className="bttn" href={callLink} style={{ border: "none" }}>Contact-Us</a>
+				</div>}
 			</div>
 		);
 	}

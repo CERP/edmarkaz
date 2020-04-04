@@ -13,11 +13,12 @@ type Props = {
 const Header = ({ path, auth, history }: Props) => {
 	return <div className="header-tabs heading">
 		{
-			path !== "/" && <img src={BackIcon} style={{ width: "20px", marginRight: "10px" }} onClick={() => history.goBack()} />
+			(path !== "/" && path !== "/about-us") && <img src={BackIcon} style={{ width: "20px", marginRight: "10px" }} onClick={() => history.goBack()} />
 		}
 		<Link to="" className="logo" />
+		<Link to="/about-us" className={path !== "/about-us" ? "bttn" : "bttn active"}>About Us</Link>
 		{
-			auth.token !== undefined && <Link to="/profile" style={{ textDecoration: "none", color: "#000000" }}> Profile</Link>
+			auth.token !== undefined && <Link to="/profile" className="profile" style={{ textDecoration: "none", color: "#000000" }}> Profile</Link>
 		}
 	</div>
 }

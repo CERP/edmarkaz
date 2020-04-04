@@ -97,14 +97,14 @@ const FrontPage = () => {
 			</div>
 		</div>
 
-		<div className="partition bg-teal">
-			{/* <div className="info-container">
+		{/* <div className="partition bg-teal">
+			<div className="info-container">
 				<div className="heading">Footer</div>
 				<div className="para">
 					Something
 				</div>
-			</div> */}
-		</div>
+			</div>
+		</div> */}
 
 	</div>
 }
