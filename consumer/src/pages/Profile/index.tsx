@@ -50,7 +50,7 @@ class Profile extends React.Component<P, S> {
 		return <div className="user-profile">
 			<SchoolForm school={this.state.profile} former={this.former} base_path={["profile"]} />
 			<div className="tabs-button red" onClick={this.onLogout}>Logout</div>
-			<div className="tabs-button save" onClick={this.onSave}>Save</div>
+			<div className="tabs-button" onClick={this.onSave} style={{ marginTop: "10px" }}>Save</div>
 		</div>
 	}
 }

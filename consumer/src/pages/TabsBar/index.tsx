@@ -93,7 +93,7 @@ class TabsBar extends Component<propTypes, S> {
 							Library
 						</Link>
 						{
-							token && <Link to="/bazaar" className={current === "/bazaar" ? "cell active" : "cell"}>
+							(token && user === "SCHOOL") && <Link to="/bazaar" className={current === "/bazaar" ? "cell active" : "cell"}>
 								Bazaar
 							</Link>
 						}

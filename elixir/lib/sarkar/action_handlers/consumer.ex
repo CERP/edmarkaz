@@ -46,7 +46,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 					refcode = Map.get(profile, "refcode")
 					{:ok, one_token} = EdMarkaz.Auth.gen_onetime_token(refcode)
 
-					case EdMarkaz.Contegris.send_sms(phone, "Click here to login https://ilmexchange.com/auth/#{one_token} \nOr enter code #{one_token}") do
+					case EdMarkaz.Contegris.send_sms(phone, "Click here to login https://ilmexchange.com/auth/#{one_token} ,Or enter code #{one_token}") do
 						{:ok, res} ->
 							{:reply, succeed(res), state}
 						{:error, msg} ->
@@ -137,7 +137,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 					end
 				end
 
-				{:reply, succeed(%{token: token}), %{id: number, client_id: client_id}}
+				{:reply, succeed(%{token: token, user: "SCHOOL"}), %{id: number, client_id: client_id}}
 			{:error, msg} ->
 				{:reply, fail(msg), state}
 		end
@@ -155,7 +155,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 				end
 				{:ok, new_token} = EdMarkaz.Auth.gen_token(number, client_id)
 
-				{:reply, succeed(%{token: new_token, sync_state: %{ "profile" => profile }, id: number }), %{id: number, client_id: client_id}}
+				{:reply, succeed(%{token: new_token, sync_state: %{ "profile" => profile }, id: number, user: "SCHOOL" }), %{id: number, client_id: client_id}}
 			{:error, err} ->
 				IO.inspect err
 				{:reply, fail(err), %{}}
