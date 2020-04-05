@@ -34,7 +34,7 @@
 	margin: 5px 2px;
 	width: 100%;
 	height: 50px;
-	background-color: #FFEB3B;
+	background-color: #ffc107;
 	text-decoration: solid;
 	color: black;
 }
@@ -60,46 +60,56 @@
 	justify-content: center;
     align-items: center;
 	flex-direction: column;
-	width: fit-content;
+	width: 70px;
 	padding: 10px 20px;
 	height: auto;
-	background: #eeeeee;
 	border-radius: 40px;
 	cursor: pointer;
+	border: 1px solid #ebebeb
 }
 .student-portal-op .square {
 	display: flex;
-	justify-content: center;
+	justify-content: flex-end;
     align-items: center;
 	flex-direction: column;
 	border-radius: 5px;
 	padding: 25px 15px;
-	border: 1px solid #efefef;
 	cursor: pointer;
+	text-decoration: none;
+	color: #000;
+	width: 120px;
+	height: 100px;
+	box-shadow: 0px 0px 8px 0px #bebebe;
 }
+	.student-portal-op .square.subject {
+		background-repeat: no-repeat;
+		background-position: 50% 15%;
+		background-size: 50%;
+	}
 .oval:hover {
 	color: #ffffff;
-	background-color: rgb(5, 5, 70);
+	background-color: #42A5F5;
 }
 .circle:hover {
-	background-color: #FFEB3B;
+	background-color: #ffc107;
+	color: #ffffff;
 }
 .square:hover {
-	color: rgb(5, 5, 70);
-	border: 1px solid rgb(5, 5, 70);
+	color: #222;
+	border: 1px solid #42A5F5;
 }
 
 .bg-yellow {
-	background-color: #FFEB3B;
-	color: #222;
+	background-color: #ffc107;
+	color: #ffffff;
 }
 .bg-blue {
 	color: #ffffff;
-	background-color: rgb(5, 5, 70) !important;
+	background-color: #42A5F5 !important;
 }
 .bg-bluish {
-	color: rgb(5, 5, 70);
-	border: 1px solid rgb(5, 5, 70) !important;
+	color: #42A5F5;
+	border: 1px solid #42A5F5 !important;
 }
 .school .card-list {
 	display: flex;
@@ -139,7 +149,7 @@
 		flex-direction: row;
 		flex-wrap: wrap;
 		justify-content: space-evenly;
-
+		margin-top: 10px;
 	}
 
 	.lesson-box {
@@ -153,24 +163,25 @@
 		transition: ease 300ms;
 		margin: 10px 20px;
 		flex-grow: 1;
+		min-height: 100px;
 	}
 		.lesson-box.border-yellow {
-			border-left: 10px solid #FFEB3B;
+			border-left: 10px solid #ffc107;
 		}
 		.lesson-box.border-red {
-			border-left: 10px solid rgb(107, 36, 7);
+			border-left: 10px solid #FE7C56;
 		}
 		.lesson-box.border-green {
-			border-left: 10px solid rgb(18, 78, 3);
+			border-left: 10px solid #8BC349;
 		}
 		.lesson-box.border-blue {
-			border-left: 10px solid rgb(5, 28, 77);
+			border-left: 10px solid #42A5F5;
 		}
 		.lesson-box.border-grey {
 			border-left: 10px solid rgb(155, 155, 155);
 		}
 		.lesson-box.border-purple {
-			border-left: 10px solid rgb(84, 7, 121);
+			border-left: 10px solid #C588CE;
 		}
 		.lesson-box.active {
 			width: 100%;
@@ -196,7 +207,7 @@
 			width: 100%;
 		}
 			.lesson-box .list-container .header {
-				font-size: 15px;
+				font-size: 30px;
 				font-weight: bold;
 			}
 			.lesson-box .list-container .lb-list {
@@ -270,7 +281,12 @@
 
 	.lesson-box {
 		width: 100%;
-		margin: 10px 0px;;
+		margin: 10px 0px;
+		min-height: 50px;
+	}
+
+	.lesson-box .list-container .header {
+		font-size: 20px;
 	}
 
 }
