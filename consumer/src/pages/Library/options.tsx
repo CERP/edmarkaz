@@ -59,7 +59,7 @@ const StudentPortalOptions: React.FC<P> = ({ getLessons, lessons, lesson_loading
 						}
 					</div> : <div className="content selected">
 							<div className="circle bg-yellow">Urdu</div>
-							<div style={{ textDecoration: "underline", color: "blue" }} onClick={(e) => setMedium("")}>Change Class</div>
+							<div style={{ textDecoration: "underline", color: "blue" }} onClick={(e) => setMedium("")}>Change Medium</div>
 						</div>
 				}
 			</div>

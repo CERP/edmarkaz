@@ -44,17 +44,19 @@ const FrontPage = () => {
 					width >
 				}
 				<img className="img" src={Demo} /> */}
-				<div className="image-card">
-					<img className="img" src={TeacherMain} />
-					<div className="pill" onClick={() => setShowModal(true)}>Teachers</div>
-				</div>
-				<div className="image-card">
-					<img className="img cen" src={StudentMain} />
-					<Link className="pill" to="/library">Students</Link>
-				</div>
-				<div className="image-card">
-					<img className="img" src={SchoolMain} />
-					<Link className="pill" to="/school">Schools</Link>
+				<div className="image-card-container">
+					<div className="image-card">
+						<img className="img" src={TeacherMain} />
+						<div className="pill" onClick={() => setShowModal(true)}>Teachers</div>
+					</div>
+					<div className="image-card">
+						<img className="img cen" src={StudentMain} />
+						<Link className="pill" to="/library">Students</Link>
+					</div>
+					<div className="image-card">
+						<img className="img" src={SchoolMain} />
+						<Link className="pill" to="/school">Schools</Link>
+					</div>
 				</div>
 			</div>
 		</div>

@@ -1,3 +1,7 @@
+.student-portal-op {
+	padding: 10px 5%;
+    width: calc(100% - 10%);
+}
 .student-portal-op .row {
 	background-color: #ffffff;
 	display: flex;
@@ -134,8 +138,9 @@
 	display: flex;
 	flex-direction: column;
 	background-color: #ffffff;
-	padding: 10px 20px;
 	margin-top: 20px;
+	padding: 10px 5%;
+    width: calc(100% - 10%);
 
 }
 	.lesson-page .search-bar {
@@ -207,8 +212,7 @@
 			width: 100%;
 		}
 			.lesson-box .list-container .header {
-				font-size: 30px;
-				font-weight: bold;
+				font-size: 20px;
 			}
 			.lesson-box .list-container .lb-list {
 				overflow-y: auto;

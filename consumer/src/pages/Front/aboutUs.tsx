@@ -4,13 +4,13 @@ const AboutUs = () => {
 	const ProjectTeam = () => ([
 		{
 			position: "Principal Investigator",
-			url: "",
-			name: "Asim Ijaz Khwaja"
+			url: "https://storage.googleapis.com/ilmx-product-images/asimk-min.jpg",
+			name: "Asim Khwaja"
 		},
 		{
 			position: "LEAPS Sr. Program Manager",
 			url: "https://storage.googleapis.com/ilmx-product-images/aboutzainab.jpg",
-			name: "Zainab Siddiqui"
+			name: "Zainab Qureshi"
 		},
 		{
 			position: "Project Manager",
@@ -33,7 +33,7 @@ const AboutUs = () => {
 			name: "Farah Basit"
 		},
 		{
-			position: "Field Supervisor",
+			position: "Field Manager",
 			url: "https://storage.googleapis.com/ilmx-product-images/aboutumer.jpg",
 			name: "Umer Farooq"
 		},
@@ -75,73 +75,73 @@ const AboutUs = () => {
 	])
 	const Partners = () => ([
 		{
-			url: "",
+			url: "https://storage.googleapis.com/ilmx-product-images/bluelogo-1.png",
 			name: "Oxford University Press",
 			info: ""
 		},
 		{
-			url: "",
+			url: "https://storage.cloud.google.com/ilmx-product-images/TCFlogo.PNG?authuser=3",
 			name: "The Citizens Foundation",
 			info: ""
 		},
 		{
-			url: "",
+			url: "https://storage.googleapis.com/ilmx-product-images/dil%20new.png",
 			name: "Developments in Literacy",
 			info: ""
 		},
 		{
-			url: "",
+			url: "https://storage.googleapis.com/ilmx-product-images/Alif%20Laila.jpg",
 			name: "Alif Laila Book Bus Society",
 			info: ""
 		},
 		{
-			url: "",
+			url: "https://storage.googleapis.com/ilmx-product-images/ilm.png",
 			name: "Ilm Association",
 			info: ""
 		},
 		{
-			url: "",
+			url: "https://storage.googleapis.com/ilmx-product-images/Sabaq%20logo.png",
 			name: "Sabaq Muse",
 			info: ""
 		},
 		{
-			url: "",
+			url: "https://storage.googleapis.com/ilmx-product-images/edkasa%20new%20logo.png",
 			name: "EdKasa",
 			info: ""
 		},
 		{
-			url: "",
+			url: "https://storage.googleapis.com/ilmx-product-images/AzCorp%20Logo%20-%20New.png",
 			name: "AZ Corp",
 			info: ""
 		},
 		{
-			url: "",
+			url: "https://storage.googleapis.com/ilmx-product-images/Radec.png",
 			name: "Radec",
 			info: ""
 		},
 		{
-			url: "",
+			url: "https://storage.googleapis.com/ilmx-product-images/kp%20logo%20new.png",
 			name: "Knowledge Platform",
 			info: ""
 		},
 		{
-			url: "",
+			url: "https://storage.cloud.google.com/ilmx-product-images/javed.png",
 			name: "Javed Publishers",
 			info: ""
 		},
 		{
-			url: "",
+			url: "https://storage.googleapis.com/ilmx-product-images/KASHFLOGO-High%20Res.jpg",
 			name: "Kashf Foundation",
 			info: ""
 		},
 		{
-			url: "",
+			url: "https://storage.googleapis.com/ilmx-product-images/Finca%20Updated%20Logo%20right.jpg",
 			name: "Finca",
 			info: ""
 		},
 
 		{
-			url: "",
+			url: "https://storage.googleapis.com/ilmx-product-images/jsbank.png",
 			name: "JS Bank",
 			info: ""
 		}
@@ -207,9 +207,9 @@ const AboutUs = () => {
 				</div>
 			</div>
 		</div>
-		<div className="partition">
+		<div className="partition bg-teal">
 			<div className="info-container">
-				<div className="heading">Our Partners</div>
+				<div className="heading white">Our Partners</div>
 				<div className="card-container">
 					{
 						Partners().map(({ url, name, info }) => <div className="card partner">
@@ -218,6 +218,15 @@ const AboutUs = () => {
 						</div>)
 					}
 				</div>
+			</div>
+		</div>
+		<div className="partition">
+			<div className="info-container">
+				<div className="heading">Contact Us</div>
+				<ul style={{ textAlign: "left" }}>
+					<li style={{ marginBottom: "10px" }}><b>Address:</b> <a href="https://maps.app.goo.gl/cDmhLohH8tGYxDbJ6" target="__blank">29-P, Mushtaq Ahmed Gurmani Road Gulberg II, Lahore - Pakistan</a> </li>
+					<li><b>Helpline:</b> <a href="tel:+923481119119">0348-1119119</a></li>
+				</ul>
 			</div>
 		</div>
 	</div>

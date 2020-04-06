@@ -1,5 +1,7 @@
 
 .tabs-page .sign-up {
+	padding: 10px 5%;
+	width: calc(100% - 10%);
 	display: flex;
 	flex-direction: column;
 }
@@ -54,7 +56,8 @@
 	}
 
 	.login-page {
-
+		padding: 10px 5%;
+		width: calc(100% - 10%);
 	}
 
 	.center {

@@ -2,6 +2,7 @@
 	margin-bottom: 70px;
 }
 	.heading {
+		font-family: futura;
 		margin-top: 30px;
 		font-size: 30px;
 		font-weight: bold;
@@ -29,9 +30,11 @@
 	justify-content: flex-start;
 	background-color: #ffffff;
 	margin: unset;
-	height: 80px;
+	height: 90px;
 	align-items: center;
-	padding: 0 20px;
+	/* padding: 0 20px; */
+	padding: 10px 5%;
+    width: calc(100% - 10%);
 }
 	.header-tabs .profile {
 		padding: 5px 10px;
@@ -41,8 +44,8 @@
 		text-decoration: none;
 	}
 	.header-tabs .bttn {
-		color: #848484;
-		font-size: 20px;
+		color: #8D8D8D;
+		font-size: 18px;
 		width: 20%;
 		text-align: center;
 		margin: 0px 5px;

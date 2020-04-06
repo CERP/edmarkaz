@@ -23,6 +23,10 @@ code {
 	font-family: urdu;
 	src: url('./fonts/NotoNastaliqUrdu-Regular.ttf');
 }
+@font-face {
+	font-family: futura;
+	src: url('./fonts/FuturaPTHeavy.otf')
+}
 
 html,body, #root, .layout{
 	height: 100%;
