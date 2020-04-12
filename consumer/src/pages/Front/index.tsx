@@ -53,7 +53,7 @@ const FrontPage = () => {
 					</div>
 					<div className="image-card">
 						<img className="img cen" src={StudentMain} />
-						<Link className="pill" to="/library">Students</Link>
+						<Link className="pill" to="/student">Students</Link>
 					</div>
 					<div className="image-card">
 						<img className="img" src={SchoolMain} />
@@ -76,7 +76,7 @@ const FrontPage = () => {
 					Whether you prefer learning in Urdu of English, we bring you fun,
 					engaging content through lessons, video games and quizzes
 				</div>
-				<Link className="pill" to="/library"> Student Portal</Link>
+				<Link className="pill" to="/student"> Student Portal</Link>
 			</div>
 		</div>
 
