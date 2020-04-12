@@ -20,6 +20,8 @@ const FrontPage = () => {
 	const { height, width } = useWindowDimensions()
 
 	return <div className="front">
+		<Header path={"/"} />
+
 
 		{showModal && <Modal>
 			<div className="modal-box">

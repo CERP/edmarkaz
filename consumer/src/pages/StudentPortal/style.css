@@ -1,0 +1,10 @@
+.student {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.student .form {
+	width: 80%;
+}

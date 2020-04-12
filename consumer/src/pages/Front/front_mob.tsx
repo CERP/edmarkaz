@@ -4,6 +4,7 @@ import SchoolMain from './assets/school_main.png'
 import TeacherMain from './assets/teacher_main.png'
 import { Link } from 'react-router-dom'
 import Modal from '../../components/Modal'
+import Layout from '../../components/Layout'
 
 const OptionsMobile = () => {
 	const [showModal, setShowModal] = useState(false)
@@ -19,17 +20,17 @@ const OptionsMobile = () => {
 		</Modal>
 		}
 		<div className="card-container">
-			<div className="card">
+			<Link className="card" to="/student">
 				<img className="icon" src={StudentMain} />
-				<Link className="pill" to="/library">students</Link>
-			</div>
-			<div className="card">
+				<div className="heading teal">STUDENTS</div>
+			</Link>
+			<Link className="card" to="/school">
 				<img className="icon" src={SchoolMain} />
-				<Link className="pill" to="/school">schools</Link>
-			</div>
-			<div className="card">
+				<div className="heading teal" >SCHOOLS</div>
+			</Link>
+			<div className="card" onClick={() => setShowModal(true)}>
 				<img className="icon" src={TeacherMain} />
-				<div className="pill" onClick={() => setShowModal(true)}>teachers</div>
+				<div className="heading teal" >TEACHERS</div>
 			</div>
 		</div>
 	</div>

@@ -10,6 +10,7 @@ export const saveDB = (db: RootReducerState) => {
 		saveQueue(db.queued)
 		saveProducts(db.products)
 		saveLessons(db.lessons)
+		saveActiveStudent(db.activeStudent)
 	}
 
 	catch (err) {
@@ -31,6 +32,7 @@ export const loadAuth = (): RootReducerState['auth'] => {
 		token: undefined,
 		client_type: "consumer",
 		sms_sent: false,
+		verifying_user: false,
 		user: undefined
 	};
 
@@ -107,6 +109,24 @@ const loadLessons = () => {
 	}
 	catch (e) {
 		console.log('returning initial')
+		return initial
+	}
+}
+const saveActiveStudent = (activeStudent?: RootReducerState["activeStudent"]) => {
+	if (activeStudent !== undefined) {
+		localStorage.setItem("activeStudent", JSON.stringify(activeStudent))
+	}
+}
+
+const loadStudent = () => {
+	const initial: RootReducerState["activeStudent"] = undefined
+
+	try {
+		//@ts-ignore
+		return JSON.parse(localStorage.getItem("activeStudent")) || initial
+	}
+	catch {
+		console.log('Error getting active student returning initial')
 		return initial
 	}
 }
@@ -201,6 +221,7 @@ export const loadDB = (): RootReducerState => {
 		connected: false,
 		sync_state: loadSyncState(),
 		products: loadProducts(),
-		lessons: loadLessons()
+		lessons: loadLessons(),
+		activeStudent: loadStudent()
 	}
 }

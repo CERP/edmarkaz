@@ -1,0 +1,16 @@
+.layout-new {
+
+}
+
+.layout-new .student-header {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	height: 3rem;
+	position: fixed;
+	width: 100%;
+}
+.student-header .body {
+	margin-top: 3rem;
+}

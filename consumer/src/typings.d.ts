@@ -62,7 +62,8 @@ interface RootReducerState {
 		token?: string;
 		client_type: "consumer";
 		sms_sent: boolean;
-		user?: "SCHOOL" | "TEACHER" | "STUDENT" | "GUEST_STUDENT" | "GUEST_TEACHER"
+		verifying_user: boolean;
+		user?: "SCHOOL" | "TEACHER" | "STUDENT" | "GUEST_STUDENT" | "GUEST_TEACHER";
 	};
 	products: {
 		last_sync: number;
@@ -101,11 +102,17 @@ interface RootReducerState {
 			[id: string]: RouteAnalyticsEvent;
 		};
 	};
+	activeStudent?: ILMXStudent
 	last_snapshot: number;
 	accept_snapshot: boolean;
 	connected: boolean;
 }
 
+interface ILMXStudent {
+	name: string
+	grade: string
+	phone: string
+}
 interface CERPSchool {
 	alt_number: string;
 	alt_phone_number: string;

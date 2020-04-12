@@ -110,8 +110,18 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 				{:ok, token} = EdMarkaz.Auth.login({number, client_id, password})
 				{:ok, one_token} = EdMarkaz.Auth.gen_onetime_token(refcode)
 
+				student_token = case String.slice(number, 0..0) === "0" do
+					true ->
+						number |> String.slice(1..-1) |> String.reverse
+					false ->
+						number |> String.reverse
+				end
+
 				spawn fn ->
-					res = EdMarkaz.Contegris.send_sms(number, "Welcome to ilmExchange. Please go here to login https://ilmexchange.com/auth/#{one_token}")
+					res = EdMarkaz.Contegris.send_sms(
+						number,
+						"Welcome to ilmExchange. Please go here to login https://ilmexchange.com/auth/#{one_token} \nYour Student Referral Link and code to access our Student Portal is https://ilmexchange.com/student?referral=#{student_token}, and #{student_token}."
+					)
 					IO.inspect res
 				end
 
@@ -176,6 +186,51 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 		case EdMarkaz.School.get_profile(number) do
 			{:ok, school_id, db} -> {:reply, succeed(%{"school_id" => school_id, "school" => db}), state}
 			{:error, msg} -> {:reply, fail(%{"msg" => msg}), state}
+		end
+
+	end
+
+	def handle_action(
+		%{
+			"type" => "VERIFY_STUDENT_TOKEN",
+			"client_id" => client_id,
+			"payload" => %{
+				"token" => token
+			}
+		},
+		state
+	) do
+		number = token |> String.reverse
+
+		case EdMarkaz.School.get_profile("0#{number}") do
+			{:ok, school_id, db} ->
+				{:reply, succeed(%{"school_id" => school_id, "school" => db}), state}
+			{:error, msg} ->
+				{:reply, fail(%{"msg" => msg}), state}
+		end
+	end
+
+	def handle_action(
+		%{
+			"type" => "SAVE_STUDENT_INFORMATION",
+			"client_id" => client_id,
+			"payload" => %{
+				"profile" => profile,
+				"school_id" => school_id
+			}
+		},
+		state
+	)do
+		case Postgrex.query(
+			EdMarkaz.DB,
+			"INSERT INTO device_to_school_mapper VALUES($1, $2, $3)",
+			[school_id, client_id, profile]
+		) do
+			{:ok, res } ->
+				{:reply, succeed(), state}
+			{:error, err} ->
+				IO.inspect err
+				{:reply, fail(err), state}
 		end
 
 	end

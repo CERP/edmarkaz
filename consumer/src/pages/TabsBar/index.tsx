@@ -3,9 +3,9 @@ import { RouteComponentProps, Route } from "react-router";
 import { Link } from "react-router-dom";
 
 import Header from "../../components/Header";
-import ProductHome from "../ProductHome";
-import SupplierHome from "../Supplier";
-import ProductPage from "../accordian/Product";
+import ProductHome from "../Bazaar";
+import SupplierHome from "../Bazaar/Supplier";
+import ProductPage from "../Bazaar/Product";
 import SignUp from "../SignUp";
 import Profile from "../Profile";
 import Articles, { ArticleRouter } from "../Articles";
@@ -19,13 +19,21 @@ import login from "../SignUp/login";
 import TrackedRoute from "../../components/TrackedRoute";
 import Library from "../Library";
 import LessonPage from "../Library/Lesson";
+import LibraryInstructionMedium from '../Library/medium'
 import StudentPortalOptions from '../Library/options';
 import FrontPage from "../Front";
 import OptionsMobile from "../Front/front_mob";
 import School from "../School";
 import AboutUs from "../Front/aboutUs";
+import Layout from "../../components/Layout";
+import { Paper, Tabs, Tab } from "@material-ui/core";
+import SchoolProfile from '../Profile/profile'
+import classes from "*.module.css";
+import StudentPortal from "../StudentPortal";
+import StudentProfile from "../StudentPortal/studentProfile";
 
 interface S {
+	tab: number
 	error: boolean;
 	err?: Error;
 	errInfo?: React.ErrorInfo;
@@ -47,6 +55,7 @@ class TabsBar extends Component<propTypes, S> {
 		super(props);
 
 		this.state = {
+			tab: 0,
 			error: false,
 			err: undefined,
 			errInfo: undefined
@@ -63,9 +72,15 @@ class TabsBar extends Component<propTypes, S> {
 		});
 	}
 
+	handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+
+		console.log(newValue)
+		this.setState({ tab: newValue })
+	};
+
 	render() {
 
-		const { location, token, user } = this.props
+		const { location, token, user, history } = this.props
 		const current = location.pathname;
 		const search = location.search;
 
@@ -80,32 +95,23 @@ class TabsBar extends Component<propTypes, S> {
 		const callLink = this.props.connected ?
 			"https://api.whatsapp.com/send?phone=923481119119" : "tel:0348-1119-119"
 
-		return (
+		return <Layout>
 			<div className="tabs-page">
-				<Header path={current} />
-
-				{(current !== "/" && current !== "/about-us" && current !== "/start-mob" && current !== "/sign-up" && current !== "/log-in") && (
-					<div className="tabs-bar subtitle">
-						{/* <Link to="/articles" className={current === "/articles" ? "cell active" : "cell"}>
-							Library
-						</Link> */}
-						<Link to="/library" className={library ? "cell active" : "cell"}>
-							Library
-						</Link>
-						{
-							(token && user === "SCHOOL") && <Link to="/bazaar" className={current === "/bazaar" ? "cell active" : "cell"}>
-								Bazaar
-							</Link>
-						}
-						<Link to="/help" className={current === "/help" ? "cell active" : "cell"}>
-							Help
-						</Link>
-					</div>
-				)}
-
+				{(user === "SCHOOL" && current !== "/start-mob" && current !== "/sign-up" && current !== "/log-in") &&
+					<Paper style={{ flexGrow: 1 }}>
+						<Tabs
+							onChange={this.handleTabChange}
+							value={this.state.tab}
+							indicatorColor="primary"
+							textColor="primary"
+							centered
+						>
+							<Tab label="Library" onClick={() => history.push("/library")} />
+							<Tab label="Bazaar" onClick={() => history.push("/bazaar")} />
+							<Tab label="Help" onClick={() => history.push("/help")} />
+						</Tabs>
+					</Paper>}
 				<>
-					<TrackedRoute exact path="/" component={FrontPage} />
-					<TrackedRoute exact path="/about-us" component={AboutUs} />
 					<TrackedRoute exact path="/school" component={School} />
 					<TrackedRoute exact path="/supplier/:supplier_id/:product_id" component={ProductPage} />
 					<TrackedRoute exact path="/supplier/:supplier_id" component={SupplierHome} />
@@ -114,11 +120,15 @@ class TabsBar extends Component<propTypes, S> {
 					<Route path="/articles/:article_id" component={ArticleRouter} />
 					<TrackedRoute exact path="/articles" component={Articles} />
 					<TrackedRoute path="/help" component={Help} />
-					<TrackedRoute exact path="/library" component={StudentPortalOptions} />
+					<TrackedRoute exact path="/library" component={LibraryInstructionMedium} />
+					<TrackedRoute exact path="/library/:medium" component={StudentPortalOptions} />
 					<TrackedRoute exact path="/library/:medium/:grade/:subject" component={Library} />
+					<TrackedRoute exact path="/library/:medium/:grade/:subject/:chapter/:chapter_name" component={LessonPage} />
 					<TrackedRoute exact path="/start-mob" component={OptionsMobile} />
 					<TrackedRoute exact path="/sign-up" component={SignUp} />
 					<TrackedRoute exact path="/bazaar" component={ProductHome} />
+					<TrackedRoute exact path="/student" component={StudentPortal} />
+					<TrackedRoute exact path="/student-profile" component={StudentProfile} />
 				</>
 				{!library && <a className="contact-us" href={callLink}>
 					<img src={contactUs} />
@@ -132,7 +142,7 @@ class TabsBar extends Component<propTypes, S> {
 					<a className="bttn" href={callLink} style={{ border: "none" }}>Contact Us</a>
 				</div>}
 			</div>
-		);
+		</Layout>
 	}
 }
 export default connect(

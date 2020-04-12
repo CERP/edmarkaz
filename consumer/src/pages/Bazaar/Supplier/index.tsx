@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { Link } from 'react-router-dom'
 
-import { getProducts } from '../../actions'
+import { getProducts } from '../../../actions'
 
 import './style.css'
 

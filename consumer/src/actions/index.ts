@@ -4,6 +4,106 @@ import { createLoginSucceed, analyticsEvent, submitError } from './core';
 type Dispatch = (action: any) => any
 type GetState = () => RootReducerState
 
+
+export const saveStudentProfile = (profile: ILMXStudent) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+
+	const state = getState()
+
+	if (!state.connected) {
+		syncr.onNext('connect', () => dispatch(saveStudentProfile(profile)))
+		return
+	}
+
+	syncr.send({
+		type: "SAVE_STUDENT_INFORMATION",
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		payload: {
+			profile,
+			school_id: state.sync_state.profile.refcode
+		}
+	})
+		.then(res => dispatch({
+			type: "SET_ACTIVE_STUDENT",
+			profile
+		}))
+		.catch(err => {
+			if (err.message === "not ready") {
+				alert("not yet connected...")
+			}
+			else {
+				dispatch(submitError(err))
+			}
+		})
+}
+export interface SET_ACTIVE_STUDENT_ACTION {
+	type: "SET_ACTIVE_STUDENT",
+	profile: ILMXStudent
+}
+
+export const verifyStudentToken = (token: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+	const state = getState()
+
+	if (!state.connected) {
+		syncr.onNext('connect', () => dispatch(verifyStudentToken(token)))
+		return
+	}
+
+	dispatch({
+		type: "VERIFYING_USER"
+	})
+
+	syncr.send({
+		type: "VERIFY_STUDENT_TOKEN",
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		payload: {
+			token: token
+		}
+	})
+		.then((res: { school_id: string, school: Partial<CERPSchool> }) => {
+			dispatch({
+				type: "STUDENT_LOGIN",
+				user: "STUDENT",
+				school_id: res.school_id,
+				school: res.school
+			})
+			return res
+		})
+		.catch(err => {
+			if (err.message === "not ready") {
+				alert("not yet connected...")
+			}
+			else if (err === "timeout") {
+				setTimeout(() => dispatch(verifyStudentToken(token)), 2000)
+			}
+			else {
+				dispatch({
+					type: "STUDENT_LOGIN",
+					user: undefined,
+					school_id: undefined,
+					school: undefined
+				})
+				alert("login failed" + JSON.stringify(err))
+				dispatch(submitError(err))
+			}
+		})
+}
+
+export interface STUDENT_LOGIN_ACTION {
+	type: "STUDENT_LOGIN",
+	user: "STUDENT" | undefined,
+	school_id: string | undefined,
+	school: Partial<CERPSchool> | undefined
+}
+
+export const createGuestStudentLogin = () => (dispatch: Dispatch) => {
+	dispatch({
+		type: "GUEST_STUDENT_LOGIN"
+	})
+}
+
+
 export const createLogin = (username: string, password: string, number: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 
 	const state = getState();
@@ -132,11 +232,12 @@ export const getProducts = (filters = {}) => (dispatch: Dispatch, getState: GetS
 export const trackVideoAnalytics = (path: string, chapter_id: string, lessons_id: string, time: number) => (dispatch: Dispatch, getState: GetState) => {
 	const state = getState()
 
-	const meta = state.auth.token ?
+	const meta = (state.auth.user === "SCHOOL" || state.auth.user === "STUDENT") ?
 		{
 			route: path.split("/").splice(1),
 			refcode: state.sync_state.profile.refcode,
 			phone: state.sync_state.profile.phone_number,
+			user: state.auth.user,
 			chapter_id,
 			lessons_id,
 			time
@@ -296,14 +397,15 @@ export const trackRoute = (path: string) => (dispatch: Dispatch, getState: () =>
 
 	const state = getState()
 
-	const meta = state.auth.token ?
+	const meta = (state.auth.user === "SCHOOL" || state.auth.user === "STUDENT") ?
 		{
 			route: path.split("/").splice(1),
 			refcode: state.sync_state.profile.refcode,
-			phone: state.sync_state.profile.phone_number
+			phone: state.sync_state.profile.phone_number,
+			user: state.auth.user
 		} :
 		{
-			route: path.split("/").splice(1)
+			route: path.split("/").splice(1),
 		}
 
 	dispatch(analyticsEvent([{
