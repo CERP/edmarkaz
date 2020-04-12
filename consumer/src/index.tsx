@@ -14,6 +14,8 @@ import reducer from './reducers'
 import { loadDB, saveDB } from './utils/localStorage'
 import debounce from './utils/debounce';
 import { connected, disconnected } from './actions/core';
+import { ThemeProvider } from '@material-ui/core';
+import { theme } from './components/MuiTheme';
 
 
 const debug_url = "wss://5e4f17ae.ngrok.io/ws"
@@ -38,7 +40,7 @@ const saveBounce = debounce(() => {
 }, 500);
 
 store.subscribe(saveBounce as () => void)
-ReactDOM.render(<Routes store={store} />, document.getElementById('root'));
+ReactDOM.render(<ThemeProvider theme={theme}><Routes store={store} /></ThemeProvider>, document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
