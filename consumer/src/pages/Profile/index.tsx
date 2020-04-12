@@ -50,14 +50,16 @@ class Profile extends React.Component<P, S> {
 		const st = phone_number ? phone_number.split("").reverse().join("").substring(0, phone_number.length - 1) : ""
 		return <div className="user-profile">
 
-			<div className="referral section">
-				<div className="title">Student Referral </div>
-				<label style={{ userSelect: "auto" }}> {`https://ilmexchange.com/student?referral=${st}`}</label>
-			</div>
+			<div className="form-container">
+				<div className="referral section">
+					<div className="title">Student Referral </div>
+					<label style={{ userSelect: "auto" }}> {`https://ilmexchange.com/student?referral=${st}`}</label>
+				</div>
 
-			<SchoolForm school={this.state.profile} former={this.former} base_path={["profile"]} />
-			<div className="tabs-button red" onClick={this.onLogout}>Logout</div>
-			<div className="tabs-button" onClick={this.onSave} style={{ marginTop: "10px" }}>Save</div>
+				<SchoolForm school={this.state.profile} former={this.former} base_path={["profile"]} />
+				<div className="tabs-button red" onClick={this.onLogout}>Logout</div>
+				<div className="tabs-button" onClick={this.onSave} style={{ marginTop: "10px" }}>Save</div>
+			</div>
 		</div>
 	}
 }
