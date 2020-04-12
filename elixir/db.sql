@@ -88,3 +88,11 @@ create table platform_writes
 
 	create index on student_portal
 	(id);
+
+	create table device_to_school_mapper
+	(
+		school_id text not null,
+		device_id text not null,
+		meta jsonb not null,
+		time timestamp default current_timestamp
+	);

@@ -1,3 +1,16 @@
 .user-profile {
 	margin: 20px;
+	display: flex;
+	margin: 20px;
+	max-width: 1300px;
+	flex-direction: column;
+}
+
+.school-profile {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	padding: 20px 40px;
+	justify-content: center;
+	align-items: center;
 }

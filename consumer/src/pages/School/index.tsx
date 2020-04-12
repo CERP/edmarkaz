@@ -4,7 +4,7 @@ import { Redirect } from 'react-router'
 import { Link } from 'react-router-dom'
 import TrackedRoute from '../../components/TrackedRoute'
 import SignUp from '../SignUp'
-import ProductHome from '../ProductHome'
+import ProductHome from '../Bazaar'
 
 interface P {
 	auth: RootReducerState["auth"]

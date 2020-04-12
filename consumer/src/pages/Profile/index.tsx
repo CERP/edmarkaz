@@ -5,6 +5,7 @@ import Former from 'former'
 import { SchoolForm } from '../SignUp/form'
 import { RouteComponentProps } from 'react-router'
 import './style.css'
+import { TextField } from '@material-ui/core'
 
 type P = {
 	school: Partial<CERPSchool>;
@@ -45,9 +46,15 @@ class Profile extends React.Component<P, S> {
 
 	render() {
 
-		console.log("PROFILE", this.state.profile)
-
+		const { phone_number } = this.state.profile
+		const st = phone_number ? phone_number.split("").reverse().join("").substring(0, phone_number.length - 1) : ""
 		return <div className="user-profile">
+
+			<div className="referral section">
+				<div className="title">Student Referral </div>
+				<label style={{ userSelect: "auto" }}> {`https://ilmexchange.com/student?referral=${st}`}</label>
+			</div>
+
 			<SchoolForm school={this.state.profile} former={this.former} base_path={["profile"]} />
 			<div className="tabs-button red" onClick={this.onLogout}>Logout</div>
 			<div className="tabs-button" onClick={this.onSave} style={{ marginTop: "10px" }}>Save</div>

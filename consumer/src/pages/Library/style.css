@@ -1,11 +1,13 @@
 .student-portal-op {
 	padding: 10px 5%;
-    width: calc(100% - 10%);
+	width: calc(100% - 10%);
+	margin-top: 5px;
+	background-color: #ffffff;
 }
 .student-portal-op .row {
 	background-color: #ffffff;
 	display: flex;
-	padding: 10px 40px;
+	padding: 10px 20px;
 	margin: 20px 0px;
 	flex-direction: column;
 	align-items: center;
@@ -20,6 +22,7 @@
 		padding: 10px 0px;
 		flex-direction: row;
 		flex-wrap: wrap;
+		justify-content: center;
 	}
 	.student-portal-op .row .content.selected {
 		flex-direction: column;
@@ -137,11 +140,9 @@
 .lesson-page {
 	display: flex;
 	flex-direction: column;
-	background-color: #ffffff;
-	margin-top: 20px;
+	justify-content: center;
 	padding: 10px 5%;
-    width: calc(100% - 10%);
-
+	width: calc(100% - 10%);
 }
 	.lesson-page .search-bar {
 		width: auto;
@@ -158,11 +159,12 @@
 	}
 
 	.lesson-box {
+		text-decoration: none;
 		border-radius: 5px;
 		border: 1px solid #bebebe;
 		display: flex;
 		flex-direction: column;
-		align-items: center;
+		align-items: flex-start;
 		width: 40%;
 		padding: 10px 20px;
 		transition: ease 300ms;
@@ -197,27 +199,19 @@
 			justify-content: space-between;
 			width: 100%;
 		}
-			.lesson-box .info .title {
+		.lesson-box-container .lesson-box .title {
 				font-size: 10px;
 				color: #bebebe;
 				width: 90%;
-			}
-			.lesson-box .info .icon {
-				width: 5%;
-				height: 20px;
-			}
-		.lesson-box .list-container {
-			display: flex;
-			flex-direction: column;
-			width: 100%;
 		}
-			.lesson-box .list-container .header {
-				font-size: 20px;
-			}
-			.lesson-box .list-container .lb-list {
+		.lesson-box-container .lesson-box .header {
+			color: #222;
+		}
+
+			.lesson-page .lb-list {
 				overflow-y: auto;
-				max-height: 30vh;
-				box-shadow: inset 0 0 5px #bebebe;
+				max-height: 70vh;
+				/* box-shadow: inset 0 0 5px #bebebe; */
 				border-radius: 5px;
 				display: flex;
 				flex-direction: column;
@@ -225,23 +219,40 @@
 				margin: 10px 0px;
 				padding: 5px 0px;
 			}
-				.lesson-box .list-container .lb-list .item {
-					display: flex;
-					flex-direction: row;
-					justify-content: flex-start;
-					align-items: center;
-					padding: 5px 10px;
-					cursor: pointer;
-				}
-				.lesson-box .list-container .lb-list .item .play-icon {
-					height: 20px;
-					margin-right: 10px;
-				}
-				.lesson-box .list-container .lb-list .item .title {
-					font-size: 12px;
-					font-weight: normal;
+				.lesson-page .lb-list .play-icon {
+					height: 35px;
 				}
 
+/* ============== FOR MEDIUM PAGE==============*/
+
+.medium-page {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+}
+	.medium-page .card-container {
+		width: 70%;
+	}
+
+	.card-circle {
+		text-decoration: none;
+		width: 30%;
+		min-width: 150px;
+		height: 150px;
+		border-radius: 50%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		box-shadow: 0px 3px 6px #00000029;
+		background: #EFEFEF;
+	}
+		.card-circle .title {
+			font-family: futura;
+			color: #959595;
+		}
 /* ==============  FOR MODAL =============== */
 
 .video-modal {

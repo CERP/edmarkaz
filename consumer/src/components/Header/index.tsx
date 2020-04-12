@@ -17,9 +17,6 @@ const Header = ({ path, auth, history }: Props) => {
 		}
 		<Link to="" className="logo" />
 		<Link to="/about-us" className={path !== "/about-us" ? "bttn" : "bttn active"}>About Us</Link>
-		{
-			auth.token !== undefined && <Link to="/profile" className="profile" style={{ textDecoration: "none", color: "#000000" }}> Profile</Link>
-		}
 	</div>
 }
 {/* <Link to="/sign-up" style={{ textDecoration: "none", color: "#222", fontSize: "18px", alignSelf: "center" }} className="">

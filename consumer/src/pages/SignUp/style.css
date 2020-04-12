@@ -43,11 +43,11 @@
 	}
 
 	.tabs-page input {
-		height: 20px;
 		border: 1px solid #9E9E9E;
 		border-radius: 4px;
 		font-size: 12px;
 		padding: 10px;
+		margin: 10px 0px;
 	}
 
 	.tabs-page .row-row {

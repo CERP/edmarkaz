@@ -174,6 +174,8 @@ export const submitError = (err: Error, errInfo?: React.ErrorInfo) => (dispatch:
 			date: new Date().getTime()
 		}
 	})
+		.then(res => console.log("ERROR REPORTED"))
+		.catch(err => console.log("COULD NOT REPORT ERROR", err))
 
 }
 

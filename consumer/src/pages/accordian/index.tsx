@@ -2,9 +2,9 @@ import React from 'react'
 import { Route, Link, RouteComponentProps, withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 
-import ProductHome from '../ProductHome'
-import SupplierHome from '../Supplier'
-import ProductPage from './Product'
+import ProductHome from '../Bazaar'
+import SupplierHome from '../Bazaar/Supplier'
+import ProductPage from '../Bazaar/Product'
 import SignUp from '../SignUp'
 import Profile from '../Profile'
 
@@ -44,10 +44,10 @@ class Accordian extends React.Component<P, S> {
 			<div className="header">IlmExchange (Consumer)</div>
 
 			<div className="burger">
-				<div className="whopper" onClick={this.onMinimize} style={{ background: `url(${icon}) 50% 0 no-repeat`}} />
-				{ this.state.visible && <Link to={{ pathname: "/", search }} className={current === "/" ? "active" : ""}>Products</Link> }
-				{ this.state.visible && this.props.auth.token && <Link to={{ pathname: "/profile", search }} className={current === "/profile" ? "active" : ""}>Profile</Link> }
-				{ this.state.visible && !this.props.auth.token && <Link to={{ pathname: "/sign-up", search }} className={current === "/sign-up" ? "active" : ""}>Sign Up</Link> }
+				<div className="whopper" onClick={this.onMinimize} style={{ background: `url(${icon}) 50% 0 no-repeat` }} />
+				{this.state.visible && <Link to={{ pathname: "/", search }} className={current === "/" ? "active" : ""}>Products</Link>}
+				{this.state.visible && this.props.auth.token && <Link to={{ pathname: "/profile", search }} className={current === "/profile" ? "active" : ""}>Profile</Link>}
+				{this.state.visible && !this.props.auth.token && <Link to={{ pathname: "/sign-up", search }} className={current === "/sign-up" ? "active" : ""}>Sign Up</Link>}
 			</div>
 
 			<div className="burger-stub">

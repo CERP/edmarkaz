@@ -1,4 +1,5 @@
 import React from 'react'
+import Header from '../../components/Header'
 
 const AboutUs = () => {
 	const ProjectTeam = () => ([
@@ -148,6 +149,7 @@ const AboutUs = () => {
 	])
 
 	return <div className="front about-us">
+		<Header path={"/about-us"} />
 		<div className="partition bg-teal">
 			<div className="info-container">
 				<div className="heading white">Our Story</div>

@@ -5,6 +5,8 @@
 	"dependencies": {
 		"@cerp/syncr": "^1.1.0",
 		"@ironbay/dynamic": "^1.0.10",
+		"@material-ui/core": "^4.9.9",
+		"@material-ui/icons": "^4.9.1",
 		"@types/qrcode.react": "^1.0.0",
 		"@types/react-youtube": "^7.6.2",
 		"former": "git+https://git@github.com/CERP/former.git",
