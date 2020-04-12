@@ -38,7 +38,7 @@ const FrontPage = () => {
 				<div className="para white">
 					A library of the best educational resources from around the world, carefully curated for Pakistan
 				</div>
-				<Link className="pill mob" to="/start-mob"> start here </Link>
+				<Link className="pill mob" to="/start-mob"> Start Here </Link>
 			</div>
 
 			<div className="img-container">
@@ -76,7 +76,7 @@ const FrontPage = () => {
 					Whether you prefer learning in Urdu of English, we bring you fun,
 					engaging content through lessons, video games and quizzes
 				</div>
-				<Link className="pill" to="/library"> student portal</Link>
+				<Link className="pill" to="/library"> Student Portal</Link>
 			</div>
 		</div>
 
@@ -93,7 +93,7 @@ const FrontPage = () => {
 					We curate and organize high quality materials and teacher training content
 					to help you and your classroom be the very best!
 				</div>
-				<div className="pill" onClick={() => setShowModal(true)}> teacher portal</div>
+				<div className="pill" onClick={() => setShowModal(true)}> Teacher Portal</div>
 			</div>
 		</div>
 
@@ -109,7 +109,7 @@ const FrontPage = () => {
 					Join our network of over 1500 schools and get access to information,
 					tools for schools and Pakistan's largest Education Marketplace
 				</div>
-				<Link className="pill" to="/school"> school portal</Link>
+				<Link className="pill" to="/school"> School Portal</Link>
 			</div>
 		</div>
 

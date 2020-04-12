@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { AppBar, Toolbar, IconButton, Typography, Button, makeStyles, Box } from '@material-ui/core'
 import BackIcon from '@material-ui/icons/ArrowBack'
 import AccountCircle from '@material-ui/icons/AccountCircle';
+import ExitToApp from '@material-ui/icons/ExitToApp'
 import { Home } from '@material-ui/icons'
 
 import './style.css'
@@ -101,6 +102,13 @@ const StudentHeader: React.FC<SP> = ({ goBack, push, auth, lesson_meta }) => {
 
 		push("/student-profile")
 	}
+
+	const guestLogout = () => {
+		localStorage.removeItem("auth")
+		window.history.pushState(undefined, '', '/')
+		window.location.reload()
+	}
+
 	return <>
 		<AppBar position="static">
 
@@ -126,6 +134,11 @@ const StudentHeader: React.FC<SP> = ({ goBack, push, auth, lesson_meta }) => {
 						<IconButton onClick={toHome} edge="start" color="inherit" aria-label="menu">
 							<Home />
 						</IconButton>
+						{
+							(auth.user === "GUEST_STUDENT" || auth.user === "GUEST_TEACHER") && <IconButton onClick={guestLogout}>
+								<ExitToApp />
+							</IconButton>
+						}
 
 						{(auth.user === "SCHOOL" || auth.user === "STUDENT") && <IconButton onClick={toAccount} edge="start" color="inherit" aria-label="menu">
 							<AccountCircle />
@@ -142,6 +155,11 @@ const StudentHeader: React.FC<SP> = ({ goBack, push, auth, lesson_meta }) => {
 						<IconButton onClick={toHome} edge="start" color="inherit" aria-label="menu">
 							<Home />
 						</IconButton>
+						{
+							(auth.user === "GUEST_STUDENT" || auth.user === "GUEST_TEACHER") && <IconButton onClick={guestLogout}>
+								<ExitToApp />
+							</IconButton>
+						}
 
 						{(auth.user === "SCHOOL" || auth.user === "STUDENT") && <IconButton onClick={toAccount} edge="start" color="inherit" aria-label="menu">
 							<AccountCircle />
