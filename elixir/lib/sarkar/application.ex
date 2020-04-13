@@ -23,6 +23,7 @@ defmodule EdMarkaz.Application do
 					database: "postgres",
 					port: System.get_env("POSTGRES_PORT") || "5432",
 					types: EdMarkaz.PostgrexTypes,
+					pool: DBConnection.Poolboy,
 					pool_size: 10,
 					timeout: 60000
 			},

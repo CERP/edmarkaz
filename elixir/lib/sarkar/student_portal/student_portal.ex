@@ -6,7 +6,7 @@ defmodule EdMarkaz.StudentPortal do
 
 	def merge(id, medium, class, subject, chapter_id, lesson_id, lesson) do
 
-		case Postgrex.query(
+		case EdMarkaz.DB.Postgres.query(
 			EdMarkaz.DB,
 			"INSERT INTO student_portal (
 				id,

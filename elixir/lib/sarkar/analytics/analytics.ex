@@ -47,7 +47,7 @@ defmodule Sarkar.Analytics do
 
 							query_string = "INSERT INTO consumer_analytics ( id, client_id, time, type, meta) VALUES #{value_string} ON CONFLICT DO NOTHING"
 
-							{:ok, _resp} = Postgrex.query(
+							{:ok, _resp} = EdMarkaz.DB.Postgres.query(
 								conn,
 								query_string,
 								arguments

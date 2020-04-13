@@ -14,7 +14,7 @@ defmodule EdMarkaz.Server.Analytics do
 	end
 
 	match "/consumer-signups.csv" do
-		{:ok, data} = case Postgrex.query(
+		{:ok, data} = case EdMarkaz.DB.Postgres.query(
 			EdMarkaz.DB,
 			"SELECT
 				id,
@@ -63,7 +63,7 @@ defmodule EdMarkaz.Server.Analytics do
 	end
 
 	match "/consumer-analytics.csv" do
-		{:ok, data} = case Postgrex.query(
+		{:ok, data} = case EdMarkaz.DB.Postgres.query(
 			EdMarkaz.DB,
 			"SELECT
 				client_id,
@@ -115,7 +115,7 @@ defmodule EdMarkaz.Server.Analytics do
 
 	match "/platform-writes.csv" do
 
-		{:ok, data} = case Postgrex.query(EdMarkaz.DB,
+		{:ok, data} = case EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
 		"SELECT id, to_timestamp(time/1000)::date as date, count(*)
 		FROM platform_writes
 		GROUP BY id, date
@@ -139,7 +139,7 @@ defmodule EdMarkaz.Server.Analytics do
 	end
 
 	match "/platform-orders.csv" do
-		{:ok, data} = case Postgrex.query(EdMarkaz.DB,
+		{:ok, data} = case EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
 		"SELECT
 			a.id,
 			to_timestamp((a.value->>'time')::bigint/1000)::date as date,
@@ -172,7 +172,7 @@ defmodule EdMarkaz.Server.Analytics do
 
 	match "/platform-events.csv" do
 
-		{:ok, data} = case Postgrex.query(EdMarkaz.DB,
+		{:ok, data} = case EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
 		"SELECT
 			id,
 			to_timestamp((value->>'time')::bigint/1000)::date as date,
@@ -204,7 +204,7 @@ defmodule EdMarkaz.Server.Analytics do
 	end
 
 	match "/platform-call-surveys.csv" do
-		{:ok, data} = case Postgrex.query(EdMarkaz.DB,
+		{:ok, data} = case EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
 		"SELECT
 			id,
 			to_timestamp((value->>'time')::bigint/1000)::date as date,
@@ -256,7 +256,7 @@ defmodule EdMarkaz.Server.Analytics do
 
 
 	match "/platform-call-survey-followup.csv" do
-		{:ok, data} = case Postgrex.query(EdMarkaz.DB,
+		{:ok, data} = case EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
 		"SELECT
 			id,
 			to_timestamp((value->>'time')::bigint/1000)::date as date,
@@ -336,7 +336,7 @@ defmodule EdMarkaz.Server.Analytics do
 	end
 
 	match "/platform-completed-survey.csv" do
-		{:ok, data} = case Postgrex.query(EdMarkaz.DB,
+		{:ok, data} = case EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
 		"SELECT
 			id, to_timestamp((value->>'time')::bigint/1000)::date as date,
 			value->>'event' as event,

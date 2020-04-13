@@ -47,7 +47,7 @@ ReactDOM.render(<ThemeProvider theme={theme}><Routes store={store} /></ThemeProv
 // Learn more about service workers: https://bit.ly/CRA-PWA
 serviceWorker.register({
 	onUpdate: (registration: ServiceWorkerRegistration) => {
-		navigator.serviceWorker.controller && navigator.serviceWorker.controller.postMessage({
+		registration.installing?.postMessage({
 			type: "SKIP_WAITING"
 		})
 	}
