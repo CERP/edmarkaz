@@ -49,10 +49,10 @@ interface Lesson {
 	meta: {
 		type: string
 		name: string
-		module_name: string
-		module_id: string
 		link: string
 		chapter_name: string
+		module_name?: string
+		module_id?: string
 	}
 }
 interface RootReducerState {

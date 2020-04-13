@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { getLessons } from '../../actions';
 import { connect } from 'react-redux';
-import { Link, Redirect, RouteComponentProps } from 'react-router-dom';
+import { Link, RouteComponentProps } from 'react-router-dom';
 import LoadingIcon from '../../icons/load.svg'
 import { getIconsFromSubject } from '../../utils/getIconsFromSubject';
 
@@ -54,7 +54,7 @@ const StudentPortalOptions: React.FC<Props> = ({ getLessons, lessons, lesson_loa
 				<div className="title">Select Subject</div>
 				<div className="content">
 					{
-						Object.keys(lessons["Urdu"][grade])
+						Object.keys(lessons[medium][grade])
 							.map(s => {
 								return <Link
 									to={`/library/${medium}/${grade}/${s}`}

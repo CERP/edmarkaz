@@ -26,18 +26,18 @@ interface RouteInfo {
 type Props = P & RouteComponentProps<RouteInfo>
 
 const getIDFromYoutbeLink = (link: string) => {
-	const id = link.split("/").pop()
 
-	if (id) {
-		if (id.length === 11) {
-			return id
-		}
-		return id.split("=").pop() as string
+	const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+	const match = link.match(regExp);
+
+	if (match && match[2].length == 11) {
+		return match[2]
 	}
+
 	return ""
 }
 
-const LessonPage: React.FC<Props> = ({ lessons, match, connected, location }) => {
+const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trackVideoAnalytics }) => {
 
 	const { medium, grade, subject, chapter, chapter_name } = match.params
 	const curr_unit = lessons[medium][grade][subject][chapter]
@@ -124,6 +124,8 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location }) =>
 	// 		setActiveLesson(key)
 	// 	}
 	// }
+
+	{ activeLesson && console.log("CURRENT LESSON", curr_unit[activeLesson].meta.type) }
 
 	return <div className="lesson-page">
 		{showModal && <Modal>

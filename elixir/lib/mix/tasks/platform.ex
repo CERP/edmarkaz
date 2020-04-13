@@ -17,15 +17,13 @@ defmodule Mix.Tasks.Platform do
 		IO.puts "INGESTING STUDENT PORTAL DATA"
 		tasks = lectures
 			|> Enum.map(
-				fn [medium,grade,subject,chapter_id, chapter, lesson_id, lesson, module_no, module_name, lesson_type, video_link] ->
+				fn [medium,grade,subject,chapter_id, chapter, lesson_id, lesson, lesson_type, video_link] ->
 
 					id = "#{medium}-#{grade}-#{subject}-#{chapter_id}-#{lesson_id}"
 					lesson_map = %{
 						"name" => lesson,
 						"type" => lesson_type,
 						"link" => video_link,
-						"module_name" => module_name,
-						"module_id" => module_no,
 						"chapter_name" => chapter
 					}
 
