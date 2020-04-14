@@ -23,10 +23,9 @@ const Library: React.FC<Props> = ({ lessons, match }) => {
 
 	const [activeChapter, setActiveChapter] = useState("")
 	const [searchText, setSearchText] = useState("")
-
 	const curr = lessons[p_medium][p_grade][p_subject]
 
-	const items = Object.entries(curr)
+	const items = Object.entries(curr || {})
 		.reduce((agg, [chapter_id, less]) => {
 			const temp = Object.entries(less)
 				.reduce((acc, [lesson_id, value]) => {

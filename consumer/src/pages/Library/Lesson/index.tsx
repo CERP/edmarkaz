@@ -125,8 +125,6 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 	// 	}
 	// }
 
-	{ activeLesson && console.log("CURRENT LESSON", curr_unit[activeLesson].meta.type) }
-
 	return <div className="lesson-page">
 		{showModal && <Modal>
 			<div className="modal-box video-modal">
@@ -160,11 +158,12 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 						.map(([lesson_id, lesson]) => {
 							return <List key={lesson_id}>
 								<ListItem button onClick={() => playLesson(lesson)}>
-									<ListItemIcon>
+									<ListItemIcon style={{ minWidth: "30px" }}>
 										<img className="play-icon" src={Play} />
 									</ListItemIcon>
-									<Typography className="" >{lesson.meta.name}</Typography>
+									<Typography variant="subtitle2" align="center">{lesson.meta.name}</Typography>
 								</ListItem>
+								<Divider />
 							</List>
 						})
 				}

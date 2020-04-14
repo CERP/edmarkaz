@@ -236,8 +236,10 @@
 			font-size: 60px;
 		}
 		.front .info-container .para {
-			font-size: 26px;
+			font-size: 20px;
 			margin: 48px 0px;
+			letter-spacing: 1px;
+			word-spacing: 5px;
 		}
 
 	.front .partition.main .info-container .pill.mob {
@@ -267,6 +269,8 @@
 		justify-content: center;
 		align-items: center;
 		margin: 0px 10px;
+		text-decoration: none;
+		cursor: pointer;
 	}
 		.front .partition.main .image-card .img {
 			width: 190px;
@@ -276,7 +280,7 @@
 		.front .partition.main .image-card .img.cen {
 			width: 280px;
 			height: 280px;
-			background-color: #2b8a9c;
+			background-color: #F7C331;
 		}
 
 }

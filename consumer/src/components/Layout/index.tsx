@@ -105,6 +105,7 @@ const StudentHeader: React.FC<SP> = ({ goBack, push, auth, lesson_meta }) => {
 
 	const guestLogout = () => {
 		localStorage.removeItem("auth")
+		localStorage.removeItem("student-welcome")
 		window.history.pushState(undefined, '', '/')
 		window.location.reload()
 	}

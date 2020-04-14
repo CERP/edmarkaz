@@ -16,15 +16,17 @@ type P = {
 	createGuestStudentLogin: () => void
 } & RouteComponentProps<RouteInfo>
 
-const StudentRouter: React.FC<P> = ({ connected, auth, location, activeStudent, verifyStudentToken, createGuestStudentLogin }) => {
+const StudentRouter: React.FC<P> = ({ connected, auth, location, history, activeStudent, verifyStudentToken, createGuestStudentLogin }) => {
 
 	const query = new URLSearchParams(location.search)
 	const student_token = query.get("referral")
 	const [studentToken, setStudentToken] = useState("")
 
-	if (auth.user === "STUDENT" && activeStudent === undefined) {
-		return <Redirect to="/student-profile" />
-	}
+
+	// if (auth.user === "STUDENT" && activeStudent === undefined) {
+	// 	return <Redirect to="/student-profile" />
+	// }
+
 	if (auth.user === "STUDENT" || auth.user === "GUEST_STUDENT" || auth.token) {
 		return <Redirect to="/library" />
 	}
@@ -33,7 +35,11 @@ const StudentRouter: React.FC<P> = ({ connected, auth, location, activeStudent, 
 		verifyStudentToken(student_token)
 	}
 
-	const createGuestLogin = () => {
+	// const createGuestLogin = () => {
+	// 	createGuestStudentLogin()
+	// }
+
+	if (!student_token && !auth.verifying_user) {
 		createGuestStudentLogin()
 	}
 
@@ -41,7 +47,8 @@ const StudentRouter: React.FC<P> = ({ connected, auth, location, activeStudent, 
 		<img className="icon" src={LoadingIcon} />
 		<div className="text">Verifying, Please wait</div>
 	</div> : <div className="student">
-			<div className="form" >
+			<div className="title"> Redirecting... if it's been more than 2 minutues <a href={`https://ilmexchange.com/student`}>Click Here</a> </div>
+			{/* <div className="form" >
 				<div className="heading">Student Login</div>
 				<div className="row">
 					<label>Please Use Referral Link Or Please Enter Referral Code (Sent to Registered Schools) </label>
@@ -50,8 +57,8 @@ const StudentRouter: React.FC<P> = ({ connected, auth, location, activeStudent, 
 				<div className="button blue" onClick={(e) => verifyStudentToken("")}> Enter </div>
 				<div className="divider">Or</div>
 				<div className="button blue" onClick={createGuestLogin}>Continue as a Guest</div>
-			</div>
-		</div>
+			</div> */}
+		</div >
 }
 
 export default connect((state: RootReducerState) => ({

@@ -31,6 +31,9 @@ export const saveStudentProfile = (profile: ILMXStudent) => (dispatch: Dispatch,
 			if (err.message === "not ready") {
 				alert("not yet connected...")
 			}
+			else if (err === "timeout") {
+				setTimeout(() => dispatch(saveStudentProfile(profile)), 2000)
+			}
 			else {
 				dispatch(submitError(err))
 			}
@@ -283,12 +286,15 @@ export const getLessons = () => (dispatch: Dispatch, getState: GetState, syncr: 
 			})
 			return resp
 		})
-		.catch((err: Error) => {
-			if (!state.connected) {
-				console.error("No connection while getting lessons", err)
+		.catch(err => {
+			if (err.message === "not ready") {
+				console.error("No connection while getting lessons")
+			}
+			else if (err === "timeout") {
+				setTimeout(() => dispatch(getLessons()), 2000)
 				return err
 			}
-			console.error("Somethins happened while getting lessons", err)
+			console.error("Something happened while getting lessons", err)
 			dispatch(submitError(err))
 			return err
 		})

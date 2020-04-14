@@ -21,68 +21,70 @@ export const SchoolForm: React.SFC<SchoolProp> = ({ school, former, base_path })
 	return <div className="">
 
 		<div className="form">
-			<div className="title">School Profile</div>
+			<div className="title">School Profile <Span /></div>
 			<EditSurveyRow base_path={base_path} label="School Name" path={["school_name"]} former={former} />
 			<EditSurveyRow base_path={base_path} label="Address" path={["school_address"]} former={former} />
 
+			<div className="title">Location<Span /></div>
 			<div className="row">
-				<div className="subtitle">Location<Span /></div>
-				<div className="row-row">
-					<div className="row">
-						<label>District</label>
-						<select {...former.super_handle([...base_path, "school_district"])}>
-							<option value="">Select a District</option>
+				<label>District</label>
+				<input type="text" placeholder="District" {...former.super_handle([...base_path, "school_district"])} />
+				{/* <option value="">Select a District</option>
 							<option value="LAHORE">Lahore</option>
 							<option value="SHEIKHUPURA">Sheikhupura</option>
 							<option value="KASUR">Kasur</option>
-						</select>
-					</div>
+						</select> */}
+			</div>
 
-					<div className="row">
-						<label>Tehsil</label>
-						<select {...former.super_handle([...base_path, "school_tehsil"])}>
-							<option value="">Select a Location</option>
-							{
-								school && school.school_district === "LAHORE" && <>
-									<option value="LAHORE_CITY">Lahore City</option>
-									<option value="LAHORE_CANTT">Lahore Cantt</option>
-									<option value="RAIWIND">Raiwind</option>
-									<option value="SHALIMAR">Shalimar</option>
-								</>
-							}
+			<div className="row">
+				<label>Tehsil</label>
+				<input type="text" placeholder="Tehsil" {...former.super_handle([...base_path, "school_tehsil"])} />
+				{/* <option value="">Select a Location</option>
+					{
+						school && school.school_district === "LAHORE" && <>
+							<option value="LAHORE_CITY">Lahore City</option>
+							<option value="LAHORE_CANTT">Lahore Cantt</option>
+							<option value="RAIWIND">Raiwind</option>
+							<option value="SHALIMAR">Shalimar</option>
+						</>
+					}
 
-							{
-								school && school.school_district === "SHEIKHUPURA" && <>
-									<option value="FEROZWALA">Ferozwala</option>
-									<option value="MURIDKE">Muridke</option>
-									<option value="SAFDARABAD">Safdarabad</option>
-									<option value="SHEIKHUPURA">Sheikhupura</option>
-								</>
-							}
+					{
+						school && school.school_district === "SHEIKHUPURA" && <>
+							<option value="FEROZWALA">Ferozwala</option>
+							<option value="MURIDKE">Muridke</option>
+							<option value="SAFDARABAD">Safdarabad</option>
+							<option value="SHEIKHUPURA">Sheikhupura</option>
+						</>
+					}
 
-							{
-								school && school.school_district === "KASUR" && <>
-									<option value="CHUNIAN">Chunian</option>
-									<option value="KASUR">Kasur</option>
-									<option value="KOT_RADHA_KISHAN">Kot Radha Kishan</option>
-									<option value="PATTOKI">Pattoki</option>
-								</>
-							}
-						</select>
-					</div>
-
-				</div>
+					{
+						school && school.school_district === "KASUR" && <>
+							<option value="CHUNIAN">Chunian</option>
+							<option value="KASUR">Kasur</option>
+							<option value="KOT_RADHA_KISHAN">Kot Radha Kishan</option>
+							<option value="PATTOKI">Pattoki</option>
+						</>
+					}
+				</select> */}
 			</div>
 		</div>
 
 		<div className="form">
-			<div className="title">Optional Information</div>
+			<div className="title">Additional Information</div>
 			<EditSurveyRow base_path={base_path} label="Enrollment" path={["total_enrolment"]} former={former} />
 			<div className="row-row">
 				<EditSurveyRow base_path={base_path} label="Lowest Fee" path={["lowest_fee"]} former={former} />
 				<EditSurveyRow base_path={base_path} label="Highest Fee" path={["highest_fee"]} former={former} />
 			</div>
-			<EditSurveyRow base_path={base_path} label="Respondent is Owner" path={["respondent_owner"]} former={former} />
+			<div className="row">
+				<label></label>
+				<select {...former.super_handle([...base_path, "respondent_owner"])}>
+					<option>Select</option>
+					<option value="YES">Yes</option>
+					<option value="NO">No</option>
+				</select>
+			</div>
 		</div>
 	</div>
 }

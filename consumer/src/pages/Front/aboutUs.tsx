@@ -154,13 +154,13 @@ const AboutUs = () => {
 			<div className="info-container">
 				<div className="heading white">Our Story</div>
 				<div className="para white">
-					Ilm Exchange is a digital education platform designed to connect schools,
-					teachers and students with affordable, high quality educational resources to
-					enable quality teaching and learning across Pakistan. Our long-term vision is
-					to become Pakistan’s premier education hub that brings together school leaders,
-					teachers, students, parents, education service providers, education financers,
-					donors, researchers and policymakers, with the underlying goal of nurturing innovation and
-					improving education quality at the system level.
+					Ilm Exchange is a digital education platform that connects schools,
+					teachers and students with affordable resources to enable quality
+					teaching and learning across Pakistan. Our long-term vision is to become
+					Pakistan’s premier education hub that brings together stakeholders across
+					the education ecosystem — from school leaders to service providers and
+					financers to researchers and policymakers. Our underlying goal is to nurture
+					innovation and improve education quality at the system level.
 				</div>
 				<div className="para white">
 					Ilm Exchange has been created by a part of the <a href="https://www.google.com/url?q=https://epod.cid.harvard.edu/initiative/leaps-program&sa=D&ust=1586116228054000&usg=AFQjCNFgHnauCjI1el6pNHmk9r9mjUAkqw" target="__blank">LEAPS</a> (Learning and Educational Achievements in
@@ -169,19 +169,21 @@ const AboutUs = () => {
 					on how to improve student learning outcomes in Pakistani schools.
 				</div>
 				<div className="para white">
-					In response to the coronavirus pandemic that has forced schools to close,
+					In response to the Covid-19 pandemic that has forced schools to close,
 					we have worked with schools, education technology partners and content
-					creators to curate a huge library of digital educational resources so that Pakistani
-					students can continue learning from home. Whether you prefer learning in Urdu or
-					English, we bring you fun, engaging content through video lessons, games and quizzes.
-					We encourage you to use this content and give us feedback through our discussion forum
+					creators to curate a library of digital resources so that students can
+					continue learning from home. Whether you prefer learning in Urdu or English,
+					we bring you fun, engaging content through video lessons, games and quizzes.
+					We encourage you to use this content and give us feedback through our discussion
+					forum.
 				</div>
 				<div className="para white">
-					We are working towards becoming a trusted partner to an active
-					community of over 100,000 schools that explore innovative products and
-					services, engage in dialogue about best practices and share knowledge and experiences
-					to learn from one another and grow as a sector. Together with innovators and dedicated
-					education support providers, we dream of a bright future for the children of Pakistan.
+					We are working towards becoming a trusted partner to an active community
+					of over 100,000 schools that explore innovative products and services,
+					engage in dialogue about best practices and share knowledge and experiences
+					to learn from one another and grow as a sector. Together with innovators and
+					dedicated education support providers, we dream of a bright future for the
+					children of Pakistan.
 				</div>
 			</div>
 		</div>

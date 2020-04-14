@@ -163,7 +163,7 @@ const loadSyncState = (): RootReducerState['sync_state'] => {
 
 const saveSyncState = (state: RootReducerState) => {
 
-	if (state.auth.token) {
+	if (state.auth.token || state.auth.user === "STUDENT") {
 		localStorage.setItem("sync_state", JSON.stringify(state.sync_state));
 	}
 }

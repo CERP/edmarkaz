@@ -165,14 +165,19 @@ export const submitError = (err: Error, errInfo?: React.ErrorInfo) => (dispatch:
 		type: "SUBMIT_ERROR",
 		client_type: state.auth.client_type,
 		id: state.auth && state.auth.id,
-		payload: {
-			error: {
-				name: err.name,
-				message: err.message
-			},
-			errInfo: errInfo ? errInfo.componentStack : err.stack,
-			date: new Date().getTime()
-		}
+		payload: typeof (err) === "string" ?
+			{
+				error: err,
+				date: new Date().getTime()
+			}
+			: {
+				error: {
+					name: err.name,
+					message: err.message
+				},
+				errInfo: errInfo ? errInfo.componentStack : err.stack,
+				date: new Date().getTime()
+			}
 	})
 		.then(res => console.log("ERROR REPORTED"))
 		.catch(err => console.log("COULD NOT REPORT ERROR", err))

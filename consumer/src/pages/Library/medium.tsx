@@ -1,27 +1,79 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import Layout from '../../components/Layout'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Typography } from '@material-ui/core'
+import { Typography, Avatar } from '@material-ui/core'
 import { getLessons } from '../../actions'
 import LoadingIcon from '../../icons/load.svg'
+import Modal from '../../components/Modal'
+import ilmxLogo from '../../components/Header/ilmx.svg'
+import bookIcon from '../../icons/book.png'
+
 
 interface P {
+	user: RootReducerState["auth"]["user"]
 	lessons: RootReducerState["lessons"]["db"]
 	lesson_loading: RootReducerState["lessons"]["loading"]
+	school: RootReducerState["sync_state"]["profile"]
 	getLessons: () => void
 }
-const LibraryInstructionMedium: React.FC<P> = ({ lessons, lesson_loading, getLessons }) => {
+const LibraryInstructionMedium: React.FC<P> = ({ lessons, lesson_loading, getLessons, school, user }) => {
 
 	useEffect(() => {
 		getLessons()
 	}, [])
 
+	const [showModal, setShowModal] = useState(false)
+
+	const welcome = Boolean(localStorage.getItem("student-welcome"))
+	if (!welcome) {
+		localStorage.setItem("student-welcome", "true")
+		setShowModal(true)
+	}
+
 	return lesson_loading ? <div className="loading">
 		<img className="icon" src={LoadingIcon} />
 		<div className="text">Loading</div>
 	</div> : <div className="medium-page">
-			<div className="title" style={{ paddingTop: "20px" }}>Select Medium</div>
+			{
+				showModal && <Modal>
+					<div className="modal-box" style={{ maxWidth: "400px", padding: "30px 0px" }}>
+						<Avatar variant="square" style={{
+							height: "100%",
+							width: "70%",
+							margin: "auto"
+						}} src={ilmxLogo} alt="" />
+
+						<img src={bookIcon} style={{
+							width: "70%",
+							margin: "10% 15%"
+						}} />
+						<Typography
+							variant="subtitle1"
+							color="primary"
+							align="center"
+							gutterBottom
+						>
+							Welcome To Ilmexchange!
+							</Typography>
+						<Typography variant="h6" color="primary" align="center" gutterBottom>
+							STUDENT PORTAL
+						</Typography>
+						{user === "STUDENT" && <Typography
+							variant="h3"
+							align="center"
+							color="primary"
+							gutterBottom
+						>
+							{school.school_name}
+						</Typography>}
+						<div className="pill" style={{ margin: "auto" }} onClick={() => setShowModal(!showModal)}>
+							START
+						</div>
+					</div>
+				</Modal>
+			}
+			<div className="title" style={{ paddingTop: "20px" }}>Select Language of Instruction</div>
 			<div className="card-container">
 				{
 					Object.keys(lessons)
@@ -37,8 +89,10 @@ const LibraryInstructionMedium: React.FC<P> = ({ lessons, lesson_loading, getLes
 }
 
 export default connect((state: RootReducerState) => ({
+	user: state.auth.user,
 	lessons: state.lessons.db,
-	lesson_loading: state.lessons.loading
+	lesson_loading: state.lessons.loading,
+	school: state.sync_state.profile
 }), (dispatch: Function) => ({
 	getLessons: () => dispatch(getLessons())
 }))(LibraryInstructionMedium)

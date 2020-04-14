@@ -120,7 +120,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 				spawn fn ->
 					res = EdMarkaz.Contegris.send_sms(
 						number,
-						"Welcome to ilmExchange. Please go here to login https://ilmexchange.com/auth/#{one_token} \nYour Student Referral Link and code to access our Student Portal is https://ilmexchange.com/student?referral=#{student_token}, and #{student_token}."
+						"Welcome to ilmExchange. Please go here to login https://ilmexchange.com/auth/#{one_token} \nYour Student Referral Link is https://ilmexchange.com/student?referral=#{student_token}"
 					)
 					IO.inspect res
 				end
@@ -181,6 +181,20 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 		{:reply, succeed(), state}
 	end
 
+	def handle_action(%{
+		"type" => "SUBMIT_ERROR",
+		"payload" => %{
+			"error" => error,
+			"date" => date
+		}
+		}, state
+	) do
+
+		EdMarkaz.Slack.send_alert("Error: #{error}", "#ilmx-errors")
+
+		{:reply, succeed(), state}
+	end
+
 	def handle_action(%{"type" => "GET_PROFILE", "payload" => %{"number" => number}}, state) do
 
 		case EdMarkaz.School.get_profile(number) do
@@ -204,6 +218,11 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 
 		case EdMarkaz.School.get_profile("0#{number}") do
 			{:ok, school_id, db} ->
+				{:ok, res} = Postgrex.query(
+					EdMarkaz.DB,
+					"INSERT INTO device_to_school_mapper VALUES($1, $2, $3)",
+					[school_id, client_id, %{}]
+				)
 				{:reply, succeed(%{"school_id" => school_id, "school" => db}), state}
 			{:error, msg} ->
 				{:reply, fail(%{"msg" => msg}), state}
@@ -232,7 +251,6 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 				IO.inspect err
 				{:reply, fail(err), state}
 		end
-
 	end
 
 	def handle_action(%{"type" => "VERIFY", "payload" => %{"id" => id, "token" => token, "client_id" => client_id}}, state) do
