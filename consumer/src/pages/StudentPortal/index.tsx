@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { Redirect, RouteComponentProps } from 'react-router'
+import qs from 'query-string'
 import { verifyStudentToken, createGuestStudentLogin } from '../../actions'
 import LoadingIcon from '../../icons/load.svg'
 import './style.css'
@@ -18,10 +19,10 @@ type P = {
 
 const StudentRouter: React.FC<P> = ({ connected, auth, location, history, activeStudent, verifyStudentToken, createGuestStudentLogin }) => {
 
-	const query = new URLSearchParams(location.search)
-	const student_token = query.get("referral")
-	const [studentToken, setStudentToken] = useState("")
+	const params = qs.parse(location.search)
 
+	const student_token = params.referral as string | undefined
+	const [studentToken, setStudentToken] = useState("")
 
 	// if (auth.user === "STUDENT" && activeStudent === undefined) {
 	// 	return <Redirect to="/student-profile" />
