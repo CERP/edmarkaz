@@ -66,7 +66,7 @@ const Library: React.FC<Props> = ({ lessons, match }) => {
 	}
 
 	return <div className="lesson-page">
-		<div className="heading"> {`Class ${p_grade} > ${p_subject}`} </div>
+		<div className="heading"> {`Class ${p_grade} - ${p_subject}`} </div>
 		<input
 			className="search-bar"
 			type="text"

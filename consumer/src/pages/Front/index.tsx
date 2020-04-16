@@ -48,7 +48,7 @@ const FrontPage = () => {
 				<img className="img" src={Demo} /> */}
 				<div className="image-card-container">
 					<div className="image-card" onClick={() => setShowModal(true)}>
-						<img className="img" src={TeacherMain} />
+						<img className="img" src={TeacherMain} style={{ backgroundColor: "#B1E1E8", objectFit: "cover" }} />
 						<div className="pill" >Teachers</div>
 					</div>
 					<Link to="/student" className="image-card">
