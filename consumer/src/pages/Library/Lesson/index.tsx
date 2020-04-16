@@ -44,17 +44,17 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 
 	const [activeChapter, setActiveChapter] = useState("")
 	const [activeLesson, setActiveLesson] = useState("")
-	const [searchText, setSearchText] = useState("")
 	const [showModal, setShowModal] = useState(false)
 	const [videoId, setVideoID] = useState("")
 	const [startTime, setStartTime] = useState(0)
+	const [currentLessonURL, setCurrentLessonURL] = useState("")
 
 	const playLesson = (val: Lesson) => {
 
 		if (connected) {
 			setStartTime(Date.now())
 		}
-
+		setCurrentLessonURL(val.meta.link)
 		setVideoID(getIDFromYoutbeLink(val.meta.link))
 		setActiveLesson(val.lesson_id)
 		setShowModal(true)
@@ -67,10 +67,13 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 			trackVideoAnalytics(location.pathname, activeChapter, activeLesson, timePassed)
 		}
 
+		setCurrentLessonURL("")
+		setVideoID("")
 		setActiveLesson("");
 		setShowModal(false);
-
 	}
+
+	const isYoutubeUrl = (link: string) => Boolean(link.match("^(http(s)?:\/\/)?((w){3}.)?youtu(be|.be)?(\.com)?\/.+"))
 
 	// const onPrev = () => {
 
@@ -128,24 +131,35 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 	return <div className="lesson-page">
 		{showModal && <Modal>
 			<div className="modal-box video-modal">
-				{connected ? <Youtube
-					videoId={videoId}
-					className={'iframe'}
-					opts={{
-						width: "100%",
-						height: "100%",
-						playerVars: {
-							rel: 0,
-							showinfo: 0,
-							autoplay: 1
-						}
+				{connected ?
+					isYoutubeUrl(currentLessonURL) ? <Youtube
+						videoId={videoId}
+						className={'iframe'}
+						opts={{
+							width: "100%",
+							height: "100%",
+							playerVars: {
+								rel: 0,
+								showinfo: 0,
+								autoplay: 1
+							}
 
-					}}
-				/> : <div>
+						}} />
+						: <iframe src={currentLessonURL}
+							width="100%"
+							height="100%"
+							className="iframe"
+							allowFullScreen>
+							<div>
+								<div className="heading">Your Browser does not support Embeded Player</div>
+								<div className="subtitle">Please update your browser(Chrome recommended) or <a href={currentLessonURL} target="_blank">Click Here</a> to visit there page</div>
+							</div>
+						</iframe>
+					: <div>
 						<div className="heading">Something Went Wrong</div>
-						<div className="subtitle">Try again or <a href={`https://youtube.com/watch?v=${videoId}`} target="_blank">Click Here</a> to watch this on your browser</div>
-					</div>}
-
+						<div className="subtitle">Try again or <a href={isYoutubeUrl(currentLessonURL) ? `https://youtube.com/watch?v=${videoId}` : currentLessonURL} target="_blank">Click Here</a> to watch this on your browser</div>
+					</div>
+				}
 				<div className="button" style={{ marginTop: '5px', backgroundColor: "#f05967" }} onClick={() => onBack()}>Back</div>
 			</div>
 		</Modal>}
