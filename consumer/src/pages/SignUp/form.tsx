@@ -2,7 +2,7 @@ import * as React from 'react'
 import Former from 'former'
 import Dynamic from '@ironbay/dynamic'
 import { Span } from '.'
-
+import { Typography, Button, TextField, MenuItem, Grid } from '@material-ui/core'
 interface SurveyRowProp {
 	label: string;
 	path: string[];
@@ -18,75 +18,45 @@ interface SchoolProp {
 
 export const SchoolForm: React.SFC<SchoolProp> = ({ school, former, base_path }) => {
 
-	return <div className="">
+	return <>
+		<Typography variant="h5">School Profile <Span /></Typography>
+		<EditSurveyRow base_path={base_path} label="School Name" path={["school_name"]} former={former} />
+		<EditSurveyRow base_path={base_path} label="Address" path={["school_address"]} former={former} />
 
-		<div className="form">
-			<div className="title">School Profile <Span /></div>
-			<EditSurveyRow base_path={base_path} label="School Name" path={["school_name"]} former={former} />
-			<EditSurveyRow base_path={base_path} label="Address" path={["school_address"]} former={former} />
-
-			<div className="title">Location<Span /></div>
-			<div className="row">
-				<label>District</label>
-				<input type="text" placeholder="District" {...former.super_handle([...base_path, "school_district"])} />
-				{/* <option value="">Select a District</option>
-							<option value="LAHORE">Lahore</option>
-							<option value="SHEIKHUPURA">Sheikhupura</option>
-							<option value="KASUR">Kasur</option>
-						</select> */}
-			</div>
-
-			<div className="row">
-				<label>Tehsil</label>
-				<input type="text" placeholder="Tehsil" {...former.super_handle([...base_path, "school_tehsil"])} />
-				{/* <option value="">Select a Location</option>
-					{
-						school && school.school_district === "LAHORE" && <>
-							<option value="LAHORE_CITY">Lahore City</option>
-							<option value="LAHORE_CANTT">Lahore Cantt</option>
-							<option value="RAIWIND">Raiwind</option>
-							<option value="SHALIMAR">Shalimar</option>
-						</>
-					}
-
-					{
-						school && school.school_district === "SHEIKHUPURA" && <>
-							<option value="FEROZWALA">Ferozwala</option>
-							<option value="MURIDKE">Muridke</option>
-							<option value="SAFDARABAD">Safdarabad</option>
-							<option value="SHEIKHUPURA">Sheikhupura</option>
-						</>
-					}
-
-					{
-						school && school.school_district === "KASUR" && <>
-							<option value="CHUNIAN">Chunian</option>
-							<option value="KASUR">Kasur</option>
-							<option value="KOT_RADHA_KISHAN">Kot Radha Kishan</option>
-							<option value="PATTOKI">Pattoki</option>
-						</>
-					}
-				</select> */}
-			</div>
-		</div>
-
-		<div className="form">
-			<div className="title">Additional Information</div>
-			<EditSurveyRow base_path={base_path} label="Enrollment" path={["total_enrolment"]} former={former} />
-			<div className="row-row">
-				<EditSurveyRow base_path={base_path} label="Lowest Fee" path={["lowest_fee"]} former={former} />
-				<EditSurveyRow base_path={base_path} label="Highest Fee" path={["highest_fee"]} former={former} />
-			</div>
-			<div className="row">
-				<label></label>
-				<select {...former.super_handle([...base_path, "respondent_owner"])}>
-					<option>Select</option>
-					<option value="YES">Yes</option>
-					<option value="NO">No</option>
-				</select>
-			</div>
-		</div>
-	</div>
+		<Typography variant="h5">Location<Span /></Typography>
+		<Grid container xs={12} >
+			<Grid container item spacing={1}>
+				<Grid item xs={6}>
+					<EditSurveyRow base_path={base_path} label="District" path={["school_district"]} former={former} />
+				</Grid>
+				<Grid item xs={6}>
+					<EditSurveyRow base_path={base_path} label="Tehsil" path={["school_tehsil"]} former={former} />
+				</Grid>
+			</Grid>
+		</Grid>
+		<Typography variant="h5">Additional Information</Typography>
+		<Grid container xs={12} >
+			<Grid container item spacing={1}>
+				<Grid item xs={6}>
+					<EditSurveyRow base_path={base_path} label="Lowest Fee" path={["lowest_fee"]} former={former} />
+				</Grid>
+				<Grid item xs={6}>
+					<EditSurveyRow base_path={base_path} label="Highest Fee" path={["highest_fee"]} former={former} />
+				</Grid>
+			</Grid>
+		</Grid>
+		<EditSurveyRow base_path={base_path} label="Enrollment" path={["total_enrolment"]} former={former} />
+		<TextField
+			variant="outlined"
+			select
+			label="Are you the Owner of the school?"
+			fullWidth
+			{...former.super_handle([...base_path, "respondent_owner"])}
+		>
+			<MenuItem value="YES">Yes</MenuItem>
+			<MenuItem value="NO">No</MenuItem>
+		</TextField>
+	</>
 }
 
 /*
@@ -105,8 +75,15 @@ const EditSurveyRow: React.StatelessComponent<SurveyRowProp> = ({ label, path, f
 	}
 	*/
 
-	return <div className="row">
-		<div className="subtitle">{label}</div>
-		<input type="text" {...former.super_handle([...base_path, ...path])} placeholder={val} />
-	</div>
+	return <TextField
+		variant="outlined"
+		label={label}
+		margin="normal"
+		fullWidth
+		placeholder={val}
+		type="text"
+		{...former.super_handle([...base_path, ...path])}
+	/>
+	// <input type="text" {...former.super_handle([...base_path, ...path])} placeholder={val} />
+
 }

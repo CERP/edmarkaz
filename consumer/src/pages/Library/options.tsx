@@ -79,7 +79,7 @@ const StudentPortalOptions: React.FC<Props> = ({ getLessons, lessons, lesson_loa
 
 	return lesson_loading ? <div className="loading">
 		<img className="icon" src={LoadingIcon} />
-		<div className="text">Loading</div>
+		<div className="text">Fetching Lessons</div>
 	</div> : <div className="student-portal-op">
 
 			<Container maxWidth="sm">

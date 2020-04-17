@@ -4,6 +4,9 @@ import { Link, RouteComponentProps } from 'react-router-dom'
 import { SMSAuth, verifyUrlAuth } from '../../actions'
 import Former from 'former'
 import { connect } from 'react-redux'
+import Layout from '../../components/Layout'
+import { Container, Paper, Button, Typography, Avatar, TextField } from '@material-ui/core'
+import PhoneLockedOutlined from '@material-ui/icons/LockTwoTone'
 
 
 interface P {
@@ -71,58 +74,80 @@ class Login extends Component<propTypes, S> {
 				window.location.replace("/school")
 			}, 700);
 		}
+		return <Layout>
 
-		return <div className="login-page">
-			<div className="form">
+			<div className="login-page">
+				<Container maxWidth="sm">
+					<div className="section"
+						style={{
+							border: "none",
+							display: "flex",
+							flexDirection: "column",
+							alignItems: "center"
+						}}
+					>
+						<Avatar style={{ backgroundColor: "#F05967" }}>
+							<PhoneLockedOutlined />
+						</Avatar>
+						<Typography
+							variant="h4"
+							style={{ fontFamily: "futura" }}
+							color="primary" > Login </Typography>
+						<>
+							<TextField
+								variant="outlined"
+								label="Phone Number"
+								margin="normal"
+								fullWidth
+								placeholder="eg 0331 234567"
+								type="number"
+								{...this.former.super_handle(["phone"])}
+							/>
+							{
+								!this.props.sent && <Button
+									style={{ marginBottom: "20px" }}
+									fullWidth
+									variant="contained"
+									color="primary"
+									onClick={this.SendAuthSms}
+								>
+									Sign In
+								</Button>
+							}
+							{
+								this.props.sent && <>
+									<TextField
+										variant="outlined"
+										margin="normal"
+										fullWidth
+										label="Code"
+										helperText="Enter 5-digit Code that has been sent to your phone"
+										type="tel"
+										{...this.former.super_handle(["code"])}
+										placeholder="eg 12345"
+									/>
+									<Button
+										style={{ margin: "20px 0px" }}
+										color="primary"
+										variant="contained"
+										fullWidth
+										onClick={this.verifyToken}>
+										Enter Code
+									</Button>
+									<Typography variant="subtitle1">
+										Did not get the sms ? <span style={{ cursor: "pointer", textDecoration: "underline", color: "#1BB4BB" }} onClick={() => this.SendAuthSms()}>Send Again</span>
+									</Typography>
+								</>
+							}
 
-				<div className="title">Login</div>
-
-				<div className="row">
-					<div className="subtitle"> Phone Number </div>
-					<input
-						type="tel"
-						{...this.former.super_handle(["phone"])}
-						placeholder="eg 0331 234567"
-					/>
-				</div>
-
-				{
-					!this.props.sent &&
-					<div
-						className="tabs-button"
-						style={{ marginTop: "10px", marginBottom: "10px" }}
-						onClick={() => this.SendAuthSms()}>
-						Send Code
+							<Typography variant="subtitle1">
+								New to IlmExchange ? <Link to="/sign-up"> Sign-Up </Link>
+							</Typography>
+						</>
 					</div>
-				}
-
-				{
-					this.props.sent && <>
-						<div className="row">
-							<div className="subtitle"> Enter 5-digit Code that has been sent to your phone </div>
-							<input
-								type="tel"
-								{...this.former.super_handle(["code"])}
-								placeholder="eg 12345" />
-						</div>
-
-						<div
-							className="tabs-button"
-							style={{ marginTop: "10px", marginBottom: "10px" }}
-							onClick={() => this.verifyToken()}>
-							Enter Code
-						</div>
-						<div className="subtitle">
-							Did not get the sms ? <span style={{ cursor: "pointer", textDecoration: "underline", color: "#1BB4BB" }} onClick={() => this.SendAuthSms()}>Send Again</span>
-						</div>
-					</>
-				}
-
-				<div className="subtitle">
-					New to IlmExchange ? <Link to="/sign-up"> Sign-Up </Link>
-				</div>
+				</Container>
 			</div>
-		</div>
+		</Layout>
 	}
 }
 export default connect((state: RootReducerState) => ({

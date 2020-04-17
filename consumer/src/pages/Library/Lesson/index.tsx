@@ -5,6 +5,7 @@ import Youtube from 'react-youtube'
 import Play from '../../../icons/play.svg'
 import { trackVideoAnalytics, getLessons } from '../../../actions'
 import Modal from '../../../components/Modal'
+import LoadingIcon from '../../../icons/load.svg'
 import { List, ListItem, ListItemIcon, Typography, Divider } from '@material-ui/core'
 
 import "../style.css"
@@ -40,7 +41,7 @@ const getIDFromYoutbeLink = (link: string) => {
 const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trackVideoAnalytics }) => {
 
 	const { medium, grade, subject, chapter, chapter_name } = match.params
-	const curr_unit = lessons[medium][grade][subject][chapter]
+	const curr_unit = lessons[medium][grade][subject][chapter] || {}
 
 	const [activeChapter, setActiveChapter] = useState("")
 	const [activeLesson, setActiveLesson] = useState("")
@@ -164,8 +165,6 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 			</div>
 		</Modal>}
 		<>
-			<div className="title">Lessons</div>
-			<Divider />
 			<div className="lb-list">
 				{
 					Object.entries(curr_unit)
@@ -175,7 +174,7 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 									<ListItemIcon style={{ minWidth: "30px" }}>
 										<img className="play-icon" src={Play} />
 									</ListItemIcon>
-									<Typography variant="subtitle2" align="center">{lesson.meta.name}</Typography>
+									<Typography variant="subtitle2" align="left">{lesson.meta.name}</Typography>
 								</ListItem>
 								<Divider />
 							</List>

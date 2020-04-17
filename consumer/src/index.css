@@ -281,7 +281,7 @@ a.block {
 		margin-top: 10px;
 	}
 
-.form input {
+/* .form input {
 	background-color: inherit;
 	border: none;
 	border-bottom: 1px solid black;
@@ -333,7 +333,7 @@ a.block {
 	.form input:focus {
 		background-color: white;
 		border: 1px solid var(--blue);
-	}
+	} */
 
 
 .title {

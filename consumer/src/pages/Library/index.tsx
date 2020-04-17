@@ -78,7 +78,11 @@ const Library: React.FC<Props> = ({ lessons, match }) => {
 		<div className="lesson-box-container">
 			{
 				Object.entries(items)
-					.filter(([chapter_id, val]) => searchText === "" || `${val.meta.chapter_name}-${chapter_id}`.toLowerCase().includes(searchText.toLowerCase()))
+					.filter(([chapter_id, val]) =>
+						searchText === "" ||
+						`${val.meta.chapter_name}-${chapter_id}`.toLowerCase().includes(searchText.toLowerCase()) ||
+						Object.values(val.lessons).some(l => `${l.meta.name}`.includes(searchText.toLowerCase()))
+					)
 					.map(([chapter_id, val]) => {
 						return <Link
 							to={`${match.url}/${chapter_id}/${val.meta.chapter_name}`}

@@ -3,12 +3,11 @@ import { connect } from 'react-redux'
 import { RouteComponentProps, Redirect } from 'react-router'
 import { v4 } from 'uuid'
 import QRCode from 'qrcode.react'
-
+import Layout from '../../components/Layout'
+import { Container, Typography, Button, TextField } from '@material-ui/core'
 import { loadProfile, signUp } from '../../actions'
 import Former from 'former'
-
 import { SchoolForm } from './form'
-
 import './style.css'
 
 type P = {
@@ -147,34 +146,49 @@ class SignUp extends React.Component<P, S> {
 			return <Redirect to="/" />
 		}
 
-		return <div className="sign-up">
+		return <Layout>
+			<Container maxWidth="sm">
+				<div className="sign-up">
+					<Typography variant="h4" color="primary"
+						style={{ fontFamily: "futura" }} > Sign Up </Typography>
+					<Typography variant="subtitle2">Required Information<Span /></Typography>
 
-			<div className="form">
-				<div className="title">Sign Up</div>
-				<div className="subtitle">
-					<Span />
-					Required Information
-				</div>
+					<TextField
+						variant="outlined"
+						margin="normal"
+						fullWidth
+						label="Phone Number"
+						type="number"
+						{...this.former.super_handle(["phone_number"])}
+					/>
 
-				<div className="row">
-					<div className="subtitle">Phone Number <Span /></div>
-					<input type="tel" {...this.former.super_handle(["phone_number"])} />
-				</div>
+					<TextField
+						variant="outlined"
+						margin="normal"
+						fullWidth
+						label="Password"
+						type="text"
+						{...this.former.super_handle(["password"])}
+					/>
 
-				<div className="row">
-					<div className="subtitle">Password <Span /></div>
-					<input type="text" {...this.former.super_handle(["password"])} />
-				</div>
+					<SchoolForm school={this.state.school} former={this.former} base_path={["school"]} />
 
-			</div>
-			<SchoolForm school={this.state.school} former={this.former} base_path={["school"]} />
-
-			{/* <div className="center" style={{ marginTop: "10px" }}>
+					{/* <div className="center" style={{ marginTop: "10px" }}>
 				{this.state.school.refcode && <QRCode value={this.state.school.refcode} size={256} fgColor="#f05967" bgColor="#F5F5F5" />}
 			</div> */}
+					<Button
+						style={{ margin: "20px 0px" }}
+						color="primary"
+						variant="contained"
+						fullWidth
+						onClick={this.onSave}>
+						Sign Up
+					</Button>
+				</div>
 
-			<div className="tabs-button" style={{ marginTop: "10px", marginBottom: "10px" }} onClick={this.onSave}>Sign Up</div>
-		</div>
+				{/* <div className="tabs-button" style={{ marginTop: "10px", marginBottom: "10px" }} onClick={this.onSave}></div> */}
+			</Container>
+		</Layout >
 	}
 }
 
