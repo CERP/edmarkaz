@@ -6,7 +6,7 @@ import Play from '../../../icons/play.svg'
 import { trackVideoAnalytics, getLessons } from '../../../actions'
 import Modal from '../../../components/Modal'
 import LoadingIcon from '../../../icons/load.svg'
-import { List, ListItem, ListItemIcon, Typography, Divider } from '@material-ui/core'
+import { List, ListItem, ListItemIcon, Typography, Divider, Container } from '@material-ui/core'
 
 import "../style.css"
 interface P {
@@ -41,7 +41,11 @@ const getIDFromYoutbeLink = (link: string) => {
 const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trackVideoAnalytics }) => {
 
 	const { medium, grade, subject, chapter, chapter_name } = match.params
-	const curr_unit = lessons[medium][grade][subject][chapter] || {}
+	const curr_unit = lessons[medium]
+		&& lessons[medium][grade]
+		&& lessons[medium][grade][subject] ?
+		lessons[medium][grade][subject][chapter] || {}
+		: {}
 
 	const [activeChapter, setActiveChapter] = useState("")
 	const [activeLesson, setActiveLesson] = useState("")
@@ -164,8 +168,19 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 				<div className="button" style={{ marginTop: '5px', backgroundColor: "#f05967" }} onClick={() => onBack()}>Back</div>
 			</div>
 		</Modal>}
-		<>
-			<div className="lb-list">
+		{Object.keys(curr_unit).length === 0 ? <Container maxWidth="sm">
+			<Typography
+				variant="h5"
+				color="textSecondary"
+				align="center"
+				gutterBottom
+			>
+				We couldn't find anything.
+			Please write to us via <a href="tel:0348-1119-119">Sms</a>
+				<br />or <a href="https://api.whatsapp.com/send?phone=923481119119">Whatsapp</a>,
+			and help us make Ilmexchange better for you.
+		</Typography>
+		</Container> : <div className="lb-list">
 				{
 					Object.entries(curr_unit)
 						.map(([lesson_id, lesson]) => {
@@ -180,8 +195,7 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 							</List>
 						})
 				}
-			</div>
-		</>
+			</div>}
 	</div>
 }
 

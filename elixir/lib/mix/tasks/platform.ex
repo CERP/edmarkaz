@@ -1,6 +1,59 @@
 defmodule Mix.Tasks.Platform do
 	use Mix.Task
 
+	def run(["ingest_student_portal_bulk", fname ]) do
+		Application.ensure_all_started(:edmarkaz)
+
+		csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) do
+			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) |> CSV.decode!
+			false -> File.stream!("priv/#{fname}.csv") |> CSV.decode!
+		end
+
+		# Csv-Schema: medium, grade, subject, chapter no, chapter Name,lesson no, lesson name, module no, module name-(video title), leson_type, video_link
+
+		[ _ | lectures] = csv
+		|> Enum.map(fn row -> row end)
+
+		IO.puts "INGESTING STUDENT PORTAL DATA"
+		chunk_size = 100
+
+		tasks = lectures
+		|> Enum.chunk_every(chunk_size)
+		|> Enum.each(
+			fn chunk ->
+				place_holders = 1..length(chunk)
+					|> Enum.map(
+						fn num ->
+							x = (num - 1) * 7 + 1
+							"($#{x}, $#{x + 1}, $#{x + 2}, $#{x + 3}, $#{x + 4}, $#{x + 5}, $#{x + 6})"
+						end
+					)
+					|> Enum.join(",")
+
+				values = chunk
+					|> Enum.reduce(
+						[],
+						fn [medium,grade,subject,chapter_id, chapter, lesson_id, lesson, lesson_type, video_link], acc ->
+
+							id = "#{medium}-#{grade}-#{subject}-#{chapter_id}-#{lesson_id}"
+							lesson_map = %{
+								"name" => lesson,
+								"type" => lesson_type,
+								"link" => video_link,
+								"chapter_name" => chapter
+							}
+							curr = [id, medium, grade, subject, chapter_id, lesson_id, lesson_map]
+							Enum.concat(acc, curr)
+
+						end
+					)
+				EdMarkaz.StudentPortal.bulk_merge(place_holders, values)
+			end
+		)
+
+		IO.inspect tasks
+	end
+
 	def run(["ingest_student_portal", fname ]) do
 		Application.ensure_all_started(:edmarkaz)
 
@@ -15,6 +68,7 @@ defmodule Mix.Tasks.Platform do
 		|> Enum.map(fn row -> row end)
 
 		IO.puts "INGESTING STUDENT PORTAL DATA"
+
 		tasks = lectures
 			|> Enum.map(
 				fn [medium,grade,subject,chapter_id, chapter, lesson_id, lesson, lesson_type, video_link] ->

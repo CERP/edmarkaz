@@ -38,4 +38,25 @@ defmodule EdMarkaz.StudentPortal do
 		end
 	end
 
+	def bulk_merge(place_holders, values) do
+
+		query_string = "INSERT INTO student_portal (id, medium, class, subject, chapter_id, lesson_id, lesson) VALUES #{place_holders} ON CONFLICT (id) DO UPDATE SET lesson=excluded.lesson, date=current_timestamp"
+		case Postgrex.query(
+			EdMarkaz.DB,
+			query_string,
+			values
+		) do
+			{:ok, resp} ->
+				IO.puts "OK"
+				{:ok}
+			{:error, err} ->
+				IO.puts "Bulk Transaction failed"
+				IO.inspect err
+				IO.puts "===========FAILED VALUES============="
+				IO.inspect values
+				IO.puts "=============END====================="
+				{:error, err}
+		end
+	end
+
 end

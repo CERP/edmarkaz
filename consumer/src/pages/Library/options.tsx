@@ -82,7 +82,8 @@ const StudentPortalOptions: React.FC<Props> = ({ getLessons, lessons, lesson_loa
 		<div className="text">Fetching Lessons</div>
 	</div> : <div className="student-portal-op">
 
-			<Container maxWidth="sm">
+
+			{lessons[medium] ? <Container maxWidth="md">
 				<div className="row">
 					{grade === "" && <div className="title">Select Class</div>}
 					{
@@ -122,10 +123,27 @@ const StudentPortalOptions: React.FC<Props> = ({ getLessons, lessons, lesson_loa
 
 				</div>}
 				<Divider />
-			</Container>
-
+			</Container> : <Container maxWidth="sm">
+					<Typography
+						variant="h5"
+						color="textSecondary"
+						align="center"
+						gutterBottom
+					>
+						We couldn't find anything.
+						Please write to us via <a href="tel:0348-1119-119">Sms</a>
+						<br />or <a href="https://api.whatsapp.com/send?phone=923481119119">Whatsapp</a>,
+						and help us make Ilmexchange better for you.
+					</Typography>
+					<Divider />
+				</Container>
+			}
+			<Typography
+				style={{ margin: "20px 5px 0px", }}
+				color="textSecondary"
+				align="center"
+				variant="h5">Featured Apps</Typography>
 			<Container maxWidth="sm" style={{
-				marginTop: "20px",
 				display: "flex",
 				justifyContent: "center",
 				flexWrap: "wrap"
@@ -144,9 +162,11 @@ const StudentPortalOptions: React.FC<Props> = ({ getLessons, lessons, lesson_loa
 									textDecoration: "none",
 									margin: "5px",
 									padding: "5px",
-									color: "#474747"
+									color: "#474747",
 								}}>
-								<Avatar style={{ margin: "10px" }} alt="" src={p.logo} />
+								<Avatar style={{ margin: "5px", objectFit: "contain" }} variant="rounded">
+									<img className="partner-avatar" alt="" src={p.logo} />
+								</Avatar>
 								<Typography variant="subtitle2">{p.title}</Typography>
 							</a>
 						})
