@@ -7,7 +7,7 @@ import ExitToApp from '@material-ui/icons/ExitToApp'
 import { Home } from '@material-ui/icons'
 
 import './style.css'
-import { RouteComponentProps, withRouter } from 'react-router-dom'
+import { RouteComponentProps, withRouter, Link } from 'react-router-dom'
 import { getColorsFromChapter } from '../../utils/getColorsFromChapter';
 
 type P = {
@@ -15,10 +15,10 @@ type P = {
 	children?: React.ReactNode
 } & RouteComponentProps
 
-const Layout: React.FC<P> = ({ children, auth, history, match }) => {
+const Layout: React.FC<P> = ({ children, auth, history, location }) => {
 
-	const path = history.location.pathname.split("/")
-	const isLessonPage = path.length === 7 && path.find(p => p === "library")
+	const path = location.pathname.split("/") || []
+	const isLessonPage = path.length === 7 && path.some(p => p === "library")
 	let lesson_meta = undefined
 
 	if (isLessonPage) {
@@ -67,6 +67,11 @@ const useStyles = makeStyles((theme) => ({
 	box: {
 		flexGrow: 1,
 		alignSelf: "flex-end",
+		height: "100px",
+		display: "flex",
+		flexDirection: "column",
+		justifyContent: "center",
+		alignItems: "center"
 	},
 	menuButton: {
 		marginRight: theme.spacing(2),
@@ -76,6 +81,7 @@ const useStyles = makeStyles((theme) => ({
 	},
 	title: {
 		flexGrow: 1,
+		fontSize: "1rem"
 	},
 }));
 
@@ -121,13 +127,13 @@ const StudentHeader: React.FC<SP> = ({ goBack, push, auth, lesson_meta }) => {
 						</IconButton>
 
 						<Box className={classes.box}>
-							<Typography variant="subtitle1" className={classes.title}>
+							<Typography align="center" variant="subtitle1" className={classes.title}>
 								{`Class ${lesson_meta.grade}-${lesson_meta.subject}`}
 							</Typography>
-							<Typography variant="h6" className={classes.title}>
+							<Typography align="center" variant="h6" className={classes.title}>
 								{`Unit ${lesson_meta.chapter_id}`}
 							</Typography>
-							<Typography variant="h5" className={classes.title}>
+							<Typography align="center" variant="h5" className={classes.title}>
 								{`${lesson_meta.chapter_name}`}
 							</Typography>
 						</Box>
@@ -151,7 +157,7 @@ const StudentHeader: React.FC<SP> = ({ goBack, push, auth, lesson_meta }) => {
 							<BackIcon />
 						</IconButton>
 
-						<Typography variant="h6" className={classes.title}> ILMEXCHANGE </Typography>
+						<Button color="inherit" variant="text" disableRipple className={classes.title} component={Link} to="/"> ILMEXCHANGE </Button>
 
 						<IconButton onClick={toHome} edge="start" color="inherit" aria-label="menu">
 							<Home />

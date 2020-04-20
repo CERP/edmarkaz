@@ -81,7 +81,7 @@ const AboutUs = () => {
 			info: ""
 		},
 		{
-			url: "https://storage.cloud.google.com/ilmx-product-images/TCFlogo.PNG?authuser=3",
+			url: "https://storage.googleapis.com/ilmx-product-images/tcf%20logo.png",
 			name: "The Citizens Foundation",
 			info: ""
 		},
@@ -126,7 +126,7 @@ const AboutUs = () => {
 			info: ""
 		},
 		{
-			url: "https://storage.cloud.google.com/ilmx-product-images/javed.png",
+			url: "https://storage.googleapis.com/ilmx-product-images/jp%20logo.png",
 			name: "Javed Publishers",
 			info: ""
 		},
@@ -211,7 +211,7 @@ const AboutUs = () => {
 				</div>
 			</div>
 		</div>
-		<div className="partition bg-teal">
+		<div className="partition bg-orange">
 			<div className="info-container">
 				<div className="heading white">Our Partners</div>
 				<div className="card-container">

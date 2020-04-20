@@ -48,7 +48,7 @@ const FrontPage = () => {
 				<img className="img" src={Demo} /> */}
 				<div className="image-card-container">
 					<div className="image-card" onClick={() => setShowModal(true)}>
-						<img className="img" src={TeacherMain} />
+						<img className="img" src={TeacherMain} style={{ backgroundColor: "#B1E1E8", objectFit: "cover" }} />
 						<div className="pill" >Teachers</div>
 					</div>
 					<Link to="/student" className="image-card">
@@ -73,7 +73,7 @@ const FrontPage = () => {
 				<div className="para">
 					At ilmexchange, we aim to bring together the largest collection
 					of digital educational resources for students in Pakistan.
-					Whether you prefer learning in Urdu of English, we bring you fun,
+					Whether you prefer learning in Urdu or English, we bring you fun,
 					engaging content through lessons, video games and quizzes
 				</div>
 				<Link className="pill" to="/student"> Student Portal</Link>

@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react'
 import Layout from '../../components/Layout'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Typography, Avatar } from '@material-ui/core'
+import { Typography, Avatar, Card, CardMedia } from '@material-ui/core'
 import { getLessons } from '../../actions'
 import LoadingIcon from '../../icons/load.svg'
 import Modal from '../../components/Modal'
 import ilmxLogo from '../../components/Header/ilmx.svg'
 import bookIcon from '../../icons/book.png'
+import EngLang from '../../icons/eng-lang.png'
+import UrduLang from '../../icons/urdu-lang.png'
 
 
 interface P {
@@ -33,8 +35,8 @@ const LibraryInstructionMedium: React.FC<P> = ({ lessons, lesson_loading, getLes
 
 	return lesson_loading ? <div className="loading">
 		<img className="icon" src={LoadingIcon} />
-		<div className="text">Loading</div>
-	</div> : <div className="medium-page">
+		<div className="text">Fetching Lessons</div>
+	</div> : <div className="medium-page" style={{ margin: "20px 0px" }}>
 			{
 				showModal && <Modal>
 					<div className="modal-box" style={{ maxWidth: "400px", padding: "30px 0px" }}>
@@ -73,13 +75,22 @@ const LibraryInstructionMedium: React.FC<P> = ({ lessons, lesson_loading, getLes
 					</div>
 				</Modal>
 			}
-			<div className="title" style={{ paddingTop: "20px" }}>Select Language of Instruction</div>
+			<Typography
+				variant="h6"
+				color="primary"
+				align="center"
+			>
+				Select Language of Instruction
+			</Typography>
+			{/* <div className="title" style={{ paddingTop: "20px" }}>Select Language of Instruction</div> */}
 			<div className="card-container">
 				{
 					Object.keys(lessons)
 						.map(medium => {
-							return <Link key={medium} to={`/library/${medium}`} className="card-circle">
-								<div className="title">{medium}</div>
+							return <Link
+								style={{ background: `url(${medium === "Urdu" ? UrduLang : EngLang}) center/cover no-repeat` }}
+								key={medium}
+								to={`/library/${medium}`} className="card-medium">
 							</Link>
 						})
 				}

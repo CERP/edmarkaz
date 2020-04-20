@@ -223,6 +223,29 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 					"INSERT INTO device_to_school_mapper VALUES($1, $2, $3)",
 					[school_id, client_id, %{}]
 				)
+
+				spawn fn ->
+					time = :os.system_time(:millisecond)
+					case Sarkar.Analytics.record(
+						client_id,
+						%{ "#{UUID.uuid4}" => %{
+								"type" => "STUDENT_LINK_SIGNUP",
+								"meta" => %{
+									"number" => "0#{number}",
+									"ref_code" => school_id
+								},
+								"time" => time
+							}
+						},
+						time
+					) do
+						%{"type" => "CONFIRM_ANALYTICS_SYNC", "time" => _} ->
+							IO.puts "STUDENT_LINK_SIGNUP ANALYTICS SUCCESS"
+						%{"type" => "ANALYTICS_SYNC_FAILED"} ->
+							IO.puts "STUDENT_LINK_SIGNUP ANALYTICS FAILED"
+					end
+				end
+
 				{:reply, succeed(%{"school_id" => school_id, "school" => db}), state}
 			{:error, msg} ->
 				{:reply, fail(%{"msg" => msg}), state}

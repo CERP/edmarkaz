@@ -1,8 +1,4 @@
 .student-portal-op {
-	padding: 10px 5%;
-	width: calc(100% - 10%);
-	margin-top: 5px;
-	background-color: #ffffff;
 }
 .student-portal-op .row {
 	background-color: #ffffff;
@@ -92,6 +88,12 @@
 		background-repeat: no-repeat;
 		background-position: 50% 15%;
 		background-size: 50%;
+	}
+	.student-portal-op .partner-avatar {
+		width: 100%;
+		height: 100%;
+		background: #ffffff;
+		object-fit: contain;
 	}
 .oval:hover {
 	color: #ffffff;
@@ -236,11 +238,12 @@
 		width: 70%;
 	}
 
-	.card-circle {
+	.card-medium {
 		text-decoration: none;
-		width: 250px;
-		height: 250px;
-		border-radius: 50%;
+		background-position: center;
+		background-repeat: no-repeat;
+		width: 400px;
+		height: 160px;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -249,10 +252,6 @@
 		background: #EFEFEF;
 		margin: 10px;
 	}
-		.card-circle .title {
-			font-family: futura;
-			color: #959595;
-		}
 /* ==============  FOR MODAL =============== */
 
 .video-modal {
@@ -294,9 +293,9 @@
 
 @media only screen and (max-width: 767px) {
 
-	.card-circle {
-		width: 150px;
-		height: 150px;
+	.card-medium {
+		width: 200px;
+		height: 80px;
 	}
 	.lesson-box {
 		width: 100%;

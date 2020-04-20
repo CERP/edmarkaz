@@ -13,7 +13,7 @@
 		margin-top: 5px;
 		margin-bottom: 5px;
 		font-size: 24px;
-		font-weight: 500;
+		font-weight: 600;
 		text-decoration: none;
 		color: #474747;
 	}
@@ -233,12 +233,12 @@
 			flex-direction: row;
 			width: 100%;
 			height: fit-content;
-			background-color: #F05967;
+			background-color: #1BB4BB;
 			left: 0;
 			bottom: 0;
 			justify-content: center;
 			align-items: center;
-			padding: 15px 0px;
+			padding: 10px 0px;
 			box-shadow: 0px 0px 10px -5px #000000;
 		}
 			.tabs-page .tabs-footer .bttn {

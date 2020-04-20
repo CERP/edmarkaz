@@ -5,7 +5,7 @@ import Former from 'former'
 import { SchoolForm } from '../SignUp/form'
 import { RouteComponentProps } from 'react-router'
 import './style.css'
-import { TextField } from '@material-ui/core'
+import { Typography, Container, Paper, Button } from '@material-ui/core'
 
 type P = {
 	school: Partial<CERPSchool>;
@@ -39,6 +39,7 @@ class Profile extends React.Component<P, S> {
 	onLogout = () => {
 
 		localStorage.removeItem("auth")
+		localStorage.removeItem("sync_state")
 		window.history.pushState(undefined, '', '/')
 		window.location.reload()
 
@@ -49,17 +50,15 @@ class Profile extends React.Component<P, S> {
 		const { phone_number } = this.state.profile
 		const st = phone_number ? phone_number.split("").reverse().join("").substring(0, phone_number.length - 1) : ""
 		return <div className="user-profile">
-
-			<div className="form-container">
-				<div className="referral section">
-					<div className="title">Student Referral </div>
+			<Container maxWidth="sm">
+				<Paper className="section" style={{ border: "none" }}>
+					<Typography variant="h5" style={{ fontFamily: "futura" }}>Student Referral</Typography>
 					<label style={{ userSelect: "auto" }}> {`https://ilmexchange.com/student?referral=${st}`}</label>
-				</div>
-
+				</Paper>
 				<SchoolForm school={this.state.profile} former={this.former} base_path={["profile"]} />
-				<div className="tabs-button red" onClick={this.onLogout}>Logout</div>
-				<div className="tabs-button" onClick={this.onSave} style={{ marginTop: "10px" }}>Save</div>
-			</div>
+				<Button color="primary" variant="contained" fullWidth style={{ marginTop: "20px" }} onClick={this.onSave}> Save</Button>
+				<Button color="secondary" variant="contained" fullWidth style={{ margin: "10px 0px" }} onClick={this.onLogout}>Logout</Button>
+			</Container>
 		</div>
 	}
 }
