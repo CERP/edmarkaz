@@ -1,6 +1,37 @@
 defmodule Mix.Tasks.Platform do
 	use Mix.Task
 
+	def run(["send_sms_messages", fname]) do
+		# Application.ensure_all_started(:edmarkaz)
+
+		csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) do
+			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) |> CSV.decode!
+			false -> File.stream!("priv/#{fname}.csv") |> CSV.decode!
+		end
+
+		[_ | phone_numbers] = csv
+		|> Enum.map(fn [ num ]-> "0#{num}" end)
+
+		message = "کیا آپ کا اسکول بند کرونا وایرس کی وجہ سے بند ہے؟ اب فکر نا کریں۔ www.ilmexchange.com پر جائیں اور اس کے ذریعہ اپنے طلبہ کی تعلیم اور اسکول کے نظام کو جاری رکھیں۔ مزید معلومات کے لیے 03481119119 پر رابتہ کیں۔"
+
+		failed = phone_numbers
+		|> Enum.map(fn num ->
+			case EdMarkaz.Contegris.send_sms(num, message) do
+				{:ok, _} ->
+					IO.puts "sent message"
+					nil
+				{:error, err} ->
+					IO.inspect err
+					num
+			end
+		end)
+
+		failed
+		|> Enum.filter(fn num -> num != nil end)
+		|> Enum.map(fn num -> IO.inspect num end)
+
+	end
+
 	def run(["ingest_student_portal", fname ]) do
 		Application.ensure_all_started(:edmarkaz)
 
