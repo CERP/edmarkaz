@@ -12,7 +12,7 @@ defmodule Mix.Tasks.Platform do
 		[_ | phone_numbers] = csv
 		|> Enum.map(fn [ num ]-> "0#{num}" end)
 
-		message = "کیا آپ کا اسکول بند کرونا وایرس کی وجہ سے بند ہے؟ اب فکر نا کریں۔ www.ilmexchange.com پر جائیں اور اس کے ذریعہ اپنے طلبہ کی تعلیم اور اسکول کے نظام کو جاری رکھیں۔ مزید معلومات کے لیے 03481119119 پر رابتہ کیں۔"
+		message = "کیا آپ کا اسکول کورونا وائرس کے سبب بند ہے؟ www.ilmexchange.com آپ کو اپنے اسکول اور طلبۂ کی تعلیم کا سلسلہ جاری رکھنے میں بھرپور مدد کرے گا۔ مزید معلومات کیلیۓ 03481119119 پر رابطہ کریں۔ شکریہ"
 
 		failed = phone_numbers
 		|> Enum.map(fn num ->
@@ -35,6 +35,10 @@ defmodule Mix.Tasks.Platform do
 	def run(["ingest_student_portal_bulk", fname ]) do
 		Application.ensure_all_started(:edmarkaz)
 	# Csv-Schema: medium, grade, subject, chapter no, chapter Name,lesson no, lesson name, module no, module name-(video title), leson_type, video_link
+		csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) do
+			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) |> CSV.decode!
+			false -> File.stream!("priv/#{fname}.csv") |> CSV.decode!
+		end
 
 		[ _ | lectures] = csv
 		|> Enum.map(fn row -> row end)
