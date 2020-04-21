@@ -64,11 +64,11 @@ defmodule EdMarkaz.Server.Analytics do
 			ORDER BY time DESC",
 			[]
 		) do
-			{:ok, resp} -> {:ok, resp}
+			{:ok, resp} -> {:ok, resp.rows}
 			{:error, err} -> {:error, err}
 		end
 
-		csv = [ ["device_id", "school_id", "time"] | formatted]
+		csv = [ ["device_id", "school_id", "time"] | data]
 		|> CSV.encode
 		|> Enum.join()
 
