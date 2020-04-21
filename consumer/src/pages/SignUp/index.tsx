@@ -101,6 +101,10 @@ class SignUp extends React.Component<P, S> {
 			return alert("phone number must start with 03")
 		}
 
+		if (number.length > 11 || number.length < 11) {
+			return alert("please enter a valid number")
+		}
+
 		if (!password) {
 			alert("Password is required")
 		}
@@ -159,6 +163,7 @@ class SignUp extends React.Component<P, S> {
 						fullWidth
 						label="Phone Number"
 						type="number"
+						error={this.state.phone_number.length < 11 || this.state.phone_number.length > 11}
 						{...this.former.super_handle(["phone_number"])}
 					/>
 

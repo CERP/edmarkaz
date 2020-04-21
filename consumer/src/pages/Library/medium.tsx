@@ -35,7 +35,7 @@ const LibraryInstructionMedium: React.FC<P> = ({ lessons, lesson_loading, getLes
 
 	return lesson_loading ? <div className="loading">
 		<img className="icon" src={LoadingIcon} />
-		<div className="text">Fetching Lessons</div>
+		<div className="text">Fetching Lessons, It might take a few minutes depending on your connection speed</div>
 	</div> : <div className="medium-page" style={{ margin: "20px 0px" }}>
 			{
 				showModal && <Modal>

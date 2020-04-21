@@ -278,7 +278,7 @@ export const getLessons = () => (dispatch: Dispatch, getState: GetState, syncr: 
 		client_type: state.auth.client_type,
 		client_id: state.client_id,
 		payload: {}
-	})
+	}, 20000)
 		.then((resp: RootReducerState["lessons"]["db"]) => {
 			dispatch({
 				type: ADD_COURSES,

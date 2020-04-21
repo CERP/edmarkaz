@@ -197,7 +197,7 @@ const AboutUs = () => {
 				</div>
 			</div>
 		</div> */}
-		<div className="partition">
+		<div className="partition bg-orange">
 			<div className="info-container">
 				<div className="heading">Our Team</div>
 				<div className="card-container">
@@ -211,9 +211,9 @@ const AboutUs = () => {
 				</div>
 			</div>
 		</div>
-		<div className="partition bg-orange">
+		<div className="partition">
 			<div className="info-container">
-				<div className="heading white">Our Partners</div>
+				<div className="heading">Our Partners</div>
 				<div className="card-container">
 					{
 						Partners().map(({ url, name, info }) => <div className="card partner">

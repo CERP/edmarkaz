@@ -32,7 +32,7 @@ const StudentRouter: React.FC<P> = ({ connected, auth, location, history, active
 		return <Redirect to="/library" />
 	}
 
-	if (student_token && !auth.verifying_user) {
+	if (connected && student_token && !auth.verifying_user) {
 		verifyStudentToken(student_token)
 	}
 
@@ -48,7 +48,14 @@ const StudentRouter: React.FC<P> = ({ connected, auth, location, history, active
 		<img className="icon" src={LoadingIcon} />
 		<div className="text">Verifying, Please wait</div>
 	</div> : <div className="student">
-			<div className="title"> Redirecting... if it's been more than 2 minutues <a href={`https://ilmexchange.com/student`}>Click Here</a> </div>
+
+			{
+				connected ? <div className="title"> Redirecting... if it's been more than 2 minutues <a href={`https://ilmexchange.com/student`}>Click Here</a> </div>
+					: <div className="loading">
+						<img className="icon" src={LoadingIcon} />
+						<div className="text">Connecting to server, Please wait</div>
+					</div>
+			}
 			{/* <div className="form" >
 				<div className="heading">Student Login</div>
 				<div className="row">

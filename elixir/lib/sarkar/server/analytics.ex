@@ -13,6 +13,71 @@ defmodule EdMarkaz.Server.Analytics do
 
 	end
 
+	match "/consumer-signups-verified.csv" do
+
+		{:ok, data} = case Postgrex.query(
+			"SELECT
+				to_timestamp(time/1000)::time as time,
+				to_timestamp(time/1000)::date as date,
+				meta -> 'number' as phone,
+				meta -> 'ref_code' as school_id,
+				client_id,
+				type
+			FROM consumer_analytics
+			WHERE type!='ROUTE'
+				AND type!='VIDEO'
+				AND type!='LOGIN'
+			ORDER BY date DESC"
+		) do
+			{:ok, resp} -> {:ok, resp.rows}
+			{:error, err} -> {:error, err}
+		end
+
+		csv = [
+			[
+				"time",
+				"date",
+				"phone",
+				"school_id",
+				"client_id",
+				"type"
+			] |
+			data
+		]
+		|> CSV.encode()
+		|> Enum.join()
+
+		conn
+		|> put_resp_header("content-type", "text/csv")
+		|> put_resp_header("cache-control", "no-cache")
+		|> send_resp(200, csv)
+	end
+
+	match "/unique-students.csv" do
+		{:ok, data} = case Postrex.query(
+			Edmarkaz.DB,
+			"SELECT
+				device_id,
+				school_id,
+				time
+			FROM device_to_school_mapper
+			ORDER BY time DESC",
+			[]
+		) do
+			{:ok, resp} -> {:ok, resp}
+			{:error, err} -> {:error, err}
+		end
+
+		csv = [ ["device_id", "school_id", "time"] | formatted]
+		|> CSV.encode
+		|> Enum.join()
+
+		conn
+		|> put_resp_header("content-type", "text/csv")
+		|> put_resp_header("cache-control", "no-cache")
+		|> send_resp( 200, csv)
+	end
+
 	match "/consumer-signups.csv" do
 		{:ok, data} = case Postgrex.query(
 			EdMarkaz.DB,

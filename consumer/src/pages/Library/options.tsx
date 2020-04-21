@@ -37,6 +37,18 @@ const StudentPortalOptions: React.FC<Props> = ({ getLessons, lessons, lesson_loa
 
 	const partners = [
 		{
+			title: "Sabaq Muse",
+			link_play: "http://bit.ly/muselessons",
+			link_app: "http://bit.ly/muselessons",
+			logo: "https://storage.googleapis.com/ilmx-product-images/Sabaq%20logo.png"
+		},
+		{
+			title: "Radec",
+			link_play: "",
+			link_app: "",
+			logo: "https://storage.googleapis.com/ilmx-product-images/Radec.png"
+		},
+		{
 			title: "Knowledge Platform",
 			link_play: "https://play.google.com/store/apps/details?id=com.knowledgeplatform.lsp&hl=en",
 			link_app: "https://play.google.com/store/apps/details?id=com.knowledgeplatform.lsp&hl=en",
@@ -59,18 +71,6 @@ const StudentPortalOptions: React.FC<Props> = ({ getLessons, lessons, lesson_loa
 			link_play: "https://play.google.com/store/apps/details?id=org.khanacademy.android",
 			link_app: "https://apps.apple.com/us/app/khan-academy/id469863705",
 			logo: KAcad
-		},
-		{
-			title: "Sabaq Muse",
-			link_play: "http://bit.ly/muselessons",
-			link_app: "http://bit.ly/muselessons",
-			logo: "https://storage.googleapis.com/ilmx-product-images/Sabaq%20logo.png"
-		},
-		{
-			title: "Radec",
-			link_play: "",
-			link_app: "",
-			logo: "https://storage.googleapis.com/ilmx-product-images/Radec.png"
 		}
 	]
 
