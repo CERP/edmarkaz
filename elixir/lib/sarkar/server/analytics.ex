@@ -16,6 +16,7 @@ defmodule EdMarkaz.Server.Analytics do
 	match "/consumer-signups-verified.csv" do
 
 		{:ok, data} = case Postgrex.query(
+			Edmarkaz.DB,
 			"SELECT
 				to_timestamp(time/1000)::time as time,
 				to_timestamp(time/1000)::date as date,
@@ -27,7 +28,8 @@ defmodule EdMarkaz.Server.Analytics do
 			WHERE type!='ROUTE'
 				AND type!='VIDEO'
 				AND type!='LOGIN'
-			ORDER BY date DESC"
+			ORDER BY date DESC",
+			[]
 		) do
 			{:ok, resp} -> {:ok, resp.rows}
 			{:error, err} -> {:error, err}
@@ -54,7 +56,7 @@ defmodule EdMarkaz.Server.Analytics do
 	end
 
 	match "/unique-students.csv" do
-		{:ok, data} = case Postrex.query(
+		{:ok, data} = case Postgrex.query(
 			Edmarkaz.DB,
 			"SELECT
 				device_id,
