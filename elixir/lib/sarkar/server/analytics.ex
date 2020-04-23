@@ -61,7 +61,8 @@ defmodule EdMarkaz.Server.Analytics do
 			"SELECT
 				device_id,
 				school_id,
-				time
+				time::time as time,
+				time::date as date
 			FROM device_to_school_mapper
 			ORDER BY time DESC",
 			[]
@@ -70,7 +71,7 @@ defmodule EdMarkaz.Server.Analytics do
 			{:error, err} -> {:error, err}
 		end
 
-		csv = [ ["device_id", "school_id", "time"] | data]
+		csv = [ ["device_id", "school_id", "time", "date"] | data]
 		|> CSV.encode
 		|> Enum.join()
 
