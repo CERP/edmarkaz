@@ -220,12 +220,6 @@
 			color: #ffffff;
 			margin-left: 5px;
 		}
-	.tabs-page .tabs-footer {
-		display: none;
-	}
-
-
-	@media only screen and (max-width: 768px) {
 
 		.tabs-page .tabs-footer {
 			position: fixed;
@@ -233,23 +227,26 @@
 			flex-direction: row;
 			width: 100%;
 			height: fit-content;
-			background-color: #1BB4BB;
+			background-color: #bebebe;
 			left: 0;
 			bottom: 0;
 			justify-content: center;
 			align-items: center;
 			padding: 10px 0px;
-			box-shadow: 0px 0px 10px -5px #000000;
+			/* box-shadow: 0px 0px 10px -5px #000000; */
 		}
 			.tabs-page .tabs-footer .bttn {
 				height: 20px;
 				width: 100%;
-				font-size: 15px;
+				font-size: 12px;
 				border-right: 1px solid #ffffff;
 				text-align: center;
 				color: #ffffff;
 				text-decoration: none;
 			}
+
+	@media only screen and (max-width: 768px) {
+
 		.header-tabs .profile {
 			font-size: 15px;
 			padding: 5px;

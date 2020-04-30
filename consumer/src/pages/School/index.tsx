@@ -13,7 +13,10 @@ interface P {
 const School: React.FC<P> = ({ auth }) => {
 
 	const { token, id, user } = auth
-
+	if (user && user !== "SCHOOL") {
+		window.alert(`You are already logged in as a ${user}. Please logout to access School Portal`)
+		return <Redirect to="/" />
+	}
 	if (token && id) {
 		return <Redirect to="/bazaar" />
 	}

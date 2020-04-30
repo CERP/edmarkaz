@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, IframeHTMLAttributes } from 'react'
 import { connect } from 'react-redux'
-import { withRouter, RouteComponentProps } from 'react-router'
+import { withRouter, RouteComponentProps, Redirect } from 'react-router'
 import Youtube from 'react-youtube'
 import Play from '../../../icons/play.svg'
 import { trackVideoAnalytics, getLessons } from '../../../actions'
@@ -80,6 +80,10 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 
 	const isYoutubeUrl = (link: string) => Boolean(link.match("^(http(s)?:\/\/)?((w){3}.)?youtu(be|.be)?(\.com)?\/.+"))
 
+	const redirectToUrl = () => {
+		window.location.href = currentLessonURL
+		return true
+	}
 	// const onPrev = () => {
 
 	// 	const key = `${parseFloat(activeLesson) - 1}`
@@ -150,16 +154,21 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 							}
 
 						}} />
-						: <iframe src={currentLessonURL}
-							width="100%"
-							height="100%"
-							className="iframe"
-							allowFullScreen>
-							<div>
-								<div className="heading">Your Browser does not support Embeded Player</div>
-								<div className="subtitle">Please update your browser(Chrome recommended) or <a href={currentLessonURL} target="_blank">Click Here</a> to visit there page</div>
-							</div>
-						</iframe>
+						// : <iframe
+						// 	onLoad={checkForCrossOrigin}
+						// 	onError={() => console.log("ERROR IN IFRAME")}
+						// 	id="nyt-iframe"
+						// 	src={currentLessonURL}
+						// 	width="100%"
+						// 	height="100%"
+						// 	className="iframe"
+						// 	allowFullScreen>
+						// 	<div>
+						// 		<div className="heading">Your Browser does not support Embeded Player</div>
+						// 		<div className="subtitle">Please update your browser(Chrome recommended) or <a href={currentLessonURL} target="_blank">Click Here</a> to visit there page</div>
+						// 	</div>
+						// </iframe>
+						: redirectToUrl()
 					: <div>
 						<div className="heading">Something Went Wrong</div>
 						<div className="subtitle">Try again or <a href={isYoutubeUrl(currentLessonURL) ? `https://youtube.com/watch?v=${videoId}` : currentLessonURL} target="_blank">Click Here</a> to watch this on your browser</div>
