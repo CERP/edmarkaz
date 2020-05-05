@@ -7,6 +7,7 @@ import { getIconsFromSubject } from '../../utils/getIconsFromSubject';
 import { Container, Avatar, Divider, Typography, Paper } from '@material-ui/core';
 import KAcad from '../../icons/KAcad.png'
 import TAbad from '../../icons/TAbad.png'
+import { getDeviceOS } from '../../utils/getDeviceOS';
 
 interface P {
 	lessons: RootReducerState["lessons"]["db"]
@@ -19,59 +20,65 @@ interface Routeinfo {
 }
 
 type Props = P & RouteComponentProps<Routeinfo>
+const getFeaturedApps = () => ([
+	{
+		title: "Sabaq Muse",
+		link_play: "http://bit.ly/muselessons",
+		link_app: "http://bit.ly/muselessons",
+		logo: "https://storage.googleapis.com/ilmx-product-images/Sabaq%20logo.png"
+	},
+	{
+		title: "Knowledge Platform",
+		link_play: "https://play.google.com/store/apps/details?id=com.knowledgeplatform.lsp&hl=en",
+		link_app: "https://play.google.com/store/apps/details?id=com.knowledgeplatform.lsp&hl=en",
+		logo: "https://storage.googleapis.com/ilmx-product-images/kp%20logo%20new.png"
+	},
+	{
+		title: "Taleemabad Primary",
+		link_play: "http://bit.ly/taleemabad",
+		link_app: "http://bit.ly/taleemabad",
+		logo: TAbad
+	},
+	{
+		title: "Taleemabad Secondary",
+		link_play: "http://bit.ly/taleemabad",
+		link_app: "http://bit.ly/taleemabad",
+		logo: TAbad
+	},
+	{
+		title: "Khan Academy",
+		link_play: "https://play.google.com/store/apps/details?id=org.khanacademy.android",
+		link_app: "https://apps.apple.com/us/app/khan-academy/id469863705",
+		logo: KAcad
+	},
+	{
+		title: "Khan Academy Kids",
+		link_play: "https://play.google.com/store/apps/details?id=org.khankids.android&hl=en",
+		link_app: "https://apps.apple.com/us/app/khan-academy-kids/id1378467217",
+		logo: KAcad
+	},
+])
+
 const StudentPortalOptions: React.FC<Props> = ({ getLessons, lessons, lesson_loading, match }) => {
 
 	useEffect(() => {
 		getLessons()
 	}, [])
 
-	const getDeviceOS = () => {
-		if (navigator.platform.indexOf("iPhone") != -1) {
-			return "iOS"
-		}
-		if (navigator.platform.indexOf("Android") != -1) {
-			return "Android"
-		}
-		return "Unknown"
-	}
-
-	const partners = [
-		{
-			title: "Sabaq Muse",
-			link_play: "http://bit.ly/muselessons",
-			link_app: "http://bit.ly/muselessons",
-			logo: "https://storage.googleapis.com/ilmx-product-images/Sabaq%20logo.png"
-		},
-		{
-			title: "Radec",
-			link_play: "",
-			link_app: "",
-			logo: "https://storage.googleapis.com/ilmx-product-images/Radec.png"
-		},
-		{
-			title: "Knowledge Platform",
-			link_play: "https://play.google.com/store/apps/details?id=com.knowledgeplatform.lsp&hl=en",
-			link_app: "https://play.google.com/store/apps/details?id=com.knowledgeplatform.lsp&hl=en",
-			logo: "https://storage.googleapis.com/ilmx-product-images/kp%20logo%20new.png"
-		},
-		{
-			title: "Taleemabad Primary",
-			link_play: "http://bit.ly/taleemabad",
-			link_app: "http://bit.ly/taleemabad",
-			logo: TAbad
-		},
-		{
-			title: "Taleemabad Secondary",
-			link_play: "http://bit.ly/taleemabad",
-			link_app: "http://bit.ly/taleemabad",
-			logo: TAbad
-		},
-		{
-			title: "Khan Academy",
-			link_play: "https://play.google.com/store/apps/details?id=org.khanacademy.android",
-			link_app: "https://apps.apple.com/us/app/khan-academy/id469863705",
-			logo: KAcad
-		}
+	const subjectSortArray = [
+		"English",
+		"Math",
+		"Urdu",
+		"Science and Technology",
+		"The World Around Us",
+		"Hamari Dunya",
+		"Art & Music",
+		"Ethics & Islam",
+		"Islamiat",
+		"Me & My Health",
+		"Physics",
+		"Biology",
+		"Chemistry"
 	]
 
 	const medium = match.params.medium
@@ -109,6 +116,7 @@ const StudentPortalOptions: React.FC<Props> = ({ getLessons, lessons, lesson_loa
 					<div className="content">
 						{
 							Object.keys(lessons[medium][grade])
+								.sort((a, b) => subjectSortArray.indexOf(a) < subjectSortArray.indexOf(b) ? -1 : 1)
 								.map(s => {
 									return <Link
 										to={`/library/${medium}/${grade}/${s}`}
@@ -149,7 +157,7 @@ const StudentPortalOptions: React.FC<Props> = ({ getLessons, lessons, lesson_loa
 				flexWrap: "wrap"
 			}}>
 				{
-					partners
+					getFeaturedApps()
 						.map(p => {
 							return <a
 								href={getDeviceOS() === "Android" ? p.link_play : p.link_app}

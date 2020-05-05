@@ -153,7 +153,7 @@ defmodule EdMarkaz.Server.Analytics do
 				fn [id, refcode, path, date, count] ->
 
 					path = case List.first(path) === "" do
-						true -> path |> List.replace_at(0,"bazaar")
+						true -> path |> List.replace_at(0,"landing")
 						false -> path
 					end
 

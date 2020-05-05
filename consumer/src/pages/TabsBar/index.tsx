@@ -144,7 +144,6 @@ class TabsBar extends Component<propTypes, S> {
 
 				{(current !== "/" && current !== "/about-us") && <div className="tabs-footer">
 					{/* <div className="bttn">Forums</div> */}
-					<Link className="bttn" to="/about-us">About Us</Link>
 					<a className="bttn" href="https://web.facebook.com/groups/2982527545103658">Discussion Forum</a>
 					<a className="bttn" href={callLink} style={{ border: "none" }}>Helpline</a>
 				</div>}
