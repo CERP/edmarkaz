@@ -19,7 +19,7 @@ defmodule Sarkar.Analytics do
 				end
 			)
 
-		case Postgrex.transaction(
+			case Postgrex.transaction(
 			EdMarkaz.DB,
 			fn (conn)->
 
@@ -54,7 +54,8 @@ defmodule Sarkar.Analytics do
 							)
 						end
 					)
-			end
+			end,
+			pool: DBConnection.Poolboy
 		) do
 			{:ok,resp} ->
 				%{"type" => "CONFIRM_ANALYTICS_SYNC", "time" => latest_time}

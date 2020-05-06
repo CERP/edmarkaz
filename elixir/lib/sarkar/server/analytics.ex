@@ -15,7 +15,7 @@ defmodule EdMarkaz.Server.Analytics do
 
 	match "/consumer-signups-verified.csv" do
 
-		{:ok, data} = case Postgrex.query(
+		{:ok, data} = case EdMarkaz.DB.Postgres.query(
 			EdMarkaz.DB,
 			"SELECT
 				to_timestamp(time/1000)::time as time,
@@ -56,7 +56,7 @@ defmodule EdMarkaz.Server.Analytics do
 	end
 
 	match "/unique-students.csv" do
-		{:ok, data} = case Postgrex.query(
+		{:ok, data} = case EdMarkaz.DB.Postgres.query(
 			EdMarkaz.DB,
 			"SELECT
 				device_id,

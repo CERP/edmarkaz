@@ -218,7 +218,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 
 		case EdMarkaz.School.get_profile("0#{number}") do
 			{:ok, school_id, db} ->
-				{:ok, res} = Postgrex.query(
+				{:ok, res} = EdMarkaz.DB.Postgres.query(
 					EdMarkaz.DB,
 					"INSERT INTO device_to_school_mapper VALUES($1, $2, $3)",
 					[school_id, client_id, %{}]
