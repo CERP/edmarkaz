@@ -87,7 +87,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 		%{id: _id, client_id: _client_id} = state
 	) do
 
-		case Postgrex.query(EdMarkaz.DB,
+		case EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
 			"SELECT orders.supplier_id, orders.school_id, orders.event as order, platform_schools.db as school
 			FROM
 			(
@@ -149,7 +149,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 			end)
 			|> Enum.join(" OR ")
 
-		case Postgrex.query(EdMarkaz.DB, "SELECT id, db FROM platform_schools WHERE #{or_str}", ids) do
+		case EdMarkaz.DB.Postgres.query(EdMarkaz.DB, "SELECT id, db FROM platform_schools WHERE #{or_str}", ids) do
 			{:ok, resp} ->
 				dbs = resp.rows
 				|> Enum.map(fn [id, db] -> {id, db} end)
@@ -164,7 +164,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 
 	def handle_action(%{"type" => "SAVE_SCHOOL", "payload" => %{"school_id" => school_id, "school" => school}, "last_snapshot" => _last_sync_date}, %{id: id, client_id: client_id} = state) do
 
-		case Postgrex.query(EdMarkaz.DB, "UPDATE platform_schools set db = $1 where id=$2", [school, school_id]) do
+		case EdMarkaz.DB.Postgres.query(EdMarkaz.DB, "UPDATE platform_schools set db = $1 where id=$2", [school, school_id]) do
 			{:ok, _res} ->
 				{:reply, succeed(), %{id: id, client_id: client_id}}
 			{:error, msg} ->
@@ -176,7 +176,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 	def handle_action(%{"type" => "FIND_SCHOOL", "payload" => %{"refcode" => refcode}}, %{id: _id, client_id: _client_id} = state) do
 
 		IO.puts "FIND SCHOOL"
-		case Postgrex.query(EdMarkaz.DB, "SELECT db FROM platform_schools WHERE id=$1", [refcode]) do
+		case EdMarkaz.DB.Postgres.query(EdMarkaz.DB, "SELECT db FROM platform_schools WHERE id=$1", [refcode]) do
 			{:ok, %Postgrex.Result{num_rows: 0}} -> {:error, "no school found"}
 			{:ok, res} ->
 				[[ db ]] = res.rows
@@ -318,7 +318,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 
 		_dt = DateTime.from_unix!(last_sync, :millisecond)
 
-		case Postgrex.query(EdMarkaz.DB, "
+		case EdMarkaz.DB.Postgres.query(EdMarkaz.DB, "
 			SELECT
 				p.id,
 				p.supplier_id,
@@ -351,7 +351,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 		%{id: _id, client_id: _client_id} = state
 	) do
 
-		case Postgrex.query(EdMarkaz.DB,
+		case EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
 			"SELECT
 				id,
 				value,

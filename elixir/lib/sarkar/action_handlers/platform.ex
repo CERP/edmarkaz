@@ -81,7 +81,7 @@ defmodule EdMarkaz.ActionHandler.Platform do
 		# currently no filters...
 		# except by supplier
 
-		case Postgrex.query(EdMarkaz.DB, "SELECT id, product, sync_time FROM products WHERE supplier_id=$1", [supplier_id]) do
+		case EdMarkaz.DB.Postgres.query(EdMarkaz.DB, "SELECT id, product, sync_time FROM products WHERE supplier_id=$1", [supplier_id]) do
 			{:ok, resp} ->
 				mapped = resp.rows
 					|> Enum.map(fn [id, product, sync_time] -> {id, product} end)
@@ -98,7 +98,7 @@ defmodule EdMarkaz.ActionHandler.Platform do
 		# currently no filters...
 		# except by supplier
 
-		case Postgrex.query(EdMarkaz.DB, "SELECT id, product, sync_time FROM products", []) do
+		case EdMarkaz.DB.Postgres.query(EdMarkaz.DB, "SELECT id, product, sync_time FROM products", []) do
 			{:ok, resp} ->
 				mapped = resp.rows
 					|> Enum.map(fn [id, product, sync_time] -> {id, product} end)
@@ -113,7 +113,7 @@ defmodule EdMarkaz.ActionHandler.Platform do
 	end
 
 	def handle_action(%{"type" => "GET_PRODUCTS", "last_sync" => last_sync}, state) do
-		case Postgrex.query(EdMarkaz.DB, "SELECT supplier_id, product, sync_time from products WHERE sync_time > last_sync", []) do
+		case EdMarkaz.DB.Postgres.query(EdMarkaz.DB, "SELECT supplier_id, product, sync_time from products WHERE sync_time > last_sync", []) do
 			{:ok, resp} -> {:reply, succeed(resp.rows), state}
 			{:error, err} ->
 				IO.puts "error getting product"
@@ -228,7 +228,7 @@ defmodule EdMarkaz.ActionHandler.Platform do
 			end)
 			|> Enum.join(" OR ")
 
-		case Postgrex.query(EdMarkaz.DB, "SELECT id, db FROM platform_schools WHERE #{or_str}", ids) do
+		case EdMarkaz.DB.Postgres.query(EdMarkaz.DB, "SELECT id, db FROM platform_schools WHERE #{or_str}", ids) do
 			{:ok, resp} ->
 				dbs = resp.rows
 				|> Enum.map(fn [id, db] -> {id, db} end)

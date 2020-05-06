@@ -36,7 +36,7 @@ defmodule EdMarkaz.Supplier do
 	end
 
 	def exists(id) do
-		{:ok, res} = Postgrex.query(EdMarkaz.DB, "Select count(*) from suppliers where id=$1", [id])
+		{:ok, res} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB, "Select count(*) from suppliers where id=$1", [id])
 
 		[[num]] = res.rows
 

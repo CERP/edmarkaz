@@ -26,7 +26,7 @@ defmodule EdMarkaz.School do
 	end
 
 	def get_number(id) do
-		{:ok, resp} = Postgrex.query(EdMarkaz.DB, "Select db->>'phone_number' FROM platform_schools WHERE id=$1", [id])
+		{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB, "Select db->>'phone_number' FROM platform_schools WHERE id=$1", [id])
 		[[ number ]] = resp.rows
 
 		number

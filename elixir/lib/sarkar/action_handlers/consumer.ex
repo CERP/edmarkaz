@@ -7,7 +7,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 		},
 		state
 	) do
-		case Postgrex.query(
+		case EdMarkaz.DB.Postgres.query(
 			EdMarkaz.DB,
 			"SELECT * FROM student_portal",
 		[]
@@ -100,7 +100,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 
 		case EdMarkaz.Auth.create({ number, password }) do
 			{:ok, text} ->
-				{:ok, res} = Postgrex.query(
+				{:ok, res} = EdMarkaz.DB.Postgres.query(
 					EdMarkaz.DB,
 					"INSERT INTO platform_schools (id, db)
 					VALUES ($1, $2)
@@ -158,7 +158,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 			{:ok, refcode} ->
 				# from the refcode we need to retrieve the phone number
 				# and then we can log them in
-				{:ok, res} = Postgrex.query(EdMarkaz.DB, "SELECT db, db->>'phone_number' FROM platform_schools WHERE id=$1", [refcode])
+				{:ok, res} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB, "SELECT db, db->>'phone_number' FROM platform_schools WHERE id=$1", [refcode])
 				[[ profile, number ]] = res.rows
 				spawn fn ->
 					login_analytics(number, refcode, client_id)
@@ -263,7 +263,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 		},
 		state
 	)do
-		case Postgrex.query(
+		case EdMarkaz.DB.Postgres.query(
 			EdMarkaz.DB,
 			"INSERT INTO device_to_school_mapper VALUES($1, $2, $3)",
 			[school_id, client_id, profile]
@@ -311,7 +311,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 
 		dt = DateTime.from_unix!(last_sync, :millisecond)
 
-		case Postgrex.query(EdMarkaz.DB, "
+		case EdMarkaz.DB.Postgres.query(EdMarkaz.DB, "
 			SELECT
 				p.id,
 				p.supplier_id,
