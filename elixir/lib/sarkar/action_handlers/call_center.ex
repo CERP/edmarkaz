@@ -61,7 +61,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 		parent = self()
 
 		spawn fn ->
-			img_url = Sarkar.Storage.Google.upload_image("ilmx-product-images", image_id, data_url)
+			img_url = EdMarkaz.Storage.Google.upload_image("ilmx-product-images", image_id, data_url)
 
 			IO.inspect img_url
 			EdMarkaz.Product.merge_image(product_id, img_url)

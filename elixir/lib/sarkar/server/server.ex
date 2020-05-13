@@ -4,7 +4,7 @@ defmodule EdMarkaz.Router do
 	plug :match
 	plug :dispatch
 
-	forward "/analytics", to: EdMarkaz.Server.Analytics
+	forward "/ilmx/analytics", to: EdMarkaz.Server.Analytics
 	forward "/masking", to: EdMarkaz.Server.Masking
 
 	match "/" do

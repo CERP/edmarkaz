@@ -61,7 +61,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 
 	def login_analytics(phone, refcode, client_id) do
 		time = :os.system_time(:millisecond)
-		case Sarkar.Analytics.record(
+		case Sarkar.Analytics.Consumer.record(
 			client_id,
 			%{ "#{UUID.uuid4}" => %{
 					"type" => "LOGIN",
@@ -127,7 +127,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 
 				spawn fn ->
 					time = :os.system_time(:millisecond)
-					case Sarkar.Analytics.record(
+					case Sarkar.Analytics.Consumer.record(
 						client_id,
 						%{ "#{UUID.uuid4}" => %{
 								"type" => "SIGNUP",
@@ -226,7 +226,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 
 				spawn fn ->
 					time = :os.system_time(:millisecond)
-					case Sarkar.Analytics.record(
+					case Sarkar.Analytics.Consumer.record(
 						client_id,
 						%{ "#{UUID.uuid4}" => %{
 								"type" => "STUDENT_LINK_SIGNUP",
@@ -352,7 +352,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 			%{ "type" => "CONFIRM_SYNC_DIFF", "date" => 0, "new_writes" => %{}}
 		end
 
-		analytics_res = Sarkar.Analytics.record(client_id, analytics, last_sync_date)
+		analytics_res = Sarkar.Analytics.Consumer.record(client_id, analytics, last_sync_date)
 
 		res = %{
 			"mutations" => mutations_res,
@@ -396,7 +396,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 	) do
 
 		mutations_res = %{"type" => "noop"}
-		analytics_res = Sarkar.Analytics.record(client_id, analytics, last_sync_date)
+		analytics_res = Sarkar.Analytics.Consumer.record(client_id, analytics, last_sync_date)
 
 		res = %{
 			"mutations" => mutations_res,

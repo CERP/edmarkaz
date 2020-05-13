@@ -1,11 +1,9 @@
-defmodule Sarkar.Storage.Google do
-	def upload_image(bucket_id, imageId, dataString) do
-
-		"data:image/png;base64," <> raw = dataString
+defmodule EdMarkaz.Storage.Google do
+	def upload_image(bucket_id, imageId, "data:image/png;base64," <> dataString) do
 
 		file_path = "#{imageId}.png"
 
-		File.write!(file_path, Base.decode64!(raw))
+		File.write!(file_path, Base.decode64!(dataString))
 
 		{:ok, token} = Goth.Token.for_scope("https://www.googleapis.com/auth/cloud-platform")
 		conn = GoogleApi.Storage.V1.Connection.new(token.token)
@@ -24,28 +22,55 @@ defmodule Sarkar.Storage.Google do
 
 	end
 
-	def upload_image_from_url(bucket_id, "https://storage.cloud.google.com/" <> rest) do
-		# now we have to correct these urls...
-		# turn https://storage.cloud.google.com/ilmx-product-images/fatima%20the%20spinner.JPG?authuser=3
-		# into https://storage.googleapis.com/ilmx-product-images/fatima%20the%20spinner.JPG
+	def upload_image(bucket_id, imageId, "data:image/jpeg;base64," <> dataString) do
 
-		IO.puts "calling this method"
+		file_path = "#{imageId}.jpg"
 
-		[bucket_and_id | _junk]  = String.split(rest, "?")
+		File.write!(file_path, Base.decode64!(dataString))
 
-		[_bucket_id, id] = String.split(bucket_and_id, "/")
+		{:ok, token} = Goth.Token.for_scope("https://www.googleapis.com/auth/cloud-platform")
+		conn = GoogleApi.Storage.V1.Connection.new(token.token)
 
-		new_url = "https://storage.googleapis.com/" <> bucket_id <> "/" <> id
+		{:ok, object} = GoogleApi.Storage.V1.Api.Objects.storage_objects_insert_simple(
+			conn,
+			bucket_id,
+			"multipart",
+			%{
+				name: Path.basename(file_path),
+				contentType: "image/jpeg",
+				cacheControl: "private"
+			},
+			file_path
+		)
 
-		new_url
+		File.rm(file_path)
 
+		"https://storage.googleapis.com/#{bucket_id}/#{imageId}.jpg"
 	end
 
 	def upload_image_from_url(bucket_id, img_url) do
 
 		base = "https://storage.cloud.google.com/"
 		case String.contains?(img_url, bucket_id) do
-			true -> img_url
+			true ->
+				case String.starts_with?(img_url, base <> bucket_id) do
+					true ->
+						# now we have to correct these urls...
+						# turn https://storage.cloud.google.com/ilmx-product-images/fatima%20the%20spinner.JPG?authuser=3
+						# into https://storage.googleapis.com/ilmx-product-images/fatima%20the%20spinner.JPG
+
+						"https://storage.cloud.google.com/" <> rest = img_url
+
+						[bucket_and_id | _junk]  = String.split(rest, "?")
+
+						[_bucket_id, id] = String.split(bucket_and_id, "/")
+
+						new_url = "https://storage.googleapis.com/" <> bucket_id <> "/" <> id
+
+						new_url
+
+					false -> img_url
+				end
 			false ->
 				IO.puts "uploading img_url #{img_url}"
 				%HTTPoison.Response{body: body} = HTTPoison.get!(img_url)
@@ -68,8 +93,6 @@ defmodule Sarkar.Storage.Google do
 				)
 
 				File.rm!(file_path)
-
-				IO.inspect object
 
 				object.mediaLink
 

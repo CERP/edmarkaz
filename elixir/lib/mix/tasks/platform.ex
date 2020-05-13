@@ -347,10 +347,10 @@ defmodule Mix.Tasks.Platform do
 						})
 
 					has_url ->
-						new_logo_url = Sarkar.Storage.Google.upload_image_from_url("ilmx-product-images", logo_url)
+						new_logo_url = EdMarkaz.Storage.Google.upload_image_from_url("ilmx-product-images", logo_url)
 
 						if banner_url != "" do
-							new_banner_url = Sarkar.Storage.Google.upload_image_from_url("ilmx-product-images", banner_url)
+							new_banner_url = EdMarkaz.Storage.Google.upload_image_from_url("ilmx-product-images", banner_url)
 							EdMarkaz.Supplier.save_profile(id, %{
 								"description" => description,
 								"name" => name,
@@ -442,7 +442,7 @@ defmodule Mix.Tasks.Platform do
 						EdMarkaz.Product.merge(pid, product, sid)
 					has_url ->
 						img_url = try do
-							Sarkar.Storage.Google.upload_image_from_url("ilmx-product-images", picture_url)
+							EdMarkaz.Storage.Google.upload_image_from_url("ilmx-product-images", picture_url)
 						rescue
 							error ->
 								IO.puts "error uploading img"

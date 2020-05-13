@@ -60,7 +60,7 @@ defmodule EdMarkaz.ActionHandler.Platform do
 		parent = self()
 
 		spawn fn ->
-			img_url = Sarkar.Storage.Google.upload_image("ilmx-product-images", id, data_url)
+			img_url = EdMarkaz.Storage.Google.upload_image("ilmx-product-images", id, data_url)
 
 			IO.inspect img_url
 			EdMarkaz.Product.merge_image(product_id, img_url)
@@ -193,7 +193,7 @@ defmodule EdMarkaz.ActionHandler.Platform do
 					"date" => date
 				} = entry
 
-				image_url = Sarkar.Storage.Google.upload_image("ilmx-product-images", image_id, image_string)
+				image_url = EdMarkaz.Storage.Google.upload_image("ilmx-product-images", image_id, image_string)
 				merges = %{
 					pkey => %{
 						"action" => %{

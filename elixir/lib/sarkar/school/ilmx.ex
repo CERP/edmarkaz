@@ -2,7 +2,7 @@ defmodule EdMarkaz.School do
 
 	def get_profile(phone_number) do
 
-		{:ok, resp} = Postgrex.query(EdMarkaz.DB, "SELECT id, db->>'school_name', db FROM platform_schools WHERE
+		{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB, "SELECT id, db->>'school_name', db FROM platform_schools WHERE
 			length(id)='36' AND
 			concat('0', db->>'phone_number') = $1 OR
 			db->>'phone_number'=$1 OR
