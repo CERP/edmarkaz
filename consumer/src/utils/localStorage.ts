@@ -33,7 +33,8 @@ export const loadAuth = (): RootReducerState['auth'] => {
 		client_type: "consumer",
 		sms_sent: false,
 		verifying_user: false,
-		user: undefined
+		user: undefined,
+		loading: false
 	};
 
 	try {
@@ -44,10 +45,11 @@ export const loadAuth = (): RootReducerState['auth'] => {
 
 		const auth: RootReducerState["auth"] = JSON.parse(str)
 
-		if (auth.token && auth.id && auth.user === undefined) {
+		if (auth.token && auth.id && auth.user === undefined && auth.loading) {
 			return {
 				...auth,
-				user: "SCHOOL"
+				user: "SCHOOL",
+				loading: false
 			}
 		}
 

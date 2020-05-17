@@ -8,11 +8,13 @@ import { Container, Typography, Button, TextField } from '@material-ui/core'
 import { loadProfile, signUp } from '../../actions'
 import Former from 'former'
 import { SchoolForm } from './form'
+import LoadingIcon from '../../icons/load.svg'
 import './style.css'
 
 type P = {
 	auth: RootReducerState['auth'];
 	profile: RootReducerState['sync_state']['profile'];
+	client_id: string
 	loadProfile: (number: string) => void;
 	createAccount: (number: string, password: string, profile: Partial<CERPSchool>) => void;
 
@@ -146,8 +148,20 @@ class SignUp extends React.Component<P, S> {
 
 	render() {
 
+		const { auth, client_id } = this.props
+
+		if (auth.loading) {
+			return <div className="loading">
+				<img className="icon" src={LoadingIcon} />
+				<div className="text">Loading, might take a few seconds depending on your connection speed</div>
+			</div>
+		}
+
 		if (this.state.redirect) {
-			return <Redirect to="/" />
+			return setTimeout(
+				() => window.location.href = `https://localhost:3001/auto-login?id=${auth.id}&key=${auth.token}&cid=${client_id}`,
+				1000
+			)
 		}
 
 		return <Layout>
@@ -200,7 +214,8 @@ class SignUp extends React.Component<P, S> {
 export default connect((state: RootReducerState) => ({
 	connected: state.connected,
 	profile: state.sync_state.profile,
-	auth: state.auth
+	auth: state.auth,
+	client_id: state.client_id
 }), (dispatch: Function) => ({
 	loadProfile: (number: string) => dispatch(loadProfile(number)),
 	createAccount: (number: string, password: string, profile: Partial<CERPSchool>) => dispatch(signUp(number, password, profile))

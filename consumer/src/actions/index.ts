@@ -347,6 +347,10 @@ export const signUp = (number: string, password: string, profile: Partial<CERPSc
 
 	const state = getState();
 
+	dispatch({
+		type: "SCHOOL_SIGNUP"
+	})
+
 	syncr.send({
 		type: SIGN_UP,
 		client_type: state.auth.client_type,

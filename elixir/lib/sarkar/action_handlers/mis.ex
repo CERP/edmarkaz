@@ -1,5 +1,52 @@
 defmodule Sarkar.ActionHandler.Mis do
 
+
+	def handle_action(
+		%{
+			"type" => "AUTO_LOGIN",
+			"payload" => %{
+				"token" => token,
+				"school_id" => school_id,
+				"client_id" => client_id,
+				"ilmx_client_id" => ilmx_client_id
+			}
+		},
+		state
+	) do
+
+		#verifying the ilmx info
+		case Sarkar.Auth.verify({school_id, ilmx_client_id, token}) do
+			{:ok, message} ->
+
+				case Sarkar.Auth.gen_token(school_id, client_id) do
+					{:ok, new_token} ->
+						parent = self()
+
+						start_school(school_id)
+						register_connection(school_id, client_id)
+
+						spawn fn ->
+							db = Sarkar.School.get_db(school_id)
+
+							send(parent, {:broadcast, %{
+								"type" => "LOGIN_SUCCEED",
+								"db" => db,
+								"token" => new_token,
+								"school_id" => school_id
+							}})
+						end
+
+						{:reply, succeed(%{status: "SUCCESS"}), %{school_id: school_id, client_id: client_id}}
+					{:error, err} ->
+						IO.puts "Erorr while generating token in auto login"
+						{:reply, fail(err), %{}}
+				end
+
+			{:error, message} ->
+				{:reply, fail(message), %{}}
+		end
+	end
+
 	def handle_action(%{ "type" => "LOGIN",  "payload" => %{"school_id" => school_id, "client_id" => client_id, "password" => password }}, state) do
 		case Sarkar.Auth.login({school_id, client_id, password}) do
 			{:ok, token} ->

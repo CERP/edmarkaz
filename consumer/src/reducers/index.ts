@@ -296,6 +296,16 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 					}
 				}
 			}
+		case "SCHOOL_SIGNUP":
+			{
+				return {
+					...state,
+					auth: {
+						...state.auth,
+						loading: true
+					}
+				}
+			}
 		case LOGIN_SUCCEED:
 			{
 				const login_action = action as LoginSucceed
@@ -307,7 +317,8 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 						...state.auth,
 						id: login_action.id,
 						token: login_action.token,
-						user: login_action.user
+						user: login_action.user,
+						loading: false
 					}
 				}
 			}

@@ -64,6 +64,7 @@ interface RootReducerState {
 		sms_sent: boolean;
 		verifying_user: boolean;
 		user?: "SCHOOL" | "TEACHER" | "STUDENT" | "GUEST_STUDENT" | "GUEST_TEACHER";
+		loading: boolean
 	};
 	products: {
 		last_sync: number;
