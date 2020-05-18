@@ -9,7 +9,7 @@ const AboutUs = () => {
 			name: "Asim Khwaja"
 		},
 		{
-			position: "LEAPS Sr. Program Manager",
+			position: "LEAPS Director",
 			url: "https://storage.googleapis.com/ilmx-product-images/aboutzainab.jpg",
 			name: "Zainab Qureshi"
 		},

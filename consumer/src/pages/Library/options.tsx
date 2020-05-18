@@ -6,6 +6,7 @@ import LoadingIcon from '../../icons/load.svg'
 import { getIconsFromSubject } from '../../utils/getIconsFromSubject';
 import { Container, Avatar, Divider, Typography, Paper } from '@material-ui/core';
 import KAcad from '../../icons/KAcad.png'
+import KAcad_kids from '../../icons/KAcad_kids.png'
 import TAbad from '../../icons/TAbad.png'
 import { getDeviceOS } from '../../utils/getDeviceOS';
 
@@ -55,7 +56,7 @@ const getFeaturedApps = () => ([
 		title: "Khan Academy Kids",
 		link_play: "https://play.google.com/store/apps/details?id=org.khankids.android&hl=en",
 		link_app: "https://apps.apple.com/us/app/khan-academy-kids/id1378467217",
-		logo: KAcad
+		logo: KAcad_kids
 	},
 ])
 
