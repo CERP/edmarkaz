@@ -26,7 +26,7 @@ export default (props: P) => {
 	return <div className="articles">
 
 		<div className="tabs-banner">
-			<img crossOrigin="anonymous" className="banner-img" src={banner} />
+			<img crossOrigin="anonymous" className="banner-img" src={banner} alt="banner" />
 		</div>
 
 		<div className="tabs-home">
@@ -39,15 +39,18 @@ export default (props: P) => {
 
 				<div className="items">
 					<Link className="item-card" to={`/articles/purpose`}>
-						<img className="item-image" crossOrigin="anonymous" src="https://lh5.googleusercontent.com/V9qlXsqwKJykzdiUoL3pNgWJNEtb9xEfg8dUFuu7wEQ2ItW1MBh7GgC9QggXzXt6HG2F8xnw_DEq5E9YjrRkiyZpBbaTv3UbtiExXUxBVGcvmjsndr1WLoBgNBHoNzJ5GvXZ7JHG" />
+						<img className="item-image" crossOrigin="anonymous" src="https://lh5.googleusercontent.com/V9qlXsqwKJykzdiUoL3pNgWJNEtb9xEfg8dUFuu7wEQ2ItW1MBh7GgC9QggXzXt6HG2F8xnw_DEq5E9YjrRkiyZpBbaTv3UbtiExXUxBVGcvmjsndr1WLoBgNBHoNzJ5GvXZ7JHG"
+							alt="purpose-drawing" />
 						<div className="subtitle">What is the Purpose of School?</div>
 					</Link>
 					<Link className="item-card" to={`/articles/makes_school_great`}>
-						<img className="item-image" crossOrigin="anonymous" src="https://lh5.googleusercontent.com/x1oYxe7vOuBregHu7dB-CFqyNiR5iMdYhSBKtfbDZ6pLMs6Nmhv5MkUKgwiu5Mw7iiOfmI8i0bjgzIl51Zzw7j8HXq0ttEydB8CoG4PqhWVRKYR8dhnJXn8fr2ZS806IIiwGgUmp" />
+						<img className="item-image" crossOrigin="anonymous" src="https://lh5.googleusercontent.com/x1oYxe7vOuBregHu7dB-CFqyNiR5iMdYhSBKtfbDZ6pLMs6Nmhv5MkUKgwiu5Mw7iiOfmI8i0bjgzIl51Zzw7j8HXq0ttEydB8CoG4PqhWVRKYR8dhnJXn8fr2ZS806IIiwGgUmp"
+							alt="school-drawing" />
 						<div className="subtitle">What Makes a School Great?</div>
 					</Link>
 					<Link className="item-card" to={`/articles/prepare_students`}>
-						<img className="item-image" crossOrigin="anonymous" src="https://lh5.googleusercontent.com/l3QVeNyXAS6j4t5Z1uAnNlCmqmcv74ZpafoVNqFf8x5L2LEx620QinO6NGcJwe7IiX0M4SPf0ZvqGjKmAXq_ZxZJTp9UlJhusd23AL37Fz7X0_w8Q-lGQBrweIKBy_8EWGWO_YIy" />
+						<img className="item-image" crossOrigin="anonymous" src="https://lh5.googleusercontent.com/l3QVeNyXAS6j4t5Z1uAnNlCmqmcv74ZpafoVNqFf8x5L2LEx620QinO6NGcJwe7IiX0M4SPf0ZvqGjKmAXq_ZxZJTp9UlJhusd23AL37Fz7X0_w8Q-lGQBrweIKBy_8EWGWO_YIy"
+							alt="skills-drawing" />
 						<div className="subtitle">How Can we Prepare Students for the Future</div>
 					</Link>
 				</div>
@@ -60,15 +63,18 @@ export default (props: P) => {
 
 				<div className="items">
 					<Link className="item-card" to={`/articles/leaders_make_great`}>
-						<img className="item-image" crossOrigin="anonymous" src="https://lh6.googleusercontent.com/YxeFoAXAWXGmDb6Sl20CcC-b2YXAVLNHQt4p5M6hp9OVNn-TIcbAF9ztTnkD8u4KMtBU13NWTZNvgp9dwZgF4ecVfwhrEX0ruHGFrpUtuUN_duCRsDccT0fCeK4n5mSILESHjzf5" />
+						<img className="item-image" crossOrigin="anonymous" src="https://lh6.googleusercontent.com/YxeFoAXAWXGmDb6Sl20CcC-b2YXAVLNHQt4p5M6hp9OVNn-TIcbAF9ztTnkD8u4KMtBU13NWTZNvgp9dwZgF4ecVfwhrEX0ruHGFrpUtuUN_duCRsDccT0fCeK4n5mSILESHjzf5"
+							alt="growth-illustration" />
 						<div className="subtitle">Strong Leaders Make Great Schools</div>
 					</Link>
 					<Link className="item-card" to={`/articles/can_we_help_all_children`}>
-						<img className="item-image" crossOrigin="anonymous" src="https://lh6.googleusercontent.com/AWdnF3zDePgYD2K77ct85i-lXasGbztxdoNmU8_6anjtBnN-TTuOmaYmwG3waE3729fzLtqiEshKV61lWu9EBb8pCVT66W8BWhD5E-1on94HWMwLK9XrjpVNEGEU3joyKiCmPcPz" />
+						<img className="item-image" crossOrigin="anonymous" src="https://lh6.googleusercontent.com/AWdnF3zDePgYD2K77ct85i-lXasGbztxdoNmU8_6anjtBnN-TTuOmaYmwG3waE3729fzLtqiEshKV61lWu9EBb8pCVT66W8BWhD5E-1on94HWMwLK9XrjpVNEGEU3joyKiCmPcPz"
+							alt="kids" />
 						<div className="subtitle">How Can we Help All Children Learn?</div>
 					</Link>
 					<Link className="item-card" to={`/articles/makes_great_leader`}>
-						<img className="item-image" crossOrigin="anonymous" src="https://lh5.googleusercontent.com/JpMXRfA2YvC-xrq9B86V-3H3qidEMjfzKPh_6EOARLj_YnGnCvHaiy8y3wIB-IFe6MEGXvUVlCtKEAGfDKkcQ9YMNXfDmYjloe3cIzNxfimC42kkGwlYIZiU6L4wHkhufw" />
+						<img className="item-image" crossOrigin="anonymous" src="https://lh5.googleusercontent.com/JpMXRfA2YvC-xrq9B86V-3H3qidEMjfzKPh_6EOARLj_YnGnCvHaiy8y3wIB-IFe6MEGXvUVlCtKEAGfDKkcQ9YMNXfDmYjloe3cIzNxfimC42kkGwlYIZiU6L4wHkhufw"
+							alt="leader-characteristics" />
 						<div className="subtitle">What Makes a Great School Leader?</div>
 					</Link>
 				</div>

@@ -1,11 +1,10 @@
-import React, { useState, useEffect, IframeHTMLAttributes } from 'react'
+import React, { useState } from 'react'
 import { connect } from 'react-redux'
-import { withRouter, RouteComponentProps, Redirect } from 'react-router'
+import { withRouter, RouteComponentProps } from 'react-router'
 import Youtube from 'react-youtube'
 import Play from '../../../icons/play.svg'
 import { trackVideoAnalytics, getLessons } from '../../../actions'
 import Modal from '../../../components/Modal'
-import LoadingIcon from '../../../icons/load.svg'
 import { List, ListItem, ListItemIcon, Typography, Divider, Container } from '@material-ui/core'
 
 import "../style.css"
@@ -28,10 +27,11 @@ type Props = P & RouteComponentProps<RouteInfo>
 
 const getIDFromYoutbeLink = (link: string) => {
 
+	// eslint-disable-next-line
 	const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
 	const match = link.match(regExp);
 
-	if (match && match[2].length == 11) {
+	if (match && match[2].length === 11) {
 		return match[2]
 	}
 
@@ -40,14 +40,14 @@ const getIDFromYoutbeLink = (link: string) => {
 
 const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trackVideoAnalytics }) => {
 
-	const { medium, grade, subject, chapter, chapter_name } = match.params
+	const { medium, grade, subject, chapter } = match.params
 	const curr_unit = lessons[medium]
 		&& lessons[medium][grade]
 		&& lessons[medium][grade][subject] ?
 		lessons[medium][grade][subject][chapter] || {}
 		: {}
 
-	const [activeChapter, setActiveChapter] = useState("")
+	const [activeChapter] = useState("")
 	const [activeLesson, setActiveLesson] = useState("")
 	const [showModal, setShowModal] = useState(false)
 	const [videoId, setVideoID] = useState("")
@@ -78,6 +78,7 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 		setShowModal(false);
 	}
 
+	// eslint-disable-next-line
 	const isYoutubeUrl = (link: string) => Boolean(link.match("^(http(s)?:\/\/)?((w){3}.)?youtu(be|.be)?(\.com)?\/.+"))
 
 	const redirectToUrl = () => {
@@ -171,7 +172,7 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 						: redirectToUrl()
 					: <div>
 						<div className="heading">Something Went Wrong</div>
-						<div className="subtitle">Try again or <a href={isYoutubeUrl(currentLessonURL) ? `https://youtube.com/watch?v=${videoId}` : currentLessonURL} target="_blank">Click Here</a> to watch this on your browser</div>
+						<div className="subtitle">Try again or <a href={isYoutubeUrl(currentLessonURL) ? `https://youtube.com/watch?v=${videoId}` : currentLessonURL} target="_blank" rel="noopener noreferrer">Click Here</a> to watch this on your browser</div>
 					</div>
 				}
 				<div className="button" style={{ marginTop: '5px', backgroundColor: "#f05967" }} onClick={() => onBack()}>Back</div>
@@ -196,7 +197,7 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 							return <List key={lesson_id}>
 								<ListItem button onClick={() => playLesson(lesson)}>
 									<ListItemIcon style={{ minWidth: "30px" }}>
-										<img className="play-icon" src={Play} />
+										<img className="play-icon" src={Play} alt="play-icon" />
 									</ListItemIcon>
 									<Typography variant="subtitle2" align="left">{lesson.meta.name}</Typography>
 								</ListItem>
@@ -207,13 +208,6 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 			</div>}
 	</div>
 }
-
-{/* <div key={lesson_id}>
-	<div className="item" key={lesson_id} onClick={() => playLesson(lesson)}>
-		<img className="play-icon" src={Play} alt="play" />
-		<div className="title">{`${lesson.meta.name}`}</div>
-	</div>
-</div> */}
 
 export default connect((state: RootReducerState) => ({
 	lessons: state.lessons.db,

@@ -2,7 +2,7 @@ import * as React from 'react'
 import Former from 'former'
 import Dynamic from '@ironbay/dynamic'
 import { Span } from '.'
-import { Typography, Button, TextField, MenuItem, Grid } from '@material-ui/core'
+import { Typography, TextField, MenuItem, Grid } from '@material-ui/core'
 interface SurveyRowProp {
 	label: string;
 	path: string[];
@@ -16,7 +16,7 @@ interface SchoolProp {
 	base_path: string[];
 }
 
-export const SchoolForm: React.SFC<SchoolProp> = ({ school, former, base_path }) => {
+export const SchoolForm: React.SFC<SchoolProp> = ({ former, base_path }) => {
 
 	return <>
 		<Typography variant="h5">School Profile <Span /></Typography>

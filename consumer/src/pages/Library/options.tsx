@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import LoadingIcon from '../../icons/load.svg'
 import { getIconsFromSubject } from '../../utils/getIconsFromSubject';
-import { Container, Avatar, Divider, Typography, Paper } from '@material-ui/core';
+import { Container, Avatar, Divider, Typography } from '@material-ui/core';
 import KAcad from '../../icons/KAcad.png'
 import KAcad_kids from '../../icons/KAcad_kids.png'
 import TAbad from '../../icons/TAbad.png'
@@ -64,7 +64,7 @@ const StudentPortalOptions: React.FC<Props> = ({ getLessons, lessons, lesson_loa
 
 	useEffect(() => {
 		getLessons()
-	}, [])
+	}, [getLessons])
 
 	const subjectSortArray = [
 		"English",
@@ -86,7 +86,7 @@ const StudentPortalOptions: React.FC<Props> = ({ getLessons, lessons, lesson_loa
 	const [grade, setGrade] = useState("");
 
 	return lesson_loading ? <div className="loading">
-		<img className="icon" src={LoadingIcon} />
+		<img className="icon" src={LoadingIcon} alt="loading-icon" />
 		<div className="text">Fetching Lessons</div>
 	</div> : <div className="student-portal-op">
 

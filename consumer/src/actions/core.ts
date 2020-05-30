@@ -1,4 +1,4 @@
-import { Dispatch, AnyAction } from 'redux'
+import { Dispatch } from 'redux'
 import Syncr from '@cerp/syncr';
 import { v4 } from 'uuid';
 

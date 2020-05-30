@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom';
 import Arrow from '../../icons/arrow.svg'
 import { getProducts } from '../../actions';
-import banner from './Banner.png'
 
 import './style.css'
 
@@ -100,7 +99,7 @@ class LoggedOutHome extends React.Component<P, S> {
 										Object.entries(suppliers)
 											.sort(([, s1], [, s2]) => (s1.order || 9999) - (s2.order || 9999))
 											.map(([sid, profile]) => <Link className="item-card" to={`/supplier/${sid}`} key={`${category}-${sid}`}>
-												<img crossOrigin="anonymous" src={profile.logo && profile.logo.url} className="item-image" />
+												<img crossOrigin="anonymous" src={profile.logo && profile.logo.url} className="item-image" alt="product" />
 												<div className="subtitle">{profile.name}</div>
 											</Link>)
 									}
