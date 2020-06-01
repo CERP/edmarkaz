@@ -18,6 +18,7 @@ import StudentPortalOptions from '../Library/options';
 import Layout from "../../components/Layout";
 import { Paper, Tabs, Tab } from "@material-ui/core";
 import StudentProfile from "../StudentPortal/studentProfile";
+import HelpFooter from "components/Footer/HelpFooter"
 
 import "./style.css";
 
@@ -140,10 +141,9 @@ class TabsBar extends Component<propTypes, S> {
 					<div>Contact Us</div>
 				</a>}
 
-				{(current !== "/" && current !== "/about-us") && <div className="tabs-footer">
-					<a className="bttn" href="https://web.facebook.com/groups/2982527545103658">Discussion Forum</a>
-					<a className="bttn" href={callLink} style={{ border: "none" }}>Helpline</a>
-				</div>}
+				{(current !== "/" && current !== "/about-us") && <>
+					<HelpFooter hlink={callLink} />
+				</>}
 			</div>
 		</Layout>
 	}
