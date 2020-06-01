@@ -2,9 +2,9 @@ import React from 'react'
 import Container from '@material-ui/core/Container'
 import { Box, Grid, Button } from '@material-ui/core'
 import { YouTube, Phone } from '@material-ui/icons'
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
-import Link from '@material-ui/core/Link';
+import Typography from '@material-ui/core/Typography'
+import { makeStyles } from '@material-ui/core/styles'
+import Link from '@material-ui/core/Link'
 
 type PropsType = {
 	hlink?: string
@@ -27,7 +27,8 @@ const useStyles = makeStyles((theme) => ({
 	helpButton: {
 		background: 'white',
 		color: 'black',
-		fontWeight: 'bold'
+		fontWeight: 'bold',
+		borderRadius: "8px"
 	},
 	phoneIcon: {
 		fill: 'white',
@@ -37,8 +38,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const HelpFooter: React.FC<PropsType> = ({ hlink }) => {
-
-	console.log(hlink)
 
 	const classes = useStyles();
 
@@ -50,12 +49,12 @@ const HelpFooter: React.FC<PropsType> = ({ hlink }) => {
 						className={classes.heading6}
 						variant="h6">
 						Need help?
-				</Typography>
+					</Typography>
 					<Grid container spacing={3}>
 						<Grid item sm={6}>
 							<Box width="1">
 								<Button
-									size="medium"
+									size="large"
 									variant="outlined"
 									className={classes.helpButton}
 									startIcon={<YouTube style={{ fill: "red" }} />}>
@@ -67,7 +66,7 @@ const HelpFooter: React.FC<PropsType> = ({ hlink }) => {
 							<Box width="1">
 								<Link href={hlink} underline="none">
 									<Button
-										size="medium"
+										size="large"
 										variant="outlined"
 										className={classes.helpButton}
 										startIcon={<Phone className={classes.phoneIcon} />}>
