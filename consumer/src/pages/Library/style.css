@@ -214,7 +214,7 @@
 		}
 
 			.lesson-page .lb-list {
-				overflow-y: auto;
+				/* overflow-y: auto; */
 				max-height: 70vh;
 				/* box-shadow: inset 0 0 5px #bebebe; */
 				border-radius: 5px;
@@ -340,4 +340,16 @@
 		to {
 			transform: rotate(-360deg);
 		}
+	}
+
+	.blockquote-content {
+		border-radius: 8px;
+		background: #fbfbfb;
+		padding: 0.75rem;
+	}
+
+	.blockquote-content .heading {
+		color: var(--blue);
+		margin-top: 0.25rem;
+		margin-bottom: 0.25rem;
 	}

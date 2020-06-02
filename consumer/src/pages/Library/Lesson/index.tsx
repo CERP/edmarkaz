@@ -7,13 +7,15 @@ import { trackVideoAnalytics, getLessons } from '../../../actions'
 import Modal from '../../../components/Modal'
 import { List, ListItem, ListItemIcon, Typography, Divider, Container } from '@material-ui/core'
 
+import { getColorsFromChapter } from 'utils/getColorsFromChapter'
+
 import "../style.css"
+
 interface P {
 	lessons: RootReducerState["lessons"]["db"]
 	connected: RootReducerState["connected"]
 	getLessons: () => void
 	trackVideoAnalytics: (path: string, chapter_id: string, lessons_id: string, time: number) => void
-
 }
 
 interface RouteInfo {
@@ -23,6 +25,7 @@ interface RouteInfo {
 	chapter: string
 	chapter_name: string
 }
+
 type Props = P & RouteComponentProps<RouteInfo>
 
 const getIDFromYoutbeLink = (link: string) => {
@@ -40,7 +43,7 @@ const getIDFromYoutbeLink = (link: string) => {
 
 const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trackVideoAnalytics }) => {
 
-	const { medium, grade, subject, chapter } = match.params
+	const { medium, grade, subject, chapter, chapter_name } = match.params
 	const curr_unit = lessons[medium]
 		&& lessons[medium][grade]
 		&& lessons[medium][grade][subject] ?
@@ -85,58 +88,6 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 		window.location.href = currentLessonURL
 		return true
 	}
-	// const onPrev = () => {
-
-	// 	const key = `${parseFloat(activeLesson) - 1}`
-	// 	const prevLesson = curr[activeChapter][key]
-
-	// 	if (prevLesson) {
-
-	// 		if (startTime !== 0) {
-	// 			//Tracking analytics for curr lecture before moving to prev
-	// 			const timePassed = (Date.now() - startTime) / 1000
-	// 			trackVideoAnalytics(location.pathname, activeChapter, activeLesson, timePassed)
-	// 		}
-
-	// 		//For prev
-	// 		if (connected) {
-	// 			setStartTime(Date.now())
-	// 		}
-	// 		else {
-	// 			setStartTime(0)
-	// 		}
-
-	// 		setVideoID(getIDFromYoutbeLink(prevLesson.meta.link))
-	// 		setActiveLesson(key)
-	// 	}
-	// }
-
-	// const onNext = () => {
-
-	// 	const key = `${parseFloat(activeLesson) + 1}`
-	// 	const nextLesson = curr[activeChapter][key]
-
-	// 	if (nextLesson) {
-
-	// 		if (startTime !== 0) {
-	// 			//Tracking analytics for curr lecture before moving to next
-	// 			const timePassed = (Date.now() - startTime) / 1000
-	// 			trackVideoAnalytics(location.pathname, activeChapter, activeLesson, timePassed)
-
-	// 		}
-
-	// 		//For next
-	// 		if (connected) {
-	// 			setStartTime(Date.now())
-	// 		}
-	// 		else {
-	// 			setStartTime(0)
-	// 		}
-
-	// 		setVideoID(getIDFromYoutbeLink(nextLesson.meta.link))
-	// 		setActiveLesson(key)
-	// 	}
-	// }
 
 	return <div className="lesson-page">
 		{showModal && <Modal>
@@ -155,20 +106,6 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 							}
 
 						}} />
-						// : <iframe
-						// 	onLoad={checkForCrossOrigin}
-						// 	onError={() => console.log("ERROR IN IFRAME")}
-						// 	id="nyt-iframe"
-						// 	src={currentLessonURL}
-						// 	width="100%"
-						// 	height="100%"
-						// 	className="iframe"
-						// 	allowFullScreen>
-						// 	<div>
-						// 		<div className="heading">Your Browser does not support Embeded Player</div>
-						// 		<div className="subtitle">Please update your browser(Chrome recommended) or <a href={currentLessonURL} target="_blank">Click Here</a> to visit there page</div>
-						// 	</div>
-						// </iframe>
 						: redirectToUrl()
 					: <div>
 						<div className="heading">Something Went Wrong</div>
@@ -191,6 +128,27 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 			and help us make Ilmexchange better for you.
 		</Typography>
 		</Container> : <div className="lb-list">
+				<blockquote>
+					<div className="blockquote-content" style={{ borderLeft: `6px solid ${getColorsFromChapter(chapter_name)}` }}>
+						<Typography
+							variant="h6"
+							align="left">
+							Lesson {chapter}
+						</Typography>
+						<Typography
+							className="heading"
+							variant="h4"
+							align="left">
+							{chapter_name}
+						</Typography>
+					</div>
+				</blockquote>
+				<Typography
+					className="primary-ilmx"
+					variant="h4"
+					align="left">
+					Lesson Videos
+				</Typography>
 				{
 					Object.entries(curr_unit)
 						.map(([lesson_id, lesson]) => {
@@ -205,6 +163,21 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 							</List>
 						})
 				}
+				<Typography
+					className="primary-ilmx"
+					style={{ marginTop: "0.75rem" }}
+					variant="h4"
+					align="left">
+					Pratice
+				</Typography>
+				<Typography
+					className="primary-ilmx"
+					style={{ marginBottom: "5rem" }}
+					variant="h4"
+					align="left">
+					Quiz
+				</Typography>
+
 			</div>}
 	</div>
 }
