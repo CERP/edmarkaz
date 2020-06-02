@@ -205,7 +205,7 @@ class SignUp extends React.Component<P, S> {
 								</IconButton>
 							</InputAdornment>
 						}
-						labelWidth={70}
+						labelWidth={55}
 					/>
 				</FormControl>
 

@@ -1,11 +1,14 @@
 import React, { Component } from 'react'
-import { RouteComponentProps } from 'react-router-dom'
-
-import { SMSAuth, verifyUrlAuth } from '../../actions'
-import Former from 'former'
 import { connect } from 'react-redux'
+import { RouteComponentProps } from 'react-router-dom'
+import { Container, Button, Typography, TextField, Avatar } from '@material-ui/core'
+
+import Former from 'former'
 import Layout from '../../components/Layout'
-import { Container, Button, Typography, TextField } from '@material-ui/core'
+import ilmxLogo from 'components/Header/ilmx.svg'
+import { SMSAuth, verifyUrlAuth } from '../../actions'
+
+
 import SignUp from '.'
 
 interface P {
@@ -77,17 +80,24 @@ class Login extends Component<propTypes, S> {
 
 			<div className="login-page">
 				<Container maxWidth="sm">
-					<div className="section"
+					<div
+						className="section"
 						style={{
 							border: "none",
 							display: "flex",
 							flexDirection: "column",
-						}}
-					>
+						}}>
+
+						<Avatar variant="square" style={{
+							height: "100%",
+							width: "70%",
+							margin: "auto"
+						}} src={ilmxLogo} alt="ilmx-logo" />
+
 						<Typography
 							variant="h4"
 							align="left"
-							style={{ fontFamily: "futura" }}
+							style={{ marginTop: 20, fontFamily: "futura" }}
 							color="primary" >Sign In </Typography>
 						<>
 							<TextField
