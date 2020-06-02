@@ -25,6 +25,25 @@ defmodule EdMarkaz.School do
 		end
 	end
 
+	def get_profile_by_id(school_id) do
+
+		{:ok, resp} = EdMarkaz.DB.Postgres.query(
+			EdMarkaz.DB,
+			"SELECT
+				db->>'phone_number', db
+			FROM platform_schools
+			WHERE id=$1",
+			[school_id]
+		)
+		case resp.rows do
+			[[ phone, db]] ->
+				{:ok, phone, db }
+			other ->
+				IO.puts "no school found"
+				{:error, "school not found" }
+		end
+	end
+
 	def get_number(id) do
 		{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB, "Select db->>'phone_number' FROM platform_schools WHERE id=$1", [id])
 		[[ number ]] = resp.rows

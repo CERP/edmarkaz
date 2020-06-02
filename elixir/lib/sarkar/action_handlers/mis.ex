@@ -8,44 +8,91 @@ defmodule Sarkar.ActionHandler.Mis do
 				"token" => token,
 				"school_id" => school_id,
 				"client_id" => client_id,
+				"ilmx_school_id" => ilmx_school_id,
 				"ilmx_client_id" => ilmx_client_id
 			}
 		},
 		state
 	) do
 
+		IO.puts ilmx_school_id
+		IO.puts school_id
 		#verifying the ilmx info
 		case Sarkar.Auth.verify({school_id, ilmx_client_id, token}) do
 			{:ok, message} ->
+				IO.puts "HELLO"
+				case EdMarkaz.DB.Postgres.query(
+					EdMarkaz.DB,
+					"SELECT phone, mis_id, ilmx_id FROM ilmx_to_mis_mapper WHERE ilmx_id=$1",
+					[ilmx_school_id]
+				) do
+					{:ok, %Postgrex.Result{num_rows: 0}} ->
+						IO.puts "NOT IN ILMX/MIS MAPPER"
+						IO.puts "Putting in table"
+						{:ok, resp} = EdMarkaz.DB.Postgres.query(
+							EdMarkaz.DB,
+							"INSERT INTO ilmx_to_mis_mapper (phone, mis_id, ilmx_id) VALUES ($1,$2,$3)",
+							[school_id, school_id, ilmx_school_id]
+						)
+						IO.puts "Generating Token"
+						case Sarkar.Auth.gen_token(school_id, client_id) do
+							{:ok, new_token} ->
+								IO.puts "Logging IN"
+								IO.puts "Creating new school with ilmx creds"
+								parent = self()
 
-				case Sarkar.Auth.gen_token(school_id, client_id) do
-					{:ok, new_token} ->
-						parent = self()
+								start_school(school_id)
+								register_connection(school_id, client_id)
 
-						start_school(school_id)
-						register_connection(school_id, client_id)
+								spawn fn ->
+									db = Sarkar.School.get_db(school_id)
 
-						spawn fn ->
-							db = Sarkar.School.get_db(school_id)
+									send(parent, {:broadcast, %{
+										"type" => "LOGIN_SUCCEED",
+										"db" => db,
+										"token" => new_token,
+										"school_id" => school_id
+									}})
+								end
 
-							send(parent, {:broadcast, %{
-								"type" => "LOGIN_SUCCEED",
-								"db" => db,
-								"token" => new_token,
-								"school_id" => school_id
-							}})
+								{:reply, succeed(%{status: "SUCCESS"}), %{school_id: school_id, client_id: client_id}}
+							{:error, err} ->
+								IO.puts "Erorr while generating token in auto login"
+								{:reply, fail(err), %{}}
 						end
+					{:ok, resp} ->
+						IO.puts "Found in ILMX/MIS Mapper"
+						[[phone, mis_id, ilmx_id ]] = resp.rows
+						IO.puts "Generating token"
+						case Sarkar.Auth.gen_token(mis_id, client_id) do
+							{:ok, new_token} ->
+								parent = self()
 
-						{:reply, succeed(%{status: "SUCCESS"}), %{school_id: school_id, client_id: client_id}}
+								start_school(mis_id)
+								register_connection(mis_id, client_id)
+
+								spawn fn ->
+									db = Sarkar.School.get_db(mis_id)
+
+									send(parent, {:broadcast, %{
+										"type" => "LOGIN_SUCCEED",
+										"db" => db,
+										"token" => new_token,
+										"school_id" => mis_id
+									}})
+								end
+
+								{:reply, succeed(%{status: "SUCCESS"}), %{school_id: mis_id, client_id: client_id}}
+							{:error, err} ->
+								IO.puts "Erorr while generating token in auto login"
+								{:reply, fail(err), %{}}
+						end
 					{:error, err} ->
-						IO.puts "Erorr while generating token in auto login"
-						{:reply, fail(err), %{}}
+						IO.puts "Error Occurred"
+						IO.inspect err
 				end
-
-			{:error, message} ->
-				{:reply, fail(message), %{}}
-		end
 	end
+end
 
 	def handle_action(%{ "type" => "LOGIN",  "payload" => %{"school_id" => school_id, "client_id" => client_id, "password" => password }}, state) do
 		case Sarkar.Auth.login({school_id, client_id, password}) do
