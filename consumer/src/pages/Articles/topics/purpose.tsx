@@ -7,6 +7,7 @@ export default () => <div>
 		<img
 			className="banner-img"
 			src="https://lh5.googleusercontent.com/V9qlXsqwKJykzdiUoL3pNgWJNEtb9xEfg8dUFuu7wEQ2ItW1MBh7GgC9QggXzXt6HG2F8xnw_DEq5E9YjrRkiyZpBbaTv3UbtiExXUxBVGcvmjsndr1WLoBgNBHoNzJ5GvXZ7JHG"
+			alt="banner"
 		/>
 	</div>
 
@@ -59,7 +60,7 @@ export default () => <div>
 			<p>طلبا کو ہر مضمون میں بنیادی تصورات کی عملی مہارت مہیا کرنے کے بعد ، اساتذہ کو انہیں اس علم کو عملی جامہ پہنانے کے لئے تربیت دینے کی ضرورت ہے۔ علم کو استعمال کرنے کا طریقہ سیکھنا، خود مختار سیکھنے والا بننے کی جانب ایک اہم قدم ہے۔ ایک بار جب آپ کو علم ہو جائے کہ معلومات پر کس طرح عمل کرنا ہے تو ، آپ کسی بھی نئی معلومات پر عملدرآمد کرسکتے ہیں جو آپ کے راستے میں آجائے۔ اس سلسلے میں اساتذہ ایک مددگار ٹول استعمال کرسکتے ہیں جو بلوم ٹکسانومی (Bloom's Taxonomy)ہے۔ یہ تعلیمی نفسیات کے ماہر بینجمن بلوم نے 1956ء میں تیار کیا تھا اور اسے دنیا بھر کے اساتذہ استعمال کرتے ہیں۔</p>
 		</div>
 
-		<img className="image" src="https://lh4.googleusercontent.com/l9kf8ti1RLCeMiv4cXmiFcZ7xX8w6cLFVWwEl-2St7sfN3nORMD6FGlL0II7FP8BPMiMJxnA8vPizTZz0TIP2TFASYRIuIlWOCUb4faCZkk8H2pqAOYbBwZ0-ufJMUHIpo__wjX7" />
+		<img className="image" src="https://lh4.googleusercontent.com/l9kf8ti1RLCeMiv4cXmiFcZ7xX8w6cLFVWwEl-2St7sfN3nORMD6FGlL0II7FP8BPMiMJxnA8vPizTZz0TIP2TFASYRIuIlWOCUb4faCZkk8H2pqAOYbBwZ0-ufJMUHIpo__wjX7" alt="banner" />
 
 		<ol>
 			<li>Remember: Students learn basic concepts [e.g. definition of a noun, times tables]</li>

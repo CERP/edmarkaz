@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { RouteComponentProps, Route, Redirect } from "react-router";
-import { Link } from "react-router-dom";
 import ProductHome from "../Bazaar";
 import SupplierHome from "../Bazaar/Supplier";
 import ProductPage from "../Bazaar/Product";
@@ -92,9 +91,8 @@ class TabsBar extends Component<propTypes, S> {
 
 	render() {
 
-		const { location, token, user, history } = this.props
+		const { location, user, history } = this.props
 		const current = location.pathname;
-		const search = location.search;
 
 		const library = location.pathname.split("/").some(i => i === "library")
 
@@ -138,12 +136,11 @@ class TabsBar extends Component<propTypes, S> {
 					<TrackedRoute exact path="/student-profile" component={StudentProfile} />
 				</>
 				{!library && <a className="contact-us" href={callLink}>
-					<img src={contactUs} />
+					<img src={contactUs} alt="phone" />
 					<div>Contact Us</div>
 				</a>}
 
 				{(current !== "/" && current !== "/about-us") && <div className="tabs-footer">
-					{/* <div className="bttn">Forums</div> */}
 					<a className="bttn" href="https://web.facebook.com/groups/2982527545103658">Discussion Forum</a>
 					<a className="bttn" href={callLink} style={{ border: "none" }}>Helpline</a>
 				</div>}

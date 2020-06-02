@@ -4,12 +4,7 @@ import '../style.css'
 // eslint-disable-next-line react/display-name
 export default () => <div>
 
-	{/* <div className="tabs-banner">
-		<img
-			className="banner-img"
-			src="https://lh5.googleusercontent.com/x1oYxe7vOuBregHu7dB-CFqyNiR5iMdYhSBKtfbDZ6pLMs6Nmhv5MkUKgwiu5Mw7iiOfmI8i0bjgzIl51Zzw7j8HXq0ttEydB8CoG4PqhWVRKYR8dhnJXn8fr2ZS806IIiwGgUmp"
-		/>
-	</div> */}
+
 	<div className="article-page">
 
 		<h1>What Makes a Great School Leader? </h1>
@@ -28,6 +23,7 @@ export default () => <div>
 		<img
 			className="sm-image"
 			src="https://lh5.googleusercontent.com/JpMXRfA2YvC-xrq9B86V-3H3qidEMjfzKPh_6EOARLj_YnGnCvHaiy8y3wIB-IFe6MEGXvUVlCtKEAGfDKkcQ9YMNXfDmYjloe3cIzNxfimC42kkGwlYIZiU6L4wHkhufw"
+			alt="banner"
 		/>
 
 		<ol>

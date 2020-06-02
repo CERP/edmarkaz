@@ -22,15 +22,15 @@ const OptionsMobile = () => {
 			}
 			<div className="card-container">
 				<Link className="card" to="/student">
-					<img className="icon" src={StudentMain} />
+					<img className="icon" src={StudentMain} alt="student-icon" />
 					<div className="heading teal">STUDENTS</div>
 				</Link>
 				<Link className="card" to="/school">
-					<img className="icon" src={SchoolMain} />
+					<img className="icon" src={SchoolMain} alt="school-icon" />
 					<div className="heading teal" >SCHOOLS</div>
 				</Link>
 				<div className="card" onClick={() => setShowModal(true)}>
-					<img className="icon" src={TeacherMain} />
+					<img className="icon" src={TeacherMain} alt="teacher-icon" />
 					<div className="heading teal" >TEACHERS</div>
 				</div>
 			</div>

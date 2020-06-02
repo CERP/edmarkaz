@@ -5,7 +5,7 @@ import { SMSAuth, verifyUrlAuth } from '../../actions'
 import Former from 'former'
 import { connect } from 'react-redux'
 import Layout from '../../components/Layout'
-import { Container, Paper, Button, Typography, Avatar, TextField } from '@material-ui/core'
+import { Container, Button, Typography, Avatar, TextField } from '@material-ui/core'
 import PhoneLockedOutlined from '@material-ui/icons/LockTwoTone'
 
 
@@ -99,7 +99,7 @@ class Login extends Component<propTypes, S> {
 								label="Phone Number"
 								margin="normal"
 								fullWidth
-								placeholder="eg 0331 234567"
+								placeholder="e.g. 0300 00011100"
 								type="number"
 								{...this.former.super_handle(["phone"])}
 							/>

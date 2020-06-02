@@ -8,6 +8,7 @@ export default () => <div>
 		<img
 			className="banner-img"
 			src="https://lh5.googleusercontent.com/l3QVeNyXAS6j4t5Z1uAnNlCmqmcv74ZpafoVNqFf8x5L2LEx620QinO6NGcJwe7IiX0M4SPf0ZvqGjKmAXq_ZxZJTp9UlJhusd23AL37Fz7X0_w8Q-lGQBrweIKBy_8EWGWO_YIy"
+			alt="banner"
 		/>
 	</div>
 	<div className="article-page">
@@ -146,7 +147,6 @@ export default () => <div>
 		<div className="urdu">
 			<h3>سوال: آپ اپنے اسکول میں اس طرح کی صلاحیتیں کیسے تعمیر کرتے ہیں؟</h3>
 		</div>
-		<h2></h2>
 	</div>
 
 </div >
