@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter, Link } from 'react-router-dom'
-import { AppBar, Toolbar, IconButton, Typography, Button, makeStyles, Box } from '@material-ui/core'
+import { AppBar, Toolbar, IconButton, Button, makeStyles } from '@material-ui/core'
 import BackIcon from '@material-ui/icons/ArrowBack'
 import AccountCircle from '@material-ui/icons/AccountCircle'
 import ExitToApp from '@material-ui/icons/ExitToApp'
