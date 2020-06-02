@@ -1,17 +1,12 @@
 import React, { Component } from 'react'
-import { Link, RouteComponentProps } from 'react-router-dom'
+import { RouteComponentProps } from 'react-router-dom'
 
 import { SMSAuth, verifyUrlAuth } from '../../actions'
 import Former from 'former'
 import { connect } from 'react-redux'
 import Layout from '../../components/Layout'
-import { Container, Button, Typography, TextField, FormControl, MenuItem } from '@material-ui/core'
-import Visibility from '@material-ui/icons/Visibility'
-import VisibilityOff from '@material-ui/icons/VisibilityOff'
-import IconButton from '@material-ui/core/IconButton'
-import OutlinedInput from '@material-ui/core/OutlinedInput'
-import InputLabel from '@material-ui/core/InputLabel'
-import InputAdornment from '@material-ui/core/InputAdornment'
+import { Container, Button, Typography, TextField } from '@material-ui/core'
+import SignUp from '.'
 
 interface P {
 	sent: boolean
@@ -27,8 +22,6 @@ interface RouteInfo {
 interface S {
 	phone: string
 	code: string
-	password: string
-	showPassword: boolean
 }
 
 type propTypes = RouteComponentProps<RouteInfo> & P
@@ -41,9 +34,7 @@ class Login extends Component<propTypes, S> {
 
 		this.state = {
 			phone: "",
-			code: "",
-			password: "",
-			showPassword: false
+			code: ""
 		}
 
 		this.former = new Former(this, [])
@@ -74,15 +65,6 @@ class Login extends Component<propTypes, S> {
 		this.props.verify(this.state.code)
 	}
 
-	handleClickShowPassword = () => {
-		this.setState({ showPassword: !this.state.showPassword })
-	}
-
-	handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
-		event.preventDefault();
-	}
-
-
 	render() {
 
 		if (this.props.token) {
@@ -90,8 +72,6 @@ class Login extends Component<propTypes, S> {
 				window.location.replace("/school")
 			}, 700)
 		}
-
-		const { password, showPassword } = this.state
 
 		return <Layout>
 
@@ -119,30 +99,7 @@ class Login extends Component<propTypes, S> {
 								type="number"
 								{...this.former.super_handle(["phone"])}
 							/>
-							{
-								<FormControl variant="outlined" style={{ marginTop: 5 }}>
-									<InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
-									<OutlinedInput
-										id="outlined-adornment-password"
-										type={showPassword ? 'text' : 'password'}
-										value={password}
-										{...this.former.super_handle(["password"])}
-										endAdornment={
-											<InputAdornment position="end">
-												<IconButton
-													aria-label="toggle password visibility"
-													onClick={this.handleClickShowPassword}
-													onMouseDown={this.handleMouseDownPassword}
-													edge="end"
-												>
-													{showPassword ? <Visibility /> : <VisibilityOff />}
-												</IconButton>
-											</InputAdornment>
-										}
-										labelWidth={70}
-									/>
-								</FormControl>
-							}
+
 							{
 								!this.props.sent && <Button
 									style={{ width: "20ch", margin: "auto", marginBottom: 20, marginTop: 20, background: "#f05967", color: "white", borderRadius: "32px", fontWeight: "bold", fontSize: "1.25rem" }}
@@ -176,138 +133,12 @@ class Login extends Component<propTypes, S> {
 								</>
 							}
 
-							<Typography variant="h6">
+							<Typography variant="subtitle1">
 								Doesn't have any account?
 							</Typography>
-							<Typography
-								variant="h4"
-								align="left"
-								style={{ margin: "10px 0px", fontFamily: "futura" }}
-								color="primary" >Register your Account </Typography>
 
-							<TextField
-								variant="outlined"
-								label="Phone Number"
-								margin="normal"
-								fullWidth
-								placeholder="e.g. 0300 1110000"
-								type="number"
-								{...this.former.super_handle(["phone"])}
-							/>
-							{
-								<FormControl variant="outlined" style={{ marginTop: 5 }}>
-									<InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
-									<OutlinedInput
-										id="outlined-adornment-password"
-										type={showPassword ? 'text' : 'password'}
-										value={password}
-										{...this.former.super_handle(["password"])}
-										endAdornment={
-											<InputAdornment position="end">
-												<IconButton
-													aria-label="toggle password visibility"
-													onClick={this.handleClickShowPassword}
-													onMouseDown={this.handleMouseDownPassword}
-													edge="end"
-												>
-													{showPassword ? <Visibility /> : <VisibilityOff />}
-												</IconButton>
-											</InputAdornment>
-										}
-										labelWidth={70}
-									/>
-								</FormControl>
-							}
-							<Typography
-								variant="h6"
-								align="left"
-								style={{ marginTop: 15, fontFamily: "futura" }}
-								color="primary" >SCHOOL PROFILE </Typography>
-							<TextField
-								variant="outlined"
-								label="School Name"
-								fullWidth
-								style={{ marginTop: 15 }}
-								type="text"
-								{...this.former.super_handle(["school_name"])}
-							/>
-							<TextField
-								variant="outlined"
-								label="Address"
-								fullWidth
-								style={{ marginTop: 10 }}
-								type="text"
-								{...this.former.super_handle(["school_address"])}
-							/>
-							<Typography
-								variant="h6"
-								align="left"
-								style={{ marginTop: 15, fontFamily: "futura" }}
-								color="primary" >LOCATION</Typography>
-							<TextField
-								variant="outlined"
-								label="District"
-								fullWidth
-								style={{ marginTop: 15 }}
-								type="text"
-								{...this.former.super_handle(["school_district"])}
-							/>
-							<TextField
-								variant="outlined"
-								label="Tehsil"
-								fullWidth
-								style={{ marginTop: 10 }}
-								type="text"
-								{...this.former.super_handle(["school_tehsil"])}
-							/>
-							<Typography
-								variant="h6"
-								align="left"
-								style={{ marginTop: 15, fontFamily: "futura" }}
-								color="primary" >ADDITIONAL INFORMATION</Typography>
-							<TextField
-								variant="outlined"
-								label="Lowest Fee"
-								fullWidth
-								style={{ marginTop: 15 }}
-								type="number"
-								{...this.former.super_handle(["lowest_fee"])}
-							/>
-							<TextField
-								variant="outlined"
-								label="Highest Fee"
-								fullWidth
-								style={{ marginTop: 10 }}
-								type="number"
-								{...this.former.super_handle(["highest_fee"])}
-							/>
-							<TextField
-								variant="outlined"
-								label="Enrollment"
-								fullWidth
-								style={{ marginTop: 10 }}
-								type="number"
-								{...this.former.super_handle(["total_enrollment"])}
-							/>
-							<TextField
-								variant="outlined"
-								select
-								label="Are you the Owner of the school?"
-								fullWidth
-								style={{ marginTop: 10 }}
-								{...this.former.super_handle(["respondent_owner"])}
-							>
-								<MenuItem value="YES">Yes</MenuItem>
-								<MenuItem value="NO">No</MenuItem>
-							</TextField>
+							<SignUp />
 
-							{
-								!this.props.sent && <Button
-									style={{ width: "20ch", margin: "auto", marginBottom: 20, marginTop: 20, background: "#f05967", color: "white", borderRadius: "32px", fontWeight: "bold", fontSize: "1.25rem" }}
-									variant="contained">
-									Register
-								</Button>
-							}
 						</>
 					</div>
 				</Container>

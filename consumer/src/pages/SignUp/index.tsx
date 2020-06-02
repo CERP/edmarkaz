@@ -1,12 +1,19 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { RouteComponentProps, Redirect } from 'react-router'
+import { Redirect } from 'react-router'
 import { v4 } from 'uuid'
-import Layout from '../../components/Layout'
-import { Container, Typography, Button, TextField } from '@material-ui/core'
+import { Typography, Button, TextField, FormControl, Box } from '@material-ui/core'
+import Visibility from '@material-ui/icons/Visibility'
+import VisibilityOff from '@material-ui/icons/VisibilityOff'
+import IconButton from '@material-ui/core/IconButton'
+import OutlinedInput from '@material-ui/core/OutlinedInput'
+import InputLabel from '@material-ui/core/InputLabel'
+import InputAdornment from '@material-ui/core/InputAdornment'
 import { loadProfile, signUp } from '../../actions'
+
 import Former from 'former'
 import { SchoolForm } from './form'
+
 import './style.css'
 
 type P = {
@@ -14,12 +21,12 @@ type P = {
 	profile: RootReducerState['sync_state']['profile'];
 	loadProfile: (number: string) => void;
 	createAccount: (number: string, password: string, profile: Partial<CERPSchool>) => void;
-
-} & RouteComponentProps
+}
 
 type S = {
 	phone_number: string;
 	password: string;
+	showPassword: boolean
 	button_pressed: boolean;
 	loading: boolean;
 	redirect: boolean;
@@ -51,6 +58,7 @@ class SignUp extends React.Component<P, S> {
 		this.state = {
 			phone_number: "",
 			password: "",
+			showPassword: false,
 			button_pressed: false,
 			loading: false,
 			school: initSchool(),
@@ -143,56 +151,75 @@ class SignUp extends React.Component<P, S> {
 		}
 	}
 
+	handleClickShowPassword = () => {
+		this.setState({ showPassword: !this.state.showPassword })
+	}
+
+	handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+		event.preventDefault();
+	}
+
 	render() {
 
 		if (this.state.redirect) {
 			return <Redirect to="/" />
 		}
 
-		return <Layout>
-			<Container maxWidth="sm">
-				<div className="sign-up">
-					<Typography variant="h4" color="primary"
-						style={{ fontFamily: "futura" }} > Sign Up </Typography>
-					<Typography variant="subtitle2">Required Information<Span /></Typography>
+		const { password, showPassword, phone_number, school } = this.state
 
-					<TextField
-						variant="outlined"
-						margin="normal"
-						fullWidth
-						label="Phone Number"
-						type="number"
-						error={this.state.phone_number.length < 11 || this.state.phone_number.length > 11}
-						{...this.former.super_handle(["phone_number"])}
-					/>
+		return (
+			<div className="register-account">
+				<Typography
+					variant="h4"
+					align="left"
+					style={{ margin: "10px 0px", fontFamily: "futura" }}
+					color="primary" >Register your Account </Typography>
 
-					<TextField
-						variant="outlined"
-						margin="normal"
-						fullWidth
-						label="Password"
-						type="text"
+				<TextField
+					variant="outlined"
+					label="Phone Number"
+					margin="normal"
+					fullWidth
+					placeholder="e.g. 0300 1110000"
+					type="number"
+					error={phone_number.length < 11 || phone_number.length > 11}
+					{...this.former.super_handle(["phone_number"])}
+				/>
+
+				<FormControl variant="outlined" component="section" style={{ marginTop: 5 }} fullWidth>
+					<InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+					<OutlinedInput
+						id="outlined-adornment-password"
+						type={showPassword ? 'text' : 'password'}
+						value={password}
 						{...this.former.super_handle(["password"])}
+						endAdornment={
+							<InputAdornment position="end">
+								<IconButton
+									aria-label="toggle password visibility"
+									onClick={this.handleClickShowPassword}
+									onMouseDown={this.handleMouseDownPassword}
+									edge="end"
+								>
+									{showPassword ? <Visibility /> : <VisibilityOff />}
+								</IconButton>
+							</InputAdornment>
+						}
+						labelWidth={70}
 					/>
+				</FormControl>
 
-					<SchoolForm school={this.state.school} former={this.former} base_path={["school"]} />
-
-					{/* <div className="center" style={{ marginTop: "10px" }}>
-				{this.state.school.refcode && <QRCode value={this.state.school.refcode} size={256} fgColor="#f05967" bgColor="#F5F5F5" />}
-			</div> */}
+				<SchoolForm school={school} former={this.former} base_path={["school"]} />
+				<Box width="1" style={{ textAlign: "center" }} >
 					<Button
-						style={{ margin: "20px 0px" }}
-						color="primary"
+						style={{ width: "20ch", marginBottom: 20, marginTop: 20, background: "#f05967", color: "white", borderRadius: "32px", fontWeight: "bold", fontSize: "1.25rem" }}
 						variant="contained"
-						fullWidth
 						onClick={this.onSave}>
-						Sign Up
+						Register
 					</Button>
-				</div>
-
-				{/* <div className="tabs-button" style={{ marginTop: "10px", marginBottom: "10px" }} onClick={this.onSave}></div> */}
-			</Container>
-		</Layout >
+				</Box>
+			</div>
+		)
 	}
 }
 
