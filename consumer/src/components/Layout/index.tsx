@@ -1,14 +1,15 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { AppBar, Toolbar, IconButton, Typography, Button, makeStyles, Box } from '@material-ui/core'
+import { RouteComponentProps, withRouter, Link } from 'react-router-dom'
+import { AppBar, Toolbar, IconButton, Button, makeStyles } from '@material-ui/core'
 import BackIcon from '@material-ui/icons/ArrowBack'
-import AccountCircle from '@material-ui/icons/AccountCircle';
+import AccountCircle from '@material-ui/icons/AccountCircle'
 import ExitToApp from '@material-ui/icons/ExitToApp'
 import { Home } from '@material-ui/icons'
 
+import { getColorsFromChapter } from '../../utils/getColorsFromChapter'
+
 import './style.css'
-import { RouteComponentProps, withRouter, Link } from 'react-router-dom'
-import { getColorsFromChapter } from '../../utils/getColorsFromChapter';
 
 type P = {
 	auth: RootReducerState["auth"]
@@ -58,12 +59,6 @@ const useStyles = makeStyles((theme) => ({
 	root: {
 		flexGrow: 1,
 	},
-	toolbar: {
-		minHeight: 128,
-		alignItems: 'flex-start',
-		paddingTop: theme.spacing(1),
-		paddingBottom: theme.spacing(2),
-	},
 	box: {
 		flexGrow: 1,
 		alignSelf: "flex-end",
@@ -83,10 +78,14 @@ const useStyles = makeStyles((theme) => ({
 		flexGrow: 1,
 		fontSize: "1rem"
 	},
+	ExitButton: {
+		fill: "white"
+	}
 }));
 
 const StudentHeader: React.FC<SP> = ({ goBack, push, auth, lesson_meta }) => {
-	const classes = useStyles();
+
+	const classes = useStyles()
 
 	const toHome = () => {
 		if (auth.user === "SCHOOL") {
@@ -118,35 +117,27 @@ const StudentHeader: React.FC<SP> = ({ goBack, push, auth, lesson_meta }) => {
 
 	return <>
 		<AppBar position="static">
-
 			{
 				lesson_meta ?
-					<Toolbar className={classes.toolbar} style={{ backgroundColor: `${getColorsFromChapter(lesson_meta && lesson_meta.chapter_name)}` }}>
+					<Toolbar style={{ backgroundColor: `${getColorsFromChapter(lesson_meta && lesson_meta.chapter_name)}` }}>
 						<IconButton onClick={() => goBack()} edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
 							<BackIcon />
 						</IconButton>
-
-						<Box className={classes.box}>
-							<Typography align="center" variant="subtitle1" className={classes.title}>
-								{`Class ${lesson_meta.grade}-${lesson_meta.subject}`}
-							</Typography>
-							<Typography align="center" variant="h6" className={classes.title}>
-								{`Unit ${lesson_meta.chapter_id}`}
-							</Typography>
-							<Typography align="center" variant="h5" className={classes.title}>
-								{`${lesson_meta.chapter_name}`}
-							</Typography>
-						</Box>
-
+						<Button
+							color="inherit"
+							variant="text"
+							disableRipple
+							className={classes.title}
+							onClick={() => goBack()}>{`Class ${lesson_meta.grade}-${lesson_meta.subject}`}
+						</Button>
 						<IconButton onClick={toHome} edge="start" color="inherit" aria-label="menu">
 							<Home />
 						</IconButton>
 						{
 							(auth.user === "GUEST_STUDENT" || auth.user === "GUEST_TEACHER") && <IconButton onClick={guestLogout}>
-								<ExitToApp />
+								<ExitToApp className={classes.ExitButton} />
 							</IconButton>
 						}
-
 						{(auth.user === "SCHOOL" || auth.user === "STUDENT") && <IconButton onClick={toAccount} edge="start" color="inherit" aria-label="menu">
 							<AccountCircle />
 						</IconButton>}
@@ -164,7 +155,7 @@ const StudentHeader: React.FC<SP> = ({ goBack, push, auth, lesson_meta }) => {
 						</IconButton>
 						{
 							(auth.user === "GUEST_STUDENT" || auth.user === "GUEST_TEACHER") && <IconButton onClick={guestLogout}>
-								<ExitToApp />
+								<ExitToApp className={classes.ExitButton} />
 							</IconButton>
 						}
 
@@ -176,13 +167,3 @@ const StudentHeader: React.FC<SP> = ({ goBack, push, auth, lesson_meta }) => {
 		</AppBar>
 	</>
 }
-// const TeacherHeader = () => {
-// 	return <div className="teacher-header">
-
-// 	</div>
-// }
-// const SchoolHeader = () => {
-// 	return <div className="school-header">
-
-// 	</div>
-// }
