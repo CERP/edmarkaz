@@ -296,6 +296,26 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 					}
 				}
 			}
+		case "AUTO_LOGIN":
+			{
+				return {
+					...state,
+					auth: {
+						...state.auth,
+						loading: true
+					}
+				}
+			}
+		case "AUTO_LOGIN_SUCCESS":
+			{
+				return {
+					...state,
+					auth: {
+						...state.auth,
+						loading: false
+					}
+				}
+			}
 		case "SCHOOL_SIGNUP":
 			{
 				return {

@@ -15,10 +15,11 @@ import { getColorsFromChapter } from '../../utils/getColorsFromChapter';
 type P = {
 	auth: RootReducerState["auth"]
 	client_id: string
+	profile: RootReducerState["sync_state"]["profile"]
 	children?: React.ReactNode
 } & RouteComponentProps
 
-const Layout: React.FC<P> = ({ children, auth, history, location, client_id }) => {
+const Layout: React.FC<P> = ({ children, auth, history, location, client_id, profile }) => {
 
 	const path = location.pathname.split("/") || []
 	const isLessonPage = path.length === 7 && path.some(p => p === "library")
@@ -34,7 +35,14 @@ const Layout: React.FC<P> = ({ children, auth, history, location, client_id }) =
 	}
 
 	return <div className="layout-new">
-		<StudentHeader goBack={history.goBack} push={history.push} auth={auth} lesson_meta={lesson_meta} client_id={client_id} />
+		<StudentHeader
+			goBack={history.goBack}
+			push={history.push}
+			auth={auth}
+			lesson_meta={lesson_meta}
+			client_id={client_id}
+			profile={profile}
+		/>
 		<div className="body" style={{ width: "100%" }}>
 			{children}
 		</div>
@@ -43,7 +51,8 @@ const Layout: React.FC<P> = ({ children, auth, history, location, client_id }) =
 
 export default connect((state: RootReducerState) => ({
 	auth: state.auth,
-	client_id: state.client_id
+	client_id: state.client_id,
+	profile: state.sync_state.profile
 }), () => ({}))(withRouter(Layout))
 
 interface SP {
@@ -55,6 +64,7 @@ interface SP {
 	}
 	auth: RootReducerState["auth"]
 	client_id: string
+	profile: RootReducerState["sync_state"]["profile"]
 	goBack: () => any
 	push: (path: string, state?: any) => void
 }
@@ -90,7 +100,7 @@ const useStyles = makeStyles((theme) => ({
 	},
 }));
 
-const StudentHeader: React.FC<SP> = ({ goBack, push, auth, lesson_meta, client_id }) => {
+const StudentHeader: React.FC<SP> = ({ goBack, push, auth, lesson_meta, client_id, profile }) => {
 	const classes = useStyles();
 
 	const toHome = () => {
@@ -165,7 +175,7 @@ const StudentHeader: React.FC<SP> = ({ goBack, push, auth, lesson_meta, client_i
 						<Button color="inherit" variant="text" disableRipple className={classes.title} component={Link} to="/"> ILMEXCHANGE </Button>
 
 						{
-							auth.user === "SCHOOL" && <IconButton href={`https://localhost:3001/auto-login?id=${auth.id}&key=${auth.token}&cid=${client_id}`} edge="start" color="inherit" aria-label="menu">
+							auth.user === "SCHOOL" && <IconButton href={`https://localhost:3001/auto-login?id=${auth.id}&key=${auth.token}&cid=${client_id}&ref=${profile.refcode}`} edge="start" color="inherit" aria-label="menu">
 								<img src={mis} style={{ height: "30px" }} />
 							</IconButton>}
 
@@ -186,13 +196,3 @@ const StudentHeader: React.FC<SP> = ({ goBack, push, auth, lesson_meta, client_i
 		</AppBar>
 	</>
 }
-// const TeacherHeader = () => {
-// 	return <div className="teacher-header">
-
-// 	</div>
-// }
-// const SchoolHeader = () => {
-// 	return <div className="school-header">
-
-// 	</div>
-// }

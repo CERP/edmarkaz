@@ -91,8 +91,63 @@ defmodule Sarkar.ActionHandler.Mis do
 						IO.puts "Error Occurred"
 						IO.inspect err
 				end
+		end
 	end
-end
+
+	# def handle_action(
+	# 	%{
+	# 		"type" => "GET_ILMX_ANALYTICS",
+	# 	},
+	# 	%{ school_id: school_id, client_id: client_id } = state
+	# ) do
+	# 	# return schema
+	# 	# events: {
+	# 	# 	[device_id]: {
+	# 	# 		[timestamp]: {
+	# 	# 			lesson_id: 1,
+	# 	# 			duration: 5,
+	# 	# 		}
+	# 	# 	}
+	# 	# },
+	# 	# lessons: {
+	# 	# 	[lesson_id]: {
+	# 	# 		title: L,M,N,
+	# 	# 		type: "VIDEO",
+	# 	# 		url: yt_ling,
+	# 	# 		chapter_name: ABC,
+	# 	# 	}
+	# 	# }
+	# 	#Select client_id, time, jsonb_pretty(meta) FROM consumer_analytics WHERE type='VIDEO' AND meta->> 'refcode'='4bc542cd-6309-4991-b36a-93130320e2e7';
+	# 	case EdMarkaz.DB.Postgres.query(
+	# 		EdMarkaz.DB,
+	# 		"SELECT ilmx_id FROM ilmx_to_mis_mapper WHERE mis_id=$1",
+	# 		[school_id]
+	# 	) do
+	# 		{:ok, %Postgrex.Result{num_rows: 0}} ->
+
+	# 		{:ok, res} ->
+	# 			[[ ilmx_id]] = res.rows
+
+	# 			{:ok, resp} = EdMarkaz.DB.Postgres.query(
+	# 				EdMarkaz.DB,
+	# 				"SELECT
+	# 					client_id, time, meta
+	# 				FROM consumer_analytics
+	# 				WHERE type='VIDEO' AND meta->> 'refcode'=$1",
+	# 				[school_id]
+	# 			)
+	# 			mapped_analytics = resp.rows
+	# 			|> Enum.map(
+	# 				fn [client_id, time, meta] ->
+
+	# 				end
+	# 			)
+	# 		{:error, err} ->
+	# 			IO.inspect err
+	# 	end
+
+
+	# end
 
 	def handle_action(%{ "type" => "LOGIN",  "payload" => %{"school_id" => school_id, "client_id" => client_id, "password" => password }}, state) do
 		case Sarkar.Auth.login({school_id, client_id, password}) do

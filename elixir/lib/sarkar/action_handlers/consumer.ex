@@ -1,5 +1,26 @@
 defmodule EdMarkaz.ActionHandler.Consumer do
 
+# 	pswrd 2019244053
+
+# phhone 03324198186
+
+
+# events: {
+# 	[device_id]: {
+# 		[timestamp]: {
+# 			lesson_id: 1,
+# 			duration: 5,
+# 		}
+# 	}
+# },
+# lessons: {
+# 	[lesson_id]: {
+# 		title: L,M,N,
+# 		type: "VIDEO",
+# 		url: yt_ling,
+# 		chapter_name: ABC,
+# 	}
+# }
 
 	def handle_action(
 		%{

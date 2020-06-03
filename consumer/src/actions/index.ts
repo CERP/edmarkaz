@@ -5,6 +5,43 @@ type Dispatch = (action: any) => any
 type GetState = () => RootReducerState
 
 
+export const autoLogin = (user: string, school_id: string, client_id: string, token: string, phone: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+
+	const state = getState()
+
+	if (!state.connected) {
+		syncr.onNext('connect', () => dispatch(autoLogin(user, school_id, client_id, token, phone)))
+		return
+	}
+
+	dispatch({
+		type: "AUTO_LOGIN"
+	})
+
+	syncr.send({
+		type: "AUTO_LOGIN",
+		client_type: state.auth.client_type,
+		payload: {
+			user,
+			mis_token: token,
+			school_id,
+			client_id: state.client_id,
+			mis_client_id: client_id,
+			phone
+		}
+	})
+		.then((res: { id: string; token: string; user: RootReducerState["auth"]["user"]; sync_state: SyncState }) => {
+			dispatch(createLoginSucceed(res.id, res.token, res.user, res.sync_state))
+		})
+		.catch(err => {
+			console.log("AutoLogin failed")
+
+			if (err === "timeout") {
+				setTimeout(() => dispatch(autoLogin(user, school_id, client_id, token, phone)), 2000)
+			}
+		})
+}
+
 export const saveStudentProfile = (profile: ILMXStudent) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 
 	const state = getState()
