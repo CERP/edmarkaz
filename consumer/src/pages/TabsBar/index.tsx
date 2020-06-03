@@ -103,11 +103,12 @@ class TabsBar extends Component<propTypes, S> {
 		}
 
 		const callLink = this.props.connected ?
+
 			"https://api.whatsapp.com/send?phone=923481119119" : "tel:0348-1119-119"
 
 		return user === undefined ? <Redirect to="" /> : <Layout>
 			<div className="tabs-page">
-				{(user === "SCHOOL" && current !== "/profile" && current !== "/start-mob" && current !== "/sign-up" && current !== "/log-in") &&
+				{(user === "SCHOOL" && current !== "/profile" && current !== "/start-mob" && current !== "/log-in") &&
 					<Paper style={{ flexGrow: 1 }}>
 						<Tabs
 							onChange={this.handleTabChange}
