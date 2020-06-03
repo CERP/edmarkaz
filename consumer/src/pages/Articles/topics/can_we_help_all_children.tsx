@@ -7,6 +7,7 @@ export default () => <div>
 		<img
 			className="banner-img"
 			src="https://lh6.googleusercontent.com/AWdnF3zDePgYD2K77ct85i-lXasGbztxdoNmU8_6anjtBnN-TTuOmaYmwG3waE3729fzLtqiEshKV61lWu9EBb8pCVT66W8BWhD5E-1on94HWMwLK9XrjpVNEGEU3joyKiCmPcPz"
+			alt="banner"
 		/>
 	</div>
 	<div className="article-page">
@@ -17,8 +18,6 @@ export default () => <div>
 			At the same time, giving students an opportunity to present what they have learned provides teachers with more understanding of how to cater to students’ particular intelligences.</p>
 
 		<p>This idea was first put forward by Howard Gardner, a professor at Harvard University, who said that people have eight kinds of intelligences. This idea is referred to as “the theory of <b> multiple intelligences</b>"". These “multiple intelligences” are:</p>
-
-		<h1></h1>
 
 		<div className="urdu">
 			<h1>ذہانت کی 8 اقسام</h1>
@@ -50,6 +49,7 @@ export default () => <div>
 			<img
 				className="sm-image"
 				src="https://lh6.googleusercontent.com/AWdnF3zDePgYD2K77ct85i-lXasGbztxdoNmU8_6anjtBnN-TTuOmaYmwG3waE3729fzLtqiEshKV61lWu9EBb8pCVT66W8BWhD5E-1on94HWMwLK9XrjpVNEGEU3joyKiCmPcPz"
+				alt="lang-skills"
 			/>
 
 			<li><b> Linguistic-Verbal Intelligence <span className="urdu">(لسانی - زبانی ذہانت )</span> </b></li>
@@ -72,6 +72,7 @@ export default () => <div>
 			<img
 				className="sm-image"
 				src="https://lh6.googleusercontent.com/i_NxHlyy5ELY1QiXE8-0nhuiAtHvg8a5h6D3t_KzQt1WRuJKfwRWVRUbvMlInI7fCsfNhQY0Z-DKuk37SFcWd4ovitpK7bmk-qrTBD9wqsph1q3l1NkSuRokDMy_YelqRxd7P5LU"
+				alt="lang-skills"
 			/>
 
 			<li><b> Logical-Mathematical Intelligence <span className="urdu">(منطقی-ریاضی کی ذہانت )</span></b></li>
@@ -94,6 +95,7 @@ export default () => <div>
 			<img
 				className="sm-image"
 				src="https://lh4.googleusercontent.com/oDEJIYT6vS-vcw_aAN4h-zz69unjqEiSmXm5sptAm4_QZC8GApYaEg6XmWZql9zUBxws83CjjX2Tit3FDmSyGQoM4U7sygmS4BiM8lZCAtEEh7STmapxSFi74WFmi2Twak2UZlZQ"
+				alt="lang-skills"
 			/>
 
 			<li><b> Bodily-Kinesthetic Intelligence <span className="urdu">( جسمانی -تحریک کی ذہانت)</span></b></li>
@@ -116,6 +118,7 @@ export default () => <div>
 			<img
 				className="sm-image"
 				src="https://lh4.googleusercontent.com/aGYOC83fHnuUUCHWABeUKaJyIVtl83Dx985pCvN5q4uNRTli8_t_8yNUrQyjjJVsCPVC_mj5kh0-6tpuk-mpavB94hXJ2nG1sYg-sU9PWjr9dOv6ccmjjks1zCspR_QQmNa8CC7I"
+				alt="lang-skills"
 			/>
 
 			<li><b> Musical Intelligence <span className="urdu">(موسیقی کی ذہانت)</span> </b></li>
@@ -138,6 +141,7 @@ export default () => <div>
 			<img
 				className="sm-image"
 				src="https://lh4.googleusercontent.com/wQ8H3ms7N8bKlTaVFFVHywtVQKHeHJ4lhc_d8pQE1z7GqERuDxNeIWyxNJEjlI1alHqnyJL9L53gzdVwEs0pDF7DW1V_x9nFZcLa_zui38-f0PcdmWCFDHQYerMUbt5NcZ0Jmo36"
+				alt="lang-skills"
 			/>
 
 			<li><b>Interpersonal Intelligence <span className="urdu">(باہمی ذہانت )</span> </b></li>
@@ -160,6 +164,7 @@ export default () => <div>
 			<img
 				className="sm-image"
 				src="https://lh3.googleusercontent.com/1xY5_p5VGMu9xNPgHWjOSGwBLBw53nGA4BjbOsdJMDF2POBhXKZCee95IKVQUwefJMEJ9AojnGskXhIs43x9FpT4G390WqDYcmtbtn0NT5fG2BLBejVcybsoEVYDum_HXfc-T5KH"
+				alt="lang-skills"
 			/>
 
 			<li><b> Intrapersonal Intelligence <span className="urdu">( ذاتی/خود عکاسی کی ذہانت)</span> </b></li>
@@ -182,6 +187,7 @@ export default () => <div>
 			<img
 				className="sm-image"
 				src="https://lh6.googleusercontent.com/re94Z_AEYBWvoiVjFbR6jZB73U5Xbp88rlk19wYV6SF60W_NcFV2OCaT85CX_-kORPmyGhdBomQJCswnY7L4wMSMZGhvrxx87dwgrysFRBkoRMFaG7YV23sRfu4Cqh98ZkiSM8YO"
+				alt="lang-skills"
 			/>
 
 			<li><b>Naturalistic Intelligence <span className="urdu">(طبعی ذہانت )</span> </b></li>
@@ -204,6 +210,7 @@ export default () => <div>
 			<img
 				className="sm-image"
 				src="https://lh5.googleusercontent.com/gtW25vWdWn0EtCBa0nFf1ASPFFu6T2ufJliP86Ib9NIS6aAyTJKEinysZKmaQ_IAqcrMuAc1beBA_7gOBmqbk1Fo1EfcA6I4QJtOFQBe2YJoacIqJKMUTlncCrTzfrx2IcJIt7uh"
+				alt="lang-skills"
 			/>
 
 		</ol>

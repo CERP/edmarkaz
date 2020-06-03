@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import Layout from '../../components/Layout'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Typography, Avatar, Card, CardMedia } from '@material-ui/core'
+import { Typography, Avatar } from '@material-ui/core'
 import { getLessons } from '../../actions'
 import LoadingIcon from '../../icons/load.svg'
 import Modal from '../../components/Modal'
@@ -23,7 +22,7 @@ const LibraryInstructionMedium: React.FC<P> = ({ lessons, lesson_loading, getLes
 
 	useEffect(() => {
 		getLessons()
-	}, [])
+	}, [getLessons])
 
 	const [showModal, setShowModal] = useState(false)
 
@@ -34,7 +33,7 @@ const LibraryInstructionMedium: React.FC<P> = ({ lessons, lesson_loading, getLes
 	}
 
 	return lesson_loading ? <div className="loading">
-		<img className="icon" src={LoadingIcon} />
+		<img className="icon" src={LoadingIcon} alt="loading-icon" />
 		<div className="text">Fetching Lessons, It might take a few minutes depending on your connection speed</div>
 	</div> : <div className="medium-page" style={{ margin: "20px 0px" }}>
 			{
@@ -44,12 +43,12 @@ const LibraryInstructionMedium: React.FC<P> = ({ lessons, lesson_loading, getLes
 							height: "100%",
 							width: "70%",
 							margin: "auto"
-						}} src={ilmxLogo} alt="" />
+						}} src={ilmxLogo} alt="ilmx-logo" />
 
 						<img src={bookIcon} style={{
 							width: "70%",
 							margin: "10% 15%"
-						}} />
+						}} alt="book" />
 						<Typography
 							variant="subtitle1"
 							color="primary"

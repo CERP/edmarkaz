@@ -1,19 +1,21 @@
 import React, { Component } from 'react'
-import { Link, RouteComponentProps } from 'react-router-dom'
-
-import { SMSAuth, verifyUrlAuth } from '../../actions'
-import Former from 'former'
 import { connect } from 'react-redux'
-import Layout from '../../components/Layout'
-import { Container, Paper, Button, Typography, Avatar, TextField } from '@material-ui/core'
-import PhoneLockedOutlined from '@material-ui/icons/LockTwoTone'
+import { RouteComponentProps } from 'react-router-dom'
+import { Container, Button, Typography, TextField, Avatar } from '@material-ui/core'
 
+import Former from 'former'
+import Layout from '../../components/Layout'
+import ilmxLogo from 'components/Header/ilmx.svg'
+import { SMSAuth, verifyUrlAuth } from '../../actions'
+
+
+import SignUp from '.'
 
 interface P {
-	sent: boolean;
-	token: string | undefined;
-	sendAuthSms: (phone: string) => any;
-	verify: (token: string) => any;
+	sent: boolean
+	token: string | undefined
+	sendAuthSms: (phone: string) => any
+	verify: (token: string) => any
 }
 
 interface RouteInfo {
@@ -21,8 +23,8 @@ interface RouteInfo {
 }
 
 interface S {
-	phone: string;
-	code: string;
+	phone: string
+	code: string
 }
 
 type propTypes = RouteComponentProps<RouteInfo> & P
@@ -35,7 +37,7 @@ class Login extends Component<propTypes, S> {
 
 		this.state = {
 			phone: "",
-			code: "",
+			code: ""
 		}
 
 		this.former = new Former(this, [])
@@ -66,83 +68,87 @@ class Login extends Component<propTypes, S> {
 		this.props.verify(this.state.code)
 	}
 
-
 	render() {
 
 		if (this.props.token) {
 			setTimeout(() => {
 				window.location.replace("/school")
-			}, 700);
+			}, 700)
 		}
+
 		return <Layout>
 
 			<div className="login-page">
 				<Container maxWidth="sm">
-					<div className="section"
+					<div
+						className="section"
 						style={{
 							border: "none",
 							display: "flex",
 							flexDirection: "column",
-							alignItems: "center"
-						}}
-					>
-						<Avatar style={{ backgroundColor: "#F05967" }}>
-							<PhoneLockedOutlined />
-						</Avatar>
+						}}>
+
+						<Avatar variant="square" style={{
+							height: "100%",
+							width: "70%",
+							margin: "auto"
+						}} src={ilmxLogo} alt="ilmx-logo" />
+
 						<Typography
 							variant="h4"
-							style={{ fontFamily: "futura" }}
-							color="primary" > Login </Typography>
+							align="left"
+							style={{ marginTop: 20, fontFamily: "futura" }}
+							color="primary" >Sign In </Typography>
 						<>
 							<TextField
 								variant="outlined"
 								label="Phone Number"
 								margin="normal"
 								fullWidth
-								placeholder="eg 0331 234567"
+								placeholder="e.g. 0300 1110000"
 								type="number"
 								{...this.former.super_handle(["phone"])}
 							/>
+
 							{
 								!this.props.sent && <Button
-									style={{ marginBottom: "20px" }}
-									fullWidth
+									style={{ width: "20ch", margin: "auto", marginBottom: 20, marginTop: 20, background: "#f05967", color: "white", borderRadius: "32px", fontWeight: "bold", fontSize: "1.25rem" }}
 									variant="contained"
-									color="primary"
-									onClick={this.SendAuthSms}
-								>
+									onClick={this.SendAuthSms}>
 									Sign In
 								</Button>
 							}
+
 							{
 								this.props.sent && <>
 									<TextField
 										variant="outlined"
-										margin="normal"
+										style={{ marginTop: 5 }}
 										fullWidth
 										label="Code"
 										helperText="Enter 5-digit Code that has been sent to your phone"
 										type="tel"
 										{...this.former.super_handle(["code"])}
-										placeholder="eg 12345"
+										placeholder="e.g. 12345"
 									/>
 									<Button
-										style={{ margin: "20px 0px" }}
-										color="primary"
+										style={{ width: "20ch", margin: "auto", marginBottom: 20, marginTop: 20, background: "#f05967", color: "white", borderRadius: "32px", fontWeight: "bold", fontSize: "1.25rem" }}
 										variant="contained"
-										fullWidth
 										onClick={this.verifyToken}>
-										Enter Code
+										Verify Code
 									</Button>
 									<Typography variant="subtitle1">
-										Did not get the sms ? <span style={{ cursor: "pointer", textDecoration: "underline", color: "#1BB4BB" }} onClick={() => this.SendAuthSms()}>Send Again</span>
+										Didn't get the code through sms ? <span style={{ cursor: "pointer", textDecoration: "underline", color: "#1BB4BB" }} onClick={() => this.SendAuthSms()}>Send Again</span>
 									</Typography>
 								</>
 							}
 
 							<Typography variant="subtitle1">
-								New to IlmExchange ? <Link to="/sign-up"> Sign-Up </Link>
+								Doesn't have any account?
 							</Typography>
+
+							<SignUp />
+
 						</>
 					</div>
 				</Container>

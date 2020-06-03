@@ -235,13 +235,13 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 			}
 
 		case "SET_ACTIVE_STUDENT": {
-			{
-				const { profile } = action as SET_ACTIVE_STUDENT_ACTION
-				return {
-					...state,
-					activeStudent: profile
-				}
+
+			const { profile } = action as SET_ACTIVE_STUDENT_ACTION
+			return {
+				...state,
+				activeStudent: profile
 			}
+
 		}
 
 		case "GUEST_STUDENT_LOGIN":

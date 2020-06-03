@@ -203,7 +203,7 @@ const AboutUs = () => {
 				<div className="card-container">
 					{
 						ProjectTeam().map(({ url, name, position }) => <div className="card">
-							<img crossOrigin="anonymous" className="icon" src={url} />
+							<img crossOrigin="anonymous" className="icon" src={url} alt={name} />
 							<div className="title">{name}</div>
 							<div className="subtitle">{position}</div>
 						</div>)
@@ -216,8 +216,8 @@ const AboutUs = () => {
 				<div className="heading">Our Partners</div>
 				<div className="card-container">
 					{
-						Partners().map(({ url, name, info }) => <div className="card partner">
-							<img crossOrigin="anonymous" className="icon" src={url} />
+						Partners().map(({ url, name }) => <div className="card partner">
+							<img crossOrigin="anonymous" className="icon" src={url} alt={name} />
 							<div className="title">{name}</div>
 						</div>)
 					}

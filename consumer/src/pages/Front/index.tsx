@@ -9,7 +9,6 @@ import School from './assets/school.jpeg'
 import Teacher from './assets/teacher.png'
 
 import './style.css'
-import useWindowDimensions from '../../utils/useWindowDimensions'
 import { Link } from 'react-router-dom'
 import Modal from '../../components/Modal'
 
@@ -17,7 +16,6 @@ import Modal from '../../components/Modal'
 const FrontPage = () => {
 
 	const [showModal, setShowModal] = useState(false)
-	const { height, width } = useWindowDimensions()
 
 	return <div className="front">
 		<Header path={"/"} />
@@ -48,15 +46,15 @@ const FrontPage = () => {
 				<img className="img" src={Demo} /> */}
 				<div className="image-card-container">
 					<div className="image-card" onClick={() => setShowModal(true)}>
-						<img className="img" src={TeacherMain} style={{ backgroundColor: "#B1E1E8", objectFit: "cover" }} />
+						<img className="img" src={TeacherMain} style={{ backgroundColor: "#B1E1E8", objectFit: "cover" }} alt="teacher-menu" />
 						<div className="pill" >Teachers</div>
 					</div>
 					<Link to="/student" className="image-card">
-						<img className="img cen" src={StudentMain} />
+						<img className="img cen" src={StudentMain} alt="student-menu" />
 						<div className="pill">Students</div>
 					</Link>
 					<Link to="/school" className="image-card">
-						<img className="img" src={SchoolMain} style={{ backgroundColor: "#B1E1E8" }} />
+						<img className="img" src={SchoolMain} style={{ backgroundColor: "#B1E1E8" }} alt="school-menu" />
 						<div className="pill">Schools</div>
 					</Link>
 				</div>
@@ -65,7 +63,7 @@ const FrontPage = () => {
 		<div className="partition">
 			<div className="img-container">
 				<div className="circle-frame">
-					<img className="img" src={Student} />
+					<img className="img" src={Student} alt="student" />
 				</div>
 			</div>
 			<div className="info-container">
@@ -83,7 +81,7 @@ const FrontPage = () => {
 		<div className="partition reverse bg-teal">
 			<div className="img-container">
 				<div className="circle-frame">
-					<img className="img" src={Teacher} />
+					<img className="img" src={Teacher} alt="teacher" />
 				</div>
 			</div>
 			<div className="info-container">
@@ -100,7 +98,7 @@ const FrontPage = () => {
 		<div className="partition">
 			<div className="img-container">
 				<div className="circle-frame">
-					<img className="img" src={School} />
+					<img className="img" src={School} alt="school" />
 				</div>
 			</div>
 			<div className="info-container">
