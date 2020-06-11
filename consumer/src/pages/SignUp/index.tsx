@@ -173,7 +173,9 @@ class SignUp extends React.Component<P, S> {
 		}
 
 		if (this.state.redirect) {
-			return <Redirect to="/school" />
+			setTimeout(() => {
+				window.location.replace("/school")
+			}, 1500)
 		}
 
 		const { password, showPassword, phone_number, school } = this.state
