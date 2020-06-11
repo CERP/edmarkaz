@@ -51,10 +51,6 @@ class Profile extends React.Component<P, S> {
 		const st = phone_number ? phone_number.split("").reverse().join("").substring(0, phone_number.length - 1) : ""
 		return <div className="user-profile">
 			<Container maxWidth="sm">
-				<Paper className="section" style={{ border: "none" }}>
-					<Typography variant="h5" style={{ fontFamily: "futura" }}>Student Referral</Typography>
-					<label style={{ userSelect: "auto" }}> {`https://ilmexchange.com/student?referral=${st}`}</label>
-				</Paper>
 				<SchoolForm school={this.state.profile} former={this.former} base_path={["profile"]} />
 				<Button color="primary" variant="contained" fullWidth style={{ marginTop: "20px" }} onClick={this.onSave}> Save</Button>
 				<Button color="secondary" variant="contained" fullWidth style={{ margin: "10px 0px" }} onClick={this.onLogout}>Logout</Button>
