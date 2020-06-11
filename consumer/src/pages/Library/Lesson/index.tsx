@@ -59,12 +59,16 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 
 	const playLesson = (val: Lesson) => {
 
-		if (connected) {
-			setStartTime(Date.now())
-		}
 		setCurrentLessonURL(val.meta.link)
 		setVideoID(getIDFromYoutbeLink(val.meta.link))
 		setActiveLesson(val.lesson_id)
+
+		if (connected) {
+			setStartTime(Date.now())
+			if (!isYoutubeUrl(val.meta.link)) {
+				trackVideoAnalytics(location.pathname, val.chapter_id, val.lesson_id, 0)
+			}
+		}
 		setShowModal(true)
 	}
 
@@ -72,7 +76,7 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 
 		if (startTime !== 0) {
 			const timePassed = (Date.now() - startTime) / 1000
-			trackVideoAnalytics(location.pathname, activeChapter, activeLesson, timePassed)
+			trackVideoAnalytics(location.pathname, chapter, activeLesson, timePassed)
 		}
 
 		setCurrentLessonURL("")
@@ -89,7 +93,7 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 		return true
 	}
 
-	return <div className="lesson-page">
+	return <div className="lesson-page" style={{ overflow: "auto" }}>
 		{showModal && <Modal>
 			<div className="modal-box video-modal">
 				{connected ?

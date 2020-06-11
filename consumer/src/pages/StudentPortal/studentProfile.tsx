@@ -1,16 +1,16 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { saveStudentProfile } from '../../actions'
+//import { saveStudentProfile } from '../../actions'
 import { RouteComponentProps } from 'react-router'
 import { Paper, Typography, Button } from '@material-ui/core'
 
 type P = {
 	activeStudent: RootReducerState["activeStudent"]
 	school: RootReducerState["sync_state"]["profile"]
-	saveStudentProfile: (profile: ILMXStudent) => any
+	//saveStudentProfile: (profile: ILMXStudent) => any
 } & RouteComponentProps
 
-const StudentProfile: React.FC<P> = ({ saveStudentProfile, activeStudent, history, school }) => {
+const StudentProfile: React.FC<P> = ({ /*saveStudentProfile,*/ activeStudent, history, school }) => {
 
 	// const [name, setName] = useState(activeStudent && activeStudent.name || "")
 	// const [grade, setGrade] = useState(activeStudent && activeStudent.grade || "")
@@ -99,5 +99,5 @@ export default connect((state: RootReducerState) => ({
 	activeStudent: state.activeStudent,
 	school: state.sync_state.profile
 }), (dispatch: Function) => ({
-	saveStudentProfile: (profile: ILMXStudent) => dispatch(saveStudentProfile(profile))
+	//	saveStudentProfile: (profile: ILMXStudent) => dispatch(saveStudentProfile(profile))
 }))(StudentProfile)

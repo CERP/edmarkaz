@@ -1,5 +1,77 @@
 defmodule Sarkar.Analytics.Consumer do
 
+	def sync_to_school(client_id, events, ilmx_id, last_sync_date) do
+
+		mapped = events
+		|> Enum.filter(
+			fn {key,%{"type" => type, "meta" => meta }} ->
+				user = Map.get(meta, "user")
+
+				if user !== nil do
+					type === "VIDEO" && user === "STUDENT"
+				else
+					false
+				end
+			end
+		)
+		|> Enum.reduce(
+			[],
+			fn {key,%{"type" => type,"meta" => meta, "time" => time}}, acc ->
+				%{
+					"chapter_id" => chapter_id,
+					"lessons_id" => lesson_id,
+					"route" => route,
+					"time" => duration,
+					"user" => user,
+					"student_id" => student_id
+				} = meta
+				value = %{
+					"type" => "MERGE",
+					"path" => ["db","ilmx", "events", client_id, "#{time}"],
+					"value" => %{
+						"lesson_id" => "#{Enum.slice(route,1,4) |> Enum.join("-")}-#{lesson_id}",
+						"duration" => duration,
+						"student_id" => student_id,
+						"type" => type
+					}
+				}
+				acc ++ [value]
+			end
+		)
+
+		if length(mapped) > 0 do
+			changes = Sarkar.School.prepare_changes(mapped)
+			case EdMarkaz.DB.Postgres.query(
+				EdMarkaz.DB,
+				"SELECT mis_id FROM ilmx_to_mis_mapper WHERE phone=$1",
+				[ilmx_id]
+			) do
+				{:ok, %Postgrex.Result{num_rows: 0}} ->
+					start_school(ilmx_id)
+					register_connection(ilmx_id, client_id)
+					Sarkar.School.sync_changes(ilmx_id, client_id ,changes, last_sync_date)
+				{:ok, res} ->
+					[[ mis_id ]] = res.rows
+					start_school(mis_id)
+					register_connection(mis_id, client_id)
+					Sarkar.School.sync_changes(mis_id, client_id ,changes, last_sync_date)
+				{:error, err} ->
+					IO.puts "Failed to sync events"
+					IO.inspect err
+			end
+		end
+	end
+
+	defp start_school(school_id) do
+		case Registry.lookup(EdMarkaz.SchoolRegistry, school_id) do
+			[{_, _}] -> {:ok}
+			[] -> DynamicSupervisor.start_child(EdMarkaz.SchoolSupervisor, {Sarkar.School, {school_id}})
+		end
+	end
+	defp register_connection(school_id, client_id) do
+		{:ok, _} = Registry.register(EdMarkaz.ConnectionRegistry, school_id, client_id)
+	end
+
 	def record(_client_id, events, _last_sync_date) when events == %{} do
 		%{"type" => "CONFIRM_ANALYTICS_SYNC", "time" => 0}
 	end

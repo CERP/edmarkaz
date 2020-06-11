@@ -21,6 +21,7 @@ import StudentProfile from "../StudentPortal/studentProfile";
 import HelpFooter from "components/Footer/HelpFooter"
 
 import "./style.css";
+import SchoolDashboard from "pages/School/Dashboard";
 
 interface S {
 	tab: number
@@ -54,16 +55,19 @@ class TabsBar extends Component<propTypes, S> {
 
 	getCurrentTab = (path: string) => {
 
-		if (path.split("/").some(i => i === "bazaar" || i === "supplier")) {
-			return 1
-		}
-		if (path.split("/").some(i => i === "library")) {
+		if (path.split("/").some(i => i === "dashboard")) {
 			return 0
 		}
-		if (path.split("/").some(i => i === "help")) {
+		if (path.split("/").some(i => i === "bazaar" || i === "supplier")) {
 			return 2
 		}
-		return 3
+		if (path.split("/").some(i => i === "library")) {
+			return 1
+		}
+		if (path.split("/").some(i => i === "help")) {
+			return 3
+		}
+		return 4
 	}
 
 	componentDidUpdate(prevProps: propTypes) {
@@ -118,6 +122,7 @@ class TabsBar extends Component<propTypes, S> {
 							textColor="primary"
 							centered
 						>
+							<Tab label="Dashboard" onClick={() => history.push("/dashboard")} />
 							<Tab label="Library" onClick={() => history.push("/library")} />
 							<Tab label="Bazaar" onClick={() => history.push("/bazaar")} />
 							<Tab label="Help" onClick={() => history.push("/help")} />
@@ -136,6 +141,7 @@ class TabsBar extends Component<propTypes, S> {
 					<TrackedRoute exact path="/library/:medium/:grade/:subject/:chapter/:chapter_name" component={LessonPage} />
 					<TrackedRoute exact path="/bazaar" component={ProductHome} />
 					<TrackedRoute exact path="/student-profile" component={StudentProfile} />
+					<TrackedRoute exact path="/dashboard" component={SchoolDashboard} />
 				</>
 				{!library && <a className="contact-us" href={callLink}>
 					<img src={contactUs} alt="phone" />

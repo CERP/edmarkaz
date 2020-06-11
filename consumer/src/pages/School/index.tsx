@@ -14,7 +14,7 @@ const School: React.FC<P> = ({ auth }) => {
 		return <Redirect to="/" />
 	}
 	if (token && id) {
-		return <Redirect to="/bazaar" />
+		return <Redirect to="/dashboard" />
 	}
 
 	return <Redirect to="log-in" />

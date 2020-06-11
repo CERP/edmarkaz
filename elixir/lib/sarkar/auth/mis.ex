@@ -82,7 +82,7 @@ defmodule Sarkar.Auth do
 				end
 
 				alert_message = Poison.encode!(%{"text" => confirm_text })
-				{:ok, _resp} = Sarkar.Slack.send_alert(alert_message)
+				{:ok, _resp} = EdMarkaz.Slack.send_alert(alert_message,"#platform-dev")
 
 				{:ok, confirm_text}
 

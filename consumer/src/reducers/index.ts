@@ -1,7 +1,7 @@
 import Dynamic from '@ironbay/dynamic'
 
 import { MERGES, MergeAction, ON_CONNECT, ON_DISCONNECT, DELETES, DeletesAction, QUEUE, CONFIRM_SYNC_DIFF, ConfirmSyncAction, SnapshotDiffAction, SNAPSHOT_DIFF, LOGIN_SUCCEED, LoginSucceed, ConfirmAnalyticsSync, QueueAction } from '../actions/core'
-import { ADD_PRODUCTS, LOAD_PROFILE, ADD_COURSES, ADD_COURSES_ACTION, STUDENT_LOGIN_ACTION, SET_ACTIVE_STUDENT_ACTION } from '../actions'
+import { ADD_PRODUCTS, LOAD_PROFILE, ADD_COURSES, ADD_COURSES_ACTION, STUDENT_LOGIN_ACTION, /*SET_ACTIVE_STUDENT_ACTION*/ } from '../actions'
 import { AnyAction } from 'redux';
 
 const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerState => {
@@ -219,30 +219,33 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 
 		case "STUDENT_LOGIN":
 			{
-				const { user, school } = action as STUDENT_LOGIN_ACTION
+				const { token, id, user, school, student } = action as STUDENT_LOGIN_ACTION
 				return {
 					...state,
 					auth: {
 						...state.auth,
+						id,
 						verifying_user: false,
-						user
+						user,
+						token
 					},
 					sync_state: {
 						...state.sync_state,
 						profile: school || {}
-					}
+					},
+					activeStudent: student
 				}
 			}
 
-		case "SET_ACTIVE_STUDENT": {
+		// case "SET_ACTIVE_STUDENT": {
 
-			const { profile } = action as SET_ACTIVE_STUDENT_ACTION
-			return {
-				...state,
-				activeStudent: profile
-			}
+		// 	const { profile } = action as SET_ACTIVE_STUDENT_ACTION
+		// 	return {
+		// 		...state,
+		// 		activeStudent: profile
+		// 	}
 
-		}
+		// }
 
 		case "GUEST_STUDENT_LOGIN":
 			{

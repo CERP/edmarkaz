@@ -13,7 +13,7 @@ type P = {
 	auth: RootReducerState["auth"]
 	connected: boolean
 	activeStudent: RootReducerState["activeStudent"]
-	verifyStudentToken: (token: string) => void
+	verifyStudentToken: (token: string, std_id: string) => void
 	createGuestStudentLogin: () => void
 } & RouteComponentProps<RouteInfo>
 
@@ -22,6 +22,7 @@ const StudentRouter: React.FC<P> = ({ connected, auth, location, history, active
 	const params = qs.parse(location.search)
 
 	const student_token = params.referral as string | undefined
+	const std_id = params.std_id && params.std_id.toString() || ""
 
 	// if (auth.user === "STUDENT" && activeStudent === undefined) {
 	// 	return <Redirect to="/student-profile" />
@@ -31,8 +32,8 @@ const StudentRouter: React.FC<P> = ({ connected, auth, location, history, active
 		return <Redirect to="/library" />
 	}
 
-	if (connected && student_token && !auth.verifying_user) {
-		verifyStudentToken(student_token)
+	if (connected && student_token && std_id && !auth.verifying_user) {
+		verifyStudentToken(student_token, std_id)
 	}
 
 	// const createGuestLogin = () => {
@@ -73,6 +74,6 @@ export default connect((state: RootReducerState) => ({
 	auth: state.auth,
 	activeStudent: state.activeStudent
 }), (dispatch: Function) => ({
-	verifyStudentToken: (token: string) => dispatch(verifyStudentToken(token)),
+	verifyStudentToken: (token: string, std_id: string) => dispatch(verifyStudentToken(token, std_id)),
 	createGuestStudentLogin: () => dispatch(createGuestStudentLogin())
 }))(StudentRouter)
