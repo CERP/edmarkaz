@@ -173,10 +173,7 @@ class SignUp extends React.Component<P, S> {
 		}
 
 		if (this.state.redirect) {
-			return setTimeout(
-				() => window.location.href = `https://localhost:3001/auto-login?id=${auth.id}&key=${auth.token}&cid=${client_id}`,
-				1000
-			)
+			return <Redirect to="/school" />
 		}
 
 		const { password, showPassword, phone_number, school } = this.state

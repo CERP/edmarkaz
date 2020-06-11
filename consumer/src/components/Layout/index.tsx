@@ -165,7 +165,7 @@ const StudentHeader: React.FC<SP> = ({ goBack, push, auth, lesson_meta, client_i
 						<Button color="inherit" variant="text" disableRipple className={classes.title} component={Link} to="/"> ILMEXCHANGE </Button>
 
 						{
-							auth.user === "SCHOOL" && <IconButton href={`https://localhost:3001/auto-login?id=${auth.id}&key=${auth.token}&cid=${client_id}&ref=${profile.refcode}`} edge="start" color="inherit" aria-label="menu">
+							auth.user === "SCHOOL" && <IconButton href={`https://mischool.pk/auto-login?id=${auth.id}&key=${auth.token}&cid=${client_id}&ref=${profile.refcode}`} edge="start" color="inherit" aria-label="menu">
 								<img src={mis} style={{ height: "30px" }} />
 							</IconButton>}
 

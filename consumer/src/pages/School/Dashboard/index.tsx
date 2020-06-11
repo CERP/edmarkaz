@@ -20,7 +20,7 @@ const SchoolDashboard: React.FC<P> = ({ auth, client_id, profile }) => {
 		>
 			{`Welcome, ${profile.school_name}`}
 		</Typography>
-		<IconButton href={`https://localhost:3001/auto-login?id=${auth.id}&key=${auth.token}&cid=${client_id}&ref=${profile.refcode}`} edge="start" color="inherit" aria-label="menu" >
+		<IconButton href={`https://mischool.pk/auto-login?id=${auth.id}&key=${auth.token}&cid=${client_id}&ref=${profile.refcode}`} edge="start" color="inherit" aria-label="menu" >
 			<img src={mis} style={{ height: "100px" }} />
 		</IconButton>
 		<Typography
