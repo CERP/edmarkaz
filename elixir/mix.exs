@@ -27,6 +27,7 @@ defmodule EdMarkaz.MixProject do
 			{:poison, "~> 3.0"},
 			{:google_api_storage, "~> 0.12.0"},
 			{:goth, "~> 1.1.0"},
+			{:poolboy, "~> 1.5.2"},
 			{:tesla, "~> 1.2.0"},
 			{:csv, "~> 2.3"},
 			{:distillery, "~> 2.0"},

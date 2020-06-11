@@ -7,6 +7,7 @@ export default () => <div>
 		<img
 			className="banner-img"
 			src="https://lh6.googleusercontent.com/YxeFoAXAWXGmDb6Sl20CcC-b2YXAVLNHQt4p5M6hp9OVNn-TIcbAF9ztTnkD8u4KMtBU13NWTZNvgp9dwZgF4ecVfwhrEX0ruHGFrpUtuUN_duCRsDccT0fCeK4n5mSILESHjzf5"
+			alt="banner"
 		/>
 	</div>
 	<div className="article-page">

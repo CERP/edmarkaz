@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { RouteComponentProps, Route, Redirect } from "react-router";
-import { Link } from "react-router-dom";
 import ProductHome from "../Bazaar";
 import SupplierHome from "../Bazaar/Supplier";
 import ProductPage from "../Bazaar/Product";
@@ -19,8 +18,10 @@ import StudentPortalOptions from '../Library/options';
 import Layout from "../../components/Layout";
 import { Paper, Tabs, Tab } from "@material-ui/core";
 import StudentProfile from "../StudentPortal/studentProfile";
+import HelpFooter from "components/Footer/HelpFooter"
 
 import "./style.css";
+import SchoolDashboard from "pages/School/Dashboard";
 
 interface S {
 	tab: number
@@ -54,16 +55,19 @@ class TabsBar extends Component<propTypes, S> {
 
 	getCurrentTab = (path: string) => {
 
-		if (path.split("/").some(i => i === "bazaar" || i === "supplier")) {
-			return 1
-		}
-		if (path.split("/").some(i => i === "library")) {
+		if (path.split("/").some(i => i === "dashboard")) {
 			return 0
 		}
-		if (path.split("/").some(i => i === "help")) {
+		if (path.split("/").some(i => i === "bazaar" || i === "supplier")) {
 			return 2
 		}
-		return 3
+		if (path.split("/").some(i => i === "library")) {
+			return 1
+		}
+		if (path.split("/").some(i => i === "help")) {
+			return 3
+		}
+		return 4
 	}
 
 	componentDidUpdate(prevProps: propTypes) {
@@ -92,9 +96,8 @@ class TabsBar extends Component<propTypes, S> {
 
 	render() {
 
-		const { location, token, user, history } = this.props
+		const { location, user, history } = this.props
 		const current = location.pathname;
-		const search = location.search;
 
 		const library = location.pathname.split("/").some(i => i === "library")
 
@@ -105,11 +108,12 @@ class TabsBar extends Component<propTypes, S> {
 		}
 
 		const callLink = this.props.connected ?
+
 			"https://api.whatsapp.com/send?phone=923481119119" : "tel:0348-1119-119"
 
 		return user === undefined ? <Redirect to="" /> : <Layout>
 			<div className="tabs-page">
-				{(user === "SCHOOL" && current !== "/profile" && current !== "/start-mob" && current !== "/sign-up" && current !== "/log-in") &&
+				{(user === "SCHOOL" && current !== "/profile" && current !== "/start-mob" && current !== "/log-in") &&
 					<Paper style={{ flexGrow: 1 }}>
 						<Tabs
 							onChange={this.handleTabChange}
@@ -118,6 +122,7 @@ class TabsBar extends Component<propTypes, S> {
 							textColor="primary"
 							centered
 						>
+							<Tab label="Dashboard" onClick={() => history.push("/dashboard")} />
 							<Tab label="Library" onClick={() => history.push("/library")} />
 							<Tab label="Bazaar" onClick={() => history.push("/bazaar")} />
 							<Tab label="Help" onClick={() => history.push("/help")} />
@@ -136,17 +141,16 @@ class TabsBar extends Component<propTypes, S> {
 					<TrackedRoute exact path="/library/:medium/:grade/:subject/:chapter/:chapter_name" component={LessonPage} />
 					<TrackedRoute exact path="/bazaar" component={ProductHome} />
 					<TrackedRoute exact path="/student-profile" component={StudentProfile} />
+					<TrackedRoute exact path="/dashboard" component={SchoolDashboard} />
 				</>
 				{!library && <a className="contact-us" href={callLink}>
-					<img src={contactUs} />
+					<img src={contactUs} alt="phone" />
 					<div>Contact Us</div>
 				</a>}
 
-				{(current !== "/" && current !== "/about-us") && <div className="tabs-footer">
-					{/* <div className="bttn">Forums</div> */}
-					<a className="bttn" href="https://web.facebook.com/groups/2982527545103658">Discussion Forum</a>
-					<a className="bttn" href={callLink} style={{ border: "none" }}>Helpline</a>
-				</div>}
+				{(current !== "/" && current !== "/about-us") && <>
+					<HelpFooter hlink={callLink} />
+				</>}
 			</div>
 		</Layout>
 	}

@@ -6,7 +6,7 @@ defmodule EdMarkaz.StudentPortal do
 
 	def merge(id, medium, class, subject, chapter_id, lesson_id, lesson) do
 
-		case Postgrex.query(
+		case EdMarkaz.DB.Postgres.query(
 			EdMarkaz.DB,
 			"INSERT INTO student_portal (
 				id,
@@ -41,7 +41,7 @@ defmodule EdMarkaz.StudentPortal do
 	def bulk_merge(place_holders, values) do
 
 		query_string = "INSERT INTO student_portal (id, medium, class, subject, chapter_id, lesson_id, lesson) VALUES #{place_holders} ON CONFLICT (id) DO UPDATE SET lesson=excluded.lesson, date=current_timestamp"
-		case Postgrex.query(
+		case EdMarkaz.DB.Postgres.query(
 			EdMarkaz.DB,
 			query_string,
 			values

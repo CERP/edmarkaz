@@ -43,7 +43,7 @@ class SupplierHomePage extends React.Component<P, S>{
 				height: "300px"
 			}}>
 				<div className="supp-logo-container">
-					<img className="supplier-logo" crossOrigin="anonymous" src={logo && logo.url} />
+					<img className="supplier-logo" crossOrigin="anonymous" src={logo && logo.url} alt="supplier-logo" />
 				</div>
 			</div>
 			<div className="tabs-home">
@@ -66,7 +66,7 @@ class SupplierHomePage extends React.Component<P, S>{
 								}
 
 								return <Link className="item-card" to={`/supplier/${supplier_id}/${p.id}`} key={k}>
-									<img className="item-image" crossOrigin="anonymous" src={img_url} />
+									<img className="item-image" crossOrigin="anonymous" src={img_url} alt="product" />
 									<div className="subtitle">{p.title}</div>
 									<div>{p.price}</div>
 								</Link>

@@ -5,50 +5,87 @@ type Dispatch = (action: any) => any
 type GetState = () => RootReducerState
 
 
-export const saveStudentProfile = (profile: ILMXStudent) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+export const autoLogin = (user: string, school_id: string, client_id: string, token: string, phone: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 
 	const state = getState()
 
 	if (!state.connected) {
-		syncr.onNext('connect', () => dispatch(saveStudentProfile(profile)))
+		syncr.onNext('connect', () => dispatch(autoLogin(user, school_id, client_id, token, phone)))
 		return
 	}
 
+	dispatch({
+		type: "AUTO_LOGIN"
+	})
+
 	syncr.send({
-		type: "SAVE_STUDENT_INFORMATION",
+		type: "AUTO_LOGIN",
 		client_type: state.auth.client_type,
-		client_id: state.client_id,
 		payload: {
-			profile,
-			school_id: state.sync_state.profile.refcode
+			user,
+			mis_token: token,
+			school_id,
+			client_id: state.client_id,
+			mis_client_id: client_id,
+			phone
 		}
 	})
-		.then(res => dispatch({
-			type: "SET_ACTIVE_STUDENT",
-			profile
-		}))
+		.then((res: { id: string; token: string; user: RootReducerState["auth"]["user"]; sync_state: SyncState }) => {
+			dispatch(createLoginSucceed(res.id, res.token, res.user, res.sync_state))
+		})
 		.catch(err => {
-			if (err.message === "not ready") {
-				alert("not yet connected...")
-			}
-			else if (err === "timeout") {
-				setTimeout(() => dispatch(saveStudentProfile(profile)), 2000)
-			}
-			else {
-				dispatch(submitError(err))
+			console.log("AutoLogin failed")
+
+			if (err === "timeout") {
+				setTimeout(() => dispatch(autoLogin(user, school_id, client_id, token, phone)), 2000)
 			}
 		})
 }
-export interface SET_ACTIVE_STUDENT_ACTION {
-	type: "SET_ACTIVE_STUDENT",
-	profile: ILMXStudent
-}
 
-export const verifyStudentToken = (token: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+// export const saveStudentProfile = (profile: ILMXStudent) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+
+// 	const state = getState()
+
+// 	if (!state.connected) {
+// 		syncr.onNext('connect', () => dispatch(saveStudentProfile(profile)))
+// 		return
+// 	}
+
+// 	syncr.send({
+// 		type: "SAVE_STUDENT_INFORMATION",
+// 		client_type: state.auth.client_type,
+// 		client_id: state.client_id,
+// 		payload: {
+// 			profile,
+// 			school_id: state.sync_state.profile.refcode
+// 		}
+// 	})
+// 		.then(res => dispatch({
+// 			type: "SET_ACTIVE_STUDENT",
+// 			profile
+// 		}))
+// 		.catch(err => {
+// 			if (err.message === "not ready") {
+// 				alert("not yet connected...")
+// 			}
+// 			else if (err === "timeout") {
+// 				setTimeout(() => dispatch(saveStudentProfile(profile)), 2000)
+// 			}
+// 			else {
+// 				dispatch(submitError(err))
+// 			}
+// 		})
+// }
+// export interface SET_ACTIVE_STUDENT_ACTION {
+// 	type: "SET_ACTIVE_STUDENT",
+// 	profile: ILMXStudent
+// }
+
+export const verifyStudentToken = (token: string, std_id: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 	const state = getState()
 
 	if (!state.connected) {
-		syncr.onNext('connect', () => dispatch(verifyStudentToken(token)))
+		syncr.onNext('connect', () => dispatch(verifyStudentToken(token, std_id)))
 		return
 	}
 
@@ -61,15 +98,18 @@ export const verifyStudentToken = (token: string) => (dispatch: Dispatch, getSta
 		client_type: state.auth.client_type,
 		client_id: state.client_id,
 		payload: {
-			token: token
+			token: token,
+			student_id: std_id
 		}
 	})
-		.then((res: { school_id: string, school: Partial<CERPSchool> }) => {
+		.then((res: { token: string, number: string, school: Partial<CERPSchool>, student: MISStudent }) => {
 			dispatch({
 				type: "STUDENT_LOGIN",
 				user: "STUDENT",
-				school_id: res.school_id,
-				school: res.school
+				token: res.token,
+				id: res.number,
+				school: res.school,
+				student: res.student
 			})
 			return res
 		})
@@ -78,13 +118,15 @@ export const verifyStudentToken = (token: string) => (dispatch: Dispatch, getSta
 				alert("not yet connected...")
 			}
 			else if (err === "timeout") {
-				setTimeout(() => dispatch(verifyStudentToken(token)), 2000)
+				setTimeout(() => dispatch(verifyStudentToken(token, std_id)), 2000)
 			}
 			else {
 				dispatch({
 					type: "STUDENT_LOGIN",
 					user: undefined,
-					school_id: undefined,
+					token: undefined,
+					id: undefined,
+					student: undefined,
 					school: undefined
 				})
 				alert("login failed" + JSON.stringify(err))
@@ -96,7 +138,9 @@ export const verifyStudentToken = (token: string) => (dispatch: Dispatch, getSta
 export interface STUDENT_LOGIN_ACTION {
 	type: "STUDENT_LOGIN",
 	user: "STUDENT" | undefined,
-	school_id: string | undefined,
+	token: string | undefined,
+	id: string | undefined,
+	student: MISStudent | undefined
 	school: Partial<CERPSchool> | undefined
 }
 
@@ -235,7 +279,7 @@ export const getProducts = (filters = {}) => (dispatch: Dispatch, getState: GetS
 export const trackVideoAnalytics = (path: string, chapter_id: string, lessons_id: string, time: number) => (dispatch: Dispatch, getState: GetState) => {
 	const state = getState()
 
-	const meta = (state.auth.user === "SCHOOL" || state.auth.user === "STUDENT") ?
+	const meta = state.auth.user === "SCHOOL" ?
 		{
 			route: path.split("/").splice(1),
 			refcode: state.sync_state.profile.refcode,
@@ -244,13 +288,22 @@ export const trackVideoAnalytics = (path: string, chapter_id: string, lessons_id
 			chapter_id,
 			lessons_id,
 			time
-		} :
-		{
-			route: path.split("/").splice(1),
-			chapter_id,
-			lessons_id,
-			time
-		}
+		} : state.auth.user === "STUDENT" ?
+			{
+				route: path.split("/").splice(1),
+				refcode: state.sync_state.profile.refcode,
+				phone: state.sync_state.profile.phone_number,
+				user: state.auth.user,
+				chapter_id,
+				lessons_id,
+				time,
+				student_id: state.activeStudent && state.activeStudent.id
+			} : {
+				route: path.split("/").splice(1),
+				chapter_id,
+				lessons_id,
+				time
+			}
 
 	dispatch(analyticsEvent([{
 		type: "VIDEO",
@@ -347,6 +400,10 @@ export const signUp = (number: string, password: string, profile: Partial<CERPSc
 
 	const state = getState();
 
+	dispatch({
+		type: "SCHOOL_SIGNUP"
+	})
+
 	syncr.send({
 		type: SIGN_UP,
 		client_type: state.auth.client_type,
@@ -403,16 +460,22 @@ export const trackRoute = (path: string) => (dispatch: Dispatch, getState: () =>
 
 	const state = getState()
 
-	const meta = (state.auth.user === "SCHOOL" || state.auth.user === "STUDENT") ?
+	const meta = state.auth.user === "SCHOOL" ?
 		{
 			route: path.split("/").splice(1),
 			refcode: state.sync_state.profile.refcode,
 			phone: state.sync_state.profile.phone_number,
 			user: state.auth.user
-		} :
-		{
-			route: path.split("/").splice(1),
-		}
+		} : state.auth.user === "STUDENT" ?
+			{
+				route: path.split("/").splice(1),
+				refcode: state.sync_state.profile.refcode,
+				phone: state.sync_state.profile.phone_number,
+				user: state.auth.user,
+				student_id: state.activeStudent && state.activeStudent.id
+			} : {
+				route: path.split("/").splice(1),
+			}
 
 	dispatch(analyticsEvent([{
 		type: "ROUTE",

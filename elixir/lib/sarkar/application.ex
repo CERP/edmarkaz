@@ -11,8 +11,10 @@ defmodule EdMarkaz.Application do
 			{ Registry, keys: :duplicate, name: EdMarkaz.ConnectionRegistry },
 			{ Registry, keys: :unique, name: EdMarkaz.SupplierRegistry },
 			{ Registry, keys: :unique, name: EdMarkaz.ConsumerRegistry },
+			{ Registry, keys: :unique, name: EdMarkaz.SchoolRegistry },
 			{ DynamicSupervisor, name: EdMarkaz.SupplierSupervisor, strategy: :one_for_one },
 			{ DynamicSupervisor, name: EdMarkaz.ConsumerSupervisor, strategy: :one_for_one },
+			{ DynamicSupervisor, name: EdMarkaz.SchoolSupervisor, strategy: :one_for_one },
 			EdMarkaz.Store.Supplier,
 			{
 				Postgrex,
@@ -23,9 +25,16 @@ defmodule EdMarkaz.Application do
 					database: "postgres",
 					port: System.get_env("POSTGRES_PORT") || "5432",
 					types: EdMarkaz.PostgrexTypes,
+					pool: DBConnection.Poolboy,
 					pool_size: 10,
 					timeout: 60000
 			},
+			:poolboy.child_spec(:image_worker, [
+				{:name, {:local, :image_worker}},
+				{:worker_module, EdMarkaz.Image.Worker},
+				{:size, 5},
+				{:max_overflow, 5}
+			]),
 			# EdMarkaz.Server
 			Plug.Adapters.Cowboy.child_spec(
 				scheme: :http,
@@ -44,11 +53,25 @@ defmodule EdMarkaz.Application do
 		[
 			{:_, [
 				{"/ws", EdMarkaz.Websocket, []},
+				{"/utils/:method", Sarkar.Server.Utils, []},
+				{"/mis/analytics/:type", Sarkar.Server.Analytics, []},
+				{"/dashboard/:type", Sarkar.Server.Dashboard, []},
+				{"/upload/:type", Sarkar.Server.Upload, []},
 				{:_, Plug.Cowboy.Handler, {EdMarkaz.Router, []}}
-				# {"/", EdMarkaz.Server.OK, []},
-				# {"/analytics/:type", EdMarkaz.Server.Analytics, []},
-				# {"/masking", EdMarkaz.Server.Masking, []}
 			]}
 		]
+	end
+end
+
+defmodule Sarkar.Server.Utils do
+	def init(%{bindings: %{method: "clear"}} = req, state) do
+		req = :cowboy_req.reply(
+			200,
+			%{"Clear-Site-Data" => "cache"},
+			"ok",
+			req
+		)
+
+		{:ok, req, state}
 	end
 end

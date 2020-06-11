@@ -60,7 +60,7 @@ defmodule EdMarkaz.ActionHandler.Platform do
 		parent = self()
 
 		spawn fn ->
-			img_url = Sarkar.Storage.Google.upload_image("ilmx-product-images", id, data_url)
+			img_url = EdMarkaz.Storage.Google.upload_image("ilmx-product-images", id, data_url)
 
 			IO.inspect img_url
 			EdMarkaz.Product.merge_image(product_id, img_url)
@@ -81,7 +81,7 @@ defmodule EdMarkaz.ActionHandler.Platform do
 		# currently no filters...
 		# except by supplier
 
-		case Postgrex.query(EdMarkaz.DB, "SELECT id, product, sync_time FROM products WHERE supplier_id=$1", [supplier_id]) do
+		case EdMarkaz.DB.Postgres.query(EdMarkaz.DB, "SELECT id, product, sync_time FROM products WHERE supplier_id=$1", [supplier_id]) do
 			{:ok, resp} ->
 				mapped = resp.rows
 					|> Enum.map(fn [id, product, sync_time] -> {id, product} end)
@@ -98,7 +98,7 @@ defmodule EdMarkaz.ActionHandler.Platform do
 		# currently no filters...
 		# except by supplier
 
-		case Postgrex.query(EdMarkaz.DB, "SELECT id, product, sync_time FROM products", []) do
+		case EdMarkaz.DB.Postgres.query(EdMarkaz.DB, "SELECT id, product, sync_time FROM products", []) do
 			{:ok, resp} ->
 				mapped = resp.rows
 					|> Enum.map(fn [id, product, sync_time] -> {id, product} end)
@@ -113,7 +113,7 @@ defmodule EdMarkaz.ActionHandler.Platform do
 	end
 
 	def handle_action(%{"type" => "GET_PRODUCTS", "last_sync" => last_sync}, state) do
-		case Postgrex.query(EdMarkaz.DB, "SELECT supplier_id, product, sync_time from products WHERE sync_time > last_sync", []) do
+		case EdMarkaz.DB.Postgres.query(EdMarkaz.DB, "SELECT supplier_id, product, sync_time from products WHERE sync_time > last_sync", []) do
 			{:ok, resp} -> {:reply, succeed(resp.rows), state}
 			{:error, err} ->
 				IO.puts "error getting product"
@@ -193,7 +193,7 @@ defmodule EdMarkaz.ActionHandler.Platform do
 					"date" => date
 				} = entry
 
-				image_url = Sarkar.Storage.Google.upload_image("ilmx-product-images", image_id, image_string)
+				image_url = EdMarkaz.Storage.Google.upload_image("ilmx-product-images", image_id, image_string)
 				merges = %{
 					pkey => %{
 						"action" => %{
@@ -228,7 +228,7 @@ defmodule EdMarkaz.ActionHandler.Platform do
 			end)
 			|> Enum.join(" OR ")
 
-		case Postgrex.query(EdMarkaz.DB, "SELECT id, db FROM platform_schools WHERE #{or_str}", ids) do
+		case EdMarkaz.DB.Postgres.query(EdMarkaz.DB, "SELECT id, db FROM platform_schools WHERE #{or_str}", ids) do
 			{:ok, resp} ->
 				dbs = resp.rows
 				|> Enum.map(fn [id, db] -> {id, db} end)

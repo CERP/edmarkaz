@@ -96,3 +96,11 @@ create table platform_writes
 		meta jsonb not null,
 		time timestamp default current_timestamp
 	);
+
+	create table ilmx_to_mis_mapper
+	(
+		phone text unique not null,
+		mis_id text not null,
+		ilmx_id text not null,
+		time timestamp default current_timestamp
+	);

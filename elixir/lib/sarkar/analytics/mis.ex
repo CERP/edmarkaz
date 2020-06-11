@@ -1,10 +1,11 @@
-defmodule Sarkar.Analytics do
 
-	def record(_client_id, events, _last_sync_date) when events == %{} do
+defmodule Sarkar.Analytics.Mis do
+
+	def record(_school_id, _client_id, events, _last_sync_date) when events == %{} do
 		%{"type" => "CONFIRM_ANALYTICS_SYNC", "time" => 0}
 	end
 
-	def record( client_id, events, _last_sync_date) do
+	def record(school_id, client_id, events, _last_sync_date) do
 
 		latest_time = events
 			|> Enum.map(fn ({ _key, %{"time" => time}})-> time end)
@@ -15,7 +16,7 @@ defmodule Sarkar.Analytics do
 		args = events
 			|> Enum.map(
 				fn({id, %{"time" => time, "meta" => meta, "type" => type}}) ->
-					[id, client_id, time, type, meta]
+					[id, school_id, meta, time, type, client_id]
 				end
 			)
 
@@ -31,8 +32,8 @@ defmodule Sarkar.Analytics do
 							value_string = 1..length(arg_chunk)
 								|> Enum.map(
 									fn (i) ->
-										x = (i - 1) * 5 + 1
-										"($#{x}, $#{x + 1}, $#{x + 2}, $#{x + 3}, $#{x + 4})"
+										x = (i - 1) * 6 + 1
+										"($#{x}, $#{x + 1}, $#{x + 2}, $#{x + 3}, $#{x + 4}, $#{x + 5})"
 									end
 								)
 								|> Enum.join(",")
@@ -45,16 +46,17 @@ defmodule Sarkar.Analytics do
 									end
 								)
 
-							query_string = "INSERT INTO consumer_analytics ( id, client_id, time, type, meta) VALUES #{value_string} ON CONFLICT DO NOTHING"
+							query_string = "INSERT INTO mischool_analytics ( id, school_id, value, time, type, client_id) VALUES #{value_string} ON CONFLICT DO NOTHING"
 
-							{:ok, _resp} = Postgrex.query(
+							{:ok, _resp} = EdMarkaz.DB.Postgres.query(
 								conn,
 								query_string,
 								arguments
 							)
 						end
 					)
-			end
+			end,
+			pool: DBConnection.Poolboy
 		) do
 			{:ok,resp} ->
 				%{"type" => "CONFIRM_ANALYTICS_SYNC", "time" => latest_time}

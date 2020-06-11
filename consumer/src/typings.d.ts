@@ -64,6 +64,7 @@ interface RootReducerState {
 		sms_sent: boolean;
 		verifying_user: boolean;
 		user?: "SCHOOL" | "TEACHER" | "STUDENT" | "GUEST_STUDENT" | "GUEST_TEACHER";
+		loading: boolean
 	};
 	products: {
 		last_sync: number;
@@ -102,7 +103,7 @@ interface RootReducerState {
 			[id: string]: RouteAnalyticsEvent;
 		};
 	};
-	activeStudent?: ILMXStudent
+	activeStudent?: MISStudent
 	last_snapshot: number;
 	accept_snapshot: boolean;
 	connected: boolean;
@@ -112,6 +113,54 @@ interface ILMXStudent {
 	name: string
 	grade: string
 	phone: string
+}
+
+interface MISStudent {
+	id: string
+	Name: string
+	RollNumber: string
+	BForm: string
+	Gender: string
+	Phone: string
+	AlternatePhone?: string
+	Fee: number
+	Active: boolean
+
+	ProfilePicture?: {
+		id?: string
+		url?: string
+		image_string?: string
+	}
+
+	ManCNIC: string
+	ManName: string
+	Birthdate: string
+	Address: string
+	Notes: string
+	StartDate: number
+	AdmissionNumber: string
+	BloodType?: "" | "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-"
+	FamilyID?: string
+	Religion?: string
+	section_id: string
+	prospective_section_id?: string
+
+	// fees: {
+	// 	[id: string]: MISStudentFee
+	// }
+	// payments: {
+	// 	[id: string]: MISStudentPayment
+	// }
+	// attendance: {
+	// 	[date: string]: MISStudentAttendanceEntry
+	// }
+	// exams: {
+	// 	[id: string]: MISStudentExam
+	// }
+	// tags: { [tag: string]: boolean }
+	// certificates: {
+	// 	[id: string]: MISCertificate
+	// }
 }
 interface CERPSchool {
 	alt_number: string;

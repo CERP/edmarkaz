@@ -119,7 +119,7 @@ defmodule Mix.Tasks.Platform do
 	def run(["update_verified_bool_to_string"]) do
 		Application.ensure_all_started(:edmarkaz)
 
-		{:ok, writes} = case Postgrex.query(
+		{:ok, writes} = case EdMarkaz.DB.Postgres.query(
 			EdMarkaz.DB,
 			"SELECT
 				value ->> 'time' as time,
@@ -181,7 +181,7 @@ defmodule Mix.Tasks.Platform do
 
 		Application.ensure_all_started(:edmarkaz)
 		IO.puts "querying out writes"
-		{:ok, res} = Postgrex.query(EdMarkaz.DB,
+		{:ok, res} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
 			"SELECT client_id, type, path, value, time
 			FROM platform_writes
 			WHERE id=$1
@@ -200,7 +200,7 @@ defmodule Mix.Tasks.Platform do
 
 		IO.inspect state
 
-		{:ok, res} = Postgrex.query(EdMarkaz.DB, "
+		{:ok, res} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB, "
 			INSERT INTO suppliers(id, sync_state)
 			VALUES ($1, $2)
 			ON CONFLICT(id) DO UPDATE SET sync_state=$2", [supplier_id, state])
@@ -228,7 +228,7 @@ defmodule Mix.Tasks.Platform do
 		Enum.each(json, fn school_profile ->
 			id = Map.get(school_profile, "refcode")
 
-			case Postgrex.query(EdMarkaz.DB, "
+			case EdMarkaz.DB.Postgres.query(EdMarkaz.DB, "
 				INSERT INTO platform_schools(id, db)
 				VALUES ($1, $2)
 				ON CONFLICT(id) DO UPDATE SET db=$2 ", [id, school_profile]) do
@@ -253,7 +253,7 @@ defmodule Mix.Tasks.Platform do
 		Enum.each(json, fn school_profile ->
 			id = Map.get(school_profile, "refcode")
 
-			case Postgrex.query(EdMarkaz.DB, "
+			case EdMarkaz.DB.Postgres.query(EdMarkaz.DB, "
 				INSERT INTO platform_schools(id, db)
 				VALUES ($1, $2)
 				ON CONFLICT(id) DO UPDATE SET db=$2 ", [id, school_profile]) do
@@ -347,10 +347,10 @@ defmodule Mix.Tasks.Platform do
 						})
 
 					has_url ->
-						new_logo_url = Sarkar.Storage.Google.upload_image_from_url("ilmx-product-images", logo_url)
+						new_logo_url = EdMarkaz.Storage.Google.upload_image_from_url("ilmx-product-images", logo_url)
 
 						if banner_url != "" do
-							new_banner_url = Sarkar.Storage.Google.upload_image_from_url("ilmx-product-images", banner_url)
+							new_banner_url = EdMarkaz.Storage.Google.upload_image_from_url("ilmx-product-images", banner_url)
 							EdMarkaz.Supplier.save_profile(id, %{
 								"description" => description,
 								"name" => name,
@@ -407,7 +407,7 @@ defmodule Mix.Tasks.Platform do
 			|> Enum.map(fn [_, pid | _rest] -> "'#{pid}'" end)
 			|> Enum.join(",")
 
-		res = Postgrex.query(EdMarkaz.DB, "
+		res = EdMarkaz.DB.Postgres.query(EdMarkaz.DB, "
 			UPDATE products
 			SET product=jsonb_set(product, '{deleted}'::text[], to_jsonb(true), true)
 			WHERE id not in (#{pids}) and length(id) != 36
@@ -442,7 +442,7 @@ defmodule Mix.Tasks.Platform do
 						EdMarkaz.Product.merge(pid, product, sid)
 					has_url ->
 						img_url = try do
-							Sarkar.Storage.Google.upload_image_from_url("ilmx-product-images", picture_url)
+							EdMarkaz.Storage.Google.upload_image_from_url("ilmx-product-images", picture_url)
 						rescue
 							error ->
 								IO.puts "error uploading img"
@@ -478,7 +478,7 @@ defmodule Mix.Tasks.Platform do
 
 	def run(args) do
 		Application.ensure_all_started(:edmarkaz)
-		case Postgrex.query(EdMarkaz.DB, "SELECT id, sync_state from suppliers", []) do
+		case EdMarkaz.DB.Postgres.query(EdMarkaz.DB, "SELECT id, sync_state from suppliers", []) do
 			{:ok, res} ->
 				res.rows
 				|> Enum.each(fn ([id, sync_state]) ->
@@ -504,7 +504,7 @@ defmodule Mix.Tasks.Platform do
 		matches = Map.get(sync_state, "matches", %{})
 
 		# put the first 100 things into here
-		{:ok, resp} = Postgrex.query(EdMarkaz.DB, "SELECT id, db from platform_schools limit 10", [])
+		{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB, "SELECT id, db from platform_schools limit 10", [])
 
 		next_matches = resp.rows
 		|> Enum.reduce(%{}, fn([school_id, db], agg) ->

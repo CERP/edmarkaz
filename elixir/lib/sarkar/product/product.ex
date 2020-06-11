@@ -6,7 +6,7 @@ defmodule EdMarkaz.Product do
 
 	def merge(id, product, supplier_id) do
 
-		case Postgrex.query(
+		case EdMarkaz.DB.Postgres.query(
 			EdMarkaz.DB,
 			"INSERT INTO products (id, supplier_id, product) VALUES ($1, $2, $3)
 			ON CONFLICT (id) DO UPDATE SET product=$3, supplier_id=$2, sync_time=current_timestamp",
@@ -23,7 +23,7 @@ defmodule EdMarkaz.Product do
 
 	def merge_image(id, img_url) do
 
-		case Postgrex.query(
+		case EdMarkaz.DB.Postgres.query(
 			EdMarkaz.DB,
 			"UPDATE products
 			SET product = jsonb_set(product, '{image, url}', $1), sync_time=current_timestamp

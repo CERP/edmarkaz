@@ -22,7 +22,6 @@ const Library: React.FC<Props> = ({ lessons, match }) => {
 	const p_grade = match.params.grade
 	const p_subject = match.params.subject
 
-	const [activeChapter, setActiveChapter] = useState("")
 	const [searchText, setSearchText] = useState("")
 	const curr = lessons[p_medium] &&
 		lessons[p_medium][p_grade] ?

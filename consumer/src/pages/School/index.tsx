@@ -1,10 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Redirect } from 'react-router'
-import { Link } from 'react-router-dom'
-import TrackedRoute from '../../components/TrackedRoute'
-import SignUp from '../SignUp'
-import ProductHome from '../Bazaar'
 
 interface P {
 	auth: RootReducerState["auth"]
@@ -18,7 +14,7 @@ const School: React.FC<P> = ({ auth }) => {
 		return <Redirect to="/" />
 	}
 	if (token && id) {
-		return <Redirect to="/bazaar" />
+		return <Redirect to="/dashboard" />
 	}
 
 	return <Redirect to="log-in" />
