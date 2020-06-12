@@ -19,6 +19,9 @@ interface SchoolProp {
 
 export const SchoolForm: React.SFC<SchoolProp> = ({ school, former, base_path }) => {
 
+	// @ts-ignore
+	const district_tehsils = school.school_district && getDistrictTehsilList()["PUNJAB"][school.school_district]
+
 	return <>
 		<TextField
 			style={{ marginTop: 10 }}
@@ -68,7 +71,7 @@ export const SchoolForm: React.SFC<SchoolProp> = ({ school, former, base_path })
 			}
 		</TextField>
 
-		{school.school_district !== "" && <TextField
+		{district_tehsils && district_tehsils.length > 0 && school.school_district && <TextField
 			style={{ marginTop: 10 }}
 			variant="outlined"
 			select
@@ -77,12 +80,16 @@ export const SchoolForm: React.SFC<SchoolProp> = ({ school, former, base_path })
 			{...former.super_handle([...base_path, "school_tehsil"])}
 		>
 			{
-				//@ts-ignore
-				school.school_district && getDistrictTehsilList()["PUNJAB"][school.school_district].map(
-					(tehsil: string) => <MenuItem value={tehsil}>{tehsil}</MenuItem>
-				)
+				district_tehsils.map((tehsil: string) => <MenuItem value={tehsil}>{tehsil}</MenuItem>)
 			}
 		</TextField>}
+		{
+			district_tehsils === undefined && <EditSurveyRow
+				base_path={base_path}
+				label="Tehsil"
+				path={["school_tehsil"]}
+				former={former} />
+		}
 		{/* <Typography
 			variant="h6"
 			align="left"

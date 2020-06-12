@@ -51,6 +51,8 @@ interface Lesson {
 		name: string
 		link: string
 		chapter_name: string
+		video_type?: "Lesson Video" | "Additional Video"
+		source?: string
 		module_name?: string
 		module_id?: string
 	}

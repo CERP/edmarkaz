@@ -93,6 +93,8 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 		return true
 	}
 
+	const additional_videos = Object.entries(curr_unit).filter(([lesson_id, lesson]) => lesson.meta.video_type && lesson.meta.video_type === "Additional Video")
+
 	return <div className="lesson-page" style={{ overflow: "auto" }}>
 		{showModal && <Modal>
 			<div className="modal-box video-modal">
@@ -110,7 +112,11 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 							}
 
 						}} />
-						: redirectToUrl()
+						: curr_unit[activeLesson] && curr_unit[activeLesson].meta.source === "Sabaq Muse" ?
+							<iframe className="iframe" src={currentLessonURL}>
+								your browser doesn't support iframe, please update it and use chrome for the best experience
+							</iframe> :
+							redirectToUrl()
 					: <div>
 						<div className="heading">Something Went Wrong</div>
 						<div className="subtitle">Try again or <a href={isYoutubeUrl(currentLessonURL) ? `https://youtube.com/watch?v=${videoId}` : currentLessonURL} target="_blank" rel="noopener noreferrer">Click Here</a> to watch this on your browser</div>
@@ -167,21 +173,27 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 							</List>
 						})
 				}
-				<Typography
+				{additional_videos.length > 0 && <Typography
 					className="primary-ilmx"
 					style={{ marginTop: "0.75rem" }}
 					variant="h4"
 					align="left">
-					Pratice
-				</Typography>
-				<Typography
-					className="primary-ilmx"
-					style={{ marginBottom: "5rem" }}
-					variant="h4"
-					align="left">
-					Quiz
-				</Typography>
-
+					Additional Videos
+				</Typography>}
+				{
+					additional_videos
+						.map(([lesson_id, lesson]) => {
+							return <List key={lesson_id}>
+								<ListItem button onClick={() => playLesson(lesson)}>
+									<ListItemIcon style={{ minWidth: "30px" }}>
+										<img className="play-icon" src={Play} alt="play-icon" />
+									</ListItemIcon>
+									<Typography variant="subtitle2" align="left">{lesson.meta.name}</Typography>
+								</ListItem>
+								<Divider />
+							</List>
+						})
+				}
 			</div>}
 	</div>
 }
