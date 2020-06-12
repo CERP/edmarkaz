@@ -33,8 +33,9 @@ defmodule Mix.Tasks.Platform do
 	end
 
 	def run(["ingest_student_portal_bulk", fname ]) do
+		# Csv-Schema: medium, grade, subject, chapter no, chapter Name,lesson no, lesson name, module no, module name-(video title), leson_type, video_link
+
 		Application.ensure_all_started(:edmarkaz)
-	# Csv-Schema: medium, grade, subject, chapter no, chapter Name,lesson no, lesson name, module no, module name-(video title), leson_type, video_link
 		csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) do
 			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) |> CSV.decode!
 			false -> File.stream!("priv/#{fname}.csv") |> CSV.decode!
