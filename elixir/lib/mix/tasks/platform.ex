@@ -63,7 +63,7 @@ defmodule Mix.Tasks.Platform do
 				values = chunk
 					|> Enum.reduce(
 						[],
-						fn [medium,grade,subject,chapter_id, chapter, lesson_id, lesson, lesson_type, video_link, video_type, source], acc ->
+						fn [medium,grade,subject,chapter_id, chapter, lesson_id, lesson, lesson_type, video_link, video_type, source, source_id], acc ->
 
 							id = "#{String.trim(medium)}-#{String.trim(grade)}-#{String.trim(subject)}-#{String.trim(chapter_id)}-#{String.trim(lesson_id)}"
 							lesson_map = %{
@@ -72,7 +72,8 @@ defmodule Mix.Tasks.Platform do
 								"link" => video_link,
 								"chapter_name" => String.trim(chapter),
 								"video_type" => String.trim(video_type),
-								"source" => String.trim(source)
+								"source" => String.trim(source),
+								"source_id" => source_id
 							}
 							curr = [id, String.trim(medium), String.trim(grade), String.trim(subject), String.trim(chapter_id), String.trim(lesson_id), lesson_map]
 							Enum.concat(acc, curr)
@@ -103,7 +104,7 @@ defmodule Mix.Tasks.Platform do
 
 		tasks = lectures
 			|> Enum.map(
-				fn [medium, grade, subject, chapter_id, chapter, lesson_id, lesson, lesson_type, video_link, video_type, source] ->
+				fn [medium, grade, subject, chapter_id, chapter, lesson_id, lesson, lesson_type, video_link, video_type, source, source_id] ->
 
 					id = "#{String.trim(medium)}-#{String.trim(grade)}-#{String.trim(subject)}-#{String.trim(chapter_id)}-#{String.trim(lesson_id)}"
 					lesson_map = %{
@@ -112,7 +113,8 @@ defmodule Mix.Tasks.Platform do
 						"link" => video_link,
 						"chapter_name" => String.trim(chapter),
 						"video_type" => String.trim(video_type),
-						"source" => String.trim(source)
+						"source" => String.trim(source),
+						"source_id" => source_id
 					}
 
 					EdMarkaz.StudentPortal.merge(id, String.trim(medium), String.trim(grade), String.trim(subject), String.trim(chapter_id), String.trim(lesson_id), lesson_map)

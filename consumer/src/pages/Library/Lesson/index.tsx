@@ -65,7 +65,7 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 
 		if (connected) {
 			setStartTime(Date.now())
-			if (!isYoutubeUrl(val.meta.link)) {
+			if (!isYoutubeUrl(val.meta.link) && (val.meta.source ? val.meta.source !== "Sabaq Muse" : true)) {
 				trackVideoAnalytics(location.pathname, val.chapter_id, val.lesson_id, 0)
 			}
 		}
@@ -113,9 +113,9 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 
 						}} />
 						: curr_unit[activeLesson] && curr_unit[activeLesson].meta.source === "Sabaq Muse" ?
-							<iframe className="iframe" src={currentLessonURL}>
-								your browser doesn't support iframe, please update it and use chrome for the best experience
-							</iframe> :
+							<video className="iframe" src={currentLessonURL} controls autoPlay>
+								your browser doesn't support html video, please update it and use chrome for best experience.
+							</video> :
 							redirectToUrl()
 					: <div>
 						<div className="heading">Something Went Wrong</div>
