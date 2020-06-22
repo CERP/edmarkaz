@@ -63,7 +63,7 @@ defmodule Mix.Tasks.Platform do
 				values = chunk
 					|> Enum.reduce(
 						[],
-						fn [medium,grade,subject,chapter_id, chapter, lesson_id, lesson, lesson_type, video_link, video_type, source, source_id], acc ->
+						fn [medium,grade,subject,chapter_id, chapter, lesson_id, lesson, lesson_type, video_link, video_type, source, source_id ], acc ->
 
 							id = "#{String.trim(medium)}-#{String.trim(grade)}-#{String.trim(subject)}-#{String.trim(chapter_id)}-#{String.trim(lesson_id)}"
 							lesson_map = %{
