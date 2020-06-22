@@ -89,6 +89,23 @@ interface RootReducerState {
 			}
 		}
 	}
+	assessments: {
+		last_sync: number
+		loading: boolean
+		db: {
+			[medium: string]: {
+				[grade: string]: {
+					[subject: string]: {
+						[chapter_id: string]: {
+							[lesson_id: string]: {
+								[id: string]: ILMXAssessment
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 	client_id: string;
 	queued: {
 		mutations: {
@@ -111,6 +128,44 @@ interface RootReducerState {
 	connected: boolean;
 }
 
+interface ILMXAssessment {
+	type: string,
+	id: string,
+	chapter_id: string,
+	lesson_id: string,
+	subject: string,
+	grade: string,
+	title: string,
+	title_ustring: string,
+	description: string,
+	order: string,
+	time: string,
+	total_marks: string,
+	active: boolean,
+	questions: {
+		[id: string]: ILMXQuestion
+	},
+	source: string
+}
+interface ILMXQuestion {
+	order: string,
+	id: string,
+	title: string,
+	title_urdu: string,
+	response_limit: string,
+	multi_response: string,
+	active: boolean,
+	answers: {
+		[id: string]: ILMXAnswer
+	}
+}
+interface ILMXAnswer {
+	answer: string
+	correct_answer: boolean
+	urdu_answer: string
+	id: string
+	active: boolean
+}
 interface ILMXStudent {
 	name: string
 	grade: string

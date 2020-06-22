@@ -3,19 +3,22 @@ import { connect } from 'react-redux'
 import { withRouter, RouteComponentProps } from 'react-router'
 import Youtube from 'react-youtube'
 import Play from '../../../icons/play.svg'
-import { trackVideoAnalytics, getLessons } from '../../../actions'
+import { trackVideoAnalytics, trackAssessmentAnalytics, getLessons } from '../../../actions'
 import Modal from '../../../components/Modal'
-import { List, ListItem, ListItemIcon, Typography, Divider, Container } from '@material-ui/core'
-
+import { List, ListItem, ListItemIcon, Typography, Divider, Container, Avatar } from '@material-ui/core'
+import BorderColorIcon from '@material-ui/icons/BorderColor';
 import { getColorsFromChapter } from 'utils/getColorsFromChapter'
 
 import "../style.css"
+import AssessmentForm from './AssessmentForm'
 
 interface P {
 	lessons: RootReducerState["lessons"]["db"]
+	assessments: RootReducerState["assessments"]["db"]
 	connected: RootReducerState["connected"]
 	getLessons: () => void
 	trackVideoAnalytics: (path: string, chapter_id: string, lessons_id: string, time: number) => void
+	trackAssessmentAnalytics: (path: string, score: number, total_score: number, assessment_meta: any) => void
 }
 
 interface RouteInfo {
@@ -41,7 +44,7 @@ const getIDFromYoutbeLink = (link: string) => {
 	return ""
 }
 
-const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trackVideoAnalytics }) => {
+const LessonPage: React.FC<Props> = ({ lessons, assessments, match, connected, location, trackVideoAnalytics, trackAssessmentAnalytics }) => {
 
 	const { medium, grade, subject, chapter, chapter_name } = match.params
 	const curr_unit = lessons[medium]
@@ -49,13 +52,20 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 		&& lessons[medium][grade][subject] ?
 		lessons[medium][grade][subject][chapter] || {}
 		: {}
+	const curr_assessments = assessments[medium]
+		&& assessments[medium][grade]
+		&& assessments[medium][grade][subject] ?
+		assessments[medium][grade][subject][chapter] || {}
+		: {}
 
 	const [activeChapter] = useState("")
 	const [activeLesson, setActiveLesson] = useState("")
-	const [showModal, setShowModal] = useState(false)
+	const [showVideoModal, setVideoModal] = useState(false)
+	const [showAssessmentModal, setAssessmentModal] = useState(false)
 	const [videoId, setVideoID] = useState("")
 	const [startTime, setStartTime] = useState(0)
 	const [currentLessonURL, setCurrentLessonURL] = useState("")
+	const [currentAssessment, setCurrentAssessment] = useState<ILMXAssessment | undefined>(undefined)
 
 	const playLesson = (val: Lesson) => {
 
@@ -69,7 +79,7 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 				trackVideoAnalytics(location.pathname, val.chapter_id, val.lesson_id, 0)
 			}
 		}
-		setShowModal(true)
+		setVideoModal(true)
 	}
 
 	const onBack = () => {
@@ -82,7 +92,7 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 		setCurrentLessonURL("")
 		setVideoID("")
 		setActiveLesson("");
-		setShowModal(false);
+		setVideoModal(false);
 	}
 
 	// eslint-disable-next-line
@@ -93,10 +103,24 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 		return true
 	}
 
+	const takeAssessment = (assessment: ILMXAssessment) => {
+		setCurrentAssessment(assessment)
+		setAssessmentModal(true)
+	}
+	const quitAssessment = () => {
+		setAssessmentModal(false)
+		setCurrentAssessment(undefined)
+	}
+
 	const additional_videos = Object.entries(curr_unit).filter(([lesson_id, lesson]) => lesson.meta.video_type && lesson.meta.video_type === "Additional Video")
+	const filtered_assessments = Object.entries(curr_assessments)
+		.reduce((agg, [lesson_id, exercises]) => {
+			return [...agg, ...Object.values(exercises)]
+		}, [] as ILMXAssessment[])
+		.filter(ex => ex.type === "MCQs" || ex.type.search("Fill in the Blanks \\(Input ") !== -1)
 
 	return <div className="lesson-page" style={{ overflow: "auto" }}>
-		{showModal && <Modal>
+		{!showAssessmentModal && showVideoModal && <Modal>
 			<div className="modal-box video-modal">
 				{connected ?
 					isYoutubeUrl(currentLessonURL) ? <Youtube
@@ -125,6 +149,21 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 				<div className="button" style={{ marginTop: '5px', backgroundColor: "#f05967" }} onClick={() => onBack()}>Back</div>
 			</div>
 		</Modal>}
+		{
+			!showVideoModal && showAssessmentModal && <Modal>
+				<div className="modal-box video-modal" style={{ height: "90%" }}>
+					<AssessmentForm
+						path={location.pathname}
+						medium={medium}
+						subject={subject}
+						chapter_id={chapter}
+						assessment={currentAssessment}
+						startTime={Date.now()}
+						submitAssessment={trackAssessmentAnalytics}
+						quit={quitAssessment} />
+				</div>
+			</Modal>
+		}
 		{Object.keys(curr_unit).length === 0 ? <Container maxWidth="sm">
 			<Typography
 				variant="h5"
@@ -173,6 +212,28 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 							</List>
 						})
 				}
+				{filtered_assessments.length > 0 && <Typography
+					className="primary-ilmx"
+					style={{ marginTop: "0.75rem" }}
+					variant="h4"
+					align="left">
+					Assessments
+				</Typography>}
+				{
+					filtered_assessments
+						.map((ex) => {
+							return <List key={`${ex.lesson_id}-${ex.order}`}>
+								<ListItem button onClick={() => takeAssessment(ex)}>
+									<ListItemIcon style={{ minWidth: "30px" }}>
+										<BorderColorIcon />
+									</ListItemIcon>
+									<Typography variant="subtitle2" align="left">{ex.title}</Typography>
+								</ListItem>
+								<Divider />
+							</List>
+						})
+				}
+
 				{additional_videos.length > 0 && <Typography
 					className="primary-ilmx"
 					style={{ marginTop: "0.75rem" }}
@@ -200,8 +261,10 @@ const LessonPage: React.FC<Props> = ({ lessons, match, connected, location, trac
 
 export default connect((state: RootReducerState) => ({
 	lessons: state.lessons.db,
+	assessments: state.assessments.db,
 	connected: state.connected
 }), (dispatch: Function) => ({
 	getLessons: () => dispatch(getLessons()),
-	trackVideoAnalytics: (path: string, chapter_id: string, lessons_id: string, time: number) => dispatch(trackVideoAnalytics(path, chapter_id, lessons_id, time))
+	trackVideoAnalytics: (path: string, chapter_id: string, lessons_id: string, time: number) => dispatch(trackVideoAnalytics(path, chapter_id, lessons_id, time)),
+	trackAssessmentAnalytics: (path: string, score: number, total_score: number, assessment_meta: any) => dispatch(trackAssessmentAnalytics(path, score, total_score, assessment_meta))
 }))(withRouter(LessonPage))

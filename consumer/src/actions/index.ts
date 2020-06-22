@@ -276,6 +276,41 @@ export const getProducts = (filters = {}) => (dispatch: Dispatch, getState: GetS
 		})
 }
 
+export const trackAssessmentAnalytics = (path: string, score: number, total_score: number, assessment_meta: any) => (dispatch: Dispatch, getState: GetState) => {
+	const state = getState()
+
+	const meta = state.auth.user === "SCHOOL" ?
+		{
+			route: path.split("/").splice(1),
+			refcode: state.sync_state.profile.refcode,
+			phone: state.sync_state.profile.phone_number,
+			user: state.auth.user,
+			score,
+			total_score,
+			assessment_meta
+		} : state.auth.user === "STUDENT" ?
+			{
+				route: path.split("/").splice(1),
+				refcode: state.sync_state.profile.refcode,
+				phone: state.sync_state.profile.phone_number,
+				user: state.auth.user,
+				student_id: state.activeStudent && state.activeStudent.id,
+				score,
+				total_score,
+				assessment_meta
+			} : {
+				route: path.split("/").splice(1),
+				score,
+				total_score,
+				assessment_meta
+			}
+
+	dispatch(analyticsEvent([{
+		type: "ASSESSMENT",
+		meta
+	}]))
+}
+
 export const trackVideoAnalytics = (path: string, chapter_id: string, lessons_id: string, time: number) => (dispatch: Dispatch, getState: GetState) => {
 	const state = getState()
 
@@ -309,6 +344,50 @@ export const trackVideoAnalytics = (path: string, chapter_id: string, lessons_id
 		type: "VIDEO",
 		meta
 	}]))
+}
+
+export const getAssessments = () => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+	const state = getState()
+
+	if (!state.connected) {
+		syncr.onNext('connect', () => dispatch(getAssessments()))
+	}
+
+	if (Object.keys(state.assessments.db).length === 0) {
+		dispatch({
+			type: "LOAD_ASSESSMENTS"
+		})
+	}
+
+	syncr.send({
+		type: "GET_ASSESSMENTS",
+		payload: {},
+		client_type: state.auth.client_type,
+		client_id: state.client_id
+	})
+		.then(resp => {
+			dispatch({
+				type: "ADD_ASSESSMENTS",
+				assessments: resp
+			})
+			return resp
+		})
+		.catch(err => {
+			if (err.message === "not ready") {
+				console.error("No connection while getting assessments")
+			}
+			else if (err === "timeout") {
+				setTimeout(() => dispatch(getAssessments()), 2000)
+				return err
+			}
+			console.log("Error while getting assessments", err)
+			dispatch(submitError(err))
+			return err
+		})
+}
+export interface ADD_ASSESSMENT_ACTION {
+	type: "ADD_ASSESSMENTS",
+	assessments: RootReducerState["assessments"]["db"]
 }
 
 export const ADD_COURSES = "ADD_COURSES"
@@ -427,6 +506,9 @@ export const signUp = (number: string, password: string, profile: Partial<CERPSc
 			console.error(err)
 			alert(err)
 
+			dispatch({
+				type: "SCHOOL_SIGNUP_FAILED"
+			})
 			// dispatch sign-up failed (phone number not unique?)
 		})
 

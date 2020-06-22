@@ -10,6 +10,7 @@ export const saveDB = (db: RootReducerState) => {
 		saveQueue(db.queued)
 		saveProducts(db.products)
 		saveLessons(db.lessons)
+		saveAssessments(db.assessments)
 		saveActiveStudent(db.activeStudent)
 	}
 
@@ -93,6 +94,12 @@ const saveLessons = (lessons?: RootReducerState["lessons"]) => {
 		localStorage.setItem("lessons", JSON.stringify(rest))
 	}
 }
+const saveAssessments = (assessments?: RootReducerState["assessments"]) => {
+	if (assessments !== undefined) {
+		const { loading, ...rest } = assessments
+		localStorage.setItem("assessments", JSON.stringify(rest))
+	}
+}
 
 const loadLessons = () => {
 	const initial: RootReducerState["lessons"] = {
@@ -106,6 +113,27 @@ const loadLessons = () => {
 		const lessons: RootReducerState["lessons"] = JSON.parse(localStorage.getItem("lessons")) || initial
 		return {
 			...lessons,
+			loading: false
+		}
+	}
+	catch (e) {
+		console.log('returning initial')
+		return initial
+	}
+}
+
+const loadAssessments = () => {
+	const initial: RootReducerState["assessments"] = {
+		last_sync: 0,
+		loading: true,
+		db: {}
+	}
+
+	try {
+		// @ts-ignore
+		const assessments: RootReducerState["assessments"] = JSON.parse(localStorage.getItem("assessments")) || initial
+		return {
+			...assessments,
 			loading: false
 		}
 	}
@@ -224,6 +252,7 @@ export const loadDB = (): RootReducerState => {
 		sync_state: loadSyncState(),
 		products: loadProducts(),
 		lessons: loadLessons(),
+		assessments: loadAssessments(),
 		activeStudent: loadStudent()
 	}
 }

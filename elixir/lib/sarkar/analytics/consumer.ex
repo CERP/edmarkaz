@@ -8,7 +8,7 @@ defmodule Sarkar.Analytics.Consumer do
 				user = Map.get(meta, "user")
 
 				if user !== nil do
-					type === "VIDEO" && user === "STUDENT"
+					(type === "VIDEO" || type === "ASSESSMENT") && user === "STUDENT"
 				else
 					false
 				end
@@ -17,24 +17,49 @@ defmodule Sarkar.Analytics.Consumer do
 		|> Enum.reduce(
 			[],
 			fn {key,%{"type" => type,"meta" => meta, "time" => time}}, acc ->
-				%{
-					"chapter_id" => chapter_id,
-					"lessons_id" => lesson_id,
-					"route" => route,
-					"time" => duration,
-					"user" => user,
-					"student_id" => student_id
-				} = meta
-				value = %{
-					"type" => "MERGE",
-					"path" => ["db","ilmx", "events", client_id, "#{time}"],
-					"value" => %{
-						"lesson_id" => "#{Enum.slice(route,1,4) |> Enum.join("-")}-#{lesson_id}",
-						"duration" => duration,
-						"student_id" => student_id,
-						"type" => type
-					}
-				}
+
+				value = case type do
+					"VIDEO" ->
+						%{
+							"chapter_id" => chapter_id,
+							"lessons_id" => lesson_id,
+							"route" => route,
+							"time" => duration,
+							"user" => user,
+							"student_id" => student_id
+						} = meta
+						value = %{
+							"type" => "MERGE",
+							"path" => ["db","ilmx", "events", client_id, "#{time}"],
+							"value" => %{
+								"lesson_id" => "#{Enum.slice(route,1,4) |> Enum.join("-")}-#{lesson_id}",
+								"duration" => duration,
+								"student_id" => student_id,
+								"type" => type
+							}
+						}
+					"ASSESSMENT" ->
+						%{
+							"route" => route,
+							"user" => user,
+							"student_id" => student_id,
+							"score" => score,
+							"total_score" => total_score,
+							"assessment_meta" => assessment_meta
+						} = meta
+						%{
+							"type" => "MERGE",
+							"path" => ["db","ilmx", "events", client_id, "#{time}"],
+							"value" => %{
+								"type" => type,
+								"student_id" => student_id,
+								"score" => score,
+								"total_score" => total_score,
+								"date" => time,
+								"meta" => assessment_meta
+							}
+						}
+				end
 				acc ++ [value]
 			end
 		)

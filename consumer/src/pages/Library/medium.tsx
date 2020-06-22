@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Typography, Avatar } from '@material-ui/core'
-import { getLessons } from '../../actions'
+import { getLessons, getAssessments } from '../../actions'
 import LoadingIcon from '../../icons/load.svg'
 import Modal from '../../components/Modal'
 import ilmxLogo from '../../components/Header/ilmx.svg'
@@ -17,11 +17,13 @@ interface P {
 	lesson_loading: RootReducerState["lessons"]["loading"]
 	school: RootReducerState["sync_state"]["profile"]
 	getLessons: () => void
+	getAssessments: () => void
 }
-const LibraryInstructionMedium: React.FC<P> = ({ lessons, lesson_loading, getLessons, school, user }) => {
+const LibraryInstructionMedium: React.FC<P> = ({ lessons, lesson_loading, getLessons, getAssessments, school, user }) => {
 
 	useEffect(() => {
 		getLessons()
+		getAssessments()
 	}, [getLessons])
 
 	const [showModal, setShowModal] = useState(false)
@@ -104,5 +106,6 @@ export default connect((state: RootReducerState) => ({
 	lesson_loading: state.lessons.loading,
 	school: state.sync_state.profile
 }), (dispatch: Function) => ({
-	getLessons: () => dispatch(getLessons())
+	getLessons: () => dispatch(getLessons()),
+	getAssessments: () => dispatch(getAssessments())
 }))(LibraryInstructionMedium)

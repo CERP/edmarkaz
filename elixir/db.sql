@@ -104,3 +104,18 @@ create table platform_writes
 		ilmx_id text not null,
 		time timestamp default current_timestamp
 	);
+
+	create table assessments
+	(
+		id text unique not null,
+		medium text not null,
+		class text not null,
+		subject text not null,
+		chapter_id text not null,
+		lesson_id text not null,
+		meta jsonb,
+		questions jsonb,
+		date timestamp default current_timestamp
+	);
+		-- chapter_id text not null,
+		-- lesson_id text not null,

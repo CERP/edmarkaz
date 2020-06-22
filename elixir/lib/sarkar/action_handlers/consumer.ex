@@ -530,6 +530,35 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 
 	end
 
+	def handle_action(
+		%{
+			"type" => "GET_ASSESSMENTS",
+			"payload" => payload
+		},
+		%{client_id: client_id, id: id} = state
+	) do
+			case EdMarkaz.DB.Postgres.query(
+				EdMarkaz.DB,
+				"SELECT * FROM assessments",
+				[]
+			) do
+				{:ok, resp } ->
+					mapped = resp.rows
+					|> Enum.reduce(
+						%{},
+						fn [ id, medium, class, subject, chapter_id, lesson_id, meta, questions, _date ], acc ->
+							val = meta |> Map.put("questions", questions )
+							order = Map.get(val, "order")
+							Dynamic.put(acc,[medium, class, subject, chapter_id, lesson_id, order], val)
+						end
+					)
+					{:reply, succeed(mapped), state}
+				{:error, err} ->
+					IO.inspect err
+					{:reply, fail(err), state}
+			end
+	end
+
 	def handle_action(%{"type" => "GET_PRODUCTS", "last_sync" => last_sync}, state) do
 
 		dt = DateTime.from_unix!(last_sync, :millisecond)

@@ -1,7 +1,7 @@
 import Dynamic from '@ironbay/dynamic'
 
 import { MERGES, MergeAction, ON_CONNECT, ON_DISCONNECT, DELETES, DeletesAction, QUEUE, CONFIRM_SYNC_DIFF, ConfirmSyncAction, SnapshotDiffAction, SNAPSHOT_DIFF, LOGIN_SUCCEED, LoginSucceed, ConfirmAnalyticsSync, QueueAction } from '../actions/core'
-import { ADD_PRODUCTS, LOAD_PROFILE, ADD_COURSES, ADD_COURSES_ACTION, STUDENT_LOGIN_ACTION, /*SET_ACTIVE_STUDENT_ACTION*/ } from '../actions'
+import { ADD_PRODUCTS, LOAD_PROFILE, ADD_COURSES, ADD_COURSES_ACTION, STUDENT_LOGIN_ACTION, ADD_ASSESSMENT_ACTION, /*SET_ACTIVE_STUDENT_ACTION*/ } from '../actions'
 import { AnyAction } from 'redux';
 
 const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerState => {
@@ -299,6 +299,29 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 					}
 				}
 			}
+
+		case "LOAD_ASSESSMENTS":
+			{
+				return {
+					...state,
+					assessments: {
+						...state.assessments,
+						loading: true
+					}
+				}
+			}
+		case "ADD_ASSESSMENTS":
+			{
+				const { assessments } = action as ADD_ASSESSMENT_ACTION
+				return {
+					...state,
+					assessments: {
+						last_sync: new Date().getTime(),
+						loading: false,
+						db: assessments
+					}
+				}
+			}
 		case "AUTO_LOGIN":
 			{
 				return {
@@ -326,6 +349,16 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 					auth: {
 						...state.auth,
 						loading: true
+					}
+				}
+			}
+		case "SCHOOL_SIGNUP_FAILED":
+			{
+				return {
+					...state,
+					auth: {
+						...state.auth,
+						loading: false
 					}
 				}
 			}
