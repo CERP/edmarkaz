@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom';
 import Arrow from '../../icons/arrow.svg'
 import { getProducts } from '../../actions';
+import { Container } from '@material-ui/core';
 
 import './style.css'
 
@@ -84,30 +85,32 @@ class LoggedOutHome extends React.Component<P, S> {
 			{/* <div className="tabs-banner">
 				<img className="banner-img" src={banner} />
 			</div> */}
-			<div className="tabs-home">
-				{
-					sorted
-						.map(([category, suppliers]) => {
+			<Container maxWidth="md">
+				<div className="tabs-home">
+					{
+						sorted
+							.map(([category, suppliers]) => {
 
-							return <div className="item-row" key={category}>
-								<div className="title-row" >
-									<div className="title">{category}</div>
-									<img className="arrow-icon" src={Arrow} alt="arrow" />
+								return <div className="item-row" key={category}>
+									<div className="title-row" >
+										<div className="title">{category}</div>
+										<img className="arrow-icon" src={Arrow} alt="arrow" />
+									</div>
+									<div className="items">
+										{
+											Object.entries(suppliers)
+												.sort(([, s1], [, s2]) => (s1.order || 9999) - (s2.order || 9999))
+												.map(([sid, profile]) => <Link className="item-card" to={`/supplier/${sid}`} key={`${category}-${sid}`}>
+													<img crossOrigin="anonymous" src={profile.logo && profile.logo.url} className="item-image" alt="product" />
+													<div className="subtitle">{profile.name}</div>
+												</Link>)
+										}
+									</div>
 								</div>
-								<div className="items">
-									{
-										Object.entries(suppliers)
-											.sort(([, s1], [, s2]) => (s1.order || 9999) - (s2.order || 9999))
-											.map(([sid, profile]) => <Link className="item-card" to={`/supplier/${sid}`} key={`${category}-${sid}`}>
-												<img crossOrigin="anonymous" src={profile.logo && profile.logo.url} className="item-image" alt="product" />
-												<div className="subtitle">{profile.name}</div>
-											</Link>)
-									}
-								</div>
-							</div>
-						})
-				}
-			</div>
+							})
+					}
+				</div>
+			</Container>
 		</div>
 	}
 }

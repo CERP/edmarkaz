@@ -59,7 +59,7 @@ defmodule EdMarkaz.StudentPortal do
 		end
 	end
 
-	def merge_sabaq_assessments(quiz_data) do
+	def merge_assessments(quiz_data) do
 
 		case EdMarkaz.DB.Postgres.query(
 			EdMarkaz.DB,

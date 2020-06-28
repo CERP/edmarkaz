@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import DownArrow from './icons/downArrow.svg'
+import { Container } from '@material-ui/core'
 import "./style.css"
 
 const answer = (question: number) => {
@@ -58,69 +59,70 @@ export default () => {
 	const [selectedQuestion, setSelectedQuestion] = useState(0)
 
 	return <div className="help-page">
+		<Container maxWidth="md">
 
-		<div className="q-bar" onClick={() => selectedQuestion !== 1 ? setSelectedQuestion(1) : setSelectedQuestion(0)}>
-			<div className="q-title"> How can I order a product on IlmExchange?</div>
-			<div className={`q-img ${selectedQuestion === 1 ? "rot" : ""}`} style={{ backgroundImage: `url(${DownArrow})` }} />
-		</div>
-		{
-			selectedQuestion === 1 && answer(selectedQuestion)
-		}
+			<div className="q-bar" onClick={() => selectedQuestion !== 1 ? setSelectedQuestion(1) : setSelectedQuestion(0)}>
+				<div className="q-title"> How can I order a product on IlmExchange?</div>
+				<div className={`q-img ${selectedQuestion === 1 ? "rot" : ""}`} style={{ backgroundImage: `url(${DownArrow})` }} />
+			</div>
+			{
+				selectedQuestion === 1 && answer(selectedQuestion)
+			}
 
-		<div className="q-bar" onClick={() => selectedQuestion !== 2 ? setSelectedQuestion(2) : setSelectedQuestion(0)}>
-			<div className="q-title"> Why should I order things from IlmExchange instead of buying them from somewhere else?</div>
-			<div className={`q-img ${selectedQuestion === 2 ? "rot" : ""}`} style={{ backgroundImage: `url(${DownArrow})` }} />
-		</div>
-		{
-			selectedQuestion === 2 && answer(selectedQuestion)
-		}
+			<div className="q-bar" onClick={() => selectedQuestion !== 2 ? setSelectedQuestion(2) : setSelectedQuestion(0)}>
+				<div className="q-title"> Why should I order things from IlmExchange instead of buying them from somewhere else?</div>
+				<div className={`q-img ${selectedQuestion === 2 ? "rot" : ""}`} style={{ backgroundImage: `url(${DownArrow})` }} />
+			</div>
+			{
+				selectedQuestion === 2 && answer(selectedQuestion)
+			}
 
-		<div className="q-bar" onClick={() => selectedQuestion !== 3 ? setSelectedQuestion(3) : setSelectedQuestion(0)}>
-			<div className="q-title"> What if I want to see a product before ordering it? </div>
-			<div className={`q-img ${selectedQuestion === 3 ? "rot" : ""}`} style={{ backgroundImage: `url(${DownArrow})` }} />
-		</div>
-		{
-			selectedQuestion === 3 && answer(selectedQuestion)
-		}
+			<div className="q-bar" onClick={() => selectedQuestion !== 3 ? setSelectedQuestion(3) : setSelectedQuestion(0)}>
+				<div className="q-title"> What if I want to see a product before ordering it? </div>
+				<div className={`q-img ${selectedQuestion === 3 ? "rot" : ""}`} style={{ backgroundImage: `url(${DownArrow})` }} />
+			</div>
+			{
+				selectedQuestion === 3 && answer(selectedQuestion)
+			}
 
-		<div className="q-bar" onClick={() => selectedQuestion !== 4 ? setSelectedQuestion(4) : setSelectedQuestion(0)}>
-			<div className="q-title"> What if I need help in the ordering process?</div>
-			<div className={`q-img ${selectedQuestion === 4 ? "rot" : ""}`} style={{ backgroundImage: `url(${DownArrow})` }} />
-		</div>
-		{
-			selectedQuestion === 4 && answer(selectedQuestion)
-		}
+			<div className="q-bar" onClick={() => selectedQuestion !== 4 ? setSelectedQuestion(4) : setSelectedQuestion(0)}>
+				<div className="q-title"> What if I need help in the ordering process?</div>
+				<div className={`q-img ${selectedQuestion === 4 ? "rot" : ""}`} style={{ backgroundImage: `url(${DownArrow})` }} />
+			</div>
+			{
+				selectedQuestion === 4 && answer(selectedQuestion)
+			}
 
-		<div className="q-bar" onClick={() => selectedQuestion !== 5 ? setSelectedQuestion(5) : setSelectedQuestion(0)}>
-			<div className="q-title"> How do I pay for products?</div>
-			<div className={`q-img ${selectedQuestion === 5 ? "rot" : ""}`} style={{ backgroundImage: `url(${DownArrow})` }} />
-		</div>
-		{
-			selectedQuestion === 5 && answer(selectedQuestion)
-		}
+			<div className="q-bar" onClick={() => selectedQuestion !== 5 ? setSelectedQuestion(5) : setSelectedQuestion(0)}>
+				<div className="q-title"> How do I pay for products?</div>
+				<div className={`q-img ${selectedQuestion === 5 ? "rot" : ""}`} style={{ backgroundImage: `url(${DownArrow})` }} />
+			</div>
+			{
+				selectedQuestion === 5 && answer(selectedQuestion)
+			}
 
-		<div className="q-bar" onClick={() => selectedQuestion !== 6 ? setSelectedQuestion(6) : setSelectedQuestion(0)}>
-			<div className="q-title"> Can I trust the IlmExchange Sales Rep who comes to my school?</div>
-			<div className={`q-img ${selectedQuestion === 6 ? "rot" : ""}`} style={{ backgroundImage: `url(${DownArrow})` }} />
-		</div>
-		{
-			selectedQuestion === 6 && answer(selectedQuestion)
-		}
+			<div className="q-bar" onClick={() => selectedQuestion !== 6 ? setSelectedQuestion(6) : setSelectedQuestion(0)}>
+				<div className="q-title"> Can I trust the IlmExchange Sales Rep who comes to my school?</div>
+				<div className={`q-img ${selectedQuestion === 6 ? "rot" : ""}`} style={{ backgroundImage: `url(${DownArrow})` }} />
+			</div>
+			{
+				selectedQuestion === 6 && answer(selectedQuestion)
+			}
 
-		<div className="q-bar" onClick={() => selectedQuestion !== 7 ? setSelectedQuestion(7) : setSelectedQuestion(0)}>
-			<div className="q-title"> Is my school’s information safe with IlmExchange?</div>
-			<div className={`q-img ${selectedQuestion === 7 ? "rot" : ""}`} style={{ backgroundImage: `url(${DownArrow})` }} />
-		</div>
-		{
-			selectedQuestion === 7 && answer(selectedQuestion)
-		}
-		<div className="q-bar" onClick={() => selectedQuestion !== 8 ? setSelectedQuestion(8) : setSelectedQuestion(0)}>
-			<div className="q-title">What is my device ID?</div>
-			<div className={`q-img ${selectedQuestion === 8 ? "rot" : ""}`} style={{ backgroundImage: `url(${DownArrow})` }} />
-		</div>
-		{
-			selectedQuestion === 8 && localStorage.getItem("client_id")
-		}
-
+			<div className="q-bar" onClick={() => selectedQuestion !== 7 ? setSelectedQuestion(7) : setSelectedQuestion(0)}>
+				<div className="q-title"> Is my school’s information safe with IlmExchange?</div>
+				<div className={`q-img ${selectedQuestion === 7 ? "rot" : ""}`} style={{ backgroundImage: `url(${DownArrow})` }} />
+			</div>
+			{
+				selectedQuestion === 7 && answer(selectedQuestion)
+			}
+			<div className="q-bar" onClick={() => selectedQuestion !== 8 ? setSelectedQuestion(8) : setSelectedQuestion(0)}>
+				<div className="q-title">What is my device ID?</div>
+				<div className={`q-img ${selectedQuestion === 8 ? "rot" : ""}`} style={{ backgroundImage: `url(${DownArrow})` }} />
+			</div>
+			{
+				selectedQuestion === 8 && localStorage.getItem("client_id")
+			}
+		</Container>
 	</div>
 }

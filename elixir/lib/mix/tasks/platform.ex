@@ -63,7 +63,7 @@ defmodule Mix.Tasks.Platform do
 				values = chunk
 					|> Enum.reduce(
 						[],
-						fn [medium,grade,subject,chapter_id, chapter, lesson_id, lesson, lesson_type, video_link, video_type, source, source_id ], acc ->
+						fn [medium, grade, subject, chapter_id, lesson_id, video_type, chapter, lesson, lesson_type, video_link, source, source_id ], acc ->
 
 							id = "#{String.trim(medium)}-#{String.trim(grade)}-#{String.trim(subject)}-#{String.trim(chapter_id)}-#{String.trim(lesson_id)}"
 							lesson_map = %{
@@ -104,7 +104,7 @@ defmodule Mix.Tasks.Platform do
 
 		tasks = lectures
 			|> Enum.map(
-				fn [medium, grade, subject, chapter_id, chapter, lesson_id, lesson, lesson_type, video_link, video_type, source, source_id] ->
+				fn [medium, grade, subject, chapter_id, lesson_id, video_type, chapter, lesson, lesson_type, video_link, source, source_id] ->
 
 					id = "#{String.trim(medium)}-#{String.trim(grade)}-#{String.trim(subject)}-#{String.trim(chapter_id)}-#{String.trim(lesson_id)}"
 					lesson_map = %{
@@ -123,7 +123,7 @@ defmodule Mix.Tasks.Platform do
 		IO.inspect tasks
 	end
 
-	def run(["ingest_sabaq_assessments", fname ]) do
+	def run(["ingest_assessments", fname ]) do
 		Application.ensure_all_started(:edmarkaz)
 
 		csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) do
@@ -149,7 +149,9 @@ defmodule Mix.Tasks.Platform do
 							"correct_answer" =>  is_correct,
 							"urdu_answer" => "",
 							"id" => Integer.to_string(x),
-							"active" => true
+							"active" => true,
+							"image" => "",
+							"audio" => ""
 						}
 						Map.put(acc, Integer.to_string(x), answer)
 						end)
@@ -162,6 +164,10 @@ defmodule Mix.Tasks.Platform do
 							"title_urdu" => "",
 							"response_limit" => 0,
 							"multi_response" => false,
+							"image" => "",
+							"urdu_image" => "",
+							"audio" => "",
+							"active" => true,
 							"answers" => answers
 						}
 						Dynamic.put(agg, [id, "questions", question_no], question)
@@ -170,15 +176,18 @@ defmodule Mix.Tasks.Platform do
 							"quiz_info" => [id, medium, grade, subject, chapter_id, lesson_id],
 							"meta" => %{
 								"medium" => String.trim(medium),
-								"class" => String.trim(grade),
+								"grade" => String.trim(grade),
 								"subject" => String.trim(subject),
+								"chapter_id" => chapter_id,
+								"lesson_id" => lesson_id,
 								"type" => "MCQs",
 								"title" => String.trim(quiz_name),
+								"id" => String.trim(quiz_id),
 								"order" => String.trim(quiz_id),
 								"time" => 0,
 								"total_marks" => 0,
 								"active" => true,
-								"source" => "sabaq"
+								"source" => "Ilmx" # will change based on the source
 							},
 							"questions" => %{
 								question_no => %{
@@ -188,6 +197,10 @@ defmodule Mix.Tasks.Platform do
 									"title_urdu" => "",
 									"response_limit" => 0,
 									"multi_response" => false,
+									"image" => "",
+									"urdu_image" => "",
+									"audio" => "",
+									"active" => true,
 									"answers" => answers
 								}
 							}
@@ -204,7 +217,7 @@ defmodule Mix.Tasks.Platform do
 
 				insert_row = Enum.concat([quiz_info, [quiz_meta], [quiz_questions]])
 
-				EdMarkaz.StudentPortal.merge_sabaq_assessments(insert_row)
+				EdMarkaz.StudentPortal.merge_assessments(insert_row)
 			end)
 	end
 

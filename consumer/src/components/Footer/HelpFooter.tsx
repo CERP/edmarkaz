@@ -12,7 +12,7 @@ type PropsType = {
 
 const useStyles = makeStyles((theme) => ({
 	main: {
-		marginTop: theme.spacing(4),
+		padding: "unset"
 	},
 	heading6: {
 		color: "#1bb4bb",
@@ -20,7 +20,11 @@ const useStyles = makeStyles((theme) => ({
 		paddingBottom: theme.spacing(1)
 	},
 	footer: {
-		marginTop: 'auto',
+		left: 0,
+		right: 0,
+		bottom: 0,
+		padding: theme.spacing(1),
+		position: "fixed",
 		backgroundColor:
 			theme.palette.type === 'light' ? theme.palette.grey[100] : theme.palette.grey[800],
 	},
@@ -43,37 +47,34 @@ const HelpFooter: React.FC<PropsType> = ({ hlink }) => {
 
 	return (
 		<footer className={classes.footer}>
-			<Container maxWidth="sm" className={classes.main}>
+			<Container maxWidth="md" className={classes.main}>
 				<div style={{ marginLeft: "1.50rem", marginRight: "1.50rem" }}>
-					<Typography
-						className={classes.heading6}
-						variant="h6">
-						Need help?
-					</Typography>
-					<Grid container spacing={3}>
-						<Grid item sm={6}>
-							<Box width="1">
+					<Grid container spacing={0} alignItems="center" justify="center">
+						<Grid item xs={12} sm={3}>
+							<Typography
+								className={classes.heading6}
+								variant="h6">
+								Need help?
+							</Typography>
+						</Grid>
+						<Grid container item xs={12} sm={8} justify="center" alignItems="center">
+							<Grid item xs={6} sm={4}>
 								<Button
-									size="large"
+									size="medium"
 									variant="outlined"
 									className={classes.helpButton}
-									startIcon={<YouTube style={{ fill: "red" }} />}>
-									Watch Tutorial
-						</Button>
-							</Box>
-						</Grid>
-						<Grid item sm={6}>
-							<Box width="1">
-								<Link href={hlink} underline="none">
-									<Button
-										size="large"
-										variant="outlined"
-										className={classes.helpButton}
-										startIcon={<Phone className={classes.phoneIcon} />}>
-										Contact Us
-								</Button>
-								</Link>
-							</Box>
+									startIcon={<YouTube style={{ fill: "red" }} />}
+								> Tutorial </Button>
+							</Grid>
+							<Grid item xs={6} sm={4}>
+								<Button
+									size="medium"
+									variant="outlined"
+									className={classes.helpButton}
+									startIcon={<Phone className={classes.phoneIcon} />}
+									href={hlink}
+								> Contact Us </Button>
+							</Grid>
 						</Grid>
 					</Grid>
 				</div>

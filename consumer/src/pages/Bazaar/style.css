@@ -1,6 +1,5 @@
 .products {
-	padding: 10px 5%;
-	width: calc(100% - 10%);
+
 }
 .products .supplier-box {
 	display: flex;

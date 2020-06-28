@@ -148,7 +148,7 @@ class TabsBar extends Component<propTypes, S> {
 					<div>Contact Us</div>
 				</a>}
 
-				{(current !== "/" && current !== "/about-us") && <>
+				{(current !== "/" && current !== "/bazaar" && current !== "/about-us") && <>
 					<HelpFooter hlink={callLink} />
 				</>}
 			</div>

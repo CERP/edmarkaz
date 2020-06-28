@@ -80,7 +80,7 @@ const AssessmentForm: React.FC<Props> = ({ assessment, quit, startTime, path, me
 	return <div className="assessment-form">
 
 		<Typography
-			variant="h3"
+			variant="h4"
 			color="primary"
 			align="center"
 		>
@@ -98,26 +98,42 @@ const AssessmentForm: React.FC<Props> = ({ assessment, quit, startTime, path, me
 				Object.entries(assessment && assessment.questions || {})
 					.map(([qid, qs], index) => {
 						return <Paper elevation={2} key={qid} style={submitted && responses[qid] === undefined ? { margin: "5px", padding: "20px", border: "1px solid red" } : { margin: "5px", padding: "20px" }}>
-							<Typography
-								variant="h6"
-								color="textPrimary"
-								align="left"
-							>
-								{`Qs: ${qs.title.replace("$", "______")} ?`}
-							</Typography>
+							<div className="qs-row">
+								<Typography
+									variant="h6"
+									color="textPrimary"
+									align="left"
+								>
+									{qs.title ? `Qs: ${(qs.title || "").replace("$", "______")}` : qs.title_urdu}
+								</Typography>
+								{
+									qs.image !== "" && <img
+										className="qs-img"
+										src={qs.image}
+									/>
+								}
+							</div>
 
 							<RadioGroup value={responses[qid] || ""}>
 								{
 									Object.entries(qs.answers).map(([aid, ans]) => {
-										return <FormControlLabel
-											style={submitted && ans.correct_answer ? { border: "1px solid green" } : {}}
-											onChange={() => chooseAnswer(qid, aid)}
-											value={aid}
-											control={<Radio />}
-											label={ans.answer}
-											key={`${qid}-${aid}`}
-											disabled={submitted}
-										/>
+										return <div className="ans-row" key={`${qid}-${aid}`}>
+											<FormControlLabel
+												className="ans-statement"
+												style={submitted && ans.correct_answer ? { border: "2px solid green" } : submitted && !ans.correct_answer && responses[qid] === aid ? { border: "2px solid red" } : {}}
+												onChange={() => chooseAnswer(qid, aid)}
+												value={aid}
+												control={<Radio />}
+												label={ans.answer}
+												disabled={submitted}
+											/>
+											{
+												ans.image !== "" && <img
+													className="ans-img"
+													src={ans.image}
+												/>
+											}
+										</div >
 									})
 								}
 							</RadioGroup>
@@ -128,7 +144,7 @@ const AssessmentForm: React.FC<Props> = ({ assessment, quit, startTime, path, me
 		</div>
 		{!submitted && <Button
 			variant="contained"
-			size="large"
+			size="medium"
 			startIcon={<Done />}
 			color="primary"
 			onClick={submitQuiz}
@@ -138,7 +154,7 @@ const AssessmentForm: React.FC<Props> = ({ assessment, quit, startTime, path, me
 		</Button>}
 		<Button
 			variant="contained"
-			size="large"
+			size="medium"
 			startIcon={<Quit />}
 			color="secondary"
 			onClick={quitAssessment}
