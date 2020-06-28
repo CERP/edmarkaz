@@ -33,6 +33,7 @@ defmodule Mix.Tasks.Platform do
 	end
 
 	def run(["ingest_student_portal_bulk", fname ]) do
+		# Can make nulk transactions
 		# Csv-Schema: medium, grade, subject, chapter no, chapter Name,lesson no, lesson name, module no, module name-(video title), leson_type, video_link
 		Application.ensure_all_started(:edmarkaz)
 
