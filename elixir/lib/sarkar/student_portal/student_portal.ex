@@ -59,4 +59,42 @@ defmodule EdMarkaz.StudentPortal do
 		end
 	end
 
+	def merge_assessments(quiz_data) do
+
+		case EdMarkaz.DB.Postgres.query(
+			EdMarkaz.DB,
+			"INSERT INTO assessments (
+				id,
+				medium,
+				class,
+				subject,
+				chapter_id,
+				lesson_id,
+				meta,
+				questions
+			) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+			ON CONFLICT (id) DO
+			UPDATE SET
+				medium=$2,
+				class=$3,
+				subject=$4,
+				chapter_id=$5,
+				lesson_id=$6,
+				meta=$7,
+				questions=$8,
+				date=current_timestamp",
+			quiz_data
+		) do
+			{:ok, resp} ->
+				[head | tail ] = quiz_data
+				IO.puts "OK #{head}"
+				{:ok}
+			{:error, err} ->
+				[head | tail ] = quiz_data
+				IO.puts "assessment merge failed #{head}"
+				IO.inspect err
+				{:error, err}
+		end
+	end
+
 end

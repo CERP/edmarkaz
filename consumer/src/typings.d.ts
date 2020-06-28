@@ -136,7 +136,6 @@ interface ILMXAssessment {
 	subject: string,
 	grade: string,
 	title: string,
-	title_ustring: string,
 	description: string,
 	order: string,
 	time: string,
@@ -152,9 +151,12 @@ interface ILMXQuestion {
 	id: string,
 	title: string,
 	title_urdu: string,
-	response_limit: string,
-	multi_response: string,
+	response_limit: number,
+	multi_response: boolean,
 	active: boolean,
+	image: string,
+	urdu_image: string,
+	audio: string,
 	answers: {
 		[id: string]: ILMXAnswer
 	}
@@ -164,6 +166,8 @@ interface ILMXAnswer {
 	correct_answer: boolean
 	urdu_answer: string
 	id: string
+	image: string
+	audio: string
 	active: boolean
 }
 interface ILMXStudent {

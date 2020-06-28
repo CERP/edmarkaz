@@ -364,7 +364,7 @@ export const getAssessments = () => (dispatch: Dispatch, getState: GetState, syn
 		payload: {},
 		client_type: state.auth.client_type,
 		client_id: state.client_id
-	})
+	}, 20000)
 		.then(resp => {
 			dispatch({
 				type: "ADD_ASSESSMENTS",

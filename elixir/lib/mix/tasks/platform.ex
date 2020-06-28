@@ -63,7 +63,7 @@ defmodule Mix.Tasks.Platform do
 				values = chunk
 					|> Enum.reduce(
 						[],
-						fn [medium,grade,subject,chapter_id, chapter, lesson_id, lesson, lesson_type, video_link, video_type, source, source_id ], acc ->
+						fn [medium, grade, subject, chapter_id, lesson_id, video_type, chapter, lesson, lesson_type, video_link, source, source_id ], acc ->
 
 							id = "#{String.trim(medium)}-#{String.trim(grade)}-#{String.trim(subject)}-#{String.trim(chapter_id)}-#{String.trim(lesson_id)}"
 							lesson_map = %{
@@ -104,7 +104,7 @@ defmodule Mix.Tasks.Platform do
 
 		tasks = lectures
 			|> Enum.map(
-				fn [medium, grade, subject, chapter_id, chapter, lesson_id, lesson, lesson_type, video_link, video_type, source, source_id] ->
+				fn [medium, grade, subject, chapter_id, lesson_id, video_type, chapter, lesson, lesson_type, video_link, source, source_id] ->
 
 					id = "#{String.trim(medium)}-#{String.trim(grade)}-#{String.trim(subject)}-#{String.trim(chapter_id)}-#{String.trim(lesson_id)}"
 					lesson_map = %{
@@ -121,6 +121,104 @@ defmodule Mix.Tasks.Platform do
 				end
 			)
 		IO.inspect tasks
+	end
+
+	def run(["ingest_assessments", fname ]) do
+		Application.ensure_all_started(:edmarkaz)
+
+		csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) do
+			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) |> CSV.decode!
+			false -> File.stream!("priv/#{fname}.csv") |> CSV.decode!
+		end
+
+		[ _ | assessments] = csv
+		|> Enum.map(fn row -> row end)
+
+		mapped_assessments = assessments
+			|> Enum.reduce(%{}, fn([medium, grade, subject, chapter_id, lesson_id, quiz_id, quiz_name, question_no, question_statement, opt_a, opt_b, opt_c, opt_d, correct_answer]), agg ->
+
+					id = "#{String.trim(medium)}-#{String.trim(grade)}-#{String.trim(subject)}-#{String.trim(chapter_id)}-#{String.trim(lesson_id)}-#{String.trim(quiz_id)}"
+
+					ans_map = %{ 1 => "A", 2 => "B", 3 => "C", 4 => "D" }
+					options = %{ 1 => opt_a, 2 => opt_b, 3 => opt_c, 4 => opt_d }
+
+					answers = Enum.reduce(1..4, %{}, fn x, acc ->
+						is_correct = Map.get(ans_map, x) == correct_answer
+						answer = %{
+							"answer" => String.trim(Map.get(options, x)),
+							"correct_answer" =>  is_correct,
+							"urdu_answer" => "",
+							"id" => Integer.to_string(x),
+							"active" => true,
+							"image" => "",
+							"audio" => ""
+						}
+						Map.put(acc, Integer.to_string(x), answer)
+						end)
+
+					if Map.has_key?(agg, id) do
+						question = %{
+							"order" => String.trim(question_no),
+							"id" =>  String.trim(question_no),
+							"title" => String.trim(question_statement),
+							"title_urdu" => "",
+							"response_limit" => 0,
+							"multi_response" => false,
+							"image" => "",
+							"urdu_image" => "",
+							"audio" => "",
+							"active" => true,
+							"answers" => answers
+						}
+						Dynamic.put(agg, [id, "questions", question_no], question)
+					else
+						assessment = %{
+							"quiz_info" => [id, medium, grade, subject, chapter_id, lesson_id],
+							"meta" => %{
+								"medium" => String.trim(medium),
+								"grade" => String.trim(grade),
+								"subject" => String.trim(subject),
+								"chapter_id" => chapter_id,
+								"lesson_id" => lesson_id,
+								"type" => "MCQs",
+								"title" => String.trim(quiz_name),
+								"id" => String.trim(quiz_id),
+								"order" => String.trim(quiz_id),
+								"time" => 0,
+								"total_marks" => 0,
+								"active" => true,
+								"source" => "Ilmx" # will change based on the source
+							},
+							"questions" => %{
+								question_no => %{
+									"order" => String.trim(question_no),
+									"id" =>  String.trim(question_no),
+									"title" => String.trim(question_statement),
+									"title_urdu" => "",
+									"response_limit" => 0,
+									"multi_response" => false,
+									"image" => "",
+									"urdu_image" => "",
+									"audio" => "",
+									"active" => true,
+									"answers" => answers
+								}
+							}
+						}
+						Map.put(agg, id, assessment)
+					end
+				end)
+
+		mapped_assessments
+			|> Enum.each(fn({id, value}) ->
+				quiz_info = value["quiz_info"]
+				quiz_meta = value["meta"]
+				quiz_questions = value["questions"]
+
+				insert_row = Enum.concat([quiz_info, [quiz_meta], [quiz_questions]])
+
+				EdMarkaz.StudentPortal.merge_assessments(insert_row)
+			end)
 	end
 
 	def run(["update_verified_bool_to_string"]) do

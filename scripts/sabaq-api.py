@@ -4,7 +4,7 @@ import requests
 import psycopg2 as pg
 from urllib.parse import urlparse, parse_qs
 
-with open('urdu_portal_sabaq.csv') as f:
+with open('sabaq_june28_formatted.csv') as f:
     reader = csv.DictReader(f)
     fieldnames = reader.fieldnames
     lines = [l for l in reader]
@@ -25,6 +25,15 @@ answers_resp = requests.get(
 conn = pg.connect(dbname="postgres", user="postgres",
                   host="localhost", password="postgres")
 cur = conn.cursor()
+
+
+def addPrefix(val):
+    pre = 'https://musebysabaq.s3.ap-south-1.amazonaws.com'
+    if val == None:
+        return ""
+    else:
+        return pre + val
+
 
 prefix = 'https://musebysabaq.s3.ap-south-1.amazonaws.com/'
 mapped = []
@@ -58,13 +67,13 @@ for v in lines:
         'subtopic_id': rel['SubTopicId']
     })
 
-with open('mapped_urdu_portal.csv', 'w') as f:
-    writer = csv.DictWriter(
-        f, [*fieldnames, 'sabaq_id', 'topic_id', 'subtopic_id'])
-    writer.writeheader()
-    writer.writerows(mapped)
+# with open('lol.csv', 'w') as f:
+#     writer = csv.DictWriter(
+#         f, [*fieldnames, 'sabaq_id', 'topic_id', 'subtopic_id'])
+#     writer.writeheader()
+#     writer.writerows(mapped)
 
-
+# ======================================================================
 print("Preparing Dictionares")
 ex_dict = {}
 
@@ -154,6 +163,8 @@ for val in mapped:
                                         "answer": ans_dict[q_id][ans_id]["Answer"],
                                         "correct_answer": ans_dict[q_id][ans_id]["CorrectAnswer"],
                                         "urdu_answer": ans_dict[q_id][ans_id]["UrduAnswer"],
+                                        "image": addPrefix(ans_dict[q_id][ans_id]["ImagePath"]),
+                                        "audio": addPrefix(ans_dict[q_id][ans_id]["AudioPath"]),
                                         "id": ans_dict[q_id][ans_id]["Id"],
                                         "active": ans_dict[q_id][ans_id]["Active"]
                                     }
@@ -167,6 +178,9 @@ for val in mapped:
                                 "response_limit": curr_qs["ResponseLimit"],
                                 "multi_response": curr_qs["IsMultipleResponseAllowed"],
                                 "active": curr_qs["Active"],
+                                "image": addPrefix(curr_qs["ImagePath"]),
+                                "urdu_image": addPrefix(curr_qs["UrduImagePath"]),
+                                "audio": addPrefix(curr_qs["AudioPath"]),
                                 "answers": ans_for_qs
                             }
                             ex_with_qs_ans[k] = {
@@ -197,7 +211,7 @@ for val in mapped:
                     id = f'{val["Medium"]}-{val["Grade"]}-{val["Subject"]}-{val["Unit No"]}-{val["Video No"]}-{ex_with_qs_ans[l]["order"]}'
                     cur.execute(
                         """INSERT INTO assessments (id, medium, class, subject, chapter_id, lesson_id, meta, questions)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT DO NOTHING;""", (id, val["Medium"], val["Grade"], val["Subject"], val["Unit No"], val["Video No"], json.dumps(meta), json.dumps(ques)))
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT (id) DO UPDATE SET meta=excluded.meta, questions=excluded.questions;""", (id, val["Medium"], val["Grade"], val["Subject"], val["Unit No"], val["Video No"], json.dumps(meta), json.dumps(ques)))
                     conn.commit()
                     print("DONE")
 

@@ -4,6 +4,7 @@ import { RouteComponentProps } from 'react-router'
 import { Link } from 'react-router-dom'
 import { getProducts, placeOrder } from '../../../actions';
 import Modal from "../../../components/Modal";
+import { Container } from '@material-ui/core';
 
 import './style.css'
 
@@ -67,36 +68,39 @@ class ProductPage extends React.Component<P, S> {
 		}
 
 		return <div className="item-page">
+			<Container maxWidth="md" disableGutters>
+				{this.state.showModal && <Modal>
+					<div className="modal-box">
 
-			{this.state.showModal && <Modal>
-				<div className="modal-box">
+						<div className="title">Congratulations</div>
+						<div className="subtitle" style={{ margin: "10px 0px" }}>
+							Our Representative will soon contact you with further information.
+						</div>
 
-					<div className="title">Congratulations</div>
-					<div className="subtitle" style={{ margin: "10px 0px" }}>
-						Our Representative will soon contact you with further information.
+						<div className="button save" onClick={() => this.closeModal()}>
+							Great
+						</div>
 					</div>
+				</Modal>}
 
-					<div className="button save" onClick={() => this.closeModal()}>
-						Great
-					</div>
+
+				<img crossOrigin="anonymous" src={product.image && product.image.url} className="item-image" alt="Product" />
+				<div className="item-info">
+					<div className="title">{product.title}</div>
+					<div className="subtitle">{supplier_name}</div>
+					<div className="heading">{product.price}</div>
 				</div>
-			</Modal>}
 
+				{this.props.connected && !this.props.auth.token && <Link to="/log-in" className="order-button"> Login to Order Online</Link>}
+				{this.props.connected && this.props.auth.token && <div className="order-button" onClick={this.onOrder}> Request Information</div>}
 
-			<img crossOrigin="anonymous" src={product.image && product.image.url} className="item-image" alt="Product" />
-			<div className="item-info">
-				<div className="title">{product.title}</div>
-				<div className="subtitle">{supplier_name}</div>
-				<div className="heading">{product.price}</div>
-			</div>
+				<div className="description">{
+					product.description.split('\n')
+						.map((t, k) => <div key={k}>{t}</div>)
+				}</div>
 
-			{this.props.connected && !this.props.auth.token && <Link to="/log-in" className="order-button"> Login to Order Online</Link>}
-			{this.props.connected && this.props.auth.token && <div className="order-button" onClick={this.onOrder}> Request Information</div>}
+			</Container>
 
-			<div className="description">{
-				product.description.split('\n')
-					.map((t, k) => <div key={k}>{t}</div>)
-			}</div>
 			{/* {this.props.connected && !this.props.auth.token && <Link className="button blue" to="/sign-up">Sign up to Order Online</Link>}
 			{this.props.connected && this.props.auth.token && <div className="button blue" onClick={this.onOrder}>Request Information</div>} */}
 		</div>

@@ -177,24 +177,29 @@ const LessonPage: React.FC<Props> = ({ lessons, assessments, match, connected, l
 			and help us make Ilmexchange better for you.
 		</Typography>
 		</Container> : <div className="lb-list">
-				<blockquote>
-					<div className="blockquote-content" style={{ borderLeft: `6px solid ${getColorsFromChapter(chapter_name)}` }}>
+				<div className="styled-intro-box">
+					<div
+						className="bar"
+						style={{ background: `${getColorsFromChapter(chapter_name)}` }} />
+					<div className="box">
 						<Typography
-							variant="h6"
+							color="textSecondary"
+							variant="subtitle2"
 							align="left">
 							Lesson {chapter}
 						</Typography>
 						<Typography
-							className="heading"
-							variant="h4"
+							variant="h5"
+							color="primary"
 							align="left">
 							{chapter_name}
 						</Typography>
 					</div>
-				</blockquote>
+				</div>
 				<Typography
-					className="primary-ilmx"
-					variant="h4"
+					style={{ marginTop: "10px" }}
+					variant="h6"
+					color="primary"
 					align="left">
 					Lesson Videos
 				</Typography>
@@ -213,11 +218,11 @@ const LessonPage: React.FC<Props> = ({ lessons, assessments, match, connected, l
 						})
 				}
 				{filtered_assessments.length > 0 && <Typography
-					className="primary-ilmx"
-					style={{ marginTop: "0.75rem" }}
-					variant="h4"
+					color="primary"
+					style={{ marginTop: "10px" }}
+					variant="h6"
 					align="left">
-					Assessments
+					Practice
 				</Typography>}
 				{
 					filtered_assessments
@@ -235,9 +240,9 @@ const LessonPage: React.FC<Props> = ({ lessons, assessments, match, connected, l
 				}
 
 				{additional_videos.length > 0 && <Typography
-					className="primary-ilmx"
-					style={{ marginTop: "0.75rem" }}
-					variant="h4"
+					color="primary"
+					style={{ marginTop: "10px" }}
+					variant="h6"
 					align="left">
 					Additional Videos
 				</Typography>}

@@ -2,6 +2,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { Link } from 'react-router-dom'
+import { Container } from '@material-ui/core'
 
 import { getProducts } from '../../../actions'
 
@@ -37,44 +38,46 @@ class SupplierHomePage extends React.Component<P, S>{
 		const { banner, logo, name, description } = products[0][1].supplier_profile
 
 		return <div className="supplier-home">
+			<Container maxWidth="md" disableGutters>
 
-			<div className="tabs-banner" style={{
-				backgroundImage: `url(${banner && banner.url})`,
-				height: "300px"
-			}}>
-				<div className="supp-logo-container">
-					<img className="supplier-logo" crossOrigin="anonymous" src={logo && logo.url} alt="supplier-logo" />
-				</div>
-			</div>
-			<div className="tabs-home">
-				<div className="supplier-info">
-
-					<div className="supplier-desc">
-						<div className="title" style={{ marginLeft: "160px" }}>{name}</div>
-						<div className="subtitle" style={{ marginTop: "10px" }}>{description}</div>
+				<div className="tabs-banner" style={{
+					backgroundImage: `url(${banner && banner.url})`,
+					height: "300px"
+				}}>
+					<div className="supp-logo-container">
+						<img className="supplier-logo" crossOrigin="anonymous" src={logo && logo.url} alt="supplier-logo" />
 					</div>
 				</div>
-				<div className="item-row">
-					<div className="title">Products</div>
-					<div className="items">
-						{
-							products.map(([k, p]) => {
+				<div className="tabs-home">
+					<div className="supplier-info">
 
-								let img_url = ""
-								if (p.image && p.image.url) {
-									img_url = p.image.url.replace(/\.(png|jpg|jpeg|tif|gif)$/, "_thumb.png")
-								}
+						<div className="supplier-desc">
+							<div className="title" style={{ marginLeft: "160px" }}>{name}</div>
+							<div className="subtitle" style={{ marginTop: "10px" }}>{description}</div>
+						</div>
+					</div>
+					<div className="item-row">
+						<div className="title">Products</div>
+						<div className="items">
+							{
+								products.map(([k, p]) => {
 
-								return <Link className="item-card" to={`/supplier/${supplier_id}/${p.id}`} key={k}>
-									<img className="item-image" crossOrigin="anonymous" src={img_url} alt="product" />
-									<div className="subtitle">{p.title}</div>
-									<div>{p.price}</div>
-								</Link>
-							})
-						}
+									let img_url = ""
+									if (p.image && p.image.url) {
+										img_url = p.image.url.replace(/\.(png|jpg|jpeg|tif|gif)$/, "_thumb.png")
+									}
+
+									return <Link className="item-card" to={`/supplier/${supplier_id}/${p.id}`} key={k}>
+										<img className="item-image" crossOrigin="anonymous" src={img_url} alt="product" />
+										<div className="subtitle">{p.title}</div>
+										<div>{p.price}</div>
+									</Link>
+								})
+							}
+						</div>
 					</div>
 				</div>
-			</div>
+			</Container>
 		</div>
 	}
 

@@ -228,6 +228,24 @@
 					height: 20px;
 				}
 
+				.lb-list .styled-intro-box {
+					display: flex;
+					flex-direction: row;
+				}
+
+				.lb-list .styled-intro-box .bar {
+					width: 5px;
+					border-radius: 5px;
+					margin-right: 10px;
+				}
+				.lb-list .styled-intro-box .box {
+					width: 100%;
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+					margin: 10px 0px;
+				}
+
 /* ============== FOR MEDIUM PAGE==============*/
 
 .medium-page {
@@ -298,6 +316,27 @@
 	flex-direction: column;
 	width: 100%;
 }
+	.assessment-form .qs-row {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+	}
+		.qs-row .qs-img {
+			width: 40%;
+			object-fit: contain;
+		}
+	.assessment-form .ans-row {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		margin: 5px 0px;
+	}
+		.ans-row .ans-statement {
+			padding: 0px 5px;
+		}
+		.ans-row .ans-img {
+			height: 40px;
+		}
 
 @media only screen and (max-width: 767px) {
 
