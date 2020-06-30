@@ -1,10 +1,9 @@
 import React from 'react'
 import Container from '@material-ui/core/Container'
 import { Box, Grid, Button } from '@material-ui/core'
-import { YouTube, Phone } from '@material-ui/icons'
+import { YouTube, Phone, Facebook } from '@material-ui/icons'
 import Typography from '@material-ui/core/Typography'
 import { makeStyles } from '@material-ui/core/styles'
-import Link from '@material-ui/core/Link'
 
 type PropsType = {
 	hlink?: string
@@ -38,12 +37,23 @@ const useStyles = makeStyles((theme) => ({
 		fill: 'white',
 		background: '#4fce5d',
 		borderRadius: '50%'
+	},
+	fbIcon: {
+		fill: '#385898'
 	}
 }));
+
+// const handleFbUrl = () => {
+// 	setTimeout(() => {
+// 		window.location.href = "https://web.facebook.com/groups/ilmexchangediscussionforum/"
+// 	}, 25);
+// 	window.location.href = "fb://groups/ilmexchangediscussionforum/";
+// }
 
 const HelpFooter: React.FC<PropsType> = ({ hlink }) => {
 
 	const classes = useStyles();
+	const fbLink = "https://web.facebook.com/groups/ilmexchangediscussionforum/"
 
 	return (
 		<footer className={classes.footer}>
@@ -57,8 +67,8 @@ const HelpFooter: React.FC<PropsType> = ({ hlink }) => {
 								Need help?
 							</Typography>
 						</Grid>
-						<Grid container item xs={12} sm={8} justify="center" alignItems="center">
-							<Grid item xs={6} sm={4}>
+						<Grid container item xs={12} sm={9} spacing={1} justify="center">
+							<Grid item xs={6} sm={3}>
 								<Button
 									size="medium"
 									variant="outlined"
@@ -66,7 +76,7 @@ const HelpFooter: React.FC<PropsType> = ({ hlink }) => {
 									startIcon={<YouTube style={{ fill: "red" }} />}
 								> Tutorial </Button>
 							</Grid>
-							<Grid item xs={6} sm={4}>
+							<Grid item xs={6} sm={3}>
 								<Button
 									size="medium"
 									variant="outlined"
@@ -74,6 +84,15 @@ const HelpFooter: React.FC<PropsType> = ({ hlink }) => {
 									startIcon={<Phone className={classes.phoneIcon} />}
 									href={hlink}
 								> Contact Us </Button>
+							</Grid>
+							<Grid item xs={12} sm={3}>
+								<Button
+									size="medium"
+									variant="outlined"
+									className={classes.helpButton}
+									startIcon={<Facebook className={classes.fbIcon} />}
+									href={fbLink}
+								> Discussion </Button>
 							</Grid>
 						</Grid>
 					</Grid>

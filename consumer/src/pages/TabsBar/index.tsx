@@ -143,10 +143,10 @@ class TabsBar extends Component<propTypes, S> {
 					<TrackedRoute exact path="/student-profile" component={StudentProfile} />
 					<TrackedRoute exact path="/dashboard" component={SchoolDashboard} />
 				</>
-				{!library && <a className="contact-us" href={callLink}>
+				{/* {!library && <a className="contact-us" href={callLink}>
 					<img src={contactUs} alt="phone" />
 					<div>Contact Us</div>
-				</a>}
+				</a>} */}
 
 				{(current !== "/" && current !== "/bazaar" && current !== "/about-us") && <>
 					<HelpFooter hlink={callLink} />
