@@ -423,7 +423,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 					{:ok, number, db} ->
 						IO.puts "PROFILE FOUND"
 
-						school_id = Map.get(db,"ref_code")
+						school_id = Map.get(db,"refcode")
 						start_school(mis_id)
 						#register_connection(mis_id, client_id)
 						mis_db = Sarkar.School.get_db(mis_id)
