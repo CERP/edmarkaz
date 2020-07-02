@@ -18,16 +18,29 @@ defmodule EdMarkaz.Server.Analytics do
 		{:ok, data} = case EdMarkaz.DB.Postgres.query(
 			EdMarkaz.DB,
 			"SELECT
-				to_timestamp(time/1000)::time as time,
-				to_timestamp(time/1000)::date as date,
-				meta -> 'number' as phone,
-				meta -> 'ref_code' as school_id,
+				C.time,
+				date,
+				phone,
+				school_id,
 				client_id,
-				type
-			FROM consumer_analytics
-			WHERE type!='ROUTE'
-				AND type!='VIDEO'
-				AND type!='LOGIN'
+				type,
+				P.db -> 'school_name' as name,
+				P.db -> 'school_district' as district,
+				P.db -> 'school_tehsil' as tehsil
+			FROM (
+				SELECT
+					to_timestamp(time/1000)::time as time,
+					to_timestamp(time/1000)::date as date,
+					meta -> 'number' as phone,
+					meta ->> 'ref_code' as school_id,
+					client_id,
+					type
+				FROM consumer_analytics
+				WHERE type!='ROUTE'
+					AND type!='VIDEO'
+					AND type!='LOGIN'
+				) as C
+			JOIN platform_schools as P ON school_id = P.id
 			ORDER BY date DESC",
 			[]
 		) do
