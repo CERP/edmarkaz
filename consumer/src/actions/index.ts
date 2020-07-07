@@ -81,11 +81,11 @@ export const autoLogin = (user: string, school_id: string, client_id: string, to
 // 	profile: ILMXStudent
 // }
 
-export const verifyStudentToken = (token: string, std_id: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+export const createUniqueStudentLogin = (token: string, std_id: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 	const state = getState()
 
 	if (!state.connected) {
-		syncr.onNext('connect', () => dispatch(verifyStudentToken(token, std_id)))
+		syncr.onNext('connect', () => dispatch(createUniqueStudentLogin(token, std_id)))
 		return
 	}
 
@@ -118,7 +118,60 @@ export const verifyStudentToken = (token: string, std_id: string) => (dispatch: 
 				alert("not yet connected...")
 			}
 			else if (err === "timeout") {
-				setTimeout(() => dispatch(verifyStudentToken(token, std_id)), 2000)
+				setTimeout(() => dispatch(createUniqueStudentLogin(token, std_id)), 2000)
+			}
+			else {
+				dispatch({
+					type: "STUDENT_LOGIN",
+					user: undefined,
+					token: undefined,
+					id: undefined,
+					student: undefined,
+					school: undefined
+				})
+				alert("login failed" + JSON.stringify(err))
+				dispatch(submitError(err))
+			}
+		})
+}
+
+export const createGeneralStudentLogin = (token: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+	const state = getState()
+
+	if (!state.connected) {
+		syncr.onNext('connect', () => dispatch(createGeneralStudentLogin(token)))
+		return
+	}
+
+	dispatch({
+		type: "VERIFYING_USER"
+	})
+
+	syncr.send({
+		type: "VERIFY_STUDENT_TOKEN",
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		payload: {
+			token: token
+		}
+	})
+		.then((res: { token: string, number: string, school: Partial<CERPSchool> }) => {
+			dispatch({
+				type: "STUDENT_LOGIN",
+				user: "STUDENT",
+				token: res.token,
+				id: res.number,
+				school: res.school,
+				student: undefined
+			})
+			return res
+		})
+		.catch(err => {
+			if (err.message === "not ready") {
+				alert("not yet connected...")
+			}
+			else if (err === "timeout") {
+				setTimeout(() => dispatch(createGeneralStudentLogin(token)), 2000)
 			}
 			else {
 				dispatch({
@@ -277,33 +330,29 @@ export const getProducts = (filters = {}) => (dispatch: Dispatch, getState: GetS
 }
 
 export const trackAssessmentAnalytics = (path: string, score: number, total_score: number, assessment_meta: any) => (dispatch: Dispatch, getState: GetState) => {
-	const state = getState()
 
-	const meta = state.auth.user === "SCHOOL" ?
+	const state = getState()
+	const generalMeta = {
+		route: path.split("/").splice(1),
+		score,
+		total_score,
+		assessment_meta
+	}
+
+	const specificMeta = state.auth.user === "SCHOOL" || (state.auth.user === "STUDENT" && state.activeStudent === undefined) ?
 		{
-			route: path.split("/").splice(1),
 			refcode: state.sync_state.profile.refcode,
 			phone: state.sync_state.profile.phone_number,
-			user: state.auth.user,
-			score,
-			total_score,
-			assessment_meta
+			user: state.auth.user
 		} : state.auth.user === "STUDENT" ?
 			{
-				route: path.split("/").splice(1),
 				refcode: state.sync_state.profile.refcode,
 				phone: state.sync_state.profile.phone_number,
 				user: state.auth.user,
 				student_id: state.activeStudent && state.activeStudent.id,
-				score,
-				total_score,
-				assessment_meta
-			} : {
-				route: path.split("/").splice(1),
-				score,
-				total_score,
-				assessment_meta
-			}
+			} : {}
+
+	const meta = { ...generalMeta, ...specificMeta }
 
 	dispatch(analyticsEvent([{
 		type: "ASSESSMENT",
@@ -312,33 +361,29 @@ export const trackAssessmentAnalytics = (path: string, score: number, total_scor
 }
 
 export const trackVideoAnalytics = (path: string, chapter_id: string, lessons_id: string, time: number) => (dispatch: Dispatch, getState: GetState) => {
-	const state = getState()
 
-	const meta = state.auth.user === "SCHOOL" ?
+	const state = getState()
+	const generalMeta = {
+		route: path.split("/").splice(1),
+		chapter_id,
+		lessons_id,
+		time
+	}
+
+	const specificMeta = state.auth.user === "SCHOOL" || (state.auth.user === "STUDENT" && state.activeStudent === undefined) ?
 		{
-			route: path.split("/").splice(1),
 			refcode: state.sync_state.profile.refcode,
 			phone: state.sync_state.profile.phone_number,
-			user: state.auth.user,
-			chapter_id,
-			lessons_id,
-			time
+			user: state.auth.user
 		} : state.auth.user === "STUDENT" ?
 			{
-				route: path.split("/").splice(1),
 				refcode: state.sync_state.profile.refcode,
 				phone: state.sync_state.profile.phone_number,
 				user: state.auth.user,
-				chapter_id,
-				lessons_id,
-				time,
 				student_id: state.activeStudent && state.activeStudent.id
-			} : {
-				route: path.split("/").splice(1),
-				chapter_id,
-				lessons_id,
-				time
-			}
+			} : {}
+
+	const meta = { ...generalMeta, ...specificMeta }
 
 	dispatch(analyticsEvent([{
 		type: "VIDEO",

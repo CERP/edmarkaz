@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Redirect, RouteComponentProps } from 'react-router'
 import qs from 'query-string'
-import { verifyStudentToken, createGuestStudentLogin } from '../../actions'
+import { createUniqueStudentLogin, createGeneralStudentLogin, createGuestStudentLogin } from '../../actions'
 import LoadingIcon from '../../icons/load.svg'
 import './style.css'
 
@@ -13,11 +13,12 @@ type P = {
 	auth: RootReducerState["auth"]
 	connected: boolean
 	activeStudent: RootReducerState["activeStudent"]
-	verifyStudentToken: (token: string, std_id: string) => void
+	createUniqueStudentLogin: (token: string, std_id: string) => void
+	createGeneralStudentLogin: (token: string) => void
 	createGuestStudentLogin: () => void
 } & RouteComponentProps<RouteInfo>
 
-const StudentRouter: React.FC<P> = ({ connected, auth, location, history, activeStudent, verifyStudentToken, createGuestStudentLogin }) => {
+const StudentRouter: React.FC<P> = ({ connected, auth, location, history, activeStudent, createUniqueStudentLogin, createGeneralStudentLogin, createGuestStudentLogin }) => {
 
 	const params = qs.parse(location.search)
 
@@ -33,7 +34,11 @@ const StudentRouter: React.FC<P> = ({ connected, auth, location, history, active
 	}
 
 	if (connected && student_token && std_id && !auth.verifying_user) {
-		verifyStudentToken(student_token, std_id)
+		createUniqueStudentLogin(student_token, std_id)
+	}
+
+	if (connected && student_token && !std_id && !auth.verifying_user) {
+		createGeneralStudentLogin(student_token)
 	}
 
 	// const createGuestLogin = () => {
@@ -74,6 +79,7 @@ export default connect((state: RootReducerState) => ({
 	auth: state.auth,
 	activeStudent: state.activeStudent
 }), (dispatch: Function) => ({
-	verifyStudentToken: (token: string, std_id: string) => dispatch(verifyStudentToken(token, std_id)),
+	createUniqueStudentLogin: (token: string, std_id: string) => dispatch(createUniqueStudentLogin(token, std_id)),
+	createGeneralStudentLogin: (token: string) => dispatch(createGeneralStudentLogin(token)),
 	createGuestStudentLogin: () => dispatch(createGuestStudentLogin())
 }))(StudentRouter)

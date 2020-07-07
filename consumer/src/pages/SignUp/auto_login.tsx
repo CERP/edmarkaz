@@ -14,17 +14,12 @@ interface p {
 const AutoLogin: React.FC<p & RouteComponentProps> = ({ connected, auth, createAutoLogin, location }) => {
 
 	const params = qs.parse(location.search)
-
 	const user = params.type && params.type.toString()
-	console.log("user", user)
 	const school_id = params.id && params.id.toString()
-	console.log("school_id", school_id)
 	const token = params.key && params.key.toString()
-	console.log("token", token)
 	const client_id = params.cid && params.cid.toString()
-	console.log("client_id", client_id)
 	const phone = params.phone && params.phone.toString()
-	console.log("phone", phone)
+
 
 	//will need to handle both teacher and school
 	if (auth.token && auth.user === user) {
@@ -35,7 +30,6 @@ const AutoLogin: React.FC<p & RouteComponentProps> = ({ connected, auth, createA
 	}
 
 	if (connected && !auth.token && !auth.loading && user && school_id && token && phone && client_id) {
-		console.log("Have Everythin to auto login dfsfdsf")
 		createAutoLogin(user, school_id, client_id, token, phone)
 	}
 
