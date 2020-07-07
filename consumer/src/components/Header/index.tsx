@@ -23,3 +23,9 @@ const Header = ({ path, history }: Props) => {
 export default connect((state: RootReducerState) => ({
 	auth: state.auth
 }))(withRouter(Header));
+
+export const PublicHeader = () => {
+	return <div className="header-tabs heading">
+		<Link to="/" className="logo" />
+	</div>
+}

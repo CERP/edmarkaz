@@ -12,12 +12,14 @@ import login from './pages/SignUp/login'
 import OptionsMobile from './pages/Front/front_mob'
 import School from './pages/School'
 import AutoLogin from './pages/SignUp/auto_login'
+import AppPrivacy from 'pages/Privacy'
 
 const Routes = ({ store }: { store: Store }) => (
 	<Provider store={store}>
 		<BrowserRouter>
 			<Switch>
 				<TrackedRoute exact path="/" component={FrontPage} />
+				<TrackedRoute path="/privacy" component={AppPrivacy} />
 				<TrackedRoute exact path="/about-us" component={AboutUs} />
 				<TrackedRoute exact path="/start-mob" component={OptionsMobile} />
 				<TrackedRoute path="/auth/:token" component={TokenAuth} />
