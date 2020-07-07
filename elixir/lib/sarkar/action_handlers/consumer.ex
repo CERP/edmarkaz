@@ -477,6 +477,55 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 
 	def handle_action(
 		%{
+			"type" => "VERIFY_STUDENT_TOKEN",
+			"client_id" => client_id,
+			"payload" => %{
+				"token" => number,
+			}
+		},
+		state
+	) do
+		case EdMarkaz.School.get_profile(number) do
+			{:ok, school_id, db} ->
+
+				case EdMarkaz.Auth.gen_token(number, client_id) do
+					{:ok, token} ->
+
+						spawn fn ->
+							time = :os.system_time(:millisecond)
+							case Sarkar.Analytics.Consumer.record(
+								client_id,
+								%{ "#{UUID.uuid4}" => %{
+										"type" => "STUDENT_LINK_SIGNUP",
+										"meta" => %{
+											"number" => number,
+											"ref_code" => school_id,
+										},
+										"time" => time
+									}
+								},
+								time
+							) do
+								%{"type" => "CONFIRM_ANALYTICS_SYNC", "time" => _} ->
+									IO.puts "STUDENT_LINK_SIGNUP ANALYTICS SUCCESS"
+								%{"type" => "ANALYTICS_SYNC_FAILED"} ->
+									IO.puts "STUDENT_LINK_SIGNUP ANALYTICS FAILED"
+							end
+						end
+
+						{:reply, succeed(%{"token" => token, "number" => number, "school" => db }), %{id: number, client_id: client_id }}
+					{:error, msg} ->
+						IO.inspect msg
+						{:reply, fail(%{"msg" => msg}), state}
+				end
+
+			{:error, msg} ->
+				{:reply, fail(%{"msg" => msg}), state}
+		end
+	end
+
+	def handle_action(
+		%{
 			"type" => "SAVE_STUDENT_INFORMATION",
 			"client_id" => client_id,
 			"payload" => %{
