@@ -92,8 +92,7 @@ const StudentPortalOptions: React.FC<Props> = ({
     "Chemistry",
   ];
   const medium = match.params.medium;
-  const classGrade = match.params.grade ? match.params.grade : "";
-  const [grade, setGrade] = useState("");
+  const grade = match.params.grade ? match.params.grade : "";
 
   return lesson_loading ? (
     <div className="loading">
@@ -105,8 +104,8 @@ const StudentPortalOptions: React.FC<Props> = ({
       {lessons[medium] ? (
         <Container maxWidth="md">
           <div className="row">
-            {classGrade === "" && <div className="title">Select Class</div>}
-            {classGrade === "" ? (
+            {grade === "" && <div className="title">Select Class</div>}
+            {grade === "" ? (
               <div className="content">
                 {lessons[medium]["Preschool"] && (
                   <Link to={`/library/${medium}/${`Preschool`}`}>
@@ -125,9 +124,7 @@ const StudentPortalOptions: React.FC<Props> = ({
                     return (
                       <Link to={`/library/${medium}/${g}`}>
                         <div
-                          className={
-                            classGrade === g ? "bg-blue oval " : "oval"
-                          }
+                          className={grade === g ? "bg-blue oval " : "oval"}
                           key={g}
                         >{`Class ${g}`}</div>
                       </Link>
@@ -137,18 +134,18 @@ const StudentPortalOptions: React.FC<Props> = ({
             ) : (
               <div className="content selected">
                 <div className="bg-blue oval">
-                  {classGrade !== "Preschool" && classGrade !== "KG"
-                    ? `Class ${classGrade}`
-                    : classGrade}
+                  {grade !== "Preschool" && grade !== "KG"
+                    ? `Class ${grade}`
+                    : grade}
                 </div>
               </div>
             )}
           </div>
-          {classGrade && classGrade && (
+          {grade && grade && (
             <div className="row">
               <div className="title">Select Subject</div>
               <div className="content">
-                {Object.keys(lessons[medium][classGrade])
+                {Object.keys(lessons[medium][grade])
                   .sort((a, b) =>
                     subjectSortArray.indexOf(a) < subjectSortArray.indexOf(b)
                       ? -1
@@ -157,7 +154,7 @@ const StudentPortalOptions: React.FC<Props> = ({
                   .map((s) => {
                     return (
                       <Link
-                        to={`/library/${medium}/${classGrade}/${s}`}
+                        to={`/library/${medium}/${grade}/${s}`}
                         className="square subject"
                         style={{
                           backgroundImage: `url(${getIconsFromSubject(s)})`,
