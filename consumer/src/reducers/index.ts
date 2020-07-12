@@ -1,7 +1,18 @@
 import Dynamic from '@ironbay/dynamic'
 
 import { MERGES, MergeAction, ON_CONNECT, ON_DISCONNECT, DELETES, DeletesAction, QUEUE, CONFIRM_SYNC_DIFF, ConfirmSyncAction, SnapshotDiffAction, SNAPSHOT_DIFF, LOGIN_SUCCEED, LoginSucceed, ConfirmAnalyticsSync, QueueAction } from '../actions/core'
-import { ADD_PRODUCTS, LOAD_PROFILE, ADD_COURSES, ADD_COURSES_ACTION, STUDENT_LOGIN_ACTION, ADD_ASSESSMENT_ACTION, /*SET_ACTIVE_STUDENT_ACTION*/ } from '../actions'
+import {
+	ADD_PRODUCTS,
+	LOAD_PROFILE,
+	ADD_COURSES,
+	ADD_COURSES_ACTION,
+	STUDENT_LOGIN_ACTION,
+	ADD_ASSESSMENT_ACTION,
+	GET_ANALYTICS_EVENTS,
+	GET_ANALYTICS_EVENTS_SUCCESS,
+	GET_ANALYTICS_EVENTS_FAILURE
+} from '../actions'
+
 import { AnyAction } from 'redux';
 
 const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerState => {
@@ -320,6 +331,35 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 						loading: false,
 						db: assessments
 					}
+				}
+			}
+
+		case GET_ANALYTICS_EVENTS:
+			return {
+				...state,
+				analytics_events: {
+					...state.analytics_events,
+					is_loading: true,
+					has_error: false
+				}
+			}
+		case GET_ANALYTICS_EVENTS_SUCCESS:
+			return {
+				...state,
+				analytics_events: {
+					...state.analytics_events,
+					...action.payload as any,
+					isLoading: false,
+					hasError: false
+				}
+			}
+		case GET_ANALYTICS_EVENTS_FAILURE:
+			return {
+				...state,
+				analytics_events: {
+					...state.analytics_events,
+					is_loading: false,
+					has_error: true
 				}
 			}
 		case "AUTO_LOGIN":

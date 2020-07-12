@@ -608,6 +608,62 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 			end
 	end
 
+	def handle_action(
+		%{
+			"type" => "GET_ANALYTICS_EVENTS",
+			"payload" => %{
+				"refcode" => refcode
+			}
+		},
+		%{ client_id: client_id, id: id } = state
+	) do
+		case handle_action_query(refcode) do
+			{:ok, events} ->
+				IO.inspect events
+				{:reply, succeed(events), state}
+			{:error, err} ->
+				IO.inspect err
+				{:reply, fail(err), state}
+		end
+	end
+
+	def handle_action_query(refcode) do
+
+		raw_query = "SELECT id, client_id, time, type, meta FROM consumer_analytics WHERE meta->>'ref_code'=$1 OR meta->>'refcode'=$1"
+
+		case EdMarkaz.DB.Postgres.query(
+			EdMarkaz.DB,
+			raw_query,
+			[refcode]
+		) do
+			{:ok, resp } ->
+				events = resp.rows |> Enum.reduce(
+					%{
+						"signup_events" => %{},
+						"video_events" => %{},
+						"assessment_events" => %{}
+					},
+					fn [id, client_id, time, type, meta], acc ->
+						case type do
+							"STUDENT_LINK_SIGNUP" ->
+								Dynamic.put(acc, ["signup_events", client_id], time)
+							"VIDEO" ->
+								Dynamic.put(acc, ["video_events", id, client_id, time], meta)
+							"ASSESSMENTS" ->
+								Dynamic.put(acc, ["assessment_events", id, client_id, time], meta)
+							_ ->
+								acc
+						end
+					end)
+
+				{:ok, events}
+
+			{:error, err} ->
+				{:error, err}
+		end
+
+	end
+
 	def handle_action(%{"type" => "GET_PRODUCTS", "last_sync" => last_sync}, state) do
 
 		dt = DateTime.from_unix!(last_sync, :millisecond)
