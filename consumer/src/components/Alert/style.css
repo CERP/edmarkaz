@@ -1,0 +1,14 @@
+.alert-bar {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	padding: 5px;
+	margin: 10px 0px;
+	border-radius: 5px;
+	color: #ffffff;
+	background: #ff9800;
+	min-height: 30px;
+}
+.alert-bar > * {
+	margin: 0px 5px;
+}

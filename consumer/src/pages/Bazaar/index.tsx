@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import Arrow from '../../icons/arrow.svg'
 import { getProducts } from '../../actions';
 import { Container } from '@material-ui/core';
+import Alert from 'components/Alert';
 
 import './style.css'
 
@@ -86,6 +87,7 @@ class LoggedOutHome extends React.Component<P, S> {
 				<img className="banner-img" src={banner} />
 			</div> */}
 			<Container maxWidth="md">
+				<Alert text="The bazaar service is currently suspended due to COVID-19. Please contact 03481191119 for more information." />
 				<div className="tabs-home">
 					{
 						sorted

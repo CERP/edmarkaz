@@ -8,9 +8,10 @@ import Modal from '../../../components/Modal'
 import { List, ListItem, ListItemIcon, Typography, Divider, Container, Avatar } from '@material-ui/core'
 import BorderColorIcon from '@material-ui/icons/BorderColor';
 import { getColorsFromChapter } from 'utils/getColorsFromChapter'
+import { getIDFromYoutbeLink } from 'utils/getIdFromYoutubeLink'
+import AssessmentForm from './AssessmentForm'
 
 import "../style.css"
-import AssessmentForm from './AssessmentForm'
 
 interface P {
 	lessons: RootReducerState["lessons"]["db"]
@@ -30,19 +31,6 @@ interface RouteInfo {
 }
 
 type Props = P & RouteComponentProps<RouteInfo>
-
-const getIDFromYoutbeLink = (link: string) => {
-
-	// eslint-disable-next-line
-	const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-	const match = link.match(regExp);
-
-	if (match && match[2].length === 11) {
-		return match[2]
-	}
-
-	return ""
-}
 
 const LessonPage: React.FC<Props> = ({ lessons, assessments, match, connected, location, trackVideoAnalytics, trackAssessmentAnalytics }) => {
 
