@@ -14,13 +14,11 @@ defmodule Sarkar.ActionHandler.Mis do
 		},
 		state
 	) do
-
-		IO.puts ilmx_school_id
-		IO.puts school_id
+		IO.puts "Handling MIS-Auto Login for #{school_id}"
+		time = :os.system_time(:millisecond)
 		#verifying the ilmx info
 		case Sarkar.Auth.verify({school_id, ilmx_client_id, token}) do
 			{:ok, message} ->
-				IO.puts "HELLO"
 				case EdMarkaz.DB.Postgres.query(
 					EdMarkaz.DB,
 					"SELECT phone, mis_id, ilmx_id FROM ilmx_to_mis_mapper WHERE ilmx_id=$1",
@@ -28,17 +26,17 @@ defmodule Sarkar.ActionHandler.Mis do
 				) do
 					{:ok, %Postgrex.Result{num_rows: 0}} ->
 						IO.puts "NOT IN ILMX/MIS MAPPER"
-						IO.puts "Putting in table"
+						# Putting in table
 						{:ok, resp} = EdMarkaz.DB.Postgres.query(
 							EdMarkaz.DB,
 							"INSERT INTO ilmx_to_mis_mapper (phone, mis_id, ilmx_id) VALUES ($1,$2,$3)",
 							[school_id, school_id, ilmx_school_id]
 						)
-						IO.puts "Generating Token"
+						# Generating Token
 						case Sarkar.Auth.gen_token(school_id, client_id) do
 							{:ok, new_token} ->
-								IO.puts "Logging IN"
-								IO.puts "Creating new school with ilmx creds"
+								# Logging IN
+								# Creating new school with ilmx creds
 								parent = self()
 
 								start_school(school_id)
@@ -55,6 +53,26 @@ defmodule Sarkar.ActionHandler.Mis do
 									}})
 								end
 
+								value = %{
+									"area_manager_name" => "ILMX_AUTO",
+									"type_of_login" => "ILMX_AUTO"
+								}
+
+								spawn fn ->
+									case EdMarkaz.DB.Postgres.query(
+										EdMarkaz.DB,
+										"INSERT INTO mischool_referrals (id, time, value) VALUES ($1, $2, $3)",
+										[school_id, time, value]
+									) do
+										{:ok, resp} ->
+											IO.puts "Dashboard entry successfull for school #{school_id}"
+										{:error, err} ->
+											IO.inspect err
+											IO.puts "Saving auto login info for school #{school_id} in the Mis dashboard failed "
+									end
+								end
+								{:ok, _resp} = EdMarkaz.Slack.send_alert("Successful MIS Auto login Signup for id #{school_id}","#platform-dev")
+
 								{:reply, succeed(%{status: "SUCCESS", "number": school_id}), %{school_id: school_id, client_id: client_id}}
 							{:error, err} ->
 								IO.puts "Erorr while generating token in auto login"
@@ -63,7 +81,7 @@ defmodule Sarkar.ActionHandler.Mis do
 					{:ok, resp} ->
 						IO.puts "Found in ILMX/MIS Mapper"
 						[[phone, mis_id, ilmx_id ]] = resp.rows
-						IO.puts "Generating token"
+						# Generating token"
 						case Sarkar.Auth.gen_token(mis_id, client_id) do
 							{:ok, new_token} ->
 								parent = self()
@@ -73,7 +91,6 @@ defmodule Sarkar.ActionHandler.Mis do
 
 								spawn fn ->
 									db = Sarkar.School.get_db(mis_id)
-
 									send(parent, {:broadcast, %{
 										"type" => "LOGIN_SUCCEED",
 										"db" => db,
@@ -84,7 +101,7 @@ defmodule Sarkar.ActionHandler.Mis do
 
 								{:reply, succeed(%{status: "SUCCESS", "number": phone}), %{school_id: mis_id, client_id: client_id}}
 							{:error, err} ->
-								IO.puts "Erorr while generating token in auto login"
+								IO.puts "Error while generating token in auto login"
 								{:reply, fail(err), %{}}
 						end
 					{:error, err} ->
