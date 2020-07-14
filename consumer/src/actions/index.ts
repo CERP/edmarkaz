@@ -643,11 +643,11 @@ export const fetchAnalyticsEvents = () => (dispatch: Dispatch, getState: () => R
 		}
 	})
 		.then(res => {
-			console.log("HAS EVENTS", res)
+			console.log("Events fetch success")
 			dispatch(getAnalyticsEventsSuccess(res))
 		})
 		.catch(err => {
-			console.log("HAS EVENTS ERROR")
+			console.log("Unable to fetch events")
 			dispatch(getAnalyticsEventsFailure())
 		})
 }

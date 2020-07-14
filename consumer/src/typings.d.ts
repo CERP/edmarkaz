@@ -140,26 +140,40 @@ interface SignupEvents {
 }
 
 interface VideoEvents {
-	[id: string]: {
-		[client_id: string]: {
-			[timestamp: number]: {
-				time: number
-				user: string
-				phone: string
-				route: string[]
-				refcode: string
-				chapter_id: string
-				lesson_id: string
-				student_id: string
-			}
+	[client_id: string]: {
+		[timestamp: number]: {
+			time: number
+			user: string
+			phone: string
+			route: string[]
+			refcode: string
+			chapter_id: string
+			lesson_id: string
+			student_id: string
 		}
 	}
 }
 interface AssessmentEvents {
-	[id: string]: {
-		[client_id: string]: {
-			[timestamp: number]: {
-
+	[client_id: string]: {
+		[timestamp: number]: {
+			user: string
+			phone: string
+			route: string[]
+			refcode: string
+			student_id: string
+			total_score: number
+			score: number
+			assessment_meta: {
+				medium: string
+				subject: string
+				chapter_id: string
+				lesson_id: string
+				attempt_time: number
+				excercise_id: string
+				total_duration: number
+				wrong_responses: {
+					[id: string]: boolean
+				}
 			}
 		}
 	}

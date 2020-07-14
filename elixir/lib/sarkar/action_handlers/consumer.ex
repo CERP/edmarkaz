@@ -619,7 +619,6 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 	) do
 		case handle_action_query(refcode) do
 			{:ok, events} ->
-				IO.inspect events
 				{:reply, succeed(events), state}
 			{:error, err} ->
 				IO.inspect err
@@ -629,7 +628,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 
 	def handle_action_query(refcode) do
 
-		raw_query = "SELECT id, client_id, time, type, meta FROM consumer_analytics WHERE meta->>'ref_code'=$1 OR meta->>'refcode'=$1"
+		raw_query = "SELECT client_id, time, type, meta FROM consumer_analytics WHERE meta->>'ref_code'=$1 OR meta->>'refcode'=$1"
 
 		case EdMarkaz.DB.Postgres.query(
 			EdMarkaz.DB,
@@ -643,14 +642,14 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 						"video_events" => %{},
 						"assessment_events" => %{}
 					},
-					fn [id, client_id, time, type, meta], acc ->
+					fn [client_id, time, type, meta], acc ->
 						case type do
 							"STUDENT_LINK_SIGNUP" ->
 								Dynamic.put(acc, ["signup_events", client_id], time)
 							"VIDEO" ->
-								Dynamic.put(acc, ["video_events", id, client_id, time], meta)
-							"ASSESSMENTS" ->
-								Dynamic.put(acc, ["assessment_events", id, client_id, time], meta)
+								Dynamic.put(acc, ["video_events", client_id, time], meta)
+							"ASSESSMENT" ->
+								Dynamic.put(acc, ["assessment_events", client_id, time], meta)
 							_ ->
 								acc
 						end

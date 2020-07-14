@@ -28,15 +28,16 @@ interface TabPanelProps {
 }
 
 interface PropsType {
+	lessons: RootReducerState["lessons"]["db"]
 	analytics_events: RootReducerState["analytics_events"]
 }
 
-const DashboardGraphs: React.FC<PropsType> = ({ analytics_events }) => {
+const DashboardGraphs: React.FC<PropsType> = ({ analytics_events, lessons }) => {
 
 	const classes = useStyles()
 	const [value, setValue] = React.useState(0)
 
-	const { signup_events, video_events, assessment_events, is_loading, has_error } = analytics_events
+	const { signup_events, video_events, assessment_events } = analytics_events
 
 	const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
 		setValue(newValue)
@@ -80,7 +81,7 @@ const DashboardGraphs: React.FC<PropsType> = ({ analytics_events }) => {
 			<TabPanel value={value} index={3}>
 				<Typography variant="h5" className={classes.heading} >Most viewed Videos</Typography>
 				<Card style={{ padding: "1.5rem" }}>
-					<MostWatchedLessons video_events={video_events} />
+					<MostWatchedLessons video_events={video_events} lessons={lessons} />
 				</Card>
 			</TabPanel>
 		</div>
