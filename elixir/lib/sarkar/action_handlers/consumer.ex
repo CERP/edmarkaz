@@ -578,7 +578,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 		{:reply, succeed(), state}
 
 	end
-
+	#For logged In
 	def handle_action(
 		%{
 			"type" => "GET_ASSESSMENTS",
@@ -606,6 +606,17 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 					IO.inspect err
 					{:reply, fail(err), state}
 			end
+	end
+
+	#For logged Out i.e Guest Students
+	def handle_action(
+		%{
+			"type" => "GET_ASSESSMENTS",
+			"payload" => payload
+		},
+		state
+	) do
+		{:reply, succeed(%{}), state}
 	end
 
 	def handle_action(
@@ -660,7 +671,6 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 			{:error, err} ->
 				{:error, err}
 		end
-
 	end
 
 	def handle_action(%{"type" => "GET_PRODUCTS", "last_sync" => last_sync}, state) do
