@@ -39,9 +39,7 @@ const SchoolDashboard: React.FC<PropsType> = ({ auth, client_id, profile, getAna
 	const [open, setOpen] = useState(false)
 
 	useEffect(() => {
-		setTimeout(() => {
-			getAnalyticsEvents()
-		}, 3000)
+		getAnalyticsEvents()
 	}, [])
 
 	const { id, token } = auth

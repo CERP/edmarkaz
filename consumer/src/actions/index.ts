@@ -629,6 +629,11 @@ export const getAnalyticsEventsFailure = () => ({
 
 export const fetchAnalyticsEvents = () => (dispatch: Dispatch, getState: () => RootReducerState, syncr: Syncr) => {
 
+	if (!syncr.ready) {
+		syncr.onNext('connect', () => dispatch(fetchAnalyticsEvents()))
+		return;
+	}
+
 	const state = getState()
 	// start loading
 	dispatch(getAnalyticsEvents())
