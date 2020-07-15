@@ -46,6 +46,26 @@ defmodule Sarkar.Auth.Dashboard do
 		end
 	end
 
+	def updateSchoolId({old_id, new_id}) do
+		case EdMarkaz.DB.Postgres.query(
+			EdMarkaz.School.DB,
+			"UPDATE auth SET id=$2 WHERE id=$1",
+			[old_id, new_id]
+			) do
+				{:ok, _res} ->
+					case EdMarkaz.DB.Postgres.query(EdMarkaz.School.DB,
+					"UPDATE flattened_schools SET school_id=$2 WHERE school_id=$1",
+					[old_id, new_id]
+					) do
+						{:ok, _res} ->
+							{:ok, "updated #{old_id} with #{new_id}"}
+					end
+				{:error, err} ->
+					IO.inspect err
+					{:error, "unable to update"}
+		end
+	end
+
 	def hash(text, length) do
 		:crypto.hash(:sha512, text)
 		|> Base.url_encode64

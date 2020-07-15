@@ -595,6 +595,42 @@ defmodule Sarkar.ActionHandler.Dashboard do
 		end
 	end
 
+	def handle_action(%{
+		"type" => "UPDATE_SCHOOL_ID",
+		"client_id" => _client_id,
+		"payload" => %{
+			"old_school_id" => old_school_id,
+			"new_school_id" => new_school_id
+		}
+	},
+	%{id: id, client_id: client_id } = state)
+	do
+		case Sarkar.Auth.Dashboard.updateSchoolId({old_school_id, new_school_id}) do
+			{:ok, resp} ->
+				{:reply, succeed(resp), state}
+			{:err, err} ->
+				{:reply, fail(err), state}
+		end
+	end
+
+	def handle_action(%{
+		"type" => "UPDATE_LOGIN_INFO",
+		"client_id" => _client_id,
+		"payload" => %{
+			"school_id" => school_id,
+			"value" => value
+		}
+	},
+	%{id: id, client_id: client_id } = state)
+	do
+		case Sarkar.Auth.update_referrals_info({school_id, value}) do
+			{:ok, resp} ->
+				{:reply, succeed(resp), state}
+			{:err, err} ->
+				{:reply, fail(err), state}
+		end
+	end
+
 	defp fail(message) do
 		%{type: "failure", payload: message}
 	end
