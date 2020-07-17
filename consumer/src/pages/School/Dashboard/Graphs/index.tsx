@@ -54,10 +54,10 @@ const DashboardGraphs: React.FC<PropsType> = ({ analytics_events, lessons }) => 
 					textColor="primary"
 					aria-label="dashboard graph tabs"
 				>
-					<Tab label="Students Enrolled" icon={<StudentEnrollmentIcon />}  {...a11yProps(0)} />
-					<Tab label="Recent Logins" icon={<RecentLoginActivityIcon />}  {...a11yProps(1)} />
-					<Tab label="Recent Activity" icon={<RecentVideoActivityIcon />} {...a11yProps(2)} />
-					<Tab label="Most viewed" icon={<TopWatchIcon />} {...a11yProps(3)} />
+					<Tab label="Students Enrolled" icon={<StudentEnrollmentIcon />} />
+					<Tab label="Recent Logins" icon={<RecentLoginActivityIcon />} />
+					<Tab label="Recent Activity" icon={<RecentVideoActivityIcon />} />
+					<Tab label="Most viewed" icon={<TopWatchIcon />} />
 				</Tabs>
 			</AppBar>
 			<TabPanel value={value} index={0}>
@@ -110,12 +110,6 @@ function TabPanel(props: TabPanelProps) {
 	)
 }
 
-function a11yProps(index: any) {
-	return {
-		id: `scrollable-force-tab-${index}`,
-		'aria-controls': `scrollable-force-tabpanel-${index}`,
-	}
-}
 
 const useStyles = makeStyles((theme: Theme) => ({
 	dashboardGraph: {

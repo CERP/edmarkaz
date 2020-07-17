@@ -118,10 +118,8 @@ const SchoolDashboard: React.FC<PropsType> = ({ auth, client_id, profile, getAna
 						</IconButton>
 					}
 				/>
+				<DashboardGraphs analytics_events={analytics_events} lessons={lessons_data} />
 			</Paper>
-		</Container>
-		<Container className={classes.container} maxWidth="md">
-			<DashboardGraphs analytics_events={analytics_events} lessons={lessons_data} />
 		</Container>
 		<Snackbar
 			anchorOrigin={{

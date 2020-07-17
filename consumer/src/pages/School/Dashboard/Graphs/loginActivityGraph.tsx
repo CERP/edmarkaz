@@ -13,6 +13,7 @@ interface P {
 
 type GraphData = {
 	date: number
+	timestamp: number
 	logins_count: number
 }
 
@@ -69,7 +70,7 @@ export default LoginActivityGraph
 
 const computeGraphData = (video_events: VideoEvents, assessment_events: AssessmentEvents, date_filter: number) => {
 
-	let login_activity: { [date: number]: string[] } = {}
+	let login_activity: { [date: number]: { clients: string[]; timestamp: number } } = {}
 
 	const merge_activities = [...Object.entries(video_events), ...Object.entries(assessment_events)]
 
@@ -85,12 +86,19 @@ const computeGraphData = (video_events: VideoEvents, assessment_events: Assessme
 				if (login_activity[date]) {
 					login_activity = {
 						...login_activity,
-						[date]: [...login_activity[date], client_id]
+						[date]: {
+							...login_activity[date],
+							clients: [...login_activity[date].clients, client_id]
+						}
 					}
 				} else {
 					login_activity = {
 						...login_activity,
-						[date]: [client_id]
+						[date]: {
+							//@ts-ignore
+							timestamp: parseInt(timestamp),
+							clients: [client_id]
+						}
 					}
 				}
 			}
@@ -98,15 +106,16 @@ const computeGraphData = (video_events: VideoEvents, assessment_events: Assessme
 	}
 
 	return Object.entries(login_activity)
-		.reduce<GraphData[]>((agg, [date, clients]) => {
+		.reduce<GraphData[]>((agg, [date, item]) => {
 
-			const unique_clients_count = new Set(clients).size
+			const unique_clients_count = new Set(item.clients).size
 
 			return [
 				...agg,
 				{
 					"date": parseInt(date),
-					"logins_count": unique_clients_count
+					"logins_count": unique_clients_count,
+					"timestamp": item.timestamp
 				}
 			]
 		}, [])
@@ -132,11 +141,13 @@ interface PointLabelProps {
 const PointLabel: React.FC<PointLabelProps> = ({ payload, active }): any => {
 
 	if (active && payload[0]) {
+
 		const item = payload[0].payload
+
 		return <div className="custom-tooltip">
 			<div className="row" style={{ width: "100%" }}>
 				<label>Date:</label>
-				<div>{item.date}</div>
+				<div>{moment(item.timestamp).format("MM/DD/YYYY")}</div>
 			</div>
 			<div className="row" style={{ width: "100%" }}>
 				<label>No. of logins:</label>

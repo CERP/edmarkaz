@@ -11,6 +11,7 @@ interface P {
 
 type GraphData = {
 	date: number
+	timestamp: number
 	student_count: number
 }
 
@@ -67,7 +68,7 @@ export default EnrollmentGraph
 
 const computeGraphData = (events: SignupEvents, date_filter: number) => {
 
-	let signup_activity: { [date: number]: number } = {}
+	let signup_activity: { [date: number]: { count: number; timestamp: number } } = {}
 
 	for (const [, timestamp] of Object.entries(events)) {
 
@@ -81,12 +82,19 @@ const computeGraphData = (events: SignupEvents, date_filter: number) => {
 			if (signup_activity[date]) {
 				signup_activity = {
 					...signup_activity,
-					[date]: signup_activity[date] + 1
+					[date]: {
+						...signup_activity[date],
+						count: signup_activity[date].count + 1
+					}
 				}
 			} else {
 				signup_activity = {
 					...signup_activity,
-					[date]: 1
+					[date]: {
+						count: 1,
+						//@ts-ignore
+						timestamp: parseInt(timestamp)
+					}
 				}
 			}
 		}
@@ -94,12 +102,13 @@ const computeGraphData = (events: SignupEvents, date_filter: number) => {
 
 	return Object.entries(signup_activity)
 		.reduce<GraphData[]>((agg, curr) => {
-			const [date, count] = curr
+			const [date, item] = curr
 			return [
 				...agg,
 				{
 					"date": parseInt(date),
-					"student_count": count
+					"student_count": item.count,
+					"timestamp": item.timestamp
 				}
 			]
 		}, [])
@@ -130,7 +139,7 @@ const PointLabel: React.FC<PointLabelProps> = ({ payload, active }): any => {
 		return <div className="custom-tooltip">
 			<div className="row" style={{ width: "100%" }}>
 				<label>Date:</label>
-				<div>{item.date}</div>
+				<div>{moment(item.timestamp).format("MM/DD/YYYY")}</div>
 			</div>
 			<div className="row" style={{ width: "100%" }}>
 				<label>Enrolled Students:</label>

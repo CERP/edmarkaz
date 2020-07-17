@@ -3,11 +3,8 @@ import moment from 'moment'
 
 import { getTimeString } from 'utils/helper'
 
-import SortDescendingIcon from 'icons/dashboard/react/SortDescending'
-import SortAscendingIcon from 'icons/dashboard/react/SortAscending'
-import CalendarIcon from 'icons/dashboard/react/Calendar'
+import { SortAscendingIcon, SortDescendingIcon, CalendarIcon } from 'icons/dashboard/react/index'
 import { PlayIcon } from 'icons/index'
-
 
 type PropsType = {
 	video_events: VideoEvents
