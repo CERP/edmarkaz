@@ -140,7 +140,7 @@ interface PointLabelProps {
 
 const PointLabel: React.FC<PointLabelProps> = ({ payload, active }): any => {
 
-	if (active && payload[0]) {
+	if (active && payload && payload[0]) {
 
 		const item = payload[0].payload
 
