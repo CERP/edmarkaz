@@ -43,25 +43,27 @@ const LoginActivityGraph: React.FC<P> = ({ video_events, assessment_events }) =>
 					defaultValue={moment(dateFilter).format("YYYY-MM-DD")}
 					max={moment(current_date).format("YYYY-MM-DD")} />
 			</div>
-			<ResponsiveContainer width={"100%"} height={280} >
-				<AreaChart width={730} height={250} data={sorted_graph_data}
-					margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
-					<defs>
-						<linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-							<stop offset="5%" stopColor="#1BB4BB" stopOpacity={0.8} />
-						</linearGradient>
-					</defs>
-					<XAxis dataKey="date" label={{ value: "Date ⟶", position: "bottom", offset: 0, fill: "#1BB4BB" }} />
-					<YAxis type="number" domain={[0, max_logins_count]} allowDecimals={false}>
-						<Label value="Students Login ⟶" fill="#1BB4BB" offset={-15} position="left" angle={-90} />
-					</YAxis>
-					<CartesianGrid vertical={false} />
-					<Tooltip content={PointLabel} />
-					<Area type="monotone" strokeWidth={3} stroke="#0b969c" dataKey="logins_count"
-						activeDot={{ fill: '#0b969c', stroke: '#fff', strokeWidth: 3, r: 8 }}
-						dot={{ fill: '#0b969c', stroke: '#fff', strokeWidth: 2, r: 6 }} fillOpacity={1} fill="url(#colorUv)" />
-				</AreaChart>
-			</ResponsiveContainer>
+			<div className="scroll-wrapper">
+				<ResponsiveContainer width={"100%"} height={280} >
+					<AreaChart width={730} height={250} data={sorted_graph_data}
+						margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
+						<defs>
+							<linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
+								<stop offset="5%" stopColor="#1BB4BB" stopOpacity={0.8} />
+							</linearGradient>
+						</defs>
+						<XAxis dataKey="date" label={{ value: "Date ⟶", position: "bottom", offset: 0, fill: "#1BB4BB" }} />
+						<YAxis type="number" domain={[0, max_logins_count]} allowDecimals={false}>
+							<Label value="Students Login ⟶" fill="#1BB4BB" offset={-15} position="left" angle={-90} />
+						</YAxis>
+						<CartesianGrid vertical={false} />
+						<Tooltip content={PointLabel} />
+						<Area type="monotone" strokeWidth={3} stroke="#0b969c" dataKey="logins_count"
+							activeDot={{ fill: '#0b969c', stroke: '#fff', strokeWidth: 3, r: 8 }}
+							dot={{ fill: '#0b969c', stroke: '#fff', strokeWidth: 2, r: 6 }} fillOpacity={1} fill="url(#colorUv)" />
+					</AreaChart>
+				</ResponsiveContainer>
+			</div>
 		</div>
 	)
 }

@@ -67,6 +67,14 @@
 	padding: 1px;
 }
 
+@media (max-width: 525px) {
+	.dashboard-graphs .scroll-wrapper {
+		overflow-x: scroll;
+	}
+	.dashboard-graphs .scroll-wrapper .recharts-responsive-container {
+		width: 625px !important;
+	}
+}
 
 @media (max-width: 475px) {
 	.dashboard-graphs .card {
@@ -126,7 +134,7 @@
 	.dashboard-graphs .custom-tooltip .row {
 		font-size: 0.90rem;
 	 	margin-bottom: 0.375rem;
- 	}
+	}
 }
 
 .dashboard-graphs .filter-container select {
