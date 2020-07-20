@@ -118,6 +118,8 @@ const SchoolDashboard: React.FC<PropsType> = ({ auth, client_id, profile, getAna
 						</IconButton>
 					}
 				/>
+			</Paper>
+			<Paper className={classes.paper}>
 				<DashboardGraphs analytics_events={analytics_events} lessons={lessons_data} />
 			</Paper>
 		</Container>

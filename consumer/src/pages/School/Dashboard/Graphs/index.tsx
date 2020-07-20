@@ -5,7 +5,6 @@ import Tabs from '@material-ui/core/Tabs'
 import Tab from '@material-ui/core/Tab'
 import Typography from '@material-ui/core/Typography'
 import Box from '@material-ui/core/Box'
-import { Card } from '@material-ui/core'
 
 import EnrollmentGraph from './enrollmentGraph'
 import LoginActivityGraph from './loginActivityGraph'
@@ -45,7 +44,7 @@ const DashboardGraphs: React.FC<PropsType> = ({ analytics_events, lessons }) => 
 
 	return (<>
 		<div className={`${classes.dashboardGraph} dashboard-graphs`}>
-			<AppBar position="static" color="default">
+			<AppBar color="transparent" elevation={0} position="static">
 				<Tabs
 					value={value}
 					onChange={handleChange}
@@ -61,28 +60,20 @@ const DashboardGraphs: React.FC<PropsType> = ({ analytics_events, lessons }) => 
 				</Tabs>
 			</AppBar>
 			<TabPanel value={value} index={0}>
-				<Typography variant="h5" className={classes.heading}>No. of Students enrolled</Typography>
-				<Card style={{ padding: "1.5rem" }}>
-					<EnrollmentGraph events={signup_events} />
-				</Card>
+				<Typography color="textSecondary" variant="h5" className={classes.heading}>No. of Students enrolled</Typography>
+				<EnrollmentGraph events={signup_events} />
 			</TabPanel>
 			<TabPanel value={value} index={1}>
-				<Typography variant="h5" className={classes.heading} >Recent Logins</Typography>
-				<Card style={{ padding: "1.5rem" }}>
-					<LoginActivityGraph video_events={video_events} assessment_events={assessment_events} />
-				</Card>
+				<Typography color="textSecondary" variant="h5" className={classes.heading} >Recent Logins</Typography>
+				<LoginActivityGraph video_events={video_events} assessment_events={assessment_events} />
 			</TabPanel>
 			<TabPanel value={value} index={2}>
-				<Typography variant="h5" className={classes.heading} >Last week activity</Typography>
-				<Card style={{ padding: "1.5rem" }}>
-					<LessonActivityGraph video_events={video_events} />
-				</Card>
+				<Typography color="textSecondary" variant="h5" className={classes.heading} >Last week activity</Typography>
+				<LessonActivityGraph video_events={video_events} />
 			</TabPanel>
 			<TabPanel value={value} index={3}>
-				<Typography variant="h5" className={classes.heading} >Most viewed Videos</Typography>
-				<Card style={{ padding: "1.5rem" }}>
-					<MostWatchedLessons video_events={video_events} lessons={lessons} />
-				</Card>
+				<Typography color="textSecondary" variant="h5" className={classes.heading} >Most viewed Videos</Typography>
+				<MostWatchedLessons video_events={video_events} lessons={lessons} />
 			</TabPanel>
 		</div>
 	</>)
