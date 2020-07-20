@@ -5,6 +5,7 @@ import { YouTube, Phone, Facebook } from '@material-ui/icons'
 import Typography from '@material-ui/core/Typography'
 import { makeStyles } from '@material-ui/core/styles'
 import Modal from '../../components/Modal'
+import { getIDFromYoutbeLink } from 'utils/getIdFromYoutubeLink'
 import Youtube from 'react-youtube'
 
 type PropsType = {
@@ -44,19 +45,6 @@ const useStyles = makeStyles((theme) => ({
 		fill: '#385898'
 	}
 }));
-
-const getIDFromYoutbeLink = (link: string) => {
-
-	// eslint-disable-next-line
-	const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-	const match = link.match(regExp);
-
-	if (match && match[2].length === 11) {
-		return match[2]
-	}
-
-	return ""
-}
 
 // const handleFbUrl = () => {
 // 	setTimeout(() => {
