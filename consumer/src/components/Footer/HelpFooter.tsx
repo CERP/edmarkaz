@@ -6,7 +6,6 @@ import Typography from '@material-ui/core/Typography'
 import { makeStyles } from '@material-ui/core/styles'
 import Modal from '../../components/Modal'
 import { getIDFromYoutbeLink } from 'utils/getIdFromYoutubeLink'
-import { getTutotrialLink } from 'constants/links'
 import Youtube from 'react-youtube'
 
 type PropsType = {
@@ -60,18 +59,18 @@ const HelpFooter: React.FC<PropsType> = ({ hlink }) => {
 	const classes = useStyles();
 	const fbLink = "https://web.facebook.com/groups/ilmexchangediscussionforum/"
 	const [showModal, setShowModal] = useState(false);
-	const [youtubeUrl, setYoutubeUrl] = useState('');
-	const [videoId, setVideoId] = useState('');
 	const pathname = window.location.pathname;
 
-	const relevantTutorial = () => {
-		if (pathname === '/log-in') {
-			setYoutubeUrl(getTutotrialLink(pathname).link)
-			setVideoId(getIDFromYoutbeLink(getTutotrialLink(pathname).link))
-		} else {
-			setYoutubeUrl(getTutotrialLink(pathname).link)
-			setVideoId(getIDFromYoutbeLink(getTutotrialLink(pathname).link))
+	const getYoutubeTutorialLink = (pathname: any) => {
+		switch (pathname) {
+			case "/log-in":
+				return "https://www.youtube.com/embed/1EUc5qCODpo"
+			default:
+				return "https://www.youtube.com/embed/Yr-LY1T32Zo"
 		}
+	}
+
+	const relevantTutorial = () => {
 		setShowModal(true)
 	}
 
@@ -84,8 +83,8 @@ const HelpFooter: React.FC<PropsType> = ({ hlink }) => {
 			{showModal ? <Modal >
 				<div className="modal-box video-modal">
 					{
-						isYoutubeUrl(youtubeUrl) ? <Youtube
-							videoId={videoId}
+						isYoutubeUrl(getYoutubeTutorialLink(pathname)) ? <Youtube
+							videoId={getIDFromYoutbeLink(getYoutubeTutorialLink(pathname))}
 							className={'iframe'}
 							opts={{
 								width: "100%",
@@ -98,7 +97,7 @@ const HelpFooter: React.FC<PropsType> = ({ hlink }) => {
 
 							}} />
 							:
-							<video className="iframe" src={youtubeUrl} controls autoPlay>
+							<video className="iframe" src={getYoutubeTutorialLink(pathname)} controls autoPlay>
 								your browser doesnt support html video, please update it and use chrome for best experience.
 					</video>
 					}
