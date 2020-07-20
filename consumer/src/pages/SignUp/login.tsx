@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router-dom'
 import { Container, Button, Typography, TextField, Avatar } from '@material-ui/core'
-
+import HelpFooter from '../../components/Footer/HelpFooter'
 import Former from 'former'
 import Layout from '../../components/Layout'
 import ilmxLogo from 'components/Header/ilmx.svg'
@@ -152,6 +152,7 @@ class Login extends Component<propTypes, S> {
 						</>
 					</div>
 				</Container>
+				<HelpFooter />
 			</div>
 		</Layout>
 	}
