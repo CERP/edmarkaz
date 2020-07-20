@@ -6,6 +6,7 @@ import Typography from '@material-ui/core/Typography'
 import { makeStyles } from '@material-ui/core/styles'
 import Modal from '../../components/Modal'
 import { getIDFromYoutbeLink } from 'utils/getIdFromYoutubeLink'
+import { getTutotrialLink } from 'constants/links'
 import Youtube from 'react-youtube'
 
 type PropsType = {
@@ -58,8 +59,6 @@ const HelpFooter: React.FC<PropsType> = ({ hlink }) => {
 
 	const classes = useStyles();
 	const fbLink = "https://web.facebook.com/groups/ilmexchangediscussionforum/"
-	const exploreUrl = "https://www.youtube.com/embed/Yr-LY1T32Zo"
-	const signInUrl = "https://www.youtube.com/embed/1EUc5qCODpo"
 	const [showModal, setShowModal] = useState(false);
 	const [youtubeUrl, setYoutubeUrl] = useState('');
 	const [videoId, setVideoId] = useState('');
@@ -67,11 +66,11 @@ const HelpFooter: React.FC<PropsType> = ({ hlink }) => {
 
 	const relevantTutorial = () => {
 		if (pathname === '/log-in') {
-			setYoutubeUrl(signInUrl)
-			setVideoId(getIDFromYoutbeLink(signInUrl))
+			setYoutubeUrl(getTutotrialLink(pathname).link)
+			setVideoId(getIDFromYoutbeLink(getTutotrialLink(pathname).link))
 		} else {
-			setYoutubeUrl(exploreUrl)
-			setVideoId(getIDFromYoutbeLink(exploreUrl))
+			setYoutubeUrl(getTutotrialLink(pathname).link)
+			setVideoId(getIDFromYoutbeLink(getTutotrialLink(pathname).link))
 		}
 		setShowModal(true)
 	}
