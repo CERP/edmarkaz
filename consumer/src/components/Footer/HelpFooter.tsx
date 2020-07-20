@@ -45,6 +45,19 @@ const useStyles = makeStyles((theme) => ({
 	}
 }));
 
+const getIDFromYoutbeLink = (link: string) => {
+
+	// eslint-disable-next-line
+	const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+	const match = link.match(regExp);
+
+	if (match && match[2].length === 11) {
+		return match[2]
+	}
+
+	return ""
+}
+
 // const handleFbUrl = () => {
 // 	setTimeout(() => {
 // 		window.location.href = "https://web.facebook.com/groups/ilmexchangediscussionforum/"
@@ -57,9 +70,21 @@ const HelpFooter: React.FC<PropsType> = ({ hlink }) => {
 
 	const classes = useStyles();
 	const fbLink = "https://web.facebook.com/groups/ilmexchangediscussionforum/"
+	const exploreUrl = "https://www.youtube.com/embed/Yr-LY1T32Zo"
+	const signInUrl = "https://www.youtube.com/embed/1EUc5qCODpo"
 	const [showModal, setShowModal] = useState(false);
-	// const params = match.params;
+	const [youtubeUrl, setYoutubeUrl] = useState('');
+	const [videoId, setVideoId] = useState('');
+	const pathname = window.location.pathname;
+
 	const relevantTutorial = () => {
+		if (pathname === '/log-in') {
+			setYoutubeUrl(signInUrl)
+			setVideoId(getIDFromYoutbeLink(signInUrl))
+		} else {
+			setYoutubeUrl(exploreUrl)
+			setVideoId(getIDFromYoutbeLink(exploreUrl))
+		}
 		setShowModal(true)
 	}
 
@@ -72,8 +97,8 @@ const HelpFooter: React.FC<PropsType> = ({ hlink }) => {
 			{showModal ? <Modal >
 				<div className="modal-box video-modal">
 					{
-						isYoutubeUrl('https://www.youtube.com/embed/Yr-LY1T32Zo') ? <Youtube
-							videoId={'Yr-LY1T32Zo'}
+						isYoutubeUrl(youtubeUrl) ? <Youtube
+							videoId={videoId}
 							className={'iframe'}
 							opts={{
 								width: "100%",
@@ -86,7 +111,7 @@ const HelpFooter: React.FC<PropsType> = ({ hlink }) => {
 
 							}} />
 							:
-							<video className="iframe" src={'https://www.youtube.com/embed/Yr-LY1T32Zo'} controls autoPlay>
+							<video className="iframe" src={youtubeUrl} controls autoPlay>
 								your browser doesnt support html video, please update it and use chrome for best experience.
 					</video>
 					}
