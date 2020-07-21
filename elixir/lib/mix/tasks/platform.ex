@@ -125,7 +125,6 @@ defmodule Mix.Tasks.Platform do
 	end
 
 	def run(["ingest_assessments", fname ]) do
-		IO.puts " To Re-trigger Deployment"
 		Application.ensure_all_started(:edmarkaz)
 
 		csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) do
