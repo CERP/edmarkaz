@@ -21,56 +21,53 @@ interface Routeinfo {
 	grade: string;
 }
 
-type Props = P & RouteComponentProps<Routeinfo>;
+type Props = P & RouteComponentProps<Routeinfo>
 const getFeaturedApps = () => [
 	{
 		title: "Sabaq Muse",
 		link_play: "http://bit.ly/muselessons",
 		link_app: "http://bit.ly/muselessons",
-		logo: "https://storage.googleapis.com/ilmx-product-images/Sabaq%20logo.png",
+		logo: "https://storage.googleapis.com/ilmx-product-images/Sabaq%20logo.png"
 	},
 	{
 		title: "Knowledge Platform",
-		link_play:
-			"https://play.google.com/store/apps/details?id=com.knowledgeplatform.lsp&hl=en",
-		link_app:
-			"https://play.google.com/store/apps/details?id=com.knowledgeplatform.lsp&hl=en",
-		logo:
-			"https://storage.googleapis.com/ilmx-product-images/kp%20logo%20new.png",
+		link_play: "https://play.google.com/store/apps/details?id=com.knowledgeplatform.lsp&hl=en",
+		link_app: "https://play.google.com/store/apps/details?id=com.knowledgeplatform.lsp&hl=en",
+		logo: "https://storage.googleapis.com/ilmx-product-images/kp%20logo%20new.png"
 	},
 	{
 		title: "Taleemabad Primary",
 		link_play: "http://bit.ly/taleemabad",
 		link_app: "http://bit.ly/taleemabad",
-		logo: TAbad,
+		logo: TAbad
 	},
 	{
 		title: "Taleemabad Secondary",
 		link_play: "http://bit.ly/taleemabad",
 		link_app: "http://bit.ly/taleemabad",
-		logo: TAbad,
+		logo: TAbad
 	},
 	{
 		title: "Khan Academy",
 		link_play:
 			"https://play.google.com/store/apps/details?id=org.khanacademy.android",
 		link_app: "https://apps.apple.com/us/app/khan-academy/id469863705",
-		logo: KAcad,
+		logo: KAcad
 	},
 	{
 		title: "Khan Academy Kids",
 		link_play:
 			"https://play.google.com/store/apps/details?id=org.khankids.android&hl=en",
 		link_app: "https://apps.apple.com/us/app/khan-academy-kids/id1378467217",
-		logo: KAcad_kids,
+		logo: KAcad_kids
 	},
 ];
 
 const StudentPortalOptions: React.FC<Props> = ({ getLessons, lessons, lesson_loading, match }) => {
 
 	useEffect(() => {
-		getLessons();
-	}, [getLessons]);
+		getLessons()
+	}, [getLessons])
 
 	const subjectSortArray = [
 		"English",
@@ -85,8 +82,8 @@ const StudentPortalOptions: React.FC<Props> = ({ getLessons, lessons, lesson_loa
 		"Me & My Health",
 		"Physics",
 		"Biology",
-		"Chemistry",
-	];
+		"Chemistry"
+	]
 
 	const medium = match.params.medium;
 	const grade = match.params.grade ? match.params.grade : "";
@@ -136,11 +133,7 @@ const StudentPortalOptions: React.FC<Props> = ({ getLessons, lessons, lesson_loa
 					<div className="title">Select Subject</div>
 					<div className="content">
 						{Object.keys(lessons[medium][grade])
-							.sort((a, b) =>
-								subjectSortArray.indexOf(a) < subjectSortArray.indexOf(b)
-									? -1
-									: 1
-							)
+							.sort((a, b) => subjectSortArray.indexOf(a) < subjectSortArray.indexOf(b) ? -1 : 1)
 							.map((s) => {
 								return (
 									<Link to={`/library/${medium}/${grade}/${s}`} className="square subject" style={{
@@ -161,7 +154,7 @@ const StudentPortalOptions: React.FC<Props> = ({ getLessons, lessons, lesson_loa
 						gutterBottom
 					>
 						We couldn't find anything.
-						 Please write to us via	<a href="tel:0348-1119-119">Sms</a>
+						Please write to us via <a href="tel:0348-1119-119">Sms</a>
 						<br />or <a href="https://api.whatsapp.com/send?phone=923481119119">Whatsapp</a>,
 						and help us make Ilmexchange better for you.
         			</Typography>
@@ -208,8 +201,7 @@ const StudentPortalOptions: React.FC<Props> = ({ getLessons, lessons, lesson_loa
 
 export default connect((state: RootReducerState) => ({
 	lessons: state.lessons.db,
-	lesson_loading: state.lessons.loading,
+	lesson_loading: state.lessons.loading
 }), (dispatch: Function) => ({
-	getLessons: () => dispatch(getLessons()),
-})
-)(StudentPortalOptions)
+	getLessons: () => dispatch(getLessons())
+}))(StudentPortalOptions)

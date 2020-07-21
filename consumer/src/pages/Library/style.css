@@ -199,18 +199,18 @@
 			width: 100%;
 		}
 		.lesson-box .info {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		width: 100%;
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			width: 100%;
 		}
 		.lesson-box-container .lesson-box .title {
-		font-size: 10px;
-		color: #bebebe;
-		width: 90%;
+			font-size: 10px;
+			color: #bebebe;
+			width: 90%;
 		}
 		.lesson-box-container .lesson-box .header {
-		color: #222;
+			color: #222;
 		}
 
 			.lesson-page .lb-list {
@@ -253,7 +253,7 @@
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
-  width: 100%;
+	width: 100%;
 }
 	.medium-page .card-container {
 		width: 70%;
@@ -283,7 +283,7 @@
 	height: fit-content;
 }
 	.video-modal .next-container {
-	display: flex;
+		display: flex;
 		flex-direction: row;
 		justify-content: space-between;
 		margin-top: 5px;
@@ -336,7 +336,7 @@
 		}
 		.ans-row .ans-img {
 			height: 40px;
-	}
+		}
 
 @media only screen and (max-width: 767px) {
 

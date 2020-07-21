@@ -106,9 +106,7 @@ class TabsBar extends Component<propTypes, S> {
 			);
 		}
 
-		const callLink = this.props.connected ?
-
-			"https://api.whatsapp.com/send?phone=923481119119" : "tel:0348-1119-119";
+		const callLink = this.props.connected ? "https://api.whatsapp.com/send?phone=923481119119" : "tel:0348-1119-119";
 
 		return user === undefined ? <Redirect to="" /> : <Layout>
 			<div className="tabs-page">
@@ -154,17 +152,14 @@ class TabsBar extends Component<propTypes, S> {
 				</>}
 			</div>
 		</Layout>
-
 	}
 }
 export default connect(
 	(state: RootReducerState) => ({
 		connected: state.connected,
 		token: state.auth.token,
-		user: state.auth.user,
+		user: state.auth.user
 	}),
 	(dispatch: Function) => ({
-		sendError: (err: Error, errInfo: React.ErrorInfo) =>
-			dispatch(submitError(err, errInfo)),
-	})
-)(TabsBar);
+		sendError: (err: Error, errInfo: React.ErrorInfo) => dispatch(submitError(err, errInfo))
+	}))(TabsBar);
