@@ -631,6 +631,82 @@ defmodule Sarkar.ActionHandler.Dashboard do
 		end
 	end
 
+	def handle_action(%{
+		"type" => "GET_MIS_FACULTY",
+		"client_id" => _client_id,
+		"payload" => %{
+			"school_id" => school_id
+		}
+	},
+	%{id: id, client_id: client_id} = state)
+	do
+		case EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
+			"SELECT DISTINCT
+			    path[3] as id,
+				value
+			FROM writes
+			WHERE school_id=$1 AND path[2]='users' AND value->>'type'='admin'",
+			[school_id]
+		) do
+			{:ok, resp } ->
+				faculty = resp.rows |> Enum.reduce(
+					%{},
+					fn [id, value], acc ->
+						Dynamic.put(acc, [id], value)
+					end)
+
+				{:reply, succeed(faculty), state}
+
+			{:error, err} ->
+				IO.inspect err
+				{:reply, fail(err), state}
+		end
+
+	end
+
+	def handle_action(%{
+		"type" => "UPDATE_FACULTY_PASSWORD",
+		"client_id" => _client_id,
+		"payload" => %{
+			"merges" => merges,
+			"school_id" => school_id,
+			"faculty_id" => faculty_id,
+			"password" => password
+		}
+	},
+	%{id: id, client_id: client_id} = state)
+	do
+		case EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
+			"UPDATE flattened_schools
+			SET value=to_jsonb($2::text)
+			WHERE school_id=$1
+				AND (path='users,#{faculty_id},password'
+				OR path='faculty,#{faculty_id},Password')",
+			[school_id,password]
+		) do
+			{:ok, _resp } ->
+
+				start_school_broadcast_changes(school_id, merges)
+
+				{:reply, succeed("Password has been updated successfully!"), state}
+			{:error, err} ->
+				IO.inspect err
+				{:reply, fail("Unable to update the password!"), state}
+		end
+	end
+
+	defp start_school_broadcast_changes(school_id, merges) do
+		case Registry.lookup(EdMarkaz.SchoolRegistry, school_id) do
+			[{_, _}] -> {:ok}
+			[] -> DynamicSupervisor.start_child(EdMarkaz.SchoolSupervisor, {Sarkar.School, {school_id}})
+		end
+		merges |> Enum.map(
+			fn (merge) ->
+				Sarkar.School.sync_changes(school_id,"backend", merge, :os.system_time(:millisecond))
+			end
+		)
+	end
+
 	defp fail(message) do
 		%{type: "failure", payload: message}
 	end
