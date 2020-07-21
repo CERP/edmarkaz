@@ -122,10 +122,61 @@ interface RootReducerState {
 			[id: string]: RouteAnalyticsEvent;
 		};
 	};
+	analytics_events: {
+		signup_events: SignupEvents
+		video_events: AnalyticsEvents
+		assessment_events: AssessmentEvents
+		is_loading: boolean
+		has_error: boolean
+	}
 	activeStudent?: MISStudent
 	last_snapshot: number;
 	accept_snapshot: boolean;
 	connected: boolean;
+}
+
+interface SignupEvents {
+	[client_id: string]: number // timestamp
+}
+
+interface VideoEvents {
+	[client_id: string]: {
+		[timestamp: number]: {
+			time: number
+			user: string
+			phone: string
+			route: string[]
+			refcode: string
+			chapter_id: string
+			lesson_id: string
+			student_id: string
+		}
+	}
+}
+interface AssessmentEvents {
+	[client_id: string]: {
+		[timestamp: number]: {
+			user: string
+			phone: string
+			route: string[]
+			refcode: string
+			student_id: string
+			total_score: number
+			score: number
+			assessment_meta: {
+				medium: string
+				subject: string
+				chapter_id: string
+				lesson_id: string
+				attempt_time: number
+				excercise_id: string
+				total_duration: number
+				wrong_responses: {
+					[id: string]: boolean
+				}
+			}
+		}
+	}
 }
 
 interface ILMXAssessment {

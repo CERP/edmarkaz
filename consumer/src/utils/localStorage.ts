@@ -253,6 +253,13 @@ export const loadDB = (): RootReducerState => {
 		products: loadProducts(),
 		lessons: loadLessons(),
 		assessments: loadAssessments(),
-		activeStudent: loadStudent()
+		activeStudent: loadStudent(),
+		analytics_events: {
+			is_loading: false,
+			has_error: false,
+			signup_events: {},
+			video_events: {},
+			assessment_events: {}
+		}
 	}
 }

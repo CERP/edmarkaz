@@ -609,3 +609,50 @@ export const trackRoute = (path: string) => (dispatch: Dispatch, getState: () =>
 		meta
 	}]))
 }
+
+export const GET_ANALYTICS_EVENTS = "GET_ANALYTICS_EVENTS"
+export const GET_ANALYTICS_EVENTS_SUCCESS = "GET_ANALYTICS_EVENTS_SUCCESS"
+export const GET_ANALYTICS_EVENTS_FAILURE = "GET_ANALYTICS_EVENTS_FAILURE"
+
+export const getAnalyticsEvents = () => ({
+	type: GET_ANALYTICS_EVENTS
+})
+
+export const getAnalyticsEventsSuccess = (analytics_events: any) => ({
+	type: GET_ANALYTICS_EVENTS_SUCCESS,
+	payload: analytics_events
+})
+
+export const getAnalyticsEventsFailure = () => ({
+	type: GET_ANALYTICS_EVENTS_FAILURE
+})
+
+export const fetchAnalyticsEvents = () => (dispatch: Dispatch, getState: () => RootReducerState, syncr: Syncr) => {
+
+	if (!syncr.ready) {
+		syncr.onNext('connect', () => dispatch(fetchAnalyticsEvents()))
+		return;
+	}
+
+	const state = getState()
+	// start loading
+	dispatch(getAnalyticsEvents())
+
+	syncr.send({
+		type: GET_ANALYTICS_EVENTS,
+		id: state.auth.id,
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		payload: {
+			refcode: state.sync_state.profile.refcode,
+		}
+	})
+		.then(res => {
+			console.log("Events fetch success")
+			dispatch(getAnalyticsEventsSuccess(res))
+		})
+		.catch(err => {
+			console.log("Unable to fetch events")
+			dispatch(getAnalyticsEventsFailure())
+		})
+}

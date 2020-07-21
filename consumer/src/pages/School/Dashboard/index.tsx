@@ -1,15 +1,19 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Container, Typography, IconButton, Paper, TextField, Input, makeStyles, Theme, createStyles, Snackbar, Card, CardActionArea, CardMedia, CardContent, CardActions, Button } from '@material-ui/core'
 import Copy from '@material-ui/icons/FileCopy'
 import CloseIcon from '@material-ui/icons/Close';
+import DashboardGraphs from './Graphs/index'
 //@ts-ignore
 import mis from '../../../icons/mis.ico'
 
-interface P {
-	auth: RootReducerState["auth"]
+import { fetchAnalyticsEvents } from 'actions'
+
+interface PropsType extends RootReducerState {
 	client_id: string
-	profile: RootReducerState["sync_state"]["profile"]
+	profile: RootReducerState["sync_state"]["profile"],
+	lessons_data: RootReducerState["lessons"]["db"]
+	getAnalyticsEvents: () => void
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -30,14 +34,19 @@ const useStyles = makeStyles((theme: Theme) =>
 	})
 )
 
-const SchoolDashboard: React.FC<P> = ({ auth, client_id, profile }) => {
-	// For snackbar
+const SchoolDashboard: React.FC<PropsType> = ({ auth, client_id, profile, getAnalyticsEvents, analytics_events, lessons_data }) => {
+
 	const [open, setOpen] = useState(false)
+
+	useEffect(() => {
+		getAnalyticsEvents()
+	}, [])
+
 	const { id, token } = auth
-	const autoLoginLink = `https://mischool.pk/auto-login?id=${id}&key=${token}&cid=${client_id}&ref=${profile.refcode}`
+
+	const autoLoginLink = `https://mischool.pk/auto-login?id=${id}&key=${token}&cid=Lesson${client_id}&ref=${profile.refcode}`
 	const refLink = `https://ilmexchange.com/student?referral=${id}`
 	const classes = useStyles()
-
 	const handleCopy = (value: string) => {
 		const el = document.createElement("textarea")
 		el.value = value
@@ -110,6 +119,9 @@ const SchoolDashboard: React.FC<P> = ({ auth, client_id, profile }) => {
 					}
 				/>
 			</Paper>
+			<Paper className={classes.paper}>
+				<DashboardGraphs analytics_events={analytics_events} lessons={lessons_data} />
+			</Paper>
 		</Container>
 		<Snackbar
 			anchorOrigin={{
@@ -133,5 +145,9 @@ const SchoolDashboard: React.FC<P> = ({ auth, client_id, profile }) => {
 export default connect((state: RootReducerState) => ({
 	auth: state.auth,
 	client_id: state.client_id,
-	profile: state.sync_state.profile
+	profile: state.sync_state.profile,
+	lessons_data: state.lessons.db,
+	analytics_events: state.analytics_events,
+}), (dispatch: Function) => ({
+	getAnalyticsEvents: () => dispatch(fetchAnalyticsEvents())
 }))(SchoolDashboard)
