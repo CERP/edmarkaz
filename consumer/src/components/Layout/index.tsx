@@ -5,6 +5,7 @@ import { AppBar, Toolbar, IconButton, Button, makeStyles } from '@material-ui/co
 import BackIcon from '@material-ui/icons/ArrowBack'
 import AccountCircle from '@material-ui/icons/AccountCircle'
 import ExitToApp from '@material-ui/icons/ExitToApp'
+import FaceIcon from '@material-ui/icons/Face';
 import { Home } from '@material-ui/icons'
 
 //@ts-ignore
@@ -95,7 +96,29 @@ const useStyles = makeStyles((theme) => ({
 	},
 	ExitButton: {
 		fill: "white"
-	}
+	},
+	logoutButtonBar: {
+		backgroundColor: "white",
+	},
+	logoutBtn: {
+		color: "#1BB4BB",
+		fontWeight: 700,
+		padding: "11px",
+		gridColumnStart: 2,
+		'&:hover': {
+			backgroundColor: "#1BB4BB",
+			color: "white",
+		}
+	},
+	logoutButtonToolbar: {
+		display: "flex",
+		flexDirection: "row",
+		justifyContent: "space-between"
+	},
+	guestUserHeading: {
+		color: "#1BB4BB"
+	},
+
 }));
 
 const StudentHeader: React.FC<SP> = ({ goBack, push, auth, lesson_meta, client_id, profile }) => {
@@ -147,11 +170,7 @@ const StudentHeader: React.FC<SP> = ({ goBack, push, auth, lesson_meta, client_i
 						<IconButton onClick={toHome} edge="start" color="inherit" aria-label="menu">
 							<Home />
 						</IconButton>
-						{
-							(auth.user === "GUEST_STUDENT" || auth.user === "GUEST_TEACHER") && <IconButton onClick={guestLogout}>
-								<ExitToApp className={classes.ExitButton} />
-							</IconButton>
-						}
+
 						{(auth.user === "SCHOOL" || auth.user === "STUDENT") && <IconButton onClick={toAccount} edge="start" color="inherit" aria-label="menu">
 							<AccountCircle />
 						</IconButton>}
@@ -172,11 +191,6 @@ const StudentHeader: React.FC<SP> = ({ goBack, push, auth, lesson_meta, client_i
 						<IconButton onClick={toHome} edge="start" color="inherit" aria-label="menu">
 							<Home />
 						</IconButton>
-						{
-							(auth.user === "GUEST_STUDENT" || auth.user === "GUEST_TEACHER") && <IconButton onClick={guestLogout}>
-								<ExitToApp className={classes.ExitButton} />
-							</IconButton>
-						}
 
 						{(auth.user === "SCHOOL" || auth.user === "STUDENT") && <IconButton onClick={toAccount} edge="start" color="inherit" aria-label="menu">
 							<AccountCircle />
@@ -184,5 +198,19 @@ const StudentHeader: React.FC<SP> = ({ goBack, push, auth, lesson_meta, client_i
 					</Toolbar>
 			}
 		</AppBar>
+		{(auth.user === "GUEST_STUDENT" || auth.user === "GUEST_TEACHER") && <AppBar className={classes.logoutButtonBar} position="static">
+			{
+				<Toolbar className={classes.logoutButtonToolbar}>
+					<h2 className={classes.guestUserHeading} >Guest User</h2>
+					<Button
+						variant="text"
+						disableRipple
+						className={classes.logoutBtn}
+						onClick={guestLogout}>
+						LOGOUT
+					</Button>
+				</Toolbar>
+			}
+		</AppBar>}
 	</>
 }
