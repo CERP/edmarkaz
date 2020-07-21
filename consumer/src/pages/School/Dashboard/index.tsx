@@ -44,7 +44,7 @@ const SchoolDashboard: React.FC<PropsType> = ({ auth, client_id, profile, getAna
 
 	const { id, token } = auth
 
-	const autoLoginLink = `https://mischool.pk/auto-login?id=${id}&key=${token}&cid=Lesson${client_id}&ref=${profile.refcode}`
+	const autoLoginLink = `https://mischool.pk/auto-login?id=${id}&key=${token}&cid=${client_id}&ref=${profile.refcode}`
 	const refLink = `https://ilmexchange.com/student?referral=${id}`
 	const classes = useStyles()
 	const handleCopy = (value: string) => {
