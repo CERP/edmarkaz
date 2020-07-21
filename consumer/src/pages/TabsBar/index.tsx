@@ -9,31 +9,31 @@ import ErrorComponent from "../../components/Error";
 import { submitError } from "../../actions/core";
 import { connect } from "react-redux";
 import Help from "../Help";
-import contactUs from '../../icons/contactUs.svg'
+import contactUs from "../../icons/contactUs.svg";
 import TrackedRoute from "../../components/TrackedRoute";
 import Library from "../Library";
 import LessonPage from "../Library/Lesson";
-import LibraryInstructionMedium from '../Library/medium'
-import StudentPortalOptions from '../Library/options';
+import LibraryInstructionMedium from "../Library/medium";
+import StudentPortalOptions from "../Library/options";
 import Layout from "../../components/Layout";
 import { Paper, Tabs, Tab } from "@material-ui/core";
 import StudentProfile from "../StudentPortal/studentProfile";
-import HelpFooter from "components/Footer/HelpFooter"
+import HelpFooter from "components/Footer/HelpFooter";
 
 import "./style.css";
 import SchoolDashboard from "pages/School/Dashboard";
 
 interface S {
-	tab: number
+	tab: number;
 	error: boolean;
 	err?: Error;
 	errInfo?: React.ErrorInfo;
 }
 
 interface P {
-	token: RootReducerState["auth"]["token"]
+	token: RootReducerState["auth"]["token"];
 	connected: boolean;
-	user: RootReducerState["auth"]["user"]
+	user: RootReducerState["auth"]["user"];
 	sendError: (err: Error, errInfo: React.ErrorInfo) => void;
 }
 
@@ -49,22 +49,22 @@ class TabsBar extends Component<propTypes, S> {
 			tab: this.getCurrentTab(this.props.location.pathname),
 			error: false,
 			err: undefined,
-			errInfo: undefined
+			errInfo: undefined,
 		};
 	}
 
 	getCurrentTab = (path: string) => {
 
-		if (path.split("/").some(i => i === "dashboard")) {
+		if (path.split("/").some((i) => i === "dashboard")) {
 			return 0
 		}
-		if (path.split("/").some(i => i === "bazaar" || i === "supplier")) {
+		if (path.split("/").some((i) => i === "bazaar" || i === "supplier")) {
 			return 2
 		}
-		if (path.split("/").some(i => i === "library")) {
+		if (path.split("/").some((i) => i === "library")) {
 			return 1
 		}
-		if (path.split("/").some(i => i === "help")) {
+		if (path.split("/").some((i) => i === "help")) {
 			return 3
 		}
 		return 4
@@ -77,7 +77,6 @@ class TabsBar extends Component<propTypes, S> {
 			})
 		}
 	}
-
 
 	componentDidCatch(err: Error, errInfo: React.ErrorInfo) {
 		this.props.sendError(err, errInfo);
@@ -99,7 +98,7 @@ class TabsBar extends Component<propTypes, S> {
 		const { location, user, history } = this.props
 		const current = location.pathname;
 
-		const library = location.pathname.split("/").some(i => i === "library")
+		const library = location.pathname.split("/").some((i) => i === "library")
 
 		if (this.state.error && this.state.err && this.state.errInfo) {
 			return (
@@ -107,13 +106,11 @@ class TabsBar extends Component<propTypes, S> {
 			);
 		}
 
-		const callLink = this.props.connected ?
-
-			"https://api.whatsapp.com/send?phone=923481119119" : "tel:0348-1119-119"
+		const callLink = this.props.connected ? "https://api.whatsapp.com/send?phone=923481119119" : "tel:0348-1119-119";
 
 		return user === undefined ? <Redirect to="" /> : <Layout>
 			<div className="tabs-page">
-				{(user === "SCHOOL" && current !== "/profile" && current !== "/start-mob" && current !== "/log-in") &&
+				{user === "SCHOOL" && current !== "/profile" && current !== "/start-mob" && current !== "/log-in" &&
 					<Paper style={{ flexGrow: 1 }}>
 						<Tabs
 							onChange={this.handleTabChange}
@@ -127,7 +124,8 @@ class TabsBar extends Component<propTypes, S> {
 							<Tab label="Bazaar" onClick={() => history.push("/bazaar")} />
 							<Tab label="Help" onClick={() => history.push("/help")} />
 						</Tabs>
-					</Paper>}
+					</Paper>
+				}
 				<>
 					<TrackedRoute exact path="/supplier/:supplier_id/:product_id" component={ProductPage} />
 					<TrackedRoute exact path="/supplier/:supplier_id" component={SupplierHome} />
@@ -136,6 +134,7 @@ class TabsBar extends Component<propTypes, S> {
 					<TrackedRoute exact path="/articles" component={Articles} />
 					<TrackedRoute path="/help" component={Help} />
 					<TrackedRoute exact path="/library" component={LibraryInstructionMedium} />
+					<TrackedRoute exact path="/library/:medium/:grade" component={StudentPortalOptions} />
 					<TrackedRoute exact path="/library/:medium" component={StudentPortalOptions} />
 					<TrackedRoute exact path="/library/:medium/:grade/:subject" component={Library} />
 					<TrackedRoute exact path="/library/:medium/:grade/:subject/:chapter/:chapter_name" component={LessonPage} />
@@ -162,7 +161,5 @@ export default connect(
 		user: state.auth.user
 	}),
 	(dispatch: Function) => ({
-		sendError: (err: Error, errInfo: React.ErrorInfo) =>
-			dispatch(submitError(err, errInfo))
-	})
-)(TabsBar);
+		sendError: (err: Error, errInfo: React.ErrorInfo) => dispatch(submitError(err, errInfo))
+	}))(TabsBar);

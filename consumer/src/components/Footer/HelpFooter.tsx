@@ -4,9 +4,9 @@ import { Box, Grid, Button } from '@material-ui/core'
 import { YouTube, Phone, Facebook } from '@material-ui/icons'
 import Typography from '@material-ui/core/Typography'
 import { makeStyles } from '@material-ui/core/styles'
-import Modal from 'components/Modal'
-import Youtube from 'react-youtube'
+import Modal from '../../components/Modal'
 import { getIDFromYoutbeLink } from 'utils/getIdFromYoutubeLink'
+import Youtube from 'react-youtube'
 
 type PropsType = {
 	hlink?: string
@@ -52,59 +52,58 @@ const useStyles = makeStyles((theme) => ({
 // 	}, 25);
 // 	window.location.href = "fb://groups/ilmexchangediscussionforum/";
 // }
-
-const getYoutubeTutorialLink = () => {
-
-	// Will add mechanism to get links based on the current page in view
-	// for now just showing this link in every page
-
-	return "https://www.youtube.com/watch?v=x4YrwS2fkxE"
-}
+const isYoutubeUrl = (link: string) => Boolean(link.match("^(http(s)?:\/\/)?((w){3}.)?youtu(be|.be)?(\.com)?\/.+"))
 
 const HelpFooter: React.FC<PropsType> = ({ hlink }) => {
 
-	const [showModal, setShowModal] = useState(false)
-	const [videoId, setVideoId] = useState("")
 	const classes = useStyles();
 	const fbLink = "https://web.facebook.com/groups/ilmexchangediscussionforum/"
+	const [showModal, setShowModal] = useState(false);
+	const pathname = window.location.pathname;
 
-	const handleWatchTutorial = () => {
-		const vid = getIDFromYoutbeLink(getYoutubeTutorialLink())
-		setVideoId(vid)
+	const getYoutubeTutorialLink = (pathname: any) => {
+		switch (pathname) {
+			case "/log-in":
+				return "https://www.youtube.com/embed/1EUc5qCODpo"
+			default:
+				return "https://www.youtube.com/embed/Yr-LY1T32Zo"
+		}
+	}
+
+	const relevantTutorial = () => {
 		setShowModal(true)
 	}
 
-	const handleCloseTutorial = () => {
-		setVideoId("")
+	const onBack = () => {
 		setShowModal(false)
 	}
 
 	return (
 		<footer className={classes.footer}>
-			{showModal && <Modal>
-				<div className="modal-box">
-					<Youtube
-						videoId={videoId}
-						className={'iframe'}
-						opts={{
-							width: "100%",
-							height: "100%",
-							playerVars: {
-								rel: 0,
-								showinfo: 0,
-								autoplay: 1
-							}
-						}} />
-					<Button
-						variant="contained"
-						size="medium"
-						color="secondary"
-						style={{ margin: "5px 0px" }}
-						fullWidth
-						onClick={handleCloseTutorial}
-					> Close</Button>
+			{showModal ? <Modal >
+				<div className="modal-box video-modal">
+					{
+						isYoutubeUrl(getYoutubeTutorialLink(pathname)) ? <Youtube
+							videoId={getIDFromYoutbeLink(getYoutubeTutorialLink(pathname))}
+							className={'iframe'}
+							opts={{
+								width: "100%",
+								height: "100%",
+								playerVars: {
+									rel: 0,
+									showinfo: 0,
+									autoplay: 1
+								}
+
+							}} />
+							:
+							<video className="iframe" src={getYoutubeTutorialLink(pathname)} controls autoPlay>
+								your browser doesnt support html video, please update it and use chrome for best experience.
+					</video>
+					}
+					<div className="button" style={{ marginTop: '5px', backgroundColor: "#f05967" }} onClick={() => onBack()}>Back</div>
 				</div>
-			</Modal>}
+			</Modal> : null}
 			<Container maxWidth="md" className={classes.main}>
 				<div style={{ marginLeft: "1.50rem", marginRight: "1.50rem" }}>
 					<Grid container spacing={0} alignItems="center" justify="center">
@@ -122,7 +121,7 @@ const HelpFooter: React.FC<PropsType> = ({ hlink }) => {
 									variant="outlined"
 									className={classes.helpButton}
 									startIcon={<YouTube style={{ fill: "red" }} />}
-									onClick={handleWatchTutorial}
+									onClick={relevantTutorial}
 								> Tutorial </Button>
 							</Grid>
 							<Grid item xs={6} sm={3}>

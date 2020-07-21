@@ -1,27 +1,28 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import { getLessons } from '../../actions';
-import { connect } from 'react-redux';
+import { connect } from "react-redux";
 import { Link, RouteComponentProps } from 'react-router-dom';
-import LoadingIcon from '../../icons/load.svg'
+import LoadingIcon from '../../icons/load.svg';
 import { getIconsFromSubject } from '../../utils/getIconsFromSubject';
 import { Container, Avatar, Divider, Typography } from '@material-ui/core';
-import KAcad from '../../icons/KAcad.png'
-import KAcad_kids from '../../icons/KAcad_kids.png'
-import TAbad from '../../icons/TAbad.png'
+import KAcad from '../../icons/KAcad.png';
+import KAcad_kids from '../../icons/KAcad_kids.png';
+import TAbad from '../../icons/TAbad.png';
 import { getDeviceOS } from '../../utils/getDeviceOS';
 
 interface P {
-	lessons: RootReducerState["lessons"]["db"]
-	lesson_loading: RootReducerState["lessons"]["loading"]
-	getLessons: () => void
+	lessons: RootReducerState["lessons"]["db"];
+	lesson_loading: RootReducerState["lessons"]["loading"];
+	getLessons: () => void;
 }
 
 interface Routeinfo {
-	medium: string
+	medium: string;
+	grade: string;
 }
 
 type Props = P & RouteComponentProps<Routeinfo>
-const getFeaturedApps = () => ([
+const getFeaturedApps = () => [
 	{
 		title: "Sabaq Muse",
 		link_play: "http://bit.ly/muselessons",
@@ -48,17 +49,19 @@ const getFeaturedApps = () => ([
 	},
 	{
 		title: "Khan Academy",
-		link_play: "https://play.google.com/store/apps/details?id=org.khanacademy.android",
+		link_play:
+			"https://play.google.com/store/apps/details?id=org.khanacademy.android",
 		link_app: "https://apps.apple.com/us/app/khan-academy/id469863705",
 		logo: KAcad
 	},
 	{
 		title: "Khan Academy Kids",
-		link_play: "https://play.google.com/store/apps/details?id=org.khankids.android&hl=en",
+		link_play:
+			"https://play.google.com/store/apps/details?id=org.khankids.android&hl=en",
 		link_app: "https://apps.apple.com/us/app/khan-academy-kids/id1378467217",
 		logo: KAcad_kids
 	},
-])
+];
 
 const StudentPortalOptions: React.FC<Props> = ({ getLessons, lessons, lesson_loading, match }) => {
 
@@ -82,8 +85,8 @@ const StudentPortalOptions: React.FC<Props> = ({ getLessons, lessons, lesson_loa
 		"Chemistry"
 	]
 
-	const medium = match.params.medium
-	const [grade, setGrade] = useState("");
+	const medium = match.params.medium;
+	const grade = match.params.grade ? match.params.grade : "";
 
 	return lesson_loading ? <div className="loading">
 		<img className="icon" src={LoadingIcon} alt="loading-icon" />
@@ -96,40 +99,51 @@ const StudentPortalOptions: React.FC<Props> = ({ getLessons, lessons, lesson_loa
 					{grade === "" && <div className="title">Select Class</div>}
 					{
 						grade === "" ? <div className="content">
-							{lessons[medium]["Preschool"] && <div className="oval" onClick={(e) => setGrade("Preschool")}>Preschool</div>}
-							{lessons[medium]["KG"] && <div className="oval" onClick={(e) => setGrade("KG")}>KG</div>}
-							{
-								Object.keys(lessons[medium])
-									.filter(g => g !== "Preschool" && g !== "KG")
-									.sort((a, b) => parseFloat(a) - parseFloat(b))
-									.map(g => {
-										return <div className={grade === g ? "bg-blue oval " : "oval"} key={g} onClick={(e) => setGrade(g)}>{`Class ${g}`}</div>
-									})
+							{lessons[medium]["Preschool"] && <Link to={`/library/${medium}/${`Preschool`}`}>
+								<div className="oval">Preschool</div>
+							</Link>
 							}
+							{lessons[medium]["KG"] && <Link to={`/library/${medium}/${`KG`}`}>
+								<div className="oval">KG</div>
+							</Link>
+							}
+							{Object.keys(lessons[medium])
+								.filter((g) => g !== "Preschool" && g !== "KG")
+								.sort((a, b) => parseFloat(a) - parseFloat(b))
+								.map((g) => {
+									return (
+										<Link to={`/library/${medium}/${g}`}>
+											<div
+												className={grade === g ? "bg-blue oval " : "oval"}
+												key={g}
+											>{`Class ${g}`}</div>
+										</Link>
+									);
+								})}
 						</div> : <div className="content selected">
-								<div className="bg-blue oval">{grade !== "Preschool" && grade !== "KG" ? `Class ${grade}` : grade}</div>
-								<div style={{ textDecoration: "underline", color: "blue", cursor: "pointer" }} onClick={(e) => setGrade("")}>Change Class</div>
+								<div className="bg-blue oval">
+									{grade !== "Preschool" && grade !== "KG"
+										? `Class ${grade}`
+										: grade}
+								</div>
 							</div>
 					}
 				</div>
 				{grade && <div className="row">
 					<div className="title">Select Subject</div>
 					<div className="content">
-						{
-							Object.keys(lessons[medium][grade])
-								.sort((a, b) => subjectSortArray.indexOf(a) < subjectSortArray.indexOf(b) ? -1 : 1)
-								.map(s => {
-									return <Link
-										to={`/library/${medium}/${grade}/${s}`}
-										className="square subject"
-										style={{
-											backgroundImage: `url(${getIconsFromSubject(s)})`
-										}}
-										key={s}>{s}</Link>
-								})
-						}
+						{Object.keys(lessons[medium][grade])
+							.sort((a, b) => subjectSortArray.indexOf(a) < subjectSortArray.indexOf(b) ? -1 : 1)
+							.map((s) => {
+								return (
+									<Link to={`/library/${medium}/${grade}/${s}`} className="square subject" style={{
+										backgroundImage: `url(${getIconsFromSubject(s)})`,
+									}} key={s}>
+										{s}
+									</Link>
+								);
+							})}
 					</div>
-
 				</div>}
 				<Divider />
 			</Container> : <Container maxWidth="sm">
@@ -143,23 +157,23 @@ const StudentPortalOptions: React.FC<Props> = ({ getLessons, lessons, lesson_loa
 						Please write to us via <a href="tel:0348-1119-119">Sms</a>
 						<br />or <a href="https://api.whatsapp.com/send?phone=923481119119">Whatsapp</a>,
 						and help us make Ilmexchange better for you.
-					</Typography>
+        			</Typography>
 					<Divider />
 				</Container>
 			}
 			<Typography
-				style={{ margin: "20px 5px 0px", }}
+				style={{ margin: "20px 5px 0px" }}
 				color="textSecondary"
 				align="center"
 				variant="h5">Featured Apps</Typography>
 			<Container maxWidth="sm" style={{
 				display: "flex",
 				justifyContent: "center",
-				flexWrap: "wrap"
+				flexWrap: "wrap",
 			}}>
 				{
 					getFeaturedApps()
-						.map(p => {
+						.map((p) => {
 							return <a
 								href={getDeviceOS() === "Android" ? p.link_play : p.link_app}
 								target="__blank"
@@ -172,7 +186,8 @@ const StudentPortalOptions: React.FC<Props> = ({ getLessons, lessons, lesson_loa
 									margin: "5px",
 									padding: "5px",
 									color: "#474747",
-								}}>
+								}}
+							>
 								<Avatar style={{ margin: "5px", objectFit: "contain" }} variant="rounded">
 									<img className="partner-avatar" alt="" src={p.logo} />
 								</Avatar>

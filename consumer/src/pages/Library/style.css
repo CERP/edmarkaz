@@ -42,8 +42,7 @@
 	color: black;
 }
 .student-portal-op .row.second {
-	background-color: #f5f5f5;
-
+ 	 background-color: #f5f5f5;
 }
 .student-portal-op .circle {
 	display: flex;
@@ -54,26 +53,27 @@
 	padding: 20px;
 	margin-right: 10px;
 	justify-content: center;
-    align-items: center;
+	align-items: center;
 	flex-direction: column;
 	cursor: pointer;
 }
 .student-portal-op .oval {
 	display: flex;
 	justify-content: center;
-    align-items: center;
+	align-items: center;
 	flex-direction: column;
 	width: 70px;
 	padding: 10px 20px;
 	height: auto;
 	border-radius: 40px;
 	cursor: pointer;
-	border: 1px solid #ebebeb
+	border: 1px solid #ebebeb;
+	color: black;
 }
 .student-portal-op .square {
 	display: flex;
 	justify-content: flex-end;
-    align-items: center;
+	align-items: center;
 	flex-direction: column;
 	border-radius: 5px;
 	padding: 25px 15px;
@@ -100,7 +100,7 @@
 	}
 .oval:hover {
 	color: #ffffff;
-	background-color: #42A5F5;
+	background-color: #42a5f5;
 }
 .circle:hover {
 	background-color: #ffc107;
@@ -117,11 +117,11 @@
 }
 .bg-blue {
 	color: #ffffff;
-	background-color: #42A5F5 !important;
+	background-color: #42a5f5 !important;
 }
 .bg-bluish {
-	color: #42A5F5;
-	border: 1px solid #42A5F5 !important;
+	color: #42a5f5;
+	border: 1px solid #42a5f5 !important;
 }
 .school .card-list {
 	display: flex;
@@ -181,19 +181,19 @@
 			border-left: 10px solid #ffc107;
 		}
 		.lesson-box.border-red {
-			border-left: 10px solid #FE7C56;
+			border-left: 10px solid #fe7c56;
 		}
 		.lesson-box.border-green {
-			border-left: 10px solid #8BC349;
+			border-left: 10px solid #8bc349;
 		}
 		.lesson-box.border-blue {
-			border-left: 10px solid #42A5F5;
+			border-left: 10px solid #42a5f5;
 		}
 		.lesson-box.border-grey {
 			border-left: 10px solid rgb(155, 155, 155);
 		}
 		.lesson-box.border-purple {
-			border-left: 10px solid #C588CE;
+			border-left: 10px solid #c588ce;
 		}
 		.lesson-box.active {
 			width: 100%;
@@ -205,9 +205,9 @@
 			width: 100%;
 		}
 		.lesson-box-container .lesson-box .title {
-				font-size: 10px;
-				color: #bebebe;
-				width: 90%;
+			font-size: 10px;
+			color: #bebebe;
+			width: 90%;
 		}
 		.lesson-box-container .lesson-box .header {
 			color: #222;
@@ -269,7 +269,7 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		background: #EFEFEF;
+		background: #efefef;
 		margin: 2px 10px;
 	}
 /* ==============  FOR MODAL =============== */
@@ -305,7 +305,7 @@
 			cursor: pointer;
 		}
 		.video-modal .button {
-			background-color:#1BB4BB;
+			background-color: #1bb4bb;
 			color: #ffffff;
 			border-radius: 5px;
 		}
@@ -353,7 +353,6 @@
 	.lesson-box .list-container .header {
 		font-size: 20px;
 	}
-
 }
 
 .loading {
@@ -397,4 +396,7 @@
 		color: var(--blue);
 		margin-top: 0.25rem;
 		margin-bottom: 0.25rem;
+	}
+	a:-webkit-any-link {
+		text-decoration: none;
 	}

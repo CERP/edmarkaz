@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router-dom'
 import { Container, Button, Typography, TextField, Avatar } from '@material-ui/core'
-
+import HelpFooter from '../../components/Footer/HelpFooter'
 import Former from 'former'
 import Layout from '../../components/Layout'
 import ilmxLogo from 'components/Header/ilmx.svg'
@@ -12,6 +12,7 @@ import { SMSAuth, verifyUrlAuth } from '../../actions'
 import SignUp from '.'
 
 interface P {
+	connected: boolean
 	sent: boolean
 	token: string | undefined
 	sendAuthSms: (phone: string) => any
@@ -69,6 +70,9 @@ class Login extends Component<propTypes, S> {
 	}
 
 	render() {
+		const callLink = this.props.connected ?
+
+			"https://api.whatsapp.com/send?phone=923481119119" : "tel:0348-1119-119"
 
 		if (this.props.token) {
 			setTimeout(() => {
@@ -152,13 +156,15 @@ class Login extends Component<propTypes, S> {
 						</>
 					</div>
 				</Container>
+				<HelpFooter hlink={callLink} />
 			</div>
 		</Layout>
 	}
 }
 export default connect((state: RootReducerState) => ({
 	sent: state.auth.sms_sent,
-	token: state.auth.token
+	token: state.auth.token,
+	connected: state.connected,
 }), (dispatch: Function) => ({
 	sendAuthSms: (phone: string) => dispatch(SMSAuth(phone)),
 	verify: (token: string) => dispatch(verifyUrlAuth(token))
