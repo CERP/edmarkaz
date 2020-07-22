@@ -24,6 +24,7 @@ const useStyles = makeStyles((theme) => ({
 		paddingBottom: theme.spacing(1)
 	},
 	footer: {
+		zIndex: 1,
 		left: 0,
 		right: 0,
 		bottom: 0,
