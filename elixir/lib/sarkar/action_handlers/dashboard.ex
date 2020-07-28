@@ -597,7 +597,6 @@ defmodule Sarkar.ActionHandler.Dashboard do
 
 	def handle_action(%{
 		"type" => "UPDATE_SCHOOL_ID",
-		"client_id" => _client_id,
 		"payload" => %{
 			"old_school_id" => old_school_id,
 			"new_school_id" => new_school_id
@@ -615,7 +614,6 @@ defmodule Sarkar.ActionHandler.Dashboard do
 
 	def handle_action(%{
 		"type" => "UPDATE_LOGIN_INFO",
-		"client_id" => _client_id,
 		"payload" => %{
 			"school_id" => school_id,
 			"value" => value
@@ -633,7 +631,6 @@ defmodule Sarkar.ActionHandler.Dashboard do
 
 	def handle_action(%{
 		"type" => "GET_MIS_FACULTY",
-		"client_id" => _client_id,
 		"payload" => %{
 			"school_id" => school_id
 		}
@@ -641,18 +638,18 @@ defmodule Sarkar.ActionHandler.Dashboard do
 	%{id: id, client_id: client_id} = state)
 	do
 		case EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
-			"SELECT DISTINCT
-			    path[3] as id,
-				value
-			FROM writes
-			WHERE school_id=$1 AND path[2]='users' AND value->>'type'='admin'",
+			"SELECT
+			   SPLIT_PART(f1.path, ',', 2) as id, f2.value as name
+		    FROM
+			(SELECT value, path FROM flattened_schools WHERE school_id=$1 AND path like 'users%type' AND value=to_jsonb('admin'::text)) as f1
+		    JOIN flattened_schools f2 ON f2.path=REPLACE(f1.path, 'type', 'name')",
 			[school_id]
 		) do
 			{:ok, resp } ->
 				faculty = resp.rows |> Enum.reduce(
 					%{},
-					fn [id, value], acc ->
-						Dynamic.put(acc, [id], value)
+					fn [id, name], acc ->
+						Dynamic.put(acc, [id], name)
 					end)
 
 				{:reply, succeed(faculty), state}
@@ -666,33 +663,15 @@ defmodule Sarkar.ActionHandler.Dashboard do
 
 	def handle_action(%{
 		"type" => "UPDATE_FACULTY_PASSWORD",
-		"client_id" => _client_id,
 		"payload" => %{
 			"merges" => merges,
-			"school_id" => school_id,
-			"faculty_id" => faculty_id,
-			"password" => password
+			"school_id" => school_id
 		}
 	},
 	%{id: id, client_id: client_id} = state)
 	do
-		case EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
-			"UPDATE flattened_schools
-			SET value=to_jsonb($2::text)
-			WHERE school_id=$1
-				AND (path='users,#{faculty_id},password'
-				OR path='faculty,#{faculty_id},Password')",
-			[school_id,password]
-		) do
-			{:ok, _resp } ->
-
-				start_school_broadcast_changes(school_id, merges)
-
-				{:reply, succeed("Password has been updated successfully!"), state}
-			{:error, err} ->
-				IO.inspect err
-				{:reply, fail("Unable to update the password!"), state}
-		end
+		start_school_broadcast_changes(school_id, merges)
+		{:reply, succeed("Password has been updated successfully!"), state}
 	end
 
 	defp start_school_broadcast_changes(school_id, merges) do
@@ -700,11 +679,9 @@ defmodule Sarkar.ActionHandler.Dashboard do
 			[{_, _}] -> {:ok}
 			[] -> DynamicSupervisor.start_child(EdMarkaz.SchoolSupervisor, {Sarkar.School, {school_id}})
 		end
-		merges |> Enum.map(
-			fn (merge) ->
-				Sarkar.School.sync_changes(school_id,"backend", merge, :os.system_time(:millisecond))
-			end
-		)
+
+		Sarkar.School.sync_changes(school_id,"backend", merges, :os.system_time(:millisecond))
+
 	end
 
 	defp fail(message) do

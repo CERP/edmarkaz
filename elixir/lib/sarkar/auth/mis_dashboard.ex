@@ -48,17 +48,23 @@ defmodule Sarkar.Auth.Dashboard do
 
 	def updateSchoolId({old_id, new_id}) do
 		case EdMarkaz.DB.Postgres.query(
-			EdMarkaz.School.DB,
+			EdMarkaz.DB,
 			"UPDATE auth SET id=$2 WHERE id=$1",
 			[old_id, new_id]
 			) do
 				{:ok, _res} ->
-					case EdMarkaz.DB.Postgres.query(EdMarkaz.School.DB,
-					"UPDATE flattened_schools SET school_id=$2 WHERE school_id=$1",
+					case EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
+					"UPDATE writes SET school_id=$2 WHERE school_id=$1",
 					[old_id, new_id]
 					) do
 						{:ok, _res} ->
-							{:ok, "updated #{old_id} with #{new_id}"}
+							case EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
+							"UPDATE flattened_schools SET school_id=$2 WHERE school_id=$1",
+							[old_id, new_id]
+							) do
+								{:ok, _res} ->
+									{:ok, "updated #{old_id} with #{new_id}"}
+							end
 					end
 				{:error, err} ->
 					IO.inspect err
