@@ -144,7 +144,7 @@ const HelpFooter: React.FC<PropsType> = ({ hlink }) => {
 									<Typography
 										className={classes.heading6}
 										variant="h6">
-										Need help
+										Need help?
 									</Typography>
 									{
 										toggleFooter ? <ExpandMoreIcon className={classes.expandLessIcon} onClick={expandMore} /> : <ExpandLessIcon className={classes.expandLessIcon} onClick={expandMore} />
