@@ -87,7 +87,7 @@ class LoggedOutHome extends React.Component<P, S> {
 				<img className="banner-img" src={banner} />
 			</div> */}
 			<Container maxWidth="md">
-				<Alert text="The bazaar service is currently suspended due to COVID-19. Please contact 03481191119 for more information." />
+				<Alert text="The bazaar service is currently suspended due to COVID-19. Please contact 0348-1119-119 for more information." />
 				<div className="tabs-home">
 					{
 						sorted

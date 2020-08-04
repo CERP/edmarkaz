@@ -13,6 +13,7 @@ import OptionsMobile from './pages/Front/front_mob'
 import School from './pages/School'
 import AutoLogin from './pages/SignUp/auto_login'
 import AppPrivacy from 'pages/Privacy'
+import Campaign from 'pages/Front/campaign'
 
 const Routes = ({ store }: { store: Store }) => (
 	<Provider store={store}>
@@ -21,6 +22,7 @@ const Routes = ({ store }: { store: Store }) => (
 				<TrackedRoute exact path="/" component={FrontPage} />
 				<TrackedRoute path="/privacy" component={AppPrivacy} />
 				<TrackedRoute exact path="/about-us" component={AboutUs} />
+				<TrackedRoute exact path="/sms" component={Campaign} />
 				<TrackedRoute exact path="/start-mob" component={OptionsMobile} />
 				<TrackedRoute path="/auth/:token" component={TokenAuth} />
 				<TrackedRoute path="/auto-login" component={AutoLogin} />
