@@ -7,6 +7,7 @@ import TeacherMain from './assets/teacher_main.png'
 import Student from './assets/student.jpeg'
 import School from './assets/school.jpeg'
 import Teacher from './assets/teacher.png'
+import Campaign from './assets/campaign.jpg'
 
 import './style.css'
 import { Link } from 'react-router-dom'
@@ -63,12 +64,26 @@ const FrontPage = () => {
 		<div className="partition">
 			<div className="img-container">
 				<div className="circle-frame">
+					<img className="img" src={Campaign} alt="student" />
+				</div>
+			</div>
+			<div className="info-container">
+				<div className="heading">Back to School SMS Program</div>
+				<div className="para">
+					Schools are reopening soon. Get back into learning mode with ilmexchange! Challenge yourself with these questions.
+				</div>
+				<Link className="pill" to="/sms"> Enter </Link>
+			</div>
+		</div>
+		<div className="partition bg-teal">
+			<div className="img-container">
+				<div className="circle-frame">
 					<img className="img" src={Student} alt="student" />
 				</div>
 			</div>
 			<div className="info-container">
-				<div className="heading">FOR STUDENTS</div>
-				<div className="para">
+				<div className="heading white">FOR STUDENTS</div>
+				<div className="para white">
 					At ilmexchange, we aim to bring together the largest collection
 					of digital educational resources for students in Pakistan.
 					Whether you prefer learning in Urdu or English, we bring you fun,
@@ -78,7 +93,23 @@ const FrontPage = () => {
 			</div>
 		</div>
 
-		<div className="partition reverse bg-teal">
+		<div className="partition reverse">
+			<div className="img-container">
+				<div className="circle-frame">
+					<img className="img" src={School} alt="school" />
+				</div>
+			</div>
+			<div className="info-container">
+				<div className="heading">FOR SCHOOLS</div>
+				<div className="para">
+					Join our network of over 1500 schools and get access to information,
+					tools for schools and Pakistan's largest Education Marketplace
+				</div>
+				<Link className="pill" to="/school"> School Portal</Link>
+			</div>
+		</div>
+
+		<div className="partition bg-teal">
 			<div className="img-container">
 				<div className="circle-frame">
 					<img className="img" src={Teacher} alt="teacher" />
@@ -92,22 +123,6 @@ const FrontPage = () => {
 					to help you and your classroom be the very best!
 				</div>
 				<div className="pill" onClick={() => setShowModal(true)}> Teacher Portal</div>
-			</div>
-		</div>
-
-		<div className="partition">
-			<div className="img-container">
-				<div className="circle-frame">
-					<img className="img" src={School} alt="school" />
-				</div>
-			</div>
-			<div className="info-container">
-				<div className="heading">FOR SCHOOLS</div>
-				<div className="para">
-					Join our network of over 1500 schools and get access to information,
-					tools for schools and Pakistan's largest Education Marketplace
-				</div>
-				<Link className="pill" to="/school"> School Portal</Link>
 			</div>
 		</div>
 

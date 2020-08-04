@@ -1,3 +1,7 @@
+.header-tabs {
+	margin-bottom: 5px;
+    box-shadow: 1px 1px 1px 1px #ebebeb;
+}
 .heading .logo {
 	background-image: url('./ilmx.svg');
 	background-position: 0% 50%;
