@@ -13,6 +13,108 @@ defmodule EdMarkaz.Server.Analytics do
 
 	end
 
+	match "/mis-usage.csv" do
+
+		{:ok, data} = case EdMarkaz.DB.Postgres.query(
+			EdMarkaz.DB,
+			"SELECT
+				ilmx_id,
+				mis_id,
+				students,
+				faculty,
+				sms_sent,
+				student_link_clicked,
+				signup_time,
+				signup_date,
+				phone
+			FROM (
+				SELECT
+					ps.id ilmx_id,
+					mis_id,
+					students,
+					faculty,
+					sms sms_sent,
+					ps.time::time signup_time,
+					ps.time::date signup_date,
+					ps.db ->> 'phone_number' as phone
+				FROM platform_schools ps
+				LEFT JOIN (
+						SELECT
+							ilmx_id,
+							mis_id,
+							students,
+							faculty,
+							sms
+						FROM ( SELECT mis_id, ilmx_id FROM ilmx_to_mis_mapper ) map
+						LEFT JOIN (
+								SELECT
+									a.school_id,
+									students,
+									faculty,
+									sms
+								FROM (
+										SELECT
+											school_id,
+											count(CASE WHEN fs.path LIKE 'students,%,Name' THEN fs.path END) as students,
+											count(CASE WHEN fs.path LIKE 'faculty,%,Name' THEN fs.path END) as faculty
+										FROM flattened_schools fs
+										GROUP BY school_id
+									) as a
+								LEFT JOIN (
+										SELECT
+											school_id,
+											SUM((value->> 'count'):: INTEGER) sms
+										FROM writes
+										WHERE path[2]='analytics' AND path[3]='sms_history'
+										GROUP BY school_id
+									) as b
+								ON a.school_id = b.school_id
+							) as val
+						ON map.mis_id = val.school_id
+					) fd
+				ON ps.id = fd.ilmx_id
+				WHERE length(ps.id)='36'
+			) as p
+			LEFT JOIN (
+				SELECT
+					meta ->> 'ref_code' id,
+					COUNT(*) student_link_clicked
+				FROM consumer_analytics
+				WHERE type='STUDENT_LINK_SIGNUP'
+				GROUP BY meta ->> 'ref_code'
+			) q
+			ON p.ilmx_id=q.id
+			ORDER BY signup_date",
+			[]
+		) do
+			{:ok, resp} -> {:ok, resp.rows}
+			{:error, err} -> {:error, err}
+		end
+
+		csv = [
+			[
+				"ilmx_id",
+				"mis_id",
+				"students",
+				"faculty",
+				"sms_sent",
+				"student_link_clicked",
+				"signup_time",
+				"signup_date",
+				"phone"
+			] |
+			data
+		]
+		|> CSV.encode()
+		|> Enum.join()
+
+		conn
+		|> put_resp_header("content-type", "text/csv")
+		|> put_resp_header("cache-control", "no-cache")
+		|> send_resp(200, csv)
+
+	end
+
 	match "/consumer-signups-verified.csv" do
 
 		{:ok, data} = case EdMarkaz.DB.Postgres.query(
