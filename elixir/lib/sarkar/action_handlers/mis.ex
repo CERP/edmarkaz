@@ -229,9 +229,9 @@ defmodule Sarkar.ActionHandler.Mis do
 
 	def handle_action(%{"type" => "RESET_ADMIN_PASSWORD", "payload" => payload}, %{school_id: school_id, client_id: client_id} = state) do
 
-		%{ "number" => phone_number, "code" => reset_code } = payload
+		%{ "number" => phone_number, "password" => temp_pass } = payload
 
-		msg_text = "<MISchool> Your reset code is #{reset_code}. (Valid for 10 mins)"
+		msg_text = "<MISchool> Your temporary password is #{temp_pass}. (Please don't share with anyone)"
 
 		case EdMarkaz.Contegris.send_sms(phone_number, msg_text) do
 			{:ok, res} ->
