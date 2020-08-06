@@ -231,6 +231,17 @@
 		font-size: 20px;
 		text-align: left;
 	}
+	.campaign .tag-row {
+		display: flex;
+		width: 100%;
+		align-items: center;
+	}
+	.tag-row .tag {
+		border-radius: 5px;
+		margin: 5px;
+		padding: 5px;
+		color: #222222;
+	}
 
 
 @media only screen and (min-width: 800px) {

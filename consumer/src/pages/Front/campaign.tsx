@@ -227,7 +227,12 @@ export default () => {
 									)
 									.map((q, index) => {
 										return <div className="qs-card" key={index}>
-											<div className="qs">{`Q: ${q.title}`}</div>
+											<div className="tag-row">
+												<div className="tag bg-orange">{`Week ${q.week}`}</div>
+												<div className="tag bg-teal">{`Class ${q.grade}`}</div>
+												<div className="tag bg-blue">{`${q.subject}`}</div>
+											</div>
+											<div className="qs">{`Q${index + 1}: ${q.title}`}</div>
 											<ol type="a">
 												{
 													Object.entries(q.sub_qs)
