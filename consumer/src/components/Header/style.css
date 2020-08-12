@@ -15,3 +15,13 @@
 .heading .logo .ilm {
 	color: var(--red);
 }
+
+.challenge-btn {
+	background-color: rgb(0, 103, 8);
+    color: white;
+    font-size: 13px;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 15px 10px 15px;
+    font-weight: 600;
+}
