@@ -1,0 +1,41 @@
+.independence-heading {
+	color: rgb(0, 73, 11);
+    font-weight: 700;
+	font-size: 30px;
+	margin-top:40px;
+}
+
+.poster {
+	height: 50%;
+    width: 60%;
+    border-radius: 20px;
+}
+
+.poster-div {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	align-items: center;
+	align-content: center;
+}
+
+.content-div {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+	padding: 20px;
+}
+
+.quotes {
+	margin-bottom: 20px;
+	color: black;
+	line-height: 2;
+}
+
+.quotes-div {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+	width: 30%;
+}
