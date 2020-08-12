@@ -39,3 +39,34 @@
 	align-items: center;
 	width: 30%;
 }
+
+@media only screen and (max-width: 768px) {
+	.content-div {
+		display: flex;
+		flex-direction: column-reverse;
+		justify-content: space-around;
+		padding: 20px;
+	}
+	.poster {
+		height: 50%;
+		width: 100%;
+		border-radius: 20px;
+	}
+	.quotes-div {
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-start;
+		align-items: center;
+		width: 100%;
+		margin-top: 20px;
+	}
+}
+
+@media only screen and (max-width: 768px) {
+	.independence-heading {
+		color: rgb(0, 73, 11);
+		font-weight: 700;
+		font-size: 25px;
+		margin-top: 40px;
+	}
+}
