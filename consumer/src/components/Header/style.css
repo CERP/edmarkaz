@@ -36,6 +36,10 @@
     font-weight: 600;
 }
 
+.links-div {
+	align-items: center;
+}
+
 @media only screen and (max-width: 768px) {
 	.challenge-btn {
 		background-color: transparent;
@@ -54,5 +58,8 @@
 		text-decoration: none;
 		height: 80%;
 		width: 55%;
+	}
+	.links-div {
+		align-items: center;
 	}
 }
