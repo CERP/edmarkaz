@@ -3,6 +3,7 @@ import Header from '../../components/Header'
 import StudentMain from './assets/student_main.png'
 import SchoolMain from './assets/school_main.png'
 import TeacherMain from './assets/teacher_main.png'
+import Flag from './assets/flag.jpg'
 
 import Student from './assets/student.jpeg'
 import School from './assets/school.jpeg'
@@ -64,26 +65,41 @@ const FrontPage = () => {
 		<div className="partition">
 			<div className="img-container">
 				<div className="circle-frame">
+					<img className="img" src={Flag} alt="student" />
+				</div>
+			</div>
+			<div className="info-container">
+				<div className="heading">Independence Challenge</div>
+				<div className="para">
+					Schools are reopening soon. Get back into learning mode with ilmexchange! Challenge yourself with these questions.
+				</div>
+				<Link className="pill" to="/challenge"> Enter </Link>
+			</div>
+		</div>
+		<div className="partition bg-teal">
+			<div className="img-container">
+				<div className="circle-frame">
 					<img className="img" src={Campaign} alt="student" />
 				</div>
 			</div>
 			<div className="info-container">
-				<div className="heading">Back to School SMS Program</div>
-				<div className="para">
+				<div className="heading white">Back to School SMS Program</div>
+				<div className="para white">
 					Schools are reopening soon. Get back into learning mode with ilmexchange! Challenge yourself with these questions.
 				</div>
 				<Link className="pill" to="/sms"> Enter </Link>
 			</div>
 		</div>
-		<div className="partition bg-teal">
+		<div className="partition
+		">
 			<div className="img-container">
 				<div className="circle-frame">
 					<img className="img" src={Student} alt="student" />
 				</div>
 			</div>
 			<div className="info-container">
-				<div className="heading white">FOR STUDENTS</div>
-				<div className="para white">
+				<div className="heading">FOR STUDENTS</div>
+				<div className="para">
 					At ilmexchange, we aim to bring together the largest collection
 					of digital educational resources for students in Pakistan.
 					Whether you prefer learning in Urdu or English, we bring you fun,
@@ -93,15 +109,15 @@ const FrontPage = () => {
 			</div>
 		</div>
 
-		<div className="partition reverse">
+		<div className="partition bg-teal reverse">
 			<div className="img-container">
 				<div className="circle-frame">
 					<img className="img" src={School} alt="school" />
 				</div>
 			</div>
 			<div className="info-container">
-				<div className="heading">FOR SCHOOLS</div>
-				<div className="para">
+				<div className="heading white">FOR SCHOOLS</div>
+				<div className="para white">
 					Join our network of over 1500 schools and get access to information,
 					tools for schools and Pakistan's largest Education Marketplace
 				</div>
@@ -109,15 +125,15 @@ const FrontPage = () => {
 			</div>
 		</div>
 
-		<div className="partition bg-teal">
+		<div className="partition">
 			<div className="img-container">
 				<div className="circle-frame">
 					<img className="img" src={Teacher} alt="teacher" />
 				</div>
 			</div>
 			<div className="info-container">
-				<div className="heading white">FOR TEACHERS</div>
-				<div className="para white">
+				<div className="heading">FOR TEACHERS</div>
+				<div className="para">
 					Teaching is hard work, but there are countless resources out there to help.
 					We curate and organize high quality materials and teacher training content
 					to help you and your classroom be the very best!

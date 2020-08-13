@@ -46,7 +46,7 @@
 	.header-tabs .bttn {
 		color: #8D8D8D;
 		font-size: 15px;
-		/* width: 8%; */
+		width: 30%;
 		text-align: right;
 		margin: 0px 5px;
 		text-decoration: none;
@@ -284,14 +284,5 @@
 			}
 		.tabs-page .contact-us {
 			display: none;
-		}
-	}
-	@media only screen and (max-width: 768px) {
-		.header-tabs .bttn {
-			color: #8D8D8D;
-			font-size: 10px;
-			text-align: right;
-			margin: 0px 5px;
-			text-decoration: none;
 		}
 	}
