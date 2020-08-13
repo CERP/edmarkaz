@@ -71,7 +71,7 @@ const FrontPage = () => {
 			<div className="info-container">
 				<div className="heading">Independence Challenge</div>
 				<div className="para">
-					Schools are reopening soon. Get back into learning mode with ilmexchange! Challenge yourself with these questions.
+					IlmExchange holds inclusive open contest inviting students to participate and unleash their imagination and creative vision for the country.
 				</div>
 				<Link className="pill" to="/challenge"> Enter </Link>
 			</div>
