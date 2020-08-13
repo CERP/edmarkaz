@@ -16,8 +16,10 @@ const Header = ({ path, history }: Props) => {
 			(path !== "/" && path !== "/about-us") && <img src={BackIcon} style={{ width: "20px", marginRight: "10px" }} onClick={() => history.goBack()} alt="back-arrow" />
 		}
 		<Link to="" className="logo" />
-		<Link to="/challenge" className="challenge-btn">Challenge</Link>
-		<Link to="/about-us" className={path !== "/about-us" ? "bttn" : "bttn active"}>About Us</Link>
+		<div>
+			<Link to="/challenge" className="challenge-btn">Challenge</Link>
+			<Link to="/about-us" className={path !== "/about-us" ? "bttn" : "bttn active"}>About Us</Link>
+		</div>
 	</div>
 }
 
