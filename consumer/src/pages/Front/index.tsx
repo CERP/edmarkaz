@@ -3,7 +3,7 @@ import Header from '../../components/Header'
 import StudentMain from './assets/student_main.png'
 import SchoolMain from './assets/school_main.png'
 import TeacherMain from './assets/teacher_main.png'
-import Flag from './assets/flag.jpg'
+import Flag from './assets/flag-background.jpg'
 
 import Student from './assets/student.jpeg'
 import School from './assets/school.jpeg'
