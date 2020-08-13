@@ -346,6 +346,7 @@ export default () => {
 							<select onChange={(e) => set_week(e.target.value)}>
 								<option value="">Week</option>
 								<option value="1">Week 1</option>
+								<option value="2">Week 2</option>
 							</select>
 							<select onChange={(e) => set_subject(e.target.value)}>
 								<option value="">Subject</option>

@@ -69,9 +69,9 @@ const FrontPage = () => {
 				</div>
 			</div>
 			<div className="info-container">
-				<div className="heading">Independence Challenge</div>
+				<div className="heading">14th August Competition!</div>
 				<div className="para">
-					IlmExchange holds inclusive open contest inviting students to participate and unleash their imagination and creative vision for the country.
+					Send us art, poems or essays to celebrate the spirit of being Pakistani. Find out more details about how to participate
 				</div>
 				<Link className="pill" to="/challenge"> Enter </Link>
 			</div>
