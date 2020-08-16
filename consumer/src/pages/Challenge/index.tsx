@@ -9,9 +9,6 @@ function Challenge(props: any) {
 		<div className="poster-div" >
 			<h3 className="independence-heading">Happy Independence Day</h3>
 			<div className="content-div">
-				<div className="quotes">
-					"Pakistan not only means freedom and independence but the Muslim Ideology which has to be preserved, which has come to us as a precious gift and treasure and which, we hope other will share with us"
-					</div>
 				<img className="poster" src={poster} alt="img" />
 			</div>
 		</div >
