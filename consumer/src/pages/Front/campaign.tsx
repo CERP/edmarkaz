@@ -174,6 +174,148 @@ const qs_list: HC_QS[] = [
 			b: "Park",
 			c: "Classroom"
 		}
+	},
+	{
+		title: "Subtract the following values:",
+		grade: "3",
+		subject: "Math",
+		week: "2",
+		sub_qs: {
+			a: "1173 – 722 =",
+			b: "8911 – 6433 =",
+			c: "9366 – 5856 ="
+		},
+		ans: {
+			a: "451",
+			b: "2478",
+			c: "3510"
+		}
+	},
+	{
+		title: "Answer the following questions.",
+		grade: "4",
+		subject: "Math",
+		week: "2",
+		sub_qs: {
+			a: "A cake had 8 slices in total. Ali ate 3 slices. What fraction of the cake is left?"
+		},
+		ans: {
+			a: "⅝ of the cake is left",
+		}
+	},
+	{
+		title: "Use BODMAS to solve the following:",
+		grade: "5",
+		subject: "Math",
+		week: "2",
+		sub_qs: {
+			a: "25 + (27 ÷ 3) =  ?",
+			b: "(40  ÷ 5) + 10 = ?"
+		},
+		ans: {
+			a: "34",
+			b: "18"
+		}
+	},
+	{
+		title: "Answer the following questions.",
+		grade: "6",
+		subject: "Math",
+		week: "2",
+		sub_qs: {
+			a: "What is the LCM of 2 and 5?",
+			b: "What is the LCM of 4 and 8?"
+		},
+		ans: {
+			a: "10",
+			b: "8"
+		}
+	},
+	{
+		title: "Answer the following questions.",
+		grade: "7",
+		subject: "Math",
+		week: "2",
+		sub_qs: {
+			a: "List numbers in ascending order: 3/6, 2/3, ¼",
+		},
+		ans: {
+			a: "Ascending order: ¼, 3/6, 2/3"
+		}
+	},
+	{
+		title: "Complete the words using air, ear, or are.",
+		grade: "3",
+		subject: "English",
+		week: "2",
+		sub_qs: {
+			a: "C",
+			b: "Sh",
+			c: "P"
+		},
+		ans: {
+			a: "Chair/care",
+			b: "Share/shear",
+			c: "Pair/pear "
+		}
+	},
+	{
+		title: "Name one word that has the:",
+		grade: "4",
+		subject: "English",
+		week: "2",
+		sub_qs: {
+			a: "SHORT E sound",
+			b: "LONG E sound"
+		},
+		ans: {
+			a: "Ten, pen, jet, wet, vet",
+			b: "Feed, beat, bee, seat, dear"
+		}
+	},
+	{
+		title: "Think of three words for each of the sounds:",
+		grade: "5",
+		subject: "English",
+		week: "2",
+		sub_qs: {
+			a: "eet",
+			b: "eat"
+		},
+		ans: {
+			a: "Meet, Sheet, Sweet, Discreet",
+			b: "Meat, Neat, Repeat, Defeat"
+		}
+	},
+	{
+		title: "Write the past tense of the following verbs.",
+		grade: "6",
+		subject: "English",
+		week: "2",
+		sub_qs: {
+			a: "Buy",
+			b: "Find",
+			c: "Eat"
+		},
+		ans: {
+			a: "Bought",
+			b: "Found",
+			c: "Ate"
+		}
+	},
+	{
+		title: "Place the apostrophe in the following.",
+		grade: "7",
+		subject: "English",
+		week: "2",
+		sub_qs: {
+			a: "That is Alis car",
+			b: "Abbas pencil is broken"
+		},
+		ans: {
+			a: "Ali’s",
+			b: "Abbas’"
+		}
 	}
 ]
 
@@ -204,6 +346,7 @@ export default () => {
 							<select onChange={(e) => set_week(e.target.value)}>
 								<option value="">Week</option>
 								<option value="1">Week 1</option>
+								<option value="2">Week 2</option>
 							</select>
 							<select onChange={(e) => set_subject(e.target.value)}>
 								<option value="">Subject</option>
@@ -227,7 +370,12 @@ export default () => {
 									)
 									.map((q, index) => {
 										return <div className="qs-card" key={index}>
-											<div className="qs">{`Q: ${q.title}`}</div>
+											<div className="tag-row">
+												<div className="tag bg-orange">{`Week ${q.week}`}</div>
+												<div className="tag bg-teal">{`Class ${q.grade}`}</div>
+												<div className="tag bg-blue">{`${q.subject}`}</div>
+											</div>
+											<div className="qs">{`Q${index + 1}: ${q.title}`}</div>
 											<ol type="a">
 												{
 													Object.entries(q.sub_qs)

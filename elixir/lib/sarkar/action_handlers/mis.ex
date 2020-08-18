@@ -227,6 +227,21 @@ defmodule Sarkar.ActionHandler.Mis do
 		{:reply, succeed(), state}
 	end
 
+	def handle_action(%{"type" => "RESET_ADMIN_PASSWORD", "payload" => payload}, %{school_id: school_id, client_id: client_id} = state) do
+
+		%{ "number" => phone_number, "password" => temp_pass } = payload
+
+		msg_text = "<MISchool> Your temporary password is #{temp_pass}. (Please don't share with anyone)"
+
+		case EdMarkaz.Contegris.send_sms(phone_number, msg_text) do
+			{:ok, res} ->
+				{:reply, succeed(res), state}
+			{:error, msg} ->
+				IO.inspect msg
+				{:reply, fail(msg), state}
+		end
+	end
+
 	def handle_action(%{"type" => "SYNC", "payload" => payload, "school_id" => school_id}, state) do
 
 		changes = payload |> Map.keys |> Enum.count
