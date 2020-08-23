@@ -1,5 +1,5 @@
-import React, { useEffect, memo } from 'react'
-import { Route, RouteProps, withRouter, RouteComponentProps, matchPath } from 'react-router-dom'
+import React from 'react'
+import { Route, RouteProps } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { trackRoute } from '../../actions'
 

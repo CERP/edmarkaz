@@ -135,20 +135,3 @@ export function unregister() {
 		});
 	}
 }
-
-//initializing workbox-google-analytics for offline tracking
-// if ('serviceWorker' in navigator) {
-// 	window.addEventListener('load', () => {
-// 		navigator.serviceWorker
-// 			.register('service-worker.js', {
-// 				scope: '/'
-// 			})
-// 			.then(registration => {
-// 				console.log('SW registered: ', registration);
-// 				googleAnalytics.initialize();
-// 			})
-// 			.catch(registrationError => {
-// 				console.log('SW registration failed: ', registrationError);
-// 			});
-// 	});
-// }
