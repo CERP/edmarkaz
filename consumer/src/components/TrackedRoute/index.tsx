@@ -1,11 +1,13 @@
-import React, { useEffect } from 'react'
-import { Route, RouteProps } from 'react-router-dom'
+import React, { useEffect, memo } from 'react'
+import { Route, RouteProps, withRouter, RouteComponentProps, matchPath } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { trackRoute } from '../../actions'
+import useReactPath from 'utils/useReactPath'
 
 
 declare global {
 	interface Window {
+		ga_id: string,
 		gtag?: (
 			key: string,
 			trackingId: string,
@@ -24,7 +26,7 @@ const TrackedRoute = ({ component, trackRoute, ...rest }: propsType) => {
 
 	return <Route {...rest} render={(props) => {
 		if (window.gtag) {
-			window.gtag('config', 'UA-174568735-1', { page_path: window.location.pathname })
+			window.gtag('config', window.ga_id, { page_path: window.location.pathname })
 		}
 		trackRoute(window.location.pathname)
 		//@ts-ignore
