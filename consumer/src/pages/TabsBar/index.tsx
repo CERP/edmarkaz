@@ -24,7 +24,6 @@ import "./style.css";
 import SchoolDashboard from "pages/School/Dashboard";
 
 interface S {
-	tab: number;
 	error: boolean;
 	err?: Error;
 	errInfo?: React.ErrorInfo;
@@ -46,7 +45,6 @@ class TabsBar extends Component<propTypes, S> {
 		super(props);
 
 		this.state = {
-			tab: this.getCurrentTab(this.props.location.pathname),
 			error: false,
 			err: undefined,
 			errInfo: undefined,
@@ -54,7 +52,6 @@ class TabsBar extends Component<propTypes, S> {
 	}
 
 	getCurrentTab = (path: string) => {
-
 		if (path.split("/").some((i) => i === "dashboard")) {
 			return 0
 		}
@@ -70,14 +67,6 @@ class TabsBar extends Component<propTypes, S> {
 		return 4
 	}
 
-	componentDidUpdate(prevProps: propTypes) {
-		if (this.props.location.pathname !== prevProps.location.pathname) {
-			this.setState({
-				tab: this.getCurrentTab(this.props.location.pathname)
-			})
-		}
-	}
-
 	componentDidCatch(err: Error, errInfo: React.ErrorInfo) {
 		this.props.sendError(err, errInfo);
 
@@ -87,11 +76,6 @@ class TabsBar extends Component<propTypes, S> {
 			errInfo
 		});
 	}
-
-	handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
-
-		this.setState({ tab: newValue })
-	};
 
 	render() {
 
@@ -113,8 +97,7 @@ class TabsBar extends Component<propTypes, S> {
 				{user === "SCHOOL" && current !== "/profile" && current !== "/start-mob" && current !== "/log-in" &&
 					<Paper style={{ flexGrow: 1 }}>
 						<Tabs
-							onChange={this.handleTabChange}
-							value={this.state.tab}
+							value={this.getCurrentTab(this.props.location.pathname)}
 							indicatorColor="primary"
 							textColor="primary"
 							centered
