@@ -60,6 +60,21 @@ export const SchoolForm: React.SFC<SchoolProp> = ({ school, former, base_path })
 			style={{ marginTop: 10 }}
 			variant="outlined"
 			select
+			label="Provice"
+			fullWidth
+			{...former.super_handle([...base_path, "school_province"])}
+		>
+			{
+				Object.keys(getDistrictTehsilList()).map(
+					province => <MenuItem value={province}>{province}</MenuItem>
+				)
+			}
+		</TextField>
+
+		<TextField
+			style={{ marginTop: 10 }}
+			variant="outlined"
+			select
 			label="District"
 			fullWidth
 			{...former.super_handle([...base_path, "school_district"])}
