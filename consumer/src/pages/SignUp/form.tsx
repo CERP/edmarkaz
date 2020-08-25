@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React, { useState } from 'react'
 import Former from 'former'
 import Dynamic from '@ironbay/dynamic'
 import { Typography, TextField, MenuItem } from '@material-ui/core'
@@ -21,6 +21,10 @@ export const SchoolForm: React.SFC<SchoolProp> = ({ school, former, base_path })
 
 	// @ts-ignore
 	const district_tehsils = school.school_district && getDistrictTehsilList()["PUNJAB"][school.school_district]
+	const [province, setProvince] = useState('')
+	const getProvince = (e: any) => {
+		setProvince(e.target.value)
+	}
 
 	return <>
 		<TextField
@@ -62,7 +66,7 @@ export const SchoolForm: React.SFC<SchoolProp> = ({ school, former, base_path })
 			select
 			label="Provice"
 			fullWidth
-			{...former.super_handle([...base_path, "school_province"])}
+			onChange={getProvince}
 		>
 			{
 				Object.keys(getDistrictTehsilList()).map(
@@ -70,21 +74,23 @@ export const SchoolForm: React.SFC<SchoolProp> = ({ school, former, base_path })
 				)
 			}
 		</TextField>
-
-		<TextField
-			style={{ marginTop: 10 }}
-			variant="outlined"
-			select
-			label="District"
-			fullWidth
-			{...former.super_handle([...base_path, "school_district"])}
-		>
-			{
-				Object.keys(getDistrictTehsilList()["PUNJAB"]).map(
-					district => <MenuItem value={district}>{district}</MenuItem>
-				)
-			}
-		</TextField>
+		{
+			province !== '' ? <TextField
+				style={{ marginTop: 10 }}
+				variant="outlined"
+				select
+				label="District"
+				fullWidth
+				{...former.super_handle([...base_path, "school_district"])}
+			>
+				{
+					//@ts-ignore
+					Object.keys(getDistrictTehsilList()[province && province]).map(
+						district => <MenuItem value={district}>{district}</MenuItem>
+					)
+				}
+			</TextField> : null
+		}
 
 		{district_tehsils && district_tehsils.length > 0 && school.school_district && <TextField
 			style={{ marginTop: 10 }}
