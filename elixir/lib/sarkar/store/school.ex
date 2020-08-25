@@ -3,19 +3,37 @@ defmodule Sarkar.Store.School do
 
 	def save(school_id, writes) do
 
+		IO.puts "PUTTING IN FLATTENED"
+
 		save_flattened(school_id, writes)
+
+		IO.puts "PUTTING IN WRITES"
+
 		save_writes(school_id, writes)
+
+
+		# half_of_writes = round(length(writes) / 2)
+
+		# [first, second] = Enum.chunk_every(writes, half_of_writes)
+
+		# IO.inspect first
+		# IO.inspect second
+
+		# IO.puts "First Chunk"
+		# save_writes(school_id, first)
+		# IO.puts "Second Chunk"
+		# save_writes(school_id, second)
 
 	end
 
 	def save_writes(school_id, writes) do
-		flattened_writes = Map.values(writes)
+		flattened_writes = writes
 			|> Enum.map(fn %{"date" => date, "value" => value, "path" => path, "type" => type, "client_id" => client_id} ->
 				[school_id, path, value, date, type, client_id]
 			end)
 			|> Enum.reduce([], fn curr, agg -> Enum.concat(agg, curr) end)
 
-		gen_value_strings_writes = Stream.with_index(Map.values(writes), 1)
+		gen_value_strings_writes = Stream.with_index(writes, 1)
 			|> Enum.map(fn {w, i} ->
 				x = (i - 1) * 6 + 1
 				"($#{x}, $#{x + 1}, $#{x + 2}, $#{x + 3}, $#{x + 4}, $#{x + 5})"
@@ -34,7 +52,7 @@ defmodule Sarkar.Store.School do
 	end
 
 	def save_flattened(school_id, writes) do
-		flattened_db = Map.values(writes)
+		flattened_db = writes
 			|> Enum.reduce([], fn(%{"date" => date, "value" => value, "path" => path, "type" => type, "client_id" => client_id}, agg) ->
 
 				path = Enum.drop(path, 1)
@@ -88,6 +106,9 @@ defmodule Sarkar.Store.School do
 
 					case type do
 						"MERGE" ->
+
+							IO.puts "INSIDE MERGE"
+
 							gen_value_strings_db = 1..trunc(Enum.count(chunked_muts))
 								|> Enum.map(fn i ->
 									x = (i - 1) * 4 + 1
@@ -101,8 +122,12 @@ defmodule Sarkar.Store.School do
 							arguments = chunked_muts |> Enum.reduce([], fn (a, collect) -> collect ++ a end)
 							{:ok, res }= EdMarkaz.DB.Postgres.query(conn, query_string, arguments)
 							res
+							IO.inspect arguments
 
 						"DELETE" ->
+
+							IO.puts "INSIDE DELETE"
+
 							{query_section, arguments} = chunked_muts
 								|> Enum.with_index()
 								|> Enum.map(fn {[_, path, _, _], index} ->
@@ -116,10 +141,13 @@ defmodule Sarkar.Store.School do
 							query_string = "DELETE FROM flattened_schools WHERE school_id = $1 and #{Enum.join(query_section, " OR ")}"
 							{:ok, res} = EdMarkaz.DB.Postgres.query(conn, query_string, [school_id | arguments])
 							res
+
+							IO.inspect arguments
+
 					end
 				end)
 			end)
-		end, pool: DBConnection.Poolboy)
+		end, pool: DBConnection.Poolboy, timeout: 60_000*20)
 
 	end
 
