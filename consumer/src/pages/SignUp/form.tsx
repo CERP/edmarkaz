@@ -19,12 +19,13 @@ interface SchoolProp {
 
 export const SchoolForm: React.SFC<SchoolProp> = ({ school, former, base_path }) => {
 
-	// @ts-ignore
-	const district_tehsils = school.school_district && getDistrictTehsilList()["PUNJAB"][school.school_district]
-	const [province, setProvince] = useState('')
+	const [province, setProvince] = useState(null)
 	const getProvince = (e: any) => {
 		setProvince(e.target.value)
 	}
+
+	// @ts-ignore
+	const district_tehsils = school.school_district && getDistrictTehsilList()[province !== null ? province : "PUNJAB"][school.school_district]
 
 	return <>
 		<TextField
@@ -75,7 +76,7 @@ export const SchoolForm: React.SFC<SchoolProp> = ({ school, former, base_path })
 			}
 		</TextField>
 		{
-			province !== '' ? <TextField
+			province !== null ? <TextField
 				style={{ marginTop: 10 }}
 				variant="outlined"
 				select
@@ -85,7 +86,7 @@ export const SchoolForm: React.SFC<SchoolProp> = ({ school, former, base_path })
 			>
 				{
 					//@ts-ignore
-					Object.keys(getDistrictTehsilList()[province && province]).map(
+					Object.keys(getDistrictTehsilList()[province !== null ? province : "PUNJAB"]).map(
 						district => <MenuItem value={district}>{district}</MenuItem>
 					)
 				}
@@ -104,13 +105,13 @@ export const SchoolForm: React.SFC<SchoolProp> = ({ school, former, base_path })
 				district_tehsils.map((tehsil: string) => <MenuItem value={tehsil}>{tehsil}</MenuItem>)
 			}
 		</TextField>}
-		{
+		{/* {
 			district_tehsils === undefined && <EditSurveyRow
 				base_path={base_path}
 				label="Tehsil"
 				path={["school_tehsil"]}
 				former={former} />
-		}
+		} */}
 		{/* <Typography
 			variant="h6"
 			align="left"
