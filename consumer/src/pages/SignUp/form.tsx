@@ -65,7 +65,7 @@ export const SchoolForm: React.SFC<SchoolProp> = ({ school, former, base_path })
 			style={{ marginTop: 10 }}
 			variant="outlined"
 			select
-			label="Provice"
+			label="Province"
 			fullWidth
 			onChange={getProvince}
 		>
