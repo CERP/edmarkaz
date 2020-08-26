@@ -40,6 +40,7 @@ defmodule Sarkar.ActionHandler.Mis do
 								parent = self()
 
 								start_school(school_id)
+								Sarkar.School.init_trial(school_id)
 								register_connection(school_id, client_id)
 
 								spawn fn ->

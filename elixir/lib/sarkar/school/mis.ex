@@ -36,7 +36,7 @@ defmodule Sarkar.School do
 					"type" => "MERGE",
 					"value" => %{
 						"paid" => false,
-						"trial_period" => 15,
+						"trial_period" => 180,
 						"date" => curr_time
 					}
 				}
