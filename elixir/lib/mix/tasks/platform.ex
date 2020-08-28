@@ -9,25 +9,27 @@ defmodule Mix.Tasks.Platform do
 
 		IO.puts "Records fetching"
 
+
 		{:ok, res} = EdMarkaz.DB.Postgres.query(
 			EdMarkaz.DB,
 			"SELECT time, type, path, value, client_id
 			FROM writes
-			WHERE school_id='scholarschoolshk' AND time/1000 < $1
-			order by time asc", [august_seventh]
+			WHERE school_id='scholarschoolshk'
+			order by time desc", []
 		)
 
-		mapped_writes = res.rows
-		|> Enum.map(fn ([time, type, path, value, client_id]) ->
-			%{"date" => time, "type" => type, "path" => path, "value" => value, "client_id" => client_id}
-		end)
+		# mapped_writes = res.rows
+		# |> Enum.map(fn ([time, type, path, value, client_id]) ->
+		# 	%{"date" => time, "type" => type, "path" => path, "value" => value, "client_id" => client_id}
+		# end)
 
-		Sarkar.Store.School.save("scholarschoolshk1", mapped_writes)
+		# Sarkar.Store.School.save("tempscholarschool", mapped_writes)
 
 		# take an example student and have an idea of what their payments
 		# table should look like
 
-		IO.inspect "NEW STATE"
+		# IO.inspect "NEW STATE"
+		
 		new_state = res.rows
 		|> Enum.reduce(%{}, fn([time, type, path, value, client_id], agg) ->
 
@@ -46,24 +48,23 @@ defmodule Mix.Tasks.Platform do
 		end)
 
 		# IO.inspect new_state
-		# IO.inspect Dynamic.get(new_state, ["db", "students", "0bccee08-f020-40fd-bc80-a5c81129facd", "payments"])
+		IO.inspect Dynamic.get(new_state, ["db", "students", "0bccee08-f020-40fd-bc80-a5c81129facd", "payments"])
 
-		# all_students = Dynamic.get(new_state, ["db", "students"])
-		# all_classes = Dynamic.get(new_state, ["db", "classes"])
+		all_students = Dynamic.get(new_state, ["db", "students"])
+		all_classes = Dynamic.get(new_state, ["db", "classes"])
 
-		# IO.inspect all_classes
-		# IO.puts "SETTINGS"
-		# IO.inspect Dynamic.get(new_state, ["db", "settings"])
-		# IO.puts "TEACHERS"
-		# faculty = Dynamic.get(new_state, ["db", "faculty"]) |> Map.keys() |> length
+		IO.inspect all_classes |> Map.keys() |> length
+		IO.puts "SETTINGS"
+		IO.inspect Dynamic.get(new_state, ["db", "settings"])
+		IO.puts "TEACHERS"
+		faculty = Dynamic.get(new_state, ["db", "faculty"]) |> Map.keys() |> length
 
-		# IO.puts faculty
-
+		IO.puts faculty
 
 		# find the total students
-		# total_students = length(Enum.uniq(Map.keys(all_students)))
+		total_students = length(Enum.uniq(Map.keys(all_students)))
 		# IO.inspect total_students
-		# IO.puts "total students are: #{total_students}"
+		IO.puts "total students are: #{total_students}"
 
 	end
 

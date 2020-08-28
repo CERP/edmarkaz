@@ -7,17 +7,17 @@ defmodule Sarkar.Store.School do
 
 		save_flattened(school_id, writes)
 
-		IO.puts "PUTTING IN WRITES"
+		# IO.puts "PUTTING IN WRITES"
 
-		save_writes(school_id, writes)
+		# save_writes(school_id, writes)
 
 
 		# half_of_writes = round(length(writes) / 2)
 
 		# [first, second] = Enum.chunk_every(writes, half_of_writes)
 
-		# IO.inspect first
-		# IO.inspect second
+		# # IO.inspect first
+		# # IO.inspect second
 
 		# IO.puts "First Chunk"
 		# save_writes(school_id, first)
@@ -51,14 +51,28 @@ defmodule Sarkar.Store.School do
 
 	end
 
+	# defp duplicates(list) do
+	# 	acc_dupes = fn(x, {elems, dupes}) ->
+	# 	  case Map.has_key?(elems, x) do
+	# 		true -> {elems, Map.put(dupes, x, nil)}
+	# 		false -> {Map.put(elems, x, nil), dupes}
+	# 	  end
+	# 	end
+
+	# 	list |> Enum.reduce({%{}, %{}}, acc_dupes) |> elem(1) |> Map.keys()
+	#   end
+
+
+
 	def save_flattened(school_id, writes) do
+
 		flattened_db = writes
 			|> Enum.reduce([], fn(%{"date" => date, "value" => value, "path" => path, "type" => type, "client_id" => client_id}, agg) ->
 
 				path = Enum.drop(path, 1)
 				if is_map(value) do
 					flat_write = Dynamic.flatten(value)
-						|> Enum.map(fn {p, v} -> {Enum.join(path ++ p, ","), [type, school_id, path ++ p, v, date]} end)
+						|> Enum.map(fn {k, v} -> {Enum.join(path ++ k, ","), [type, school_id, path ++ k, v, date]} end)
 
 					Enum.concat(agg, flat_write)
 				else
@@ -66,13 +80,23 @@ defmodule Sarkar.Store.School do
 					# Enum.concat( agg, [[type, school_id, path, value, date]] )
 				end
 			end)
+
 			|> Enum.sort( fn({_, [_, _, _, _, d1]}, {_, [_, _, _, v, d2]} ) -> d1 < d2 end)
-			|> Enum.into(%{})
+			# |> Enum.into(%{})
 			|> Enum.map(fn {_, v} -> v end)
 
+
+		# IO.inspect flattened_db
+
+		# dupes = flattened_db |> duplicates
+		# IO.puts "count of dupes #{length(dupes)}"
+
 		# array of map %{ type: "MERGE" | "DELETE", mutations: [ [date, value, path, type, client_id] ] }
+
 		flattened_db_sequence = flattened_db
+		# IO.inspect dupes
 			|> Enum.reduce([], fn([type, school_id, path, value, date], agg) ->
+
 				prev = Enum.at(agg, -1) || %{}
 
 				case Map.get(prev, "type") do
@@ -119,10 +143,16 @@ defmodule Sarkar.Store.School do
 								VALUES #{Enum.join(gen_value_strings_db, ",")}
 								ON CONFLICT (school_id, path) DO UPDATE set value=excluded.value, time=excluded.time"
 
+
 							arguments = chunked_muts |> Enum.reduce([], fn (a, collect) -> collect ++ a end)
-							{:ok, res }= EdMarkaz.DB.Postgres.query(conn, query_string, arguments)
-							res
+
 							IO.inspect arguments
+
+							{:ok, res }= EdMarkaz.DB.Postgres.query(conn, query_string, arguments)
+
+							res
+
+							# IO.inspect res
 
 						"DELETE" ->
 
@@ -141,8 +171,8 @@ defmodule Sarkar.Store.School do
 							query_string = "DELETE FROM flattened_schools WHERE school_id = $1 and #{Enum.join(query_section, " OR ")}"
 							{:ok, res} = EdMarkaz.DB.Postgres.query(conn, query_string, [school_id | arguments])
 							res
-
-							IO.inspect arguments
+							# IO.inspect res
+							# IO.inspect arguments
 
 					end
 				end)
@@ -208,3 +238,42 @@ defmodule Sarkar.Store.School do
 		end
 	end
 end
+
+list = [
+	["DELETE", 5],
+	["MERGE", 12],
+	["DELETE",4],
+	["MERGE", 16]
+]
+
+list |> Enum.reduce([], fn([type, value], agg) ->
+
+	prev = Enum.at(agg, -1) || %{}
+
+	IO.puts "--------------------------"
+
+	IO.inspect prev
+
+	 case Map.get(prev, "type") do
+		 ^type ->
+
+			IO.puts type
+
+			droped = Enum.drop(agg, -1)
+
+			IO.inspect droped
+			IO.puts "--------------------------"
+
+			droped ++ [%{
+				"type" => type,
+				"mutations" => Map.get(prev, "mutations") ++ [value]
+			}]
+
+	 	other ->
+			 agg ++ [%{
+				"type" => type,
+				"mutations" => [value]
+			}]
+	end
+
+end)
