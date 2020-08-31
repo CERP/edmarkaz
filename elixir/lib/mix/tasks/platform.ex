@@ -9,62 +9,116 @@ defmodule Mix.Tasks.Platform do
 
 		IO.puts "Records fetching"
 
-
+		IO.puts "Fetching Writes"
 		{:ok, res} = EdMarkaz.DB.Postgres.query(
 			EdMarkaz.DB,
 			"SELECT time, type, path, value, client_id
 			FROM writes
-			WHERE school_id='scholarschoolshk'
-			order by time desc", []
+			WHERE school_id='scholarschoolshk' AND time/1000 < 1596758400",
+			[]
 		)
 
-		# mapped_writes = res.rows
-		# |> Enum.map(fn ([time, type, path, value, client_id]) ->
-		# 	%{"date" => time, "type" => type, "path" => path, "value" => value, "client_id" => client_id}
-		# end)
+		# IO.puts "Fetching Flattened"
+		# {:ok, res_f} = EdMarkaz.DB.Postgres.query(
+		# 	EdMarkaz.DB,
+		# 	"SELECT path, value, time FROM flattened_schools
+		# 	WHERE school_id=$1 AND time/1000 < 1596758400
+		# 	ORDER BY time asc",
+		# 	["scholarschoolshk"]
+		# )
 
-		# Sarkar.Store.School.save("tempscholarschool", mapped_writes)
+		# new_state = res_f.rows
+		# 	|> Enum.reduce(%{},
+		# 		fn [p,v],agg ->
+		# 			path = String.split(p, ",")
+		# 			Dynamic.put(agg,path,v)
+		# 		end
+		# 	)
+		# IO.puts "Saving Flattened"
+		# chunk_size = 100
+		# Postgrex.transaction(EdMarkaz.DB,
+		# 	fn(conn) ->
+		# 		chunk = res_f.rows
+		# 		|> Enum.chunk_every(chunk_size)
+		# 		|> Enum.map(
+		# 			fn chunked ->
+		# 				IO.puts "================"
+		# 				IO.inspect "in chunks"
+		# 				gen_value_strings_db = 1..trunc(Enum.count(chunked))
+		# 					|> Enum.map(fn i ->
+		# 						x = (i - 1) * 4 + 1
+		# 						"($#{x}, $#{x + 1}, $#{x + 2}, $#{x + 3})"
+		# 					end)
+
+		# 				query_string = "INSERT INTO flattened_schools (school_id, path, value, time)
+		# 					VALUES #{Enum.join(gen_value_strings_db, ",")}
+		# 					ON CONFLICT (school_id, path) DO UPDATE set value=excluded.value, time=excluded.time"
+
+
+		# 				arguments = chunked |> Enum.reduce([], fn ([path, value, time], collect) -> collect ++ ["tempscholarschool", path, value, time] end)
+
+		# 				IO.inspect arguments
+
+		# 				{:ok, res }= EdMarkaz.DB.Postgres.query(conn, query_string, arguments)
+
+		# 			end
+		# 		)
+		# 	end,
+		# 	pool: DBConnection.Poolboy, timeout: 60_000*20
+		# )
+
+
+		# IO.inspect f_mapped |> Enum.at(0)
+		# IO.inspect f_mapped
+
+		mapped_writes = res.rows
+		|> Enum.map(fn ([time, type, path, value, client_id]) ->
+			%{"date" => time, "type" => type, "path" => path, "value" => value, "client_id" => client_id}
+		end)
+
+		IO.puts "Saving"
+		Sarkar.Store.School.save("scholarschoolshk1", mapped_writes)
 
 		# take an example student and have an idea of what their payments
 		# table should look like
 
 		# IO.inspect "NEW STATE"
-		
-		new_state = res.rows
-		|> Enum.reduce(%{}, fn([time, type, path, value, client_id], agg) ->
 
-			# if(Enum.member?(path, "0bccee08-f020-40fd-bc80-a5c81129facd")) do
-			# 	IO.inspect %{"date" => time, "type" => type, "path" => path, "value" => value}
-			# end
+		# new_state = res.rows
+		# |> Enum.reduce(%{}, fn([time, type, path, value, client_id], agg) ->
 
-			case type do
-				"MERGE" -> Dynamic.put(agg, path, value)
-				"DELETE" -> Dynamic.delete(agg, path)
-				other ->
-					IO.inspect other
-					agg
-			end
+		# 	# if(Enum.member?(path, "0bccee08-f020-40fd-bc80-a5c81129facd")) do
+		# 	# 	IO.inspect %{"date" => time, "type" => type, "path" => path, "value" => value}
+		# 	# end
 
-		end)
+		# 	case type do
+		# 		"MERGE" -> Dynamic.put(agg, path, value)
+		# 		"DELETE" -> Dynamic.delete(agg, path)
+		# 		other ->
+		# 			IO.inspect other
+		# 			agg
+		# 	end
+
+		# end)
 
 		# IO.inspect new_state
-		IO.inspect Dynamic.get(new_state, ["db", "students", "0bccee08-f020-40fd-bc80-a5c81129facd", "payments"])
+		# IO.inspect Dynamic.get(new_state, ["students", "0bccee08-f020-40fd-bc80-a5c81129facd", "payments"])
 
-		all_students = Dynamic.get(new_state, ["db", "students"])
-		all_classes = Dynamic.get(new_state, ["db", "classes"])
+		# all_students = Dynamic.get(new_state, ["students"])
+		# all_classes = Dynamic.get(new_state, ["classes"])
 
-		IO.inspect all_classes |> Map.keys() |> length
-		IO.puts "SETTINGS"
-		IO.inspect Dynamic.get(new_state, ["db", "settings"])
-		IO.puts "TEACHERS"
-		faculty = Dynamic.get(new_state, ["db", "faculty"]) |> Map.keys() |> length
+		# IO.inspect all_classes |> Map.keys() |> length
+		# IO.puts "SETTINGS"
+		# IO.inspect Dynamic.get(new_state, ["settings"])
+		# IO.puts "TEACHERS"
+		# faculty = Dynamic.get(new_state, ["faculty"]) |> Map.keys() |> length
 
-		IO.puts faculty
+		# IO.puts faculty
 
-		# find the total students
-		total_students = length(Enum.uniq(Map.keys(all_students)))
-		# IO.inspect total_students
-		IO.puts "total students are: #{total_students}"
+		# # find the total students
+		# total_students = length(Enum.uniq(Map.keys(all_students)))
+		# # IO.inspect total_students
+		# IO.puts "total students are: #{total_students}"
 
 	end
 

@@ -7,22 +7,22 @@ defmodule Sarkar.Store.School do
 
 		save_flattened(school_id, writes)
 
-		# IO.puts "PUTTING IN WRITES"
+		IO.puts "PUTTING IN WRITES"
 
 		# save_writes(school_id, writes)
 
 
-		# half_of_writes = round(length(writes) / 2)
+		half_of_writes = round(length(writes) / 2)
 
-		# [first, second] = Enum.chunk_every(writes, half_of_writes)
+		[first, second] = Enum.chunk_every(writes, half_of_writes)
 
-		# # IO.inspect first
-		# # IO.inspect second
+		# IO.inspect first
+		# IO.inspect second
 
-		# IO.puts "First Chunk"
-		# save_writes(school_id, first)
-		# IO.puts "Second Chunk"
-		# save_writes(school_id, second)
+		IO.puts "First Chunk"
+		save_writes(school_id, first)
+		IO.puts "Second Chunk"
+		save_writes(school_id, second)
 
 	end
 
@@ -66,7 +66,8 @@ defmodule Sarkar.Store.School do
 
 	def save_flattened(school_id, writes) do
 
-		flattened_db = writes
+		IO.puts "Flatting writes"
+		flattened = writes
 			|> Enum.reduce([], fn(%{"date" => date, "value" => value, "path" => path, "type" => type, "client_id" => client_id}, agg) ->
 
 				path = Enum.drop(path, 1)
@@ -80,11 +81,41 @@ defmodule Sarkar.Store.School do
 					# Enum.concat( agg, [[type, school_id, path, value, date]] )
 				end
 			end)
+			#|> Enum.sort( fn({_, [_, _, _, _, d1]}, {_, [_, _, _, v, d2]} ) -> d1 < d2 end)
 
-			|> Enum.sort( fn({_, [_, _, _, _, d1]}, {_, [_, _, _, v, d2]} ) -> d1 < d2 end)
-			# |> Enum.into(%{})
+		# # flattened is [...,{path, [type, school_id, path, value, date]},...]
+		# IO.puts "FLATTENED"
+		# IO.inspect Enum.at(flattened,0)
+		# IO.inspect flattened |> length
+		# IO.inspect flattened
+		# IO.puts "============================"
+
+
+		# IO.puts "FLATTENED D"
+
+
+		 # I think the problem is in 'into', its overwriting the prev value if it has the same path,
+		 # without looking at the type
+
+		flattened_d = flattened
+			|> Enum.into(%{})
+			|> Enum.sort(fn ({_,[_,_,_,_,t1]}, {_,[_,_,_,_,t2]}) -> t1 < t2 end)
+
+		# IO.inspect Enum.at(flattened_d,0)
+		# IO.inspect flattened_d |> Map.size
+
+		# IO.puts "============================"
+		# IO.puts "FLATTENED DB"
+
+		flattened_db = flattened_d
 			|> Enum.map(fn {_, v} -> v end)
 
+
+
+		# IO.inspect Enum.at(flattened_db,0)
+		# IO.inspect flattened_db |> length
+
+		# IO.puts "============================"
 
 		# IO.inspect flattened_db
 
@@ -93,6 +124,7 @@ defmodule Sarkar.Store.School do
 
 		# array of map %{ type: "MERGE" | "DELETE", mutations: [ [date, value, path, type, client_id] ] }
 
+		IO.puts "Sequencing writes"
 		flattened_db_sequence = flattened_db
 		# IO.inspect dupes
 			|> Enum.reduce([], fn([type, school_id, path, value, date], agg) ->
@@ -101,11 +133,17 @@ defmodule Sarkar.Store.School do
 
 				case Map.get(prev, "type") do
 					^type ->
+						# IO.puts "IN FRIST"
+						# IO.inspect type
+						# IO.puts "========="
 						Enum.drop(agg, -1) ++ [%{
 							"type" => type,
 							"mutations" => Map.get(prev, "mutations") ++ [[school_id, Enum.join(path, ","), value, date]]
 						}]
 					other ->
+						# IO.puts "IN SECOND"
+						# IO.inspect type
+						# IO.puts "========="
 						agg  ++ [%{
 							"type" => type,
 							"mutations" => [
@@ -117,7 +155,8 @@ defmodule Sarkar.Store.School do
 
 		# now just generate the sql queries for each one of these segments
 
-		chunk_size = 100
+		IO.puts "Chunking writes"
+		chunk_size = 1000
 
 		results = Postgrex.transaction(EdMarkaz.DB, fn(conn) ->
 
@@ -171,9 +210,6 @@ defmodule Sarkar.Store.School do
 							query_string = "DELETE FROM flattened_schools WHERE school_id = $1 and #{Enum.join(query_section, " OR ")}"
 							{:ok, res} = EdMarkaz.DB.Postgres.query(conn, query_string, [school_id | arguments])
 							res
-							# IO.inspect res
-							# IO.inspect arguments
-
 					end
 				end)
 			end)
