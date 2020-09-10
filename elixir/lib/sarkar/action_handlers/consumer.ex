@@ -244,14 +244,31 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 				{:ok, school_id, profile} ->
 					refcode = Map.get(profile, "refcode")
 					{:ok, one_token} = EdMarkaz.Auth.gen_onetime_token(refcode)
+					
+					# case EdMarkaz.Contegris.send_sms(phone, "Click here to login https://ilmexchange.com/auth/#{one_token} ,Or enter code #{one_token}") do
+					# 	{:ok, res} ->
+					# 		{:reply, succeed(res), state}
+					# 	{:error, msg} ->
+					# 		IO.inspect msg
+					# 		{:reply, fail(msg), state}
+					# end
 
-					case EdMarkaz.Contegris.send_sms(phone, "Click here to login https://ilmexchange.com/auth/#{one_token} ,Or enter code #{one_token}") do
+					case EdMarkaz.Telenor.get_session_id() do
+						{:ok, res} -> 
+							# get session id
+							# call EdMarkaz.Telenor.send_sms
+						{:error, msg} -> 
+							{:reply, fail(msg), state}
+					end 
+
+					case EdMarkaz.Telenor.send_sms( phone, "Click here to login https://ilmexchange.com/auth/#{one_token} ,Or enter code #{one_token}") do
 						{:ok, res} ->
 							{:reply, succeed(res), state}
 						{:error, msg} ->
 							IO.inspect msg
 							{:reply, fail(msg), state}
 					end
+
 
 				{:error, msg} ->
 					{:reply, fail(msg), state}
