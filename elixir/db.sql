@@ -117,5 +117,9 @@ create table platform_writes
 		questions jsonb,
 		date timestamp default current_timestamp
 	);
-		-- chapter_id text not null,
-		-- lesson_id text not null,
+
+	CREATE TABLE branch_manager(
+		username text unique not null,
+		password text not null,
+		branches jsonb not null
+	);
