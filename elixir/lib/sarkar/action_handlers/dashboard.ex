@@ -604,11 +604,11 @@ defmodule Sarkar.ActionHandler.Dashboard do
 			"value" => branches
 		}
 	},
-	%{id: id, client_id: client_id } = state)do
+	%{ client_id: client_id } = state) do
 		case Sarkar.Auth.Dashboard.create_branch_manager({username, password, branches}) do
 			{:ok, resp} ->
 				{:reply, succeed(resp), state}
-			{:err, err} ->
+			{:error, err} ->
 				{:reply, fail(err), state}
 		end
 	end
@@ -621,11 +621,11 @@ defmodule Sarkar.ActionHandler.Dashboard do
 			"value" => branches
 		}
 	},
-	%{id: id, client_id: client_id } = state)do
+	%{ client_id: client_id } = state) do
 		case Sarkar.Auth.Dashboard.update_branches({username, branches}) do
 			{:ok, resp} ->
 				{:reply, succeed(resp), state}
-			{:err, err} ->
+			{:error, err} ->
 				{:reply, fail(err), state}
 		end
 	end
@@ -638,11 +638,11 @@ defmodule Sarkar.ActionHandler.Dashboard do
 			"password" => password
 		}
 	},
-	%{id: id, client_id: client_id } = state)do
+	%{ client_id: client_id } = state) do
 		case Sarkar.Auth.Dashboard.update_branch_manager_password({username, password}) do
 			{:ok, resp} ->
 				{:reply, succeed(resp), state}
-			{:err, err} ->
+			{:error, err} ->
 				{:reply, fail(err), state}
 		end
 	end
