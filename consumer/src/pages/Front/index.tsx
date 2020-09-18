@@ -3,10 +3,12 @@ import Header from '../../components/Header'
 import StudentMain from './assets/student_main.png'
 import SchoolMain from './assets/school_main.png'
 import TeacherMain from './assets/teacher_main.png'
+import Flag from './assets/flag-background.jpg'
 
 import Student from './assets/student.jpeg'
 import School from './assets/school.jpeg'
 import Teacher from './assets/teacher.png'
+import Campaign from './assets/campaign.jpg'
 
 import './style.css'
 import { Link } from 'react-router-dom'
@@ -63,6 +65,35 @@ const FrontPage = () => {
 		<div className="partition">
 			<div className="img-container">
 				<div className="circle-frame">
+					<img className="img" src={Flag} alt="student" />
+				</div>
+			</div>
+			<div className="info-container">
+				<div className="heading">14th August Competition!</div>
+				<div className="para">
+					Send us art, poems or essays to celebrate the spirit of being Pakistani. Find out more details about how to participate
+				</div>
+				<Link className="pill" to="/challenge"> Enter </Link>
+			</div>
+		</div>
+		<div className="partition bg-teal">
+			<div className="img-container">
+				<div className="circle-frame">
+					<img className="img" src={Campaign} alt="student" />
+				</div>
+			</div>
+			<div className="info-container">
+				<div className="heading white">Back to School SMS Program</div>
+				<div className="para white">
+					Schools are reopening soon. Get back into learning mode with ilmexchange! Challenge yourself with these questions.
+				</div>
+				<Link className="pill" to="/sms"> Enter </Link>
+			</div>
+		</div>
+		<div className="partition
+		">
+			<div className="img-container">
+				<div className="circle-frame">
 					<img className="img" src={Student} alt="student" />
 				</div>
 			</div>
@@ -78,36 +109,36 @@ const FrontPage = () => {
 			</div>
 		</div>
 
-		<div className="partition reverse bg-teal">
-			<div className="img-container">
-				<div className="circle-frame">
-					<img className="img" src={Teacher} alt="teacher" />
-				</div>
-			</div>
-			<div className="info-container">
-				<div className="heading white">FOR TEACHERS</div>
-				<div className="para white">
-					Teaching is hard work, but there are countless resources out there to help.
-					We curate and organize high quality materials and teacher training content
-					to help you and your classroom be the very best!
-				</div>
-				<div className="pill" onClick={() => setShowModal(true)}> Teacher Portal</div>
-			</div>
-		</div>
-
-		<div className="partition">
+		<div className="partition bg-teal reverse">
 			<div className="img-container">
 				<div className="circle-frame">
 					<img className="img" src={School} alt="school" />
 				</div>
 			</div>
 			<div className="info-container">
-				<div className="heading">FOR SCHOOLS</div>
-				<div className="para">
+				<div className="heading white">FOR SCHOOLS</div>
+				<div className="para white">
 					Join our network of over 1500 schools and get access to information,
 					tools for schools and Pakistan's largest Education Marketplace
 				</div>
 				<Link className="pill" to="/school"> School Portal</Link>
+			</div>
+		</div>
+
+		<div className="partition">
+			<div className="img-container">
+				<div className="circle-frame">
+					<img className="img" src={Teacher} alt="teacher" />
+				</div>
+			</div>
+			<div className="info-container">
+				<div className="heading">FOR TEACHERS</div>
+				<div className="para">
+					Teaching is hard work, but there are countless resources out there to help.
+					We curate and organize high quality materials and teacher training content
+					to help you and your classroom be the very best!
+				</div>
+				<div className="pill" onClick={() => setShowModal(true)}> Teacher Portal</div>
 			</div>
 		</div>
 

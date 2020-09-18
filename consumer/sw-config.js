@@ -1,3 +1,8 @@
+workbox.googleAnalytics.initialize({
+	parameterOverrides: {
+		cd1: 'offline',
+	},
+});
 workbox.routing.registerRoute(
 	({ url, event }) => {
 		const match = url.host === "storage.googleapis.com" ||
