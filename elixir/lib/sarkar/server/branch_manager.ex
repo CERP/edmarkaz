@@ -2,7 +2,6 @@ defmodule EdMarkaz.Server.BranchManager do
 
 	use Plug.Router
 
-	# plug BasicAuth, use_config: {:edmarkaz, :basic_auth}
 	if Mix.env == :dev do
 		use Plug.Debugger
 	  end
@@ -13,13 +12,11 @@ defmodule EdMarkaz.Server.BranchManager do
 
 	plug Plug.Parsers,	parsers: [:json],
 						pass:  ["application/json", "text/plain"],
-						json_decoder: Jason
+						json_decoder: Poison
 
 	plug :dispatch
 
 	post "/users/authenticate" do
-
-		IO.inspect conn.body_params
 
 		%{
 			"username" => username,
@@ -33,15 +30,39 @@ defmodule EdMarkaz.Server.BranchManager do
 			{:error, resp} ->
 				send_resp(conn, 200, resp)
 		end
-
 	end
 
 	get "/school-branches" do
 
-		# get get token from body
-		# verify the token
-		# prepare the response
-		# return the response
+		# get username and client_id from query params
+		%{
+			"username" => username,
+			"client_id" => client_id
+		} = conn.params
+
+		# get auth token from header
+		[ auth_token | _ ] = get_req_header(conn, "authorization")
+
+		# verify token here and get the school branches
+		case EdMarkaz.Auth.BranchManager.verify({username, client_id, auth_token}) do
+			{:ok, resp} ->
+				case EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
+					"SELECT branches FROM branch_manager WHERE username=$1",[username]) do
+						{:ok, resp} ->
+							# get branches object only
+							[ [ head ] | tail] = resp.rows
+
+							body = body = Poison.encode!(%{data: head})
+							send_resp(conn, 200, body)
+
+						{:error, err} ->
+							body = Poison.encode!(%{message: resp})
+							send_resp(conn, 200, body)
+				end
+			{:error, resp} ->
+				body = Poison.encode!(%{message: resp})
+				send_resp(conn, 200, body)
+		end
 
 	end
 
