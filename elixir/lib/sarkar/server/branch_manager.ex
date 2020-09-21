@@ -73,18 +73,21 @@ defmodule EdMarkaz.Server.BranchManager do
 	end
 
 	get "/hello" do
-		body = Poison.encode!(%{message: "Hello World"})
+		body = Poison.encode!(%{message: "Hello world"})
 		conn = append_headers(conn)
 		send_resp(conn, 200, body)
 	end
 
-
 	match _ do
-		send_resp(conn, 404, "not found")
+		body = Poison.encode!(%{message: "Not found"})
+		conn = append_headers(conn)
+		send_resp(conn, 404, body)
 	end
 
 	defp handle_errors(conn, %{kind: _kind, reason: _reason, stack: _stack}) do
-		send_resp(conn, conn.status, "Something went wrong")
+		body = Poison.encode!(%{message: "Something went wrong"})
+		conn = append_headers(conn)
+		send_resp(conn, conn.status, body)
 	end
 
 	defp append_headers(conn) do
