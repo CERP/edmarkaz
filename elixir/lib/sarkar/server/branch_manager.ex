@@ -16,7 +16,7 @@ defmodule EdMarkaz.Server.BranchManager do
 
 	plug :dispatch
 
-	post "/users/authenticate" do
+	match "/users/authenticate" do
 
 		%{
 			"username" => username,
@@ -24,11 +24,15 @@ defmodule EdMarkaz.Server.BranchManager do
 			"client_id" => client_id
 		} = conn.body_params
 
+		conn = append_headers(conn)
+
 		case EdMarkaz.Auth.BranchManager.login({ username, client_id, password }) do
 			{:ok, token} ->
-				send_resp(conn, 200, token)
-			{:error, resp} ->
-				send_resp(conn, 200, resp)
+				body = Poison.encode!(%{data: %{token: token}})
+				send_resp(conn, 200, body)
+			{:error, err} ->
+				body = Poison.encode!(%{message: err})
+				send_resp(conn, 200, body)
 		end
 	end
 
@@ -40,8 +44,10 @@ defmodule EdMarkaz.Server.BranchManager do
 			"client_id" => client_id
 		} = conn.params
 
-		# get auth token from header
-		[ auth_token | _ ] = get_resp_header(conn, "authorization")
+		# get auth token from req header
+		[ auth_token | _ ] = get_req_header(conn, "authorization")
+
+		conn = append_headers(conn)
 
 		# verify token here and get the school branches
 		case EdMarkaz.Auth.BranchManager.verify({ username, client_id, auth_token }) do
@@ -67,8 +73,9 @@ defmodule EdMarkaz.Server.BranchManager do
 	end
 
 	get "/hello" do
-		IO.puts "I'm new to this world"
-		send_resp(conn, 200, "hello")
+		body = Poison.encode!(%{message: "Hello World"})
+		conn = append_headers(conn)
+		send_resp(conn, 200, body)
 	end
 
 
@@ -80,4 +87,12 @@ defmodule EdMarkaz.Server.BranchManager do
 		send_resp(conn, conn.status, "Something went wrong")
 	end
 
+	defp append_headers(conn) do
+		conn
+			|> put_resp_header("content-type", "application/json")
+			|> put_resp_header("cache-control", "no-cache")
+			|> put_resp_header("access-control-allow-methods", "GET, POST, OPTIONS")
+			|> put_resp_header("access-control-allow-origin", "*")
+			|> put_resp_header("access-control-allow-headers", "*")
+	end
 end
