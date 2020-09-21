@@ -11,7 +11,7 @@ defmodule EdMarkaz.Server.BranchManager do
 	plug :match
 
 	plug Plug.Parsers,	parsers: [:json],
-						pass:  ["application/json", "text/plain"],
+						pass:  ["application/json"],
 						json_decoder: Poison
 
 	plug :dispatch
@@ -41,7 +41,7 @@ defmodule EdMarkaz.Server.BranchManager do
 		} = conn.params
 
 		# get auth token from header
-		[ auth_token | _ ] = get_req_header(conn, "authorization")
+		[ auth_token | _ ] = get_resp_header(conn, "authorization")
 
 		# verify token here and get the school branches
 		case EdMarkaz.Auth.BranchManager.verify({username, client_id, auth_token}) do
@@ -69,7 +69,6 @@ defmodule EdMarkaz.Server.BranchManager do
 	get "/hello" do
 		IO.puts "I'm new to this world"
 		send_resp(conn, 200, "hello")
-
 	end
 
 
