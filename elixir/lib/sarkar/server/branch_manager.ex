@@ -44,7 +44,7 @@ defmodule EdMarkaz.Server.BranchManager do
 		[ auth_token | _ ] = get_resp_header(conn, "authorization")
 
 		# verify token here and get the school branches
-		case EdMarkaz.Auth.BranchManager.verify({username, client_id, auth_token}) do
+		case EdMarkaz.Auth.BranchManager.verify({ username, client_id, auth_token }) do
 			{:ok, resp} ->
 				case EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
 					"SELECT branches FROM branch_manager WHERE username=$1",[username]) do
@@ -56,7 +56,7 @@ defmodule EdMarkaz.Server.BranchManager do
 							send_resp(conn, 200, body)
 
 						{:error, err} ->
-							body = Poison.encode!(%{message: resp})
+							body = Poison.encode!(%{message: err})
 							send_resp(conn, 200, body)
 				end
 			{:error, resp} ->
