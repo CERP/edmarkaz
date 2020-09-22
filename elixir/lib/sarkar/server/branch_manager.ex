@@ -185,7 +185,7 @@ defmodule EdMarkaz.Server.BranchManager do
 			|> put_resp_header("cache-control", "no-cache")
 			|> put_resp_header("access-control-allow-methods", "GET, POST, OPTIONS")
 			|> put_resp_header("access-control-allow-origin", "*")
-			|> put_resp_header("access-control-allow-headers", "*")a
+			|> put_resp_header("access-control-allow-headers", "*")
 
 	end
 
