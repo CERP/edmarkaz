@@ -6,7 +6,20 @@ defmodule EdMarkaz.Auth.BranchManager do
 			"SELECT * from branch_manager where username=$1 AND password=$2",
 			[username, hash(password, 52)]) do
 				{:ok, %Postgrex.Result{num_rows: 0}} -> {:error, "username or password is incorrect"}
-				{:ok, rows} -> gen_token(username, client_id)
+				{:ok, resp} ->
+					# get branches object only
+					[ [_, _, school_branches] | tail] = resp.rows
+
+					case gen_token(username, client_id) do
+						{:ok, token} ->
+							merge_resp = school_branches |> Map.put("token", token)
+							IO.inspect merge_resp
+							{:ok, merge_resp}
+						{:error, err} ->
+							IO.inspect err
+							{:error, err}
+					end
+
 				{:error, err} ->
 					IO.inspect err
 					{:error, "unknown error has happened"}

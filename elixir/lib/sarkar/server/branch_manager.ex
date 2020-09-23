@@ -32,12 +32,13 @@ defmodule EdMarkaz.Server.BranchManager do
 		conn = append_resp_headers(conn)
 
 		case EdMarkaz.Auth.BranchManager.login({ username, client_id, password }) do
-			{:ok, token} ->
-				body = Poison.encode!(%{data: %{token: token}})
+			{:ok, resp} ->
+				IO.inspect resp
+				body = Poison.encode!(%{data: resp})
 				send_resp(conn, 200, body)
 			{:error, err} ->
 				body = Poison.encode!(%{message: err})
-				send_resp(conn, 200, body)
+				send_resp(conn, 400, body)
 		end
 	end
 
@@ -61,11 +62,11 @@ defmodule EdMarkaz.Server.BranchManager do
 
 						{:error, err} ->
 							body = Poison.encode!(%{message: err})
-							send_resp(conn, 200, body)
+							send_resp(conn, 400, body)
 				end
 			{:error, err} ->
 				body = Poison.encode!(%{message: err})
-				send_resp(conn, 200, body)
+				send_resp(conn, 400, body)
 		end
 
 	end
@@ -140,7 +141,7 @@ defmodule EdMarkaz.Server.BranchManager do
 
 			{:error, err} ->
 				body = Poison.encode!(%{message: err})
-				send_resp(conn, 200, body)
+				send_resp(conn, 400, body)
 		end
 
 	end
