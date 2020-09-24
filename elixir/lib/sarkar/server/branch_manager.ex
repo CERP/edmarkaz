@@ -33,10 +33,20 @@ defmodule EdMarkaz.Server.BranchManager do
 
 		case EdMarkaz.Auth.BranchManager.login({ username, client_id, password }) do
 			{:ok, resp} ->
-				IO.inspect resp
+
+				%{ "schools" => schools, "token" => _ } = resp
+
+				# start all the schools related with branch manager
+
+				schools |> Enum.each(fn sid -> start_school(sid) end)
+
+				# send schools and token
+
 				body = Poison.encode!(%{data: resp})
 				send_resp(conn, 200, body)
+
 			{:error, err} ->
+
 				body = Poison.encode!(%{message: err})
 				send_resp(conn, 400, body)
 		end
@@ -84,25 +94,18 @@ defmodule EdMarkaz.Server.BranchManager do
 
 		case EdMarkaz.Auth.BranchManager.verify({ username, client_id, auth_token }) do
 			{:ok, _} ->
+
 				# get the student attendance stats
 				attendance_stats = case EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
-					"SELECT path, type, time, value
-						FROM writes
-						WHERE school_id=$1 AND path[2]='students' AND path[4]='attendance'
-						AND value->>'date'=to_char(now()::date, 'YYYY-MM-DD') order by time asc",[school_id]) do
-						{:ok, resp} ->
-							state = resp.rows
-									|> Enum.reduce(%{}, fn([path, type, time, value], agg) ->
-											case type do
-												"MERGE" -> Dynamic.put(agg, path, value)
-												"DELETE" -> Dynamic.delete(agg, path)
-												other ->
-													agg
-											end
-										end)
+					"SELECT value->>0 as status
+						FROM flattened_schools
+						WHERE school_id=$1 AND path like 'students%attendance%status'
+						AND to_timestamp(time/1000)::date=now()::date order by time asc",[school_id]) do
 
-							state |> Enum.reduce(%{ "present" => 0, "absent" => 0, "leave" => 0 }, fn {k, v}, agg ->
-								case Map.get(v, "status") do
+						{:ok, resp} ->
+
+							resp.rows |> Enum.reduce(%{ "present" => 0, "absent" => 0, "leave" => 0 }, fn [status], agg ->
+								case status do
 									"PRESENT" ->
 										present = agg["present"] + 1
 										Map.put(agg, "present", present)
@@ -120,6 +123,7 @@ defmodule EdMarkaz.Server.BranchManager do
 							# return empty stats list
 							[]
 					end
+
 				payment_list = case EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
 					"SELECT path[3] as student_id, value
 						FROM writes
@@ -148,17 +152,68 @@ defmodule EdMarkaz.Server.BranchManager do
 
 	get "/analytics-fees" do
 
+		# get the auth from req_headers
+		[ username, client_id, auth_token ] = get_auth_from_req_headers(conn)
+
+		# get the school id param from body
+		school_id = conn.params["school_id"]
+
+		db = Sarkar.School.get_db(school_id)
+
+
+		body = Poison.encode!(%{message: "Load db for fees analytics"})
+		conn = append_resp_headers(conn)
+		send_resp(conn, 200, body)
+
 	end
 
 	get "/analytics-studennt-attendance" do
+
+		# get the auth from req_headers
+		[ username, client_id, auth_token ] = get_auth_from_req_headers(conn)
+
+		# get the school id param from body
+		school_id = conn.params["school_id"]
+
+		db = Sarkar.School.get_db(school_id)
+
+
+		body = Poison.encode!(%{message: "Load db for student attendance"})
+		conn = append_resp_headers(conn)
+		send_resp(conn, 200, body)
 
 	end
 
 	get "/analytics-exams" do
 
+		# get the auth from req_headers
+		[ username, client_id, auth_token ] = get_auth_from_req_headers(conn)
+
+		# get the school id param from body
+		school_id = conn.params["school_id"]
+
+		db = Sarkar.School.get_db(school_id)
+
+
+		body = Poison.encode!(%{message: "Load db for exams"})
+		conn = append_resp_headers(conn)
+		send_resp(conn, 200, body)
+
 	end
 
 	get "/analytics-teacher-attendance" do
+
+		# get the auth from req_headers
+		[ username, client_id, auth_token ] = get_auth_from_req_headers(conn)
+
+		# get the school id param from body
+		school_id = conn.params["school_id"]
+
+		db = Sarkar.School.get_db(school_id)
+
+		body = Poison.encode!(%{message: "Hello world"})
+		conn = append_resp_headers(conn)
+		send_resp(conn, 200, body)
 
 	end
 
@@ -197,6 +252,13 @@ defmodule EdMarkaz.Server.BranchManager do
 		[ auth_token ] = get_req_header(conn, "auth-token")
 
 		[username, client_id, auth_token]
+	end
+
+	defp start_school(school_id) do
+		case Registry.lookup(EdMarkaz.SchoolRegistry, school_id) do
+			[{_, _}] -> {:ok}
+			[] -> DynamicSupervisor.start_child(EdMarkaz.SchoolSupervisor, {Sarkar.School, {school_id}})
+		end
 	end
 
 end
