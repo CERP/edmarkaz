@@ -157,30 +157,104 @@ defmodule EdMarkaz.Server.BranchManager do
 
 		# get the school id param from body
 		school_id = conn.params["school_id"]
-
-		db = Sarkar.School.get_db(school_id)
-
-
-		body = Poison.encode!(%{message: "Load db for fees analytics"})
-		conn = append_resp_headers(conn)
-		send_resp(conn, 200, body)
-
+		
+		case EdMarkaz.Auth.BranchManager.verify({ username, client_id, auth_token }) do
+			{:ok, _} ->
+				
+				case start_school(school_id) do
+					{:ok, pid} ->
+						IO.puts "school start now"
+					_ ->
+						IO.puts	"school already started"
+				end
+		
+				body = Poison.encode!(%{message: "fees endpoint"})
+				conn = append_resp_headers(conn)
+				send_resp(conn, 200, body)
+				
+			{:error, err} ->
+				body = Poison.encode!(%{message: err})
+				send_resp(conn, 400, body)
+		end
+		
 	end
 
-	get "/analytics-studennt-attendance" do
+	get "/analytics-students-attendance" do
 
 		# get the auth from req_headers
 		[ username, client_id, auth_token ] = get_auth_from_req_headers(conn)
-
 		# get the school id param from body
 		school_id = conn.params["school_id"]
-
-		db = Sarkar.School.get_db(school_id)
-
-
-		body = Poison.encode!(%{message: "Load db for student attendance"})
-		conn = append_resp_headers(conn)
-		send_resp(conn, 200, body)
+		
+		case EdMarkaz.Auth.BranchManager.verify({ username, client_id, auth_token }) do
+			{:ok, _} ->
+				
+				case start_school(school_id) do
+					{:ok, pid} ->
+						IO.puts "school start now"
+					_ ->
+						IO.puts	"school already started"
+				end
+		
+				db = Sarkar.School.get_db(school_id)
+				
+				students = db["students"]
+				
+				attendance_list = students |> Enum.reduce(%{}, fn {id, student}, agg ->
+					
+					attendance = student["attendance"]
+					
+					monthvise = attendance |> Enum.reduce(%{}, fn {key, value}, inner_agg ->
+		
+							[ year, month, day ] = String.split(key, "-")
+							
+							new_key = year <> "-" <> month
+							
+							case Map.has_key?(inner_agg, new_key) do
+								
+								true ->
+																
+									%{ "present" => present, "absent" => absent, "leave" => leave } = Map.get(inner_agg, new_key)
+									
+									case value["status"] do
+										"PRESENT" ->
+											Dynamic.put(inner_agg, [new_key, "present"], present + 1)
+										"ABSENT" ->
+											Dynamic.put(inner_agg, [new_key, "absent"], absent + 1)
+										_ ->
+											Dynamic.put(inner_agg, [new_key, "leave"], leave + 1)
+									end
+									
+								false ->
+									
+									 new_entry = case value["status"] do
+										"PRESENT" ->
+											%{ "present" => 1, "absent" => 0, "leave" => 0 }
+										"ABSENT" ->
+											%{ "present" => 0, "absent" => 1, "leave" => 0 }
+										_ ->
+											%{ "present" => 0, "absent" => 0, "leave" => 1 }
+									end
+									
+									Dynamic.put(inner_agg, [new_key], new_entry)
+							end
+								
+						end)
+					
+					Dynamic.put(agg, [id], monthvise)
+				
+				end)
+				
+				conn = append_resp_headers(conn)
+		
+				body = Poison.encode!(%{data: attendance_list})
+				conn = append_resp_headers(conn)
+				send_resp(conn, 200, body)
+				
+			{:error, err} ->
+				body = Poison.encode!(%{message: err})
+				send_resp(conn, 400, body)
+		end
 
 	end
 
