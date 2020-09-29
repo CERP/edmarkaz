@@ -1,3 +1,4 @@
+import SweetXml
 defmodule EdMarkaz.Telenor do
 	use Tesla
 
@@ -7,18 +8,14 @@ defmodule EdMarkaz.Telenor do
 
 	def get_session_id() do
 
-		encoded = %{
-			"msisdn" => Syetem.get_env("TELENOR_USER"),
-			"passworrd" => Syetem.get_env("TELENOR_PASS")
-		}
+		case get("auth.jsp?msisdn=#{System.get_env("TELENOR_USER")}&password=#{System.get_env("TELENOR_PASS")}") do
+			{:ok, res} ->
+				result = res.body |> xpath(~x"data/text()"l)
+				[session_id] = result
+				EdMarkaz.EtsStore.insert({"session_id", session_id, :os.system_time(:millisecond)})
+				{:ok, session_id}
 
-		case post("auth.jsp", encoded) do
-            {:ok, res} -> 
-            # parse response
-            # return {:ok, %{"session_id" => "Some session id"}} 
 			{:error, err} ->
-				IO.puts "SEND SMS ERROR to #{number}"
-				IO.inspect text
 				{:error, err}
 		end
 	end
@@ -29,17 +26,11 @@ defmodule EdMarkaz.Telenor do
 
 	def send_sms(session_id, number, text) do
 
-		encoded = %{
-			"session_id" => session_id,
-			"to" => number,
-			"text" => text
-		}
-
-		case post("sendsms.jsp", encoded) do
-			{:ok, res} -> {:ok, res.body}
+		case get("sendsms.jsp?session_id=#{session_id}&to=#{number}&text=#{text}&mask=#{System.get_env("TELENOR_MASK")}") do
+			{:ok, res} ->
+				{:ok, res.body}
 			{:error, err} ->
 				IO.puts "SEND SMS ERROR to #{number}"
-				IO.inspect text
 				{:error, err}
 		end
 	end

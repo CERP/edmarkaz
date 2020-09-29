@@ -234,6 +234,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 
 		end
 	end
+
 	def handle_action(%{ "type" => "SMS_AUTH_CODE",
 		"client_id" => client_id,
 		"payload" => %{ "phone" => phone }}, state) do
@@ -244,22 +245,34 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 				{:ok, school_id, profile} ->
 					refcode = Map.get(profile, "refcode")
 					{:ok, one_token} = EdMarkaz.Auth.gen_onetime_token(refcode)
-					
-					# case EdMarkaz.Contegris.send_sms(phone, "Click here to login https://ilmexchange.com/auth/#{one_token} ,Or enter code #{one_token}") do
-					# 	{:ok, res} ->
-					# 		{:reply, succeed(res), state}
-					# 	{:error, msg} ->
-					# 		IO.inspect msg
-					# 		{:reply, fail(msg), state}
-					# end
 
+					session_obj = EdMarkaz.EtsStore.get("session_id")
+
+			case Enum.empty?(session_obj) do
+				true ->
 					case EdMarkaz.Telenor.get_session_id() do
-						{:ok, res} -> 
-							# get session id
-							# call EdMarkaz.Telenor.send_sms
-						{:error, msg} -> 
-							{:reply, fail(msg), state}
-					end 
+					{:ok, res} ->
+						EdMarkaz.Telenor.send_sms(res, phone, "Click here to login https://ilmexchange.com/auth/#{one_token} ,Or enter code #{one_token}")
+					{:error, msg} ->
+						{:error, msg}
+					end
+				false ->
+					[{_, session_id, timestamp}] = session_obj
+					curr_time = :os.system_time(:millisecond)
+					half_hr = 30*60*1000
+
+					case timestamp + half_hr > curr_time do
+						true ->
+							EdMarkaz.Telenor.send_sms(session_id, phone, "Click here to login https://ilmexchange.com/auth/#{one_token} ,Or enter code #{one_token}")
+						false ->
+							case EdMarkaz.Telenor.get_session_id() do
+								{:ok, res} ->
+									EdMarkaz.Telenor.send_sms(res, phone, "Click here to login https://ilmexchange.com/auth/#{one_token} ,Or enter code #{one_token}")
+								{:error, msg} ->
+									{:error, msg}
+							end
+					end
+			end
 
 					case EdMarkaz.Telenor.send_sms( phone, "Click here to login https://ilmexchange.com/auth/#{one_token} ,Or enter code #{one_token}") do
 						{:ok, res} ->
