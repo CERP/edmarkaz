@@ -7,6 +7,7 @@ import Modal from "../../../components/Modal";
 import { Container } from '@material-ui/core';
 
 import './style.css'
+import { toTitleCase } from 'utils/generic';
 
 interface S {
 	showModal: boolean;
@@ -57,6 +58,13 @@ class ProductPage extends React.Component<P, S> {
 		})
 	}
 
+	locationString = (product: Product) => {
+		const { province, district, tehsil } = product.location || { province: '', district: '', tehsil: '' }
+		const makeString = [province, district, tehsil].join(",")
+
+		return product.location ? toTitleCase(makeString, ",") : ''
+	}
+
 	render() {
 		const product_id = this.props.match.params.product_id;
 
@@ -87,7 +95,9 @@ class ProductPage extends React.Component<P, S> {
 				<img crossOrigin="anonymous" src={product.image && product.image.url} className="item-image" alt="Product" />
 				<div className="item-info">
 					<div className="title">{product.title}</div>
-					<div className="subtitle">{supplier_name}</div>
+					<div className="subtitle">{supplier_name}
+						<span className="subtitle">{this.locationString(product) ? " - " + this.locationString(product) : 'Not Available'}</span>
+					</div>
 					<div className="heading">{product.price}</div>
 				</div>
 

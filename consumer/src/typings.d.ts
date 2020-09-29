@@ -38,6 +38,11 @@ interface Product {
 		order?: number;
 	};
 	order?: number;
+	location?: {
+		province: string
+		district: string
+		tehsil: string
+	}
 }
 
 interface Lesson {
