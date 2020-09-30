@@ -24,15 +24,54 @@ defmodule EdMarkaz.Telenor do
 		send_sms("923" <> number, text)
 	end
 
-	def send_sms(session_id, number, text) do
+	def send_sms(number, text) do
 
-		case get("sendsms.jsp", query: [session_id: session_id, to: number, text: text, mask: System.get_env("TELENOR_MASK")]) do
-			{:ok, res} ->
-				{:ok, res.body}
-			{:error, err} ->
-				IO.puts "SEND SMS ERROR to #{number}"
-				{:error, err}
+		session_obj = EdMarkaz.EtsStore.get("session_id")
+
+		case Enum.empty?(session_obj) do
+			true ->
+				case get_session_id() do
+				{:ok, res} ->
+					case get("sendsms.jsp", query: [session_id: res, to: number, text: text, mask: System.get_env("TELENOR_MASK")]) do
+						{:ok, res} ->
+							{:ok, res.body}
+						{:error, err} ->
+							IO.puts "SEND SMS ERROR to #{number}"
+							{:error, err}
+					end
+				{:error, msg} ->
+					{:error, msg}
+				end
+			false ->
+				[{_, session_id, timestamp}] = session_obj
+				curr_time = :os.system_time(:millisecond)
+				half_hr = 30*60*1000
+
+				case timestamp + half_hr > curr_time do
+					true ->
+						case get("sendsms.jsp", query: [session_id: session_id, to: number, text: text, mask: System.get_env("TELENOR_MASK")]) do
+							{:ok, res} ->
+								{:ok, res.body}
+							{:error, err} ->
+								IO.puts "SEND SMS ERROR to #{number}"
+								{:error, err}
+						end
+					false ->
+						case get_session_id() do
+							{:ok, res} ->
+								case get("sendsms.jsp", query: [session_id: res, to: number, text: text, mask: System.get_env("TELENOR_MASK")]) do
+									{:ok, res} ->
+										{:ok, res.body}
+									{:error, err} ->
+										IO.puts "SEND SMS ERROR to #{number}"
+										{:error, err}
+								end
+							{:error, msg} ->
+								{:error, msg}
+						end
+				end
 		end
+
 	end
 
 end

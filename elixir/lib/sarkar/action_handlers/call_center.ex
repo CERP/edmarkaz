@@ -212,7 +212,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 		end
 
 		spawn fn ->
-			EdMarkaz.Contegris.send_sms(school_number, "You have requested information for #{product_name} and will be contacted soon with more information.")
+			EdMarkaz.Telenor.send_sms(school_number, "You have requested information for #{product_name} and will be contacted soon with more information.")
 		end
 
 		{:reply, succeed(), state}
@@ -245,7 +245,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 		end
 
 		spawn fn ->
-			EdMarkaz.Contegris.send_sms(school_number, "You have requested information for #{product_name} and will be contacted soon with more information.")
+			EdMarkaz.Telenor.send_sms(school_number, "You have requested information for #{product_name} and will be contacted soon with more information.")
 		end
 
 		{:reply, succeed(), state}

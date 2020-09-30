@@ -246,34 +246,6 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 					refcode = Map.get(profile, "refcode")
 					{:ok, one_token} = EdMarkaz.Auth.gen_onetime_token(refcode)
 
-					session_obj = EdMarkaz.EtsStore.get("session_id")
-
-			case Enum.empty?(session_obj) do
-				true ->
-					case EdMarkaz.Telenor.get_session_id() do
-					{:ok, res} ->
-						EdMarkaz.Telenor.send_sms(res, phone, "Click here to login https://ilmexchange.com/auth/#{one_token} ,Or enter code #{one_token}")
-					{:error, msg} ->
-						{:error, msg}
-					end
-				false ->
-					[{_, session_id, timestamp}] = session_obj
-					curr_time = :os.system_time(:millisecond)
-					half_hr = 30*60*1000
-
-					case timestamp + half_hr > curr_time do
-						true ->
-							EdMarkaz.Telenor.send_sms(session_id, phone, "Click here to login https://ilmexchange.com/auth/#{one_token} ,Or enter code #{one_token}")
-						false ->
-							case EdMarkaz.Telenor.get_session_id() do
-								{:ok, res} ->
-									EdMarkaz.Telenor.send_sms(res, phone, "Click here to login https://ilmexchange.com/auth/#{one_token} ,Or enter code #{one_token}")
-								{:error, msg} ->
-									{:error, msg}
-							end
-					end
-			end
-
 					case EdMarkaz.Telenor.send_sms( phone, "Click here to login https://ilmexchange.com/auth/#{one_token} ,Or enter code #{one_token}") do
 						{:ok, res} ->
 							{:reply, succeed(res), state}
@@ -281,7 +253,6 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 							IO.inspect msg
 							{:reply, fail(msg), state}
 					end
-
 
 				{:error, msg} ->
 					{:reply, fail(msg), state}
@@ -340,7 +311,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 				{:ok, one_token} = EdMarkaz.Auth.gen_onetime_token(refcode)
 
 				spawn fn ->
-					res = EdMarkaz.Contegris.send_sms(
+					res = EdMarkaz.Telenor.send_sms(
 						number,
 						"Welcome to ilmExchange. Please go here to login https://ilmexchange.com/auth/#{one_token}"
 					)
@@ -602,7 +573,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 		end
 
 		spawn fn ->
-			EdMarkaz.Contegris.send_sms(id, "You have requested information for #{product_name} and will be contacted soon with more information.")
+			EdMarkaz.Telenor.send_sms(id, "You have requested information for #{product_name} and will be contacted soon with more information.")
 		end
 
 		{:reply, succeed(), state}
