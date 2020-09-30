@@ -8,12 +8,12 @@ defmodule EdMarkaz.Telenor do
 
 	def get_session_id() do
 
-		case get("auth.jsp?msisdn=#{System.get_env("TELENOR_USER")}&password=#{System.get_env("TELENOR_PASS")}") do
+		case get("auth.jsp", query: [msisdn: System.get_env("TELENOR_USER"), password: System.get_env("TELENOR_PASS")]) do
 			{:ok, res} ->
 				result = res.body |> xpath(~x"data/text()"l)
 				[session_id] = result
-				EdMarkaz.EtsStore.insert({"session_id", session_id, :os.system_time(:millisecond)})
-				{:ok, session_id}
+				EdMarkaz.EtsStore.insert({"session_id", to_string(session_id), :os.system_time(:millisecond)})
+				{:ok, to_string(session_id)}
 
 			{:error, err} ->
 				{:error, err}
@@ -26,7 +26,7 @@ defmodule EdMarkaz.Telenor do
 
 	def send_sms(session_id, number, text) do
 
-		case get("sendsms.jsp?session_id=#{session_id}&to=#{number}&text=#{text}&mask=#{System.get_env("TELENOR_MASK")}") do
+		case get("sendsms.jsp", query: [session_id: session_id, to: number, text: text, mask: System.get_env("TELENOR_MASK")]) do
 			{:ok, res} ->
 				{:ok, res.body}
 			{:error, err} ->
