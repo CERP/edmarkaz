@@ -9,7 +9,7 @@
 	flex-direction: column;
 	justify-content: center;
 	height: fit-content;
-	padding: 60px 40px;
+	padding: 40px;
 	width: calc(100% - 80px);
 }
 	.partition.main .info-container {
@@ -261,7 +261,7 @@
 	}
 	.front .partition {
 		flex-direction: row;
-		padding: 130px 5%;
+		padding: 60px 5%;
 		width: calc(100% - 10%);
 	}
 	.front .reverse {

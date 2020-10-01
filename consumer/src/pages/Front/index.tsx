@@ -35,9 +35,9 @@ const FrontPage = () => {
 		<div className="partition main bg-teal">
 			<div className="info-container">
 				<div className="heading white">PAKISTAN'S #1 DIGITAL EDUCATION HUB</div>
-				<div className="para white">
+				{/* <div className="para white">
 					A library of the best educational resources from around the world, carefully curated for Pakistan
-				</div>
+				</div> */}
 				<Link className="pill mob" to="/start-mob"> Start Here </Link>
 			</div>
 
