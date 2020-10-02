@@ -234,7 +234,7 @@ defmodule Sarkar.ActionHandler.Mis do
 
 		msg_text = "<MISchool> Your temporary password is #{temp_pass}. (Please don't share with anyone)"
 
-		case EdMarkaz.Contegris.send_sms(phone_number, msg_text) do
+		case EdMarkaz.Telenor.send_sms(phone_number, msg_text) do
 			{:ok, res} ->
 				{:reply, succeed(res), state}
 			{:error, msg} ->
