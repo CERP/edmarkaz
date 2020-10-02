@@ -50,7 +50,9 @@ defmodule EdMarkaz.Telenor do
 
 		case get("sendsms.jsp", query: [session_id: session_id, to: number, text: text, mask: "ILMEXCHANGE"]) do
 			{:ok, res} ->
-				{:ok, res.body}
+				result = res.body |> xpath(~x"data/text()"l)
+				[message_id] = result
+				{:ok, message_id}
 			{:error, err} ->
 				IO.puts "SEND SMS ERROR to #{number}"
 				IO.inspect err
