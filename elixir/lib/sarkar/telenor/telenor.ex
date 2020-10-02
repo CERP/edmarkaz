@@ -30,12 +30,7 @@ defmodule EdMarkaz.Telenor do
 
 		case Enum.empty?(session_obj) do
 			true ->
-				case get_session_id() do
-				{:ok, res} ->
-					send_sms(res, number, text)
-				{:error, msg} ->
-					{:error, msg}
-				end
+				refresh_and_send(number, text)
 			false ->
 				[{_, session_id, timestamp} | _] = session_obj
 				curr_time = :os.system_time(:millisecond)
@@ -45,12 +40,7 @@ defmodule EdMarkaz.Telenor do
 					true ->
 						send_sms(session_id, number, text)
 					false ->
-						case get_session_id() do
-							{:ok, res} ->
-								send_sms(res, number, text)
-							{:error, msg} ->
-								{:error, msg}
-						end
+						refresh_and_send(number, text)
 				end
 		end
 
@@ -65,6 +55,15 @@ defmodule EdMarkaz.Telenor do
 				IO.puts "SEND SMS ERROR to #{number}"
 				IO.inspect err
 				{:error, err}
+		end
+	end
+
+	defp refresh_and_send(number, text) do
+		case get_session_id() do
+			{:ok, res} ->
+				send_sms(res, number, text)
+			{:error, msg} ->
+				{:error, msg}
 		end
 	end
 
