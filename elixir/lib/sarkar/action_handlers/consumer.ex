@@ -234,6 +234,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 
 		end
 	end
+
 	def handle_action(%{ "type" => "SMS_AUTH_CODE",
 		"client_id" => client_id,
 		"payload" => %{ "phone" => phone }}, state) do
@@ -245,7 +246,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 					refcode = Map.get(profile, "refcode")
 					{:ok, one_token} = EdMarkaz.Auth.gen_onetime_token(refcode)
 
-					case EdMarkaz.Contegris.send_sms(phone, "Click here to login https://ilmexchange.com/auth/#{one_token} ,Or enter code #{one_token}") do
+					case EdMarkaz.Telenor.send_sms( phone, "Click here to login https://ilmexchange.com/auth/#{one_token} ,Or enter code #{one_token}") do
 						{:ok, res} ->
 							{:reply, succeed(res), state}
 						{:error, msg} ->
@@ -310,7 +311,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 				{:ok, one_token} = EdMarkaz.Auth.gen_onetime_token(refcode)
 
 				spawn fn ->
-					res = EdMarkaz.Contegris.send_sms(
+					res = EdMarkaz.Telenor.send_sms(
 						number,
 						"Welcome to ilmExchange. Please go here to login https://ilmexchange.com/auth/#{one_token}"
 					)
@@ -572,7 +573,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 		end
 
 		spawn fn ->
-			EdMarkaz.Contegris.send_sms(id, "You have requested information for #{product_name} and will be contacted soon with more information.")
+			EdMarkaz.Telenor.send_sms(id, "You have requested information for #{product_name} and will be contacted soon with more information.")
 		end
 
 		{:reply, succeed(), state}

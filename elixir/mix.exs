@@ -35,7 +35,8 @@ defmodule EdMarkaz.MixProject do
 			{:basic_auth, "~> 2.2.2"},
 			{:uuid, "~> 1.1"},
 			{:postgrex, "~>0.13.3"},
-			{:dynamic, github: "taimur38/dynamic", sparse: "elixir"}
+			{:dynamic, github: "taimur38/dynamic", sparse: "elixir"},
+			{:sweet_xml, "~> 0.6.5"}
 		]
 	end
 end
