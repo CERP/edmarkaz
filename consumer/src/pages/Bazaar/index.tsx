@@ -1,7 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom';
-import Arrow from '../../icons/arrow.svg'
 import { getProducts } from '../../actions';
 import { Container } from '@material-ui/core';
 import Alert from 'components/Alert';
@@ -96,9 +95,8 @@ class LoggedOutHome extends React.Component<P, S> {
 								return <div className="item-row" key={category}>
 									<div className="title-row" >
 										<div className="title">{category}</div>
-										<img className="arrow-icon" src={Arrow} alt="arrow" />
 									</div>
-									<div className="items">
+									<div className="items custom-scrollbar">
 										{
 											Object.entries(suppliers)
 												.sort(([, s1], [, s2]) => (s1.order || 9999) - (s2.order || 9999))
