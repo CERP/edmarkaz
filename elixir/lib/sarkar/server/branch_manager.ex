@@ -65,7 +65,7 @@ defmodule EdMarkaz.Server.BranchManager do
 					"SELECT branches FROM branch_manager WHERE username=$1",[username]) do
 						{:ok, resp} ->
 							# get branches object only
-							[ [ head ] | tail] = resp.rows
+							[ [ head ] | _] = resp.rows
 
 							body = body = Poison.encode!(%{data: head})
 							send_resp(conn, 200, body)
@@ -95,52 +95,82 @@ defmodule EdMarkaz.Server.BranchManager do
 		case EdMarkaz.Auth.BranchManager.verify({ username, client_id, auth_token }) do
 			{:ok, _} ->
 
-				# get the student attendance stats
-				attendance_stats = case EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
-					"SELECT value->>0 as status
-						FROM flattened_schools
-						WHERE school_id=$1 AND path like 'students%attendance%status'
-						AND to_timestamp(time/1000)::date=now()::date order by time asc",[school_id]) do
+				case start_school(school_id) do
+					{:ok, pid} ->
+						IO.puts "school start now"
+					_ ->
+						IO.puts	"school already started"
+				end
 
-						{:ok, resp} ->
+				db = Sarkar.School.get_db(school_id)
 
-							resp.rows |> Enum.reduce(%{ "present" => 0, "absent" => 0, "leave" => 0 }, fn [status], agg ->
-								case status do
+				daily_stats = db["students"] |> Enum.reduce(%{"attendance" =>  %{ "present" => 0, "absent" => 0, "leave" => 0 } , "payment" => %{"count" => 0, "amount" => 0 } }, fn {id, student}, agg ->
+
+					single_attendance = student["attendance"] |> Enum.reduce(%{ "present" => 0, "absent" => 0, "leave" => 0 }, fn {date, value}, inner_agg ->
+
+						current_date = DateTime.utc_now |> formatted_iso_date
+
+						case current_date == date do
+
+							true ->
+
+								case value["status"] do
 									"PRESENT" ->
-										present = agg["present"] + 1
-										Map.put(agg, "present", present)
+										Map.put(inner_agg, "present", 1)
 									"ABSENT" ->
-										absent = agg["absent"] + 1
-										Map.put(agg, "absent", absent)
-									# handle LEAVE, CASUAL_LEAVE, SHORT_LEAVE, SICK_LEAVE
+										Map.put(inner_agg, "absent", 1)
 									_ ->
-										leave = agg["leave"] + 1
-										Map.put(agg, "leave", leave)
+										Map.put(inner_agg, "leave", 1)
 								end
-							end)
 
-						{:error, err} ->
-							# return empty stats list
-							[]
+							false ->
+
+								inner_agg
+						end
+
+					end)
+
+					student_payment_sum = student["payments"] |> Enum.reduce(0, fn {id, value}, inner_agg ->
+
+						current_date = DateTime.utc_now |> formatted_iso_date
+
+						{:ok, payment_date } = DateTime.from_unix(value["date"], :millisecond)
+
+						submitted_date = payment_date |> formatted_iso_date
+
+						case current_date == submitted_date do
+
+							true ->
+								inner_agg + value["amount"]
+							false ->
+								inner_agg
+						end
+
+					end)
+
+					%{ "present" => present, "absent" => absent, "leave" => leave } = agg["attendance"]
+					%{ "amount" => amount, "count" => count } = agg["payment"]
+
+					attendance = %{
+						"present" => present + single_attendance["present"],
+						"absent" => absent + single_attendance["absent"],
+						"leave" =>  leave + single_attendance["leave"]
+					}
+
+					payment = case student_payment_sum > 0 do
+						true ->
+							%{ "amount" => amount + student_payment_sum, "count" => count + 1 }
+						false ->
+							agg["payment"]
 					end
 
-				payment_list = case EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
-					"SELECT path[3] as student_id, value
-						FROM writes
-						WHERE school_id=$1 AND path[2]='students' AND path[4]='payments' AND value->>'type'='SUBMITTED' AND to_timestamp(time/1000)::date=now()::date", [school_id]) do
-						{:ok, resp} ->
-							resp.rows
-								|> Enum.reduce(%{"count" => 0, "amount" => 0}, fn [student_id, value], agg ->
-										count = agg["count"] + 1
-										amount = agg["amount"] + value["amount"]
-										#  return updated values
-										%{"count" => count, "amount" => amount}
-								end)
-						{:error, err} ->
-							[]
-					end
+					# return to agg
+					%{ "attendance" => attendance, "payment" => payment }
 
-				body = Poison.encode!(%{data: %{ attendance: attendance_stats, payment: payment_list}})
+				end)
+
+
+				body = Poison.encode!(%{data: daily_stats})
 				send_resp(conn, 200, body)
 
 			{:error, err} ->
@@ -157,26 +187,26 @@ defmodule EdMarkaz.Server.BranchManager do
 
 		# get the school id param from body
 		school_id = conn.params["school_id"]
-		
+
 		case EdMarkaz.Auth.BranchManager.verify({ username, client_id, auth_token }) do
 			{:ok, _} ->
-				
+
 				case start_school(school_id) do
 					{:ok, pid} ->
 						IO.puts "school start now"
 					_ ->
 						IO.puts	"school already started"
 				end
-		
+
 				body = Poison.encode!(%{message: "fees endpoint"})
 				conn = append_resp_headers(conn)
 				send_resp(conn, 200, body)
-				
+
 			{:error, err} ->
 				body = Poison.encode!(%{message: err})
 				send_resp(conn, 400, body)
 		end
-		
+
 	end
 
 	get "/analytics-students-attendance" do
@@ -185,37 +215,37 @@ defmodule EdMarkaz.Server.BranchManager do
 		[ username, client_id, auth_token ] = get_auth_from_req_headers(conn)
 		# get the school id param from body
 		school_id = conn.params["school_id"]
-		
+
 		case EdMarkaz.Auth.BranchManager.verify({ username, client_id, auth_token }) do
 			{:ok, _} ->
-				
+
 				case start_school(school_id) do
 					{:ok, pid} ->
 						IO.puts "school start now"
 					_ ->
 						IO.puts	"school already started"
 				end
-		
+
 				db = Sarkar.School.get_db(school_id)
-				
+
 				students = db["students"]
-				
+
 				attendance_list = students |> Enum.reduce(%{}, fn {id, student}, agg ->
-					
+
 					attendance = student["attendance"]
-					
+
 					monthvise = attendance |> Enum.reduce(%{}, fn {key, value}, inner_agg ->
-		
+
 							[ year, month, day ] = String.split(key, "-")
-							
+
 							new_key = year <> "-" <> month
-							
+
 							case Map.has_key?(inner_agg, new_key) do
-								
+
 								true ->
-																
+
 									%{ "present" => present, "absent" => absent, "leave" => leave } = Map.get(inner_agg, new_key)
-									
+
 									case value["status"] do
 										"PRESENT" ->
 											Dynamic.put(inner_agg, [new_key, "present"], present + 1)
@@ -224,9 +254,9 @@ defmodule EdMarkaz.Server.BranchManager do
 										_ ->
 											Dynamic.put(inner_agg, [new_key, "leave"], leave + 1)
 									end
-									
+
 								false ->
-									
+
 									 new_entry = case value["status"] do
 										"PRESENT" ->
 											%{ "present" => 1, "absent" => 0, "leave" => 0 }
@@ -235,22 +265,22 @@ defmodule EdMarkaz.Server.BranchManager do
 										_ ->
 											%{ "present" => 0, "absent" => 0, "leave" => 1 }
 									end
-									
+
 									Dynamic.put(inner_agg, [new_key], new_entry)
 							end
-								
+
 						end)
-					
+
 					Dynamic.put(agg, [id], monthvise)
-				
+
 				end)
-				
+
 				conn = append_resp_headers(conn)
-		
+
 				body = Poison.encode!(%{data: attendance_list})
 				conn = append_resp_headers(conn)
 				send_resp(conn, 200, body)
-				
+
 			{:error, err} ->
 				body = Poison.encode!(%{message: err})
 				send_resp(conn, 400, body)
@@ -333,6 +363,12 @@ defmodule EdMarkaz.Server.BranchManager do
 			[{_, _}] -> {:ok}
 			[] -> DynamicSupervisor.start_child(EdMarkaz.SchoolSupervisor, {Sarkar.School, {school_id}})
 		end
+	end
+
+	defp formatted_iso_date (date) do
+		[ date | _ ] = date |> DateTime.to_string |> String.split(" ")
+		# YYYY-MM-DD
+		date
 	end
 
 end
