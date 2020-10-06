@@ -49,15 +49,24 @@ const FrontPage = () => {
 				<div className="image-card-container">
 					<div className="image-card" onClick={() => setShowModal(true)}>
 						<img className="img" src={TeacherMain} style={{ backgroundColor: "#B1E1E8", objectFit: "cover" }} alt="teacher-menu" />
-						<div className="pill" >Teachers</div>
+						<div className="pill" style={{ lineHeight: '40px' }}>
+							<div className="i-am-a">I am a</div>
+							<div className="i-am-a-title">Teacher</div>
+						</div>
 					</div>
 					<Link to="/student" className="image-card">
 						<img className="img cen" src={StudentMain} alt="student-menu" />
-						<div className="pill">Students</div>
+						<div className="pill" style={{ lineHeight: '40px' }}>
+							<div className="i-am-a">I am a</div>
+							<div className="i-am-a-title">Student</div>
+						</div>
 					</Link>
 					<Link to="/school" className="image-card">
 						<img className="img" src={SchoolMain} style={{ backgroundColor: "#B1E1E8" }} alt="school-menu" />
-						<div className="pill">Schools</div>
+						<div className="pill" style={{ lineHeight: '40px' }}>
+							<div className="i-am-a">I am a</div>
+							<div className="i-am-a-title">School</div>
+						</div>
 					</Link>
 				</div>
 			</div>
