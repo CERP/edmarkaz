@@ -78,11 +78,11 @@ const FrontPage = () => {
 				</div>
 			</div>
 			<div className="info-container">
-				<div className="heading">14th August Competition!</div>
+				<div className="heading">14th August Competition Winners!</div>
 				<div className="para">
-					Send us art, poems or essays to celebrate the spirit of being Pakistani. Find out more details about how to participate
+					We're proud to announce the winners for 14th August drawing Competition
 				</div>
-				<Link className="pill" to="/challenge"> Enter </Link>
+				<Link className="pill" to="/14th-august-competition-winners"> Enter </Link>
 			</div>
 		</div>
 		<div className="partition bg-teal">

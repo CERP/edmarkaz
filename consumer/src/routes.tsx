@@ -14,7 +14,7 @@ import School from './pages/School'
 import AutoLogin from './pages/SignUp/auto_login'
 import AppPrivacy from 'pages/Privacy'
 import Campaign from 'pages/Front/campaign'
-import Challenge from 'pages/Challenge/index'
+import { CompetitionWinners } from 'pages/Challenge/winners'
 
 const Routes = ({ store }: { store: Store }) => (
 	<Provider store={store}>
@@ -30,7 +30,7 @@ const Routes = ({ store }: { store: Store }) => (
 				<TrackedRoute exact path="/log-in" component={login} />
 				<TrackedRoute exact path="/school" component={School} />
 				<TrackedRoute exact path="/student" component={StudentPortal} />
-				<TrackedRoute exact path="/challenge" component={Challenge} />
+				<TrackedRoute exact path="/14th-august-competition-winners" component={CompetitionWinners} />
 				<Route path="/" component={TabsBar} />
 			</Switch>
 		</BrowserRouter>

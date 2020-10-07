@@ -7,7 +7,7 @@ export interface CompetitionWinner {
 	drawing_url: string
 }
 
-const CompetitionWinners: CompetitionWinner[] = [
+const Winners: CompetitionWinner[] = [
 	{
 		category: "Good citizen",
 		school: "The Wisdom School",
@@ -130,4 +130,4 @@ const CompetitionWinners: CompetitionWinner[] = [
 	}
 ]
 
-export { CompetitionWinners }
+export { Winners }
