@@ -4,7 +4,7 @@ import { RouteComponentProps } from 'react-router'
 import { Link } from 'react-router-dom'
 import { getProducts, placeOrder } from '../../../actions';
 import Modal from "../../../components/Modal";
-import { Container, Grid, Card, CardContent, Typography, Paper, ButtonBase } from '@material-ui/core';
+import { Container, Grid, Typography, Paper } from '@material-ui/core';
 
 import './style.css'
 import { toTitleCase } from 'utils/generic';
@@ -109,7 +109,7 @@ class ProductPage extends React.Component<P, S> {
 													.map((t, k) => <div key={k}>{t}</div>)
 											}
 										</div>
-										<Typography variant="subtitle1"><span className="bold">Location: </span> {product.location ? this.locationString(product) : 'Across Pakistan'}</Typography>
+										<Typography variant="subtitle1"><span className="bold">Available: </span> {product.location ? this.locationString(product) : 'Across Pakistan'}</Typography>
 									</Grid>
 									<Grid>
 										{this.props.connected && !this.props.auth.token && <Link to="/log-in" className="order-button"> Login to Order Online</Link>}
