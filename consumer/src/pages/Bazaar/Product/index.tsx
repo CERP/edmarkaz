@@ -5,9 +5,10 @@ import { Link } from 'react-router-dom'
 import { getProducts, placeOrder } from '../../../actions';
 import Modal from "../../../components/Modal";
 import { Container, Grid, Typography, Paper } from '@material-ui/core';
+import { toTitleCase } from 'utils/generic';
+import { OrderRequestSubmit } from './orderRequest'
 
 import './style.css'
-import { toTitleCase } from 'utils/generic';
 
 interface S {
 	showModal: boolean;
@@ -49,7 +50,7 @@ class ProductPage extends React.Component<P, S> {
 			showModal: true
 		})
 
-		this.props.placeOrder(this.props.products[product_id])
+		// this.props.placeOrder(this.props.products[product_id])
 	}
 
 	closeModal = () => {
@@ -78,15 +79,9 @@ class ProductPage extends React.Component<P, S> {
 		return <div className="item-page">
 			<Container maxWidth="md" disableGutters>
 				{this.state.showModal && <Modal>
-					<div className="modal-box">
-
-						<div className="title">Congratulations</div>
-						<div className="subtitle" style={{ margin: "10px 0px" }}>
-							Our Representative will soon contact you with further information.
-						</div>
-
-						<div className="button save" onClick={() => this.closeModal()}>
-							Great
+					<div className="product modal-box">
+						<div className="modal-box-inner">
+							<OrderRequestSubmit handleModalClose={this.closeModal} />
 						</div>
 					</div>
 				</Modal>}
@@ -113,7 +108,7 @@ class ProductPage extends React.Component<P, S> {
 									</Grid>
 									<Grid>
 										{this.props.connected && !this.props.auth.token && <Link to="/log-in" className="order-button"> Login to Order Online</Link>}
-										{this.props.connected && this.props.auth.token && <div style={{ borderRadius: '.75rem' }} className="order-button" onClick={this.onOrder}> Request More Information</div>}
+										{this.props.connected && <div style={{ borderRadius: '4px' }} className="order-button" onClick={this.onOrder}> Request More Information</div>}
 									</Grid>
 								</Grid>
 								<Grid item style={{ height: 20 }}>
