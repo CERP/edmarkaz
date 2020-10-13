@@ -216,6 +216,8 @@ defmodule EdMarkaz.Server.BranchManager do
 		# get the school id param from body
 		school_id = conn.params["school_id"]
 
+		conn = append_resp_headers(conn)
+
 		case EdMarkaz.Auth.BranchManager.verify({ username, client_id, auth_token }) do
 			{:ok, _} ->
 
@@ -228,13 +230,9 @@ defmodule EdMarkaz.Server.BranchManager do
 
 				db = Sarkar.School.get_db(school_id)
 
-				students = db["students"]
+				attendance_list = db["students"] |> Enum.reduce(%{}, fn {id, student}, agg ->
 
-				attendance_list = students |> Enum.reduce(%{}, fn {id, student}, agg ->
-
-					attendance = student["attendance"]
-
-					monthvise = attendance |> Enum.reduce(%{}, fn {key, value}, inner_agg ->
+					monthvise = student["attendance"] |> Enum.reduce(%{}, fn {key, value}, inner_agg ->
 
 							[ year, month, day ] = String.split(key, "-")
 
@@ -275,8 +273,6 @@ defmodule EdMarkaz.Server.BranchManager do
 
 				end)
 
-				conn = append_resp_headers(conn)
-
 				body = Poison.encode!(%{data: attendance_list})
 				conn = append_resp_headers(conn)
 				send_resp(conn, 200, body)
@@ -313,11 +309,44 @@ defmodule EdMarkaz.Server.BranchManager do
 		# get the school id param from body
 		school_id = conn.params["school_id"]
 
-		db = Sarkar.School.get_db(school_id)
-
-		body = Poison.encode!(%{message: "Hello world"})
 		conn = append_resp_headers(conn)
-		send_resp(conn, 200, body)
+
+		case EdMarkaz.Auth.BranchManager.verify({ username, client_id, auth_token }) do
+			{:ok, _} ->
+
+				# start the school
+				start_school(school_id)
+
+				db = Sarkar.School.get_db(school_id)
+
+				teacher_attendance = db["faculty"] |> Enum.reduce(%{}, fn {fid, teacher}, agg ->
+
+					attendance = teacher["attendance"] |> Enum.reduce(%{}, fn {date, value}, inner_agg ->
+
+						# value -> check_in, check_out, absent, leave
+						[ item | _] = Map.keys(value)
+
+						status = if item == "check_in" or item == "checkout", do: "present", else: item
+
+						Map.put(inner_agg, date, status)
+
+					end)
+
+					value = %{ "name" => teacher["Name"], "phone" => teacher["Phone"], "attendance" => attendance }
+
+					Map.put(agg, fid, value)
+
+				end)
+
+
+				body = Poison.encode!(%{data: teacher_attendance})
+				conn = append_resp_headers(conn)
+				send_resp(conn, 200, body)
+
+			{:error, err} ->
+				body = Poison.encode!(%{message: err})
+				send_resp(conn, 400, body)
+		end
 
 	end
 
