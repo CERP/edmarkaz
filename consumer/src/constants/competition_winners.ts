@@ -78,7 +78,7 @@ const Winners: CompetitionWinner[] = [
 		district: "Pakpatan",
 		std_name: "Ali Abdullah",
 		class: "2",
-		drawing_url: "https://storage.googleapis.com/ilmx-product-images/ali.jpg"
+		drawing_url: "https://storage.googleapis.com/ilmx-product-images/mali.jpeg"
 	},
 	{
 		category: "Favorite thing",
