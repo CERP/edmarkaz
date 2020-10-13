@@ -4,9 +4,10 @@ import { RouteComponentProps } from 'react-router'
 import { Link } from 'react-router-dom'
 import { getProducts, placeOrder } from '../../../actions';
 import Modal from "../../../components/Modal";
-import { Container } from '@material-ui/core';
+import { Container, Grid, Typography, Paper } from '@material-ui/core';
 
 import './style.css'
+import { toTitleCase } from 'utils/generic';
 
 interface S {
 	showModal: boolean;
@@ -57,6 +58,13 @@ class ProductPage extends React.Component<P, S> {
 		})
 	}
 
+	locationString = (product: Product) => {
+		const { province = '', district = '', tehsil = '' } = product.location || { province: '', district: '', tehsil: '' }
+		const makeString = [province, district, tehsil].join(", ")
+
+		return product.location ? toTitleCase(makeString, ", ") : ''
+	}
+
 	render() {
 		const product_id = this.props.match.params.product_id;
 
@@ -83,27 +91,43 @@ class ProductPage extends React.Component<P, S> {
 					</div>
 				</Modal>}
 
-
-				<img crossOrigin="anonymous" src={product.image && product.image.url} className="item-image" alt="Product" />
-				<div className="item-info">
-					<div className="title">{product.title}</div>
-					<div className="subtitle">{supplier_name}</div>
-					<div className="heading">{product.price}</div>
+				<div style={{ flexGrow: 1, marginTop: 20 }}>
+					<Paper style={{ padding: '1rem', paddingBottom: '1.5rem' }}>
+						<Grid container spacing={2}>
+							<Grid item style={{ maxWidth: 300, height: 320, marginBottom: '.45rem' }}>
+								<img alt="product" style={{ width: 'auto', maxWidth: 310, height: 320, borderRadius: '1rem' }} src={product.image && product.image.url} />
+							</Grid>
+							<Grid item xs={12} sm container style={{ marginLeft: '1rem' }}>
+								<Grid item xs container direction="column" spacing={2}>
+									<Grid item xs>
+										<Typography gutterBottom variant="h4">{product.title}</Typography>
+										<Typography gutterBottom variant="subtitle1" className="bold">{supplier_name}</Typography>
+										<Typography variant="subtitle1" className="bold"> Description </Typography>
+										<div className="description">
+											{
+												product.description.split('\n')
+													.map((t, k) => <div key={k}>{t}</div>)
+											}
+										</div>
+										<Typography variant="subtitle1"><span className="bold">Available: </span> {product.location ? this.locationString(product) : 'Across Pakistan'}</Typography>
+									</Grid>
+									<Grid>
+										{this.props.connected && !this.props.auth.token && <Link to="/log-in" className="order-button"> Login to Order Online</Link>}
+										{this.props.connected && this.props.auth.token && <div style={{ borderRadius: '.75rem' }} className="order-button" onClick={this.onOrder}> Request More Information</div>}
+									</Grid>
+								</Grid>
+								<Grid item style={{ height: 20 }}>
+									<Typography className="bold" variant="h5" style={{ color: 'var(--red)' }} gutterBottom>{product.price}</Typography>
+								</Grid>
+							</Grid>
+						</Grid>
+					</Paper>
 				</div>
-
-				{this.props.connected && !this.props.auth.token && <Link to="/log-in" className="order-button"> Login to Order Online</Link>}
-				{this.props.connected && this.props.auth.token && <div className="order-button" onClick={this.onOrder}> Request Information</div>}
-
-				<div className="description">{
-					product.description.split('\n')
-						.map((t, k) => <div key={k}>{t}</div>)
-				}</div>
-
 			</Container>
 
 			{/* {this.props.connected && !this.props.auth.token && <Link className="button blue" to="/sign-up">Sign up to Order Online</Link>}
 			{this.props.connected && this.props.auth.token && <div className="button blue" onClick={this.onOrder}>Request Information</div>} */}
-		</div>
+		</div >
 
 	}
 }

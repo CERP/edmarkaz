@@ -330,7 +330,7 @@ defmodule EdMarkaz.Supplier do
 				|> Enum.map(fn {k,v} -> k end)
 
 				spawn fn ->
-					EdMarkaz.Contegris.send_sms(number, message)
+					EdMarkaz.Telenor.send_sms(number, message)
 				end
 			end
 		end

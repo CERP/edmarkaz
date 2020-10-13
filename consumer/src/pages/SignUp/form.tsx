@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React, { useState } from 'react'
 import Former from 'former'
 import Dynamic from '@ironbay/dynamic'
 import { Typography, TextField, MenuItem } from '@material-ui/core'
@@ -19,8 +19,13 @@ interface SchoolProp {
 
 export const SchoolForm: React.SFC<SchoolProp> = ({ school, former, base_path }) => {
 
+	const [province, setProvince] = useState(null)
+	const getProvince = (e: any) => {
+		setProvince(e.target.value)
+	}
+
 	// @ts-ignore
-	const district_tehsils = school.school_district && getDistrictTehsilList()["PUNJAB"][school.school_district]
+	const district_tehsils = school.school_district && getDistrictTehsilList()[province !== null ? province : "PUNJAB"][school.school_district]
 
 	return <>
 		<TextField
@@ -60,16 +65,33 @@ export const SchoolForm: React.SFC<SchoolProp> = ({ school, former, base_path })
 			style={{ marginTop: 10 }}
 			variant="outlined"
 			select
-			label="District"
+			label="Province"
 			fullWidth
-			{...former.super_handle([...base_path, "school_district"])}
+			onChange={getProvince}
 		>
 			{
-				Object.keys(getDistrictTehsilList()["PUNJAB"]).map(
-					district => <MenuItem value={district}>{district}</MenuItem>
+				Object.keys(getDistrictTehsilList()).map(
+					province => <MenuItem value={province}>{province}</MenuItem>
 				)
 			}
 		</TextField>
+		{
+			province !== null ? <TextField
+				style={{ marginTop: 10 }}
+				variant="outlined"
+				select
+				label="District"
+				fullWidth
+				{...former.super_handle([...base_path, "school_district"])}
+			>
+				{
+					//@ts-ignore
+					Object.keys(getDistrictTehsilList()[province !== null ? province : "PUNJAB"]).map(
+						district => <MenuItem value={district}>{district}</MenuItem>
+					)
+				}
+			</TextField> : null
+		}
 
 		{district_tehsils && district_tehsils.length > 0 && school.school_district && <TextField
 			style={{ marginTop: 10 }}
@@ -83,13 +105,13 @@ export const SchoolForm: React.SFC<SchoolProp> = ({ school, former, base_path })
 				district_tehsils.map((tehsil: string) => <MenuItem value={tehsil}>{tehsil}</MenuItem>)
 			}
 		</TextField>}
-		{
+		{/* {
 			district_tehsils === undefined && <EditSurveyRow
 				base_path={base_path}
 				label="Tehsil"
 				path={["school_tehsil"]}
 				former={former} />
-		}
+		} */}
 		{/* <Typography
 			variant="h6"
 			align="left"

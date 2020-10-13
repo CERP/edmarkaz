@@ -1,7 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom';
-import Arrow from '../../icons/arrow.svg'
 import { getProducts } from '../../actions';
 import { Container } from '@material-ui/core';
 import Alert from 'components/Alert';
@@ -87,7 +86,7 @@ class LoggedOutHome extends React.Component<P, S> {
 				<img className="banner-img" src={banner} />
 			</div> */}
 			<Container maxWidth="md">
-				<Alert text="The bazaar service is currently suspended due to COVID-19. Please contact 03481191119 for more information." />
+				<Alert text="The bazaar service is currently suspended due to COVID-19. Please contact 0348-1119-119 for more information." />
 				<div className="tabs-home">
 					{
 						sorted
@@ -96,9 +95,8 @@ class LoggedOutHome extends React.Component<P, S> {
 								return <div className="item-row" key={category}>
 									<div className="title-row" >
 										<div className="title">{category}</div>
-										<img className="arrow-icon" src={Arrow} alt="arrow" />
 									</div>
-									<div className="items">
+									<div className="items custom-scrollbar">
 										{
 											Object.entries(suppliers)
 												.sort(([, s1], [, s2]) => (s1.order || 9999) - (s2.order || 9999))

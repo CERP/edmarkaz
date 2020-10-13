@@ -148,7 +148,7 @@ class Login extends Component<propTypes, S> {
 							}
 
 							<Typography variant="subtitle1">
-								Doesn't have any account?
+								New here? Create an Account
 							</Typography>
 
 							<SignUp />

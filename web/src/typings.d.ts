@@ -158,6 +158,11 @@ declare global {
 		categories: {
 			[category: string]: boolean
 		}
+		location?: {
+			province: string
+			district: string
+			tehsil: string
+		}
 	}
 
 	interface RootBankState {

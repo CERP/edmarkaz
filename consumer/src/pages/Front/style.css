@@ -9,7 +9,7 @@
 	flex-direction: column;
 	justify-content: center;
 	height: fit-content;
-	padding: 60px 40px;
+	padding: 40px;
 	width: calc(100% - 80px);
 }
 	.partition.main .info-container {
@@ -205,9 +205,49 @@
 		height: 250px;
 	}
 
+	/* For Campaign Page*/
+
+	.campaign .partition .info-container {
+		width: 100%;
+	}
+	.campaign.front .partition {
+		padding: 0px 40px;
+	}
+	.campaign .ws-cont .select-row {
+		margin-bottom: 10px;
+	}
+	.campaign .ws-cont .select-row > * {
+		padding: 5px;
+		margin: 5px;
+	}
+	.ws-cont {
+		width: 100%;
+	}
+	.ws-cont .qs-cont .qs-card {
+		border: 1px solid #ebebeb;
+		padding: 10px;
+	}
+	.qs-card .qs {
+		font-size: 20px;
+		text-align: left;
+	}
+	.campaign .tag-row {
+		display: flex;
+		width: 100%;
+		align-items: center;
+	}
+	.tag-row .tag {
+		border-radius: 5px;
+		margin: 5px;
+		padding: 5px;
+		color: #222222;
+	}
+
 
 @media only screen and (min-width: 800px) {
-
+	.campaign.front .partition {
+		padding: 0px 5%;
+	}
 	.pill {
 		width: 220px;
 		height: 60px;
@@ -221,7 +261,7 @@
 	}
 	.front .partition {
 		flex-direction: row;
-		padding: 130px 5%;
+		padding: 60px 5%;
 		width: calc(100% - 10%);
 	}
 	.front .reverse {
@@ -311,4 +351,15 @@
 		height: 400px;
 		width: 400px;
 	}
+}
+
+.pill .i-am-a {
+	font-family: 'Caveat', cursive;
+	font-weight: bold;
+	font-size: 1.5rem !important;
+}
+
+.pill .i-am-a-title {
+	top: -18px;
+	position: relative;
 }
