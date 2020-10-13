@@ -1,6 +1,3 @@
-.products {
-
-}
 .products .supplier-box {
 	display: flex;
 	flex-direction: column;
@@ -12,8 +9,30 @@
 	margin: 10px;
 }
 
-	.products .supplier-box img {
-		height: 200px;
-		width: 200px;
-		border-radius: 100%;
-	}
+.products .supplier-box img {
+	height: 200px;
+	width: 200px;
+	border-radius: 100%;
+}
+
+.products .custom-scrollbar::-webkit-scrollbar-track
+{
+	box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	border-radius: 10px;
+	background-color: #F5F5F5;
+}
+
+.products .custom-scrollbar::-webkit-scrollbar
+{
+	width: 12px;
+	background-color: #F5F5F5;
+}
+
+.products .custom-scrollbar::-webkit-scrollbar-thumb
+{
+	border-radius: 10px;
+	box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+	background-color: var(--blue);
+}

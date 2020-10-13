@@ -92,7 +92,7 @@ class TabsBar extends Component<propTypes, S> {
 
 		const callLink = this.props.connected ? "https://api.whatsapp.com/send?phone=923481119119" : "tel:0348-1119-119";
 
-		return user === undefined ? <Redirect to="" /> : <Layout>
+		return (user === undefined && current !== "/bazaar") ? <Redirect to="" /> : <Layout>
 			<div className="tabs-page">
 				{user === "SCHOOL" && current !== "/profile" && current !== "/start-mob" && current !== "/log-in" &&
 					<Paper style={{ flexGrow: 1 }}>
@@ -108,6 +108,19 @@ class TabsBar extends Component<propTypes, S> {
 							<Tab label="Help" onClick={() => history.push("/help")} />
 						</Tabs>
 					</Paper>
+				}
+				{
+					(!user && current === "/bazaar") &&
+					<Paper style={{ flexGrow: 1 }}>
+						<Tabs
+							value={this.getCurrentTab(this.props.location.pathname)}
+							indicatorColor="primary"
+							textColor="primary"
+							centered>
+							<Tab label="Bazaar" onClick={() => history.push("/bazaar")} />
+						</Tabs>
+					</Paper>
+
 				}
 				<>
 					<TrackedRoute exact path="/supplier/:supplier_id/:product_id" component={ProductPage} />
