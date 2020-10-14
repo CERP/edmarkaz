@@ -329,6 +329,18 @@ defmodule EdMarkaz.Server.Analytics do
 			a.path[3] as school_id,
 			a.value->>'event' as event,
 			a.value->'meta'->>'product_id' as product_id,
+			a.value->'meta'->>'status' as status,
+			a.value->'meta'->>'call_one' as call_1,
+			a.value->'meta'->>'call_two' as call_2,
+			a.value->'meta'->>'quantity' as quantity,
+			a.value->'meta'->>'sales_rep' as sales_rep,
+			a.value->'meta'->>'total_amount' as total_amount,
+			a.value->'meta'->>'payment_received' as payment_received,
+			a.value->'meta'->>'cancellation_reason' as cancellation_reason,
+			to_timestamp((a.value->'meta'->>'actual_date_of_delivery')::bigint/1000)::date as actual_date_of_delivery,
+			to_timestamp((a.value->'meta'->>'expected_date_of_delivery')::bigint/1000)::date as expected_date_of_delivery,
+			to_timestamp((a.value->'meta'->>'expected_completion_date')::bigint/1000)::date as expected_completion_date,
+			a.value->'meta'->>'notes' as notes,
 			b.db->>'phone_number' as number
 		FROM platform_writes a JOIN platform_schools b ON a.path[3]=b.id
 		WHERE path[4] = 'history' and value->>'event' = 'ORDER_PLACED'
@@ -342,7 +354,26 @@ defmodule EdMarkaz.Server.Analytics do
 
 		formatted = data |> Enum.map(fn [id, d | rest ] -> [id, Date.to_string(d) | rest] end)
 
-		csv = [ ["supplier_id", "date", "school_id", "event", "product_id", "number"] | formatted]
+		csv = [[
+				"supplier_id",
+				"date",
+				"school_id",
+				"event",
+				"product_id",
+				"status",
+				"call_1",
+				"call_2",
+				"quantity",
+				"sales_rep",
+				"total_amount",
+				"payment_received",
+				"cancellation_reason",
+				"actual_date_of_delivery",
+				"expected_date_of_delivery",
+				"expected_completion_date",
+				"notes",
+				"number"
+				] | formatted]
 		|> CSV.encode
 		|> Enum.join()
 
