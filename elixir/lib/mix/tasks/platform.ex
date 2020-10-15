@@ -1,6 +1,48 @@
 defmodule Mix.Tasks.Platform do
 	use Mix.Task
 
+	def run (["mappy", school_id, new_school_id]) do
+		Application.ensure_all_started(:edmarkaz)
+
+		IO.puts school_id
+		IO.puts new_school_id
+
+		# IO.puts "Fetching from writes"
+		{:ok, res} = EdMarkaz.DB.Postgres.query(
+			EdMarkaz.DB,
+			"SELECT time, type, path, value, client_id
+			FROM writes
+			WHERE school_id=$1",
+			[school_id]
+		)
+
+		mapped_writes = res.rows
+		|> Enum.map(fn ([time, type, path, value, client_id]) ->
+			%{"date" => time, "type" => type, "path" => path, "value" => value, "client_id" => client_id}
+		end)
+
+		IO.inspect mapped_writes
+
+		# new_state = res.rows
+		# |> Enum.reduce(%{}, fn([time, type, path, value, client_id], agg) ->
+		# 	case type do
+		# 		"MERGE" -> Dynamic.put(agg, path, value)
+		# 		"DELETE" -> Dynamic.delete(agg, path)
+		# 		other ->
+		# 			IO.inspect other
+		# 			agg
+		# 	end
+
+		# end)
+
+		# IO.inspect new_state
+
+		IO.puts "Save into flattened"
+		save_school_writes(new_school_id, mapped_writes)
+
+		# IO.inspect "NEW STATE"
+	end
+
 	def run(["send_sms_messages", fname]) do
 
 		csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) do
@@ -667,6 +709,158 @@ defmodule Mix.Tasks.Platform do
 			[{_, _}] -> {:ok}
 			[] -> DynamicSupervisor.start_child(EdMarkaz.SupplierSupervisor, {EdMarkaz.Supplier, {id}})
 		end
+	end
+
+	def save(school_id, writes) do
+
+		save_flattened(school_id, writes)
+		save_writes(school_id, writes)
+
+	end
+
+	defp save_school_writes(school_id, writes) do
+
+		# save_flattened(school_id, writes)
+
+		third_of_writes = round(length(writes) / 3)
+
+		[first, second, third] = Enum.chunk_every(writes, third_of_writes)
+
+		IO.puts "flatened school process done"
+
+		IO.puts "PUTTING in writes table"
+
+		IO.puts "First Chunk"
+		save_writes(school_id, first)
+		IO.puts "Second Chunk"
+		save_writes(school_id, second)
+
+		IO.puts "Third chunk"
+		save_writes(school_id, third)
+
+	end
+
+	def save_writes(school_id, writes) do
+		flattened_writes = writes
+			|> Enum.map(fn %{"date" => date, "value" => value, "path" => path, "type" => type, "client_id" => client_id} ->
+				[school_id, path, value, date, type, client_id]
+			end)
+			|> Enum.reduce([], fn curr, agg -> Enum.concat(agg, curr) end)
+
+		gen_value_strings_writes = Stream.with_index(writes, 1)
+			|> Enum.map(fn {w, i} ->
+				x = (i - 1) * 6 + 1
+				"($#{x}, $#{x + 1}, $#{x + 2}, $#{x + 3}, $#{x + 4}, $#{x + 5})"
+			end)
+
+		case EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
+			"INSERT INTO writes (school_id, path, value, time, type, client_id) VALUES #{Enum.join(gen_value_strings_writes, ",")}",
+			flattened_writes) do
+				{:ok, resp} -> {:ok}
+				{:error, err} ->
+					IO.puts "write failed"
+					IO.inspect err
+					{:ok}
+		end
+
+	end
+
+	defp save_flattened(school_id, writes) do
+		flattened_db = writes
+			|> Enum.reduce([], fn(%{"date" => date, "value" => value, "path" => path, "type" => type, "client_id" => client_id}, agg) ->
+
+				path = Enum.drop(path, 1)
+				if is_map(value) do
+					flat_write = Dynamic.flatten(value)
+						|> Enum.map(fn {k, v} -> {Enum.join(path ++ k, ","), [type, school_id, path ++ k, v, date]} end)
+
+					Enum.concat(agg, flat_write)
+				else
+					[{Enum.join(path, ","), [type, school_id, path, value, date]} | agg]
+					# Enum.concat( agg, [[type, school_id, path, value, date]] )
+				end
+			end)
+			|> Enum.sort( fn({_, [_, _, _, _, d1]}, {_, [_, _, _, v, d2]} ) -> d1 < d2 end)
+			|> Enum.into(%{})
+			|> Enum.sort(fn ({_, [_, _, _, _, d1]}, {_, [_, _, _, _, d2]} ) -> d1 < d2 end)
+			|> Enum.map(fn {_, v} -> v end)
+
+		# array of map %{ type: "MERGE" | "DELETE", mutations: [ [date, value, path, type, client_id] ] }
+		flattened_db_sequence = flattened_db
+			|> Enum.reduce([], fn([type, school_id, path, value, date], agg) ->
+
+				prev = Enum.at(agg, -1) || %{}
+
+				case Map.get(prev, "type") do
+					^type ->
+						Enum.drop(agg, -1) ++ [%{
+							"type" => type,
+							"mutations" => Map.get(prev, "mutations") ++ [[school_id, Enum.join(path, ","), value, date]]
+						}]
+					other ->
+						agg  ++ [%{
+							"type" => type,
+							"mutations" => [
+								[school_id, Enum.join(path, ","), value, date]
+							]
+						}]
+				end
+			end)
+
+		# now just generate the sql queries for each one of these segments
+
+		chunk_size = 1000
+
+		results = Postgrex.transaction(EdMarkaz.DB, fn(conn) ->
+
+			flattened_db_sequence
+			|> Enum.map(fn %{"type" => type, "mutations" => muts} ->
+
+				muts
+				|> Enum.chunk_every(chunk_size)
+				|> Enum.map(fn chunked_muts ->
+
+					case type do
+						"MERGE" ->
+
+							IO.puts "IN MERGE"
+
+							gen_value_strings_db = 1..trunc(Enum.count(chunked_muts))
+								|> Enum.map(fn i ->
+									x = (i - 1) * 4 + 1
+									"($#{x}, $#{x + 1}, $#{x + 2}, $#{x + 3})"
+								end)
+
+							query_string = "INSERT INTO flattened_schools (school_id, path, value, time)
+								VALUES #{Enum.join(gen_value_strings_db, ",")}
+								ON CONFLICT (school_id, path) DO UPDATE set value=excluded.value, time=excluded.time"
+
+							arguments = chunked_muts |> Enum.reduce([], fn (a, collect) -> collect ++ a end)
+							{:ok, res }= EdMarkaz.DB.Postgres.query(conn, query_string, arguments)
+							res
+
+						"DELETE" ->
+
+							IO.puts "IN DELETE"
+
+							{query_section, arguments} = chunked_muts
+								|> Enum.with_index()
+								|> Enum.map(fn {[_, path, _, _], index} ->
+									{ "(path LIKE $#{index + 2})", [path <> "%"] }
+								end)
+								|> Enum.reduce({[], []}, fn {query, arg}, {queries, args} -> {
+									[ query | queries ],
+									args ++ arg
+								} end)
+
+							query_string = "DELETE FROM flattened_schools WHERE school_id = $1 and #{Enum.join(query_section, " OR ")}"
+							{:ok, res} = EdMarkaz.DB.Postgres.query(conn, query_string, [school_id | arguments])
+							res
+					end
+				end)
+			end)
+		end, pool: DBConnection.Poolboy, timeout: 60_000*20)
+
 	end
 
 end
