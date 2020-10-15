@@ -79,7 +79,7 @@ defmodule Mix.Tasks.Platform do
 
 		failed = phone_numbers
 		|> Enum.map(fn num ->
-			case EdMarkaz.Contegris.send_sms(num, message) do
+			case EdMarkaz.Telenor.send_sms(num, message) do
 				{:ok, _} ->
 					IO.puts "sent message"
 					nil
@@ -365,6 +365,7 @@ defmodule Mix.Tasks.Platform do
 				"MERGE" -> Dynamic.put(agg, path, value)
 				"DELETE" -> Dynamic.delete(agg, path)
 			end
+
 		end)
 
 		IO.inspect state
@@ -735,6 +736,13 @@ defmodule Mix.Tasks.Platform do
 	defp formatted_date (date) do
 		[ date | _ ] = date |> DateTime.to_string |> String.split(" ")
 		date
+	end
+
+	defp start_school(school_id) do
+		case Registry.lookup(EdMarkaz.SchoolRegistry, school_id) do
+			[{_, _}] -> {:ok}
+			[] -> DynamicSupervisor.start_child(EdMarkaz.SchoolSupervisor, {Sarkar.School, {school_id}})
+		end
 	end
 
 end
