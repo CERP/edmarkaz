@@ -4,8 +4,7 @@ import { RouteComponentProps, withRouter, Link } from 'react-router-dom'
 import { AppBar, Toolbar, IconButton, Button, makeStyles } from '@material-ui/core'
 import BackIcon from '@material-ui/icons/ArrowBack'
 import AccountCircle from '@material-ui/icons/AccountCircle'
-import ExitToApp from '@material-ui/icons/ExitToApp'
-import FaceIcon from '@material-ui/icons/Face';
+
 import { Home } from '@material-ui/icons'
 
 //@ts-ignore
@@ -185,7 +184,7 @@ const StudentHeader: React.FC<SP> = ({ goBack, push, auth, lesson_meta, client_i
 
 						{
 							auth.user === "SCHOOL" && <IconButton href={`https://mischool.pk/auto-login?id=${auth.id}&key=${auth.token}&cid=${client_id}&ref=${profile.refcode}`} edge="start" color="inherit" aria-label="menu">
-								<img src={mis} style={{ height: "30px" }} />
+								<img src={mis} style={{ height: "30px" }} alt="mis" />
 							</IconButton>}
 
 						<IconButton onClick={toHome} edge="start" color="inherit" aria-label="menu">

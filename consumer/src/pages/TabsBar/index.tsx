@@ -9,7 +9,6 @@ import ErrorComponent from "../../components/Error";
 import { submitError } from "../../actions/core";
 import { connect } from "react-redux";
 import Help from "../Help";
-import contactUs from "../../icons/contactUs.svg";
 import TrackedRoute from "../../components/TrackedRoute";
 import Library from "../Library";
 import LessonPage from "../Library/Lesson";
@@ -82,7 +81,7 @@ class TabsBar extends Component<propTypes, S> {
 		const { location, user, history } = this.props
 		const current = location.pathname;
 
-		const library = location.pathname.split("/").some((i) => i === "library")
+		// const library = location.pathname.split("/").some((i) => i === "library")
 
 		if (this.state.error && this.state.err && this.state.errInfo) {
 			return (
@@ -138,10 +137,6 @@ class TabsBar extends Component<propTypes, S> {
 					<TrackedRoute exact path="/student-profile" component={StudentProfile} />
 					<TrackedRoute exact path="/dashboard" component={SchoolDashboard} />
 				</>
-				{/* {!library && <a className="contact-us" href={callLink}>
-					<img src={contactUs} alt="phone" />
-					<div>Contact Us</div>
-				</a>} */}
 
 				{(current !== "/" && current !== "/bazaar" && current !== "/about-us") && <>
 					<HelpFooter hlink={callLink} />

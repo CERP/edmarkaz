@@ -5,7 +5,7 @@ import Former from 'former'
 import { SchoolForm } from '../SignUp/form'
 import { RouteComponentProps } from 'react-router'
 import './style.css'
-import { Typography, Container, Paper, Button } from '@material-ui/core'
+import { Container, Button } from '@material-ui/core'
 
 type P = {
 	school: Partial<CERPSchool>;
@@ -47,8 +47,8 @@ class Profile extends React.Component<P, S> {
 
 	render() {
 
-		const { phone_number } = this.state.profile
-		const st = phone_number ? phone_number.split("").reverse().join("").substring(0, phone_number.length - 1) : ""
+		// const { phone_number } = this.state.profile
+		// const st = phone_number ? phone_number.split("").reverse().join("").substring(0, phone_number.length - 1) : ""
 		return <div className="user-profile">
 			<Container maxWidth="sm">
 				<SchoolForm school={this.state.profile} former={this.former} base_path={["profile"]} />

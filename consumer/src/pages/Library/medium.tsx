@@ -24,7 +24,7 @@ const LibraryInstructionMedium: React.FC<P> = ({ lessons, lesson_loading, getLes
 	useEffect(() => {
 		getLessons()
 		getAssessments()
-	}, [getLessons])
+	}, [getLessons, getAssessments])
 
 	const [showModal, setShowModal] = useState(false)
 

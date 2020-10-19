@@ -44,7 +44,7 @@ class ProductPage extends React.Component<P, S> {
 
 	onOrder = () => {
 		// dispatch onOrder action
-		const product_id = this.props.match.params.product_id;
+		// const product_id = this.props.match.params.product_id;
 
 		this.setState({
 			showModal: true
