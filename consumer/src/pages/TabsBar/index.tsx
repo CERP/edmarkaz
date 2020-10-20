@@ -91,7 +91,7 @@ class TabsBar extends Component<propTypes, S> {
 
 		const callLink = this.props.connected ? "https://api.whatsapp.com/send?phone=923481119119" : "tel:0348-1119-119";
 
-		return (user === undefined && current !== "/bazaar") ? <Redirect to="" /> : <Layout>
+		return <Layout>
 			<div className="tabs-page">
 				{user === "SCHOOL" && current !== "/profile" && current !== "/start-mob" && current !== "/log-in" &&
 					<Paper style={{ flexGrow: 1 }}>
@@ -109,7 +109,7 @@ class TabsBar extends Component<propTypes, S> {
 					</Paper>
 				}
 				{
-					(!user && current === "/bazaar") &&
+					!user &&
 					<Paper style={{ flexGrow: 1 }}>
 						<Tabs
 							value={this.getCurrentTab(this.props.location.pathname)}
@@ -122,8 +122,11 @@ class TabsBar extends Component<propTypes, S> {
 
 				}
 				<>
+
 					<TrackedRoute exact path="/supplier/:supplier_id/:product_id" component={ProductPage} />
 					<TrackedRoute exact path="/supplier/:supplier_id" component={SupplierHome} />
+					<TrackedRoute exact path="/bazaar" component={ProductHome} />
+
 					<TrackedRoute path="/profile" component={Profile} />
 					<Route path="/articles/:article_id" component={ArticleRouter} />
 					<TrackedRoute exact path="/articles" component={Articles} />
@@ -133,7 +136,6 @@ class TabsBar extends Component<propTypes, S> {
 					<TrackedRoute exact path="/library/:medium" component={StudentPortalOptions} />
 					<TrackedRoute exact path="/library/:medium/:grade/:subject" component={Library} />
 					<TrackedRoute exact path="/library/:medium/:grade/:subject/:chapter/:chapter_name" component={LessonPage} />
-					<TrackedRoute exact path="/bazaar" component={ProductHome} />
 					<TrackedRoute exact path="/student-profile" component={StudentProfile} />
 					<TrackedRoute exact path="/dashboard" component={SchoolDashboard} />
 				</>

@@ -8,7 +8,15 @@
 	color: #ffffff;
 	background: #ff9800;
 	min-height: 30px;
+	font-weight: bold;
 }
 .alert-bar > * {
 	margin: 0px 5px;
+}
+
+@media (min-width: 772px) {
+	.alert-bar {
+		margin-right: 20px;
+		margin-left: 20px;
+	}
 }

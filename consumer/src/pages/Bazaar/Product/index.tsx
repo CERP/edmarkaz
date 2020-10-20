@@ -107,7 +107,7 @@ class ProductPage extends React.Component<P, S> {
 										<Typography variant="subtitle1"><span className="bold">Available: </span> {product.location ? this.locationString(product) : 'Across Pakistan'}</Typography>
 									</Grid>
 									<Grid>
-										{this.props.connected && !this.props.auth.token && <Link to="/log-in" className="order-button"> Login to Order Online</Link>}
+										{/* {this.props.connected && !this.props.auth.token && <Link to="/log-in" className="order-button"> Login to Order Online</Link>} */}
 										{this.props.connected && <div style={{ borderRadius: '4px' }} className="order-button" onClick={this.onOrder}> Request More Information</div>}
 									</Grid>
 								</Grid>

@@ -82,12 +82,9 @@ class LoggedOutHome extends React.Component<P, S> {
 			.sort(([c1,], [c2,]) => getCategoryOrder(c1) - getCategoryOrder(c2))
 
 		return <div className="products">
-			{/* <div className="tabs-banner">
-				<img className="banner-img" src={banner} />
-			</div> */}
 			<Container maxWidth="md">
-				<Alert text="The bazaar service is currently suspended due to COVID-19. Please contact 0348-1119-119 for more information." />
 				<div className="tabs-home">
+					<Alert text="Product availability will be vary with location. Please contact 0348-1119-119 for more information." />
 					{
 						sorted
 							.map(([category, suppliers]) => {
