@@ -22,14 +22,19 @@ defmodule Mix.Tasks.Platform do
 			EdMarkaz.DB,
 			"SELECT time, type, path, value, client_id
 			FROM writes
-			WHERE school_id=$1 AND order by time asc",
+            WHERE school_id=$1
+            order by time asc",
 			[school_id]
 		)
 
+      # HERE is where the bad writes are filtered out.
+      # note that there may be a student with a blank id that we actually WANT to keep -- 
+      # we should copy flattened state for students with "" id, give them a new id, and merge those in. then carefully delete student with blank id
 		mapped_writes = res.rows
 		|> Enum.map(fn ([time, type, path, value, client_id]) ->
 			%{"date" => time, "type" => type, "path" => path, "value" => value, "client_id" => client_id}
 		end)
+        |> Enum.filter(fn ([_, _, path, _, _]) -> path[2] != '' end)
 
 		# IO.inspect mapped_writes
 
@@ -54,13 +59,13 @@ defmodule Mix.Tasks.Platform do
 			# end
 		end)
 
-		IO.puts "-----NEW STATE------"
+        # IO.puts "-----NEW STATE------"
 
-		IO.inspect new_state
+		# IO.inspect new_state
 
-		IO.puts "-----NEW STATE------"
+		# IO.puts "-----NEW STATE------"
 
-		# IO.inspect Dynamic.get(new_state, ["db", "students", "5f6d0983-3a46-4627-8303-82c8c47992f2"])
+		IO.inspect Dynamic.get(new_state, ["db", "students", "5f6d0983-3a46-4627-8303-82c8c47992f2"])
 
 		# IO.inspect new_state
 
@@ -808,6 +813,13 @@ defmodule Mix.Tasks.Platform do
 			|> Enum.sort(fn ({_, [_, _, _, _, d1]}, {_, [_, _, _, _, d2]} ) -> d1 < d2 end)
 			|> Enum.map(fn {_, v} -> v end)
 
+
+      IO.puts "----step1 flattened----"
+
+      IO.inspect flattened_db, limit: :infinity
+
+      IO.puts "----step1 flattened----"
+
 			# TEST STATE HERE WITH ALL OR SINGLE STUDEN WRITES
 
 				# |> Enum.reduce(%{}, fn({_, [type, school_id, path, value, date]}, agg) ->
@@ -857,74 +869,85 @@ defmodule Mix.Tasks.Platform do
 				end
 			end)
 
-		IO.puts "-----DB SQUENCE------"
 
-		IO.inspect flattened_db_sequence, limit: :infinity
+ 		IO.puts "-----DB SQUENCE------"
+ 
+ 		IO.inspect flattened_db_sequence, limit: :infinity
+ 
+ 		IO.puts "-----DB SQUENCE------"
+ 
+ 		# # now just generate the sql queries for each one of these segments
+ 
+ 		chunk_size = 100
+ 
+ 		results = Postgrex.transaction(EdMarkaz.DB, fn(conn) ->
+ 
+ 			flattened_db_sequence
+ 			|> Enum.map(fn %{"type" => type, "mutations" => muts} ->
+ 
+ 				muts
+ 				|> Enum.chunk_every(chunk_size)
+ 				|> Enum.map(fn chunked_muts ->
+ 
+ 					case type do
+ 						"MERGE" ->
+ 
+ 							IO.puts "IN MERGE"
+ 
+ 							gen_value_strings_db = 1..trunc(Enum.count(chunked_muts))
+ 								|> Enum.map(fn i ->
+ 									x = (i - 1) * 4 + 1
+ 									"($#{x}, $#{x + 1}, $#{x + 2}, $#{x + 3})"
+ 								end)
+ 
+ 							query_string = "INSERT INTO flattened_schools (school_id, path, value, time)
+ 								VALUES #{Enum.join(gen_value_strings_db, ",")}
+ 								ON CONFLICT (school_id, path) DO UPDATE set value=excluded.value, time=excluded.time"
+ 
+ 							arguments = chunked_muts |> Enum.reduce([], fn (a, collect) -> collect ++ a end)
 
-		IO.puts "-----DB SQUENCE------"
-
-		# # now just generate the sql queries for each one of these segments
-
-		chunk_size = 100
-
-		results = Postgrex.transaction(EdMarkaz.DB, fn(conn) ->
-
-			flattened_db_sequence
-			|> Enum.map(fn %{"type" => type, "mutations" => muts} ->
-
-				muts
-				|> Enum.chunk_every(chunk_size)
-				|> Enum.map(fn chunked_muts ->
-
-					case type do
-						"MERGE" ->
-
-							IO.puts "IN MERGE"
-
-							gen_value_strings_db = 1..trunc(Enum.count(chunked_muts))
-								|> Enum.map(fn i ->
-									x = (i - 1) * 4 + 1
-									"($#{x}, $#{x + 1}, $#{x + 2}, $#{x + 3})"
-								end)
-
-							query_string = "INSERT INTO flattened_schools (school_id, path, value, time)
-								VALUES #{Enum.join(gen_value_strings_db, ",")}
-								ON CONFLICT (school_id, path) DO UPDATE set value=excluded.value, time=excluded.time"
-
-							arguments = chunked_muts |> Enum.reduce([], fn (a, collect) -> collect ++ a end)
-							{:ok, res }= EdMarkaz.DB.Postgres.query(conn, query_string, arguments)
-							res
-
-						"DELETE" ->
-
-							IO.puts "IN DELETE"
-
-							{query_section, arguments} = chunked_muts
-								|> Enum.with_index()
-								|> Enum.map(fn {[_, path, _, _], index} ->
-									{ "(path LIKE $#{index + 2})", [path <> "%"] }
-								end)
-								|> Enum.reduce({[], []}, fn {query, arg}, {queries, args} -> {
-									[ query | queries ],
-									args ++ arg
-								} end)
-
-							query_string = "DELETE FROM flattened_schools WHERE school_id = $1 and #{Enum.join(query_section, " OR ")}"
-							{:ok, res} = EdMarkaz.DB.Postgres.query(conn, query_string, [school_id | arguments])
-							res
-						_ ->
-
-					end
-				end)
-			end)
-		end, pool: DBConnection.Poolboy, timeout: 60_000*20)
-
-		IO.puts "-----QUERY TRANSACTION------"
-
-		IO.inspect results, limit: :infinity
-
-		IO.puts "-----QUERY TRANSACTION------"
-
+                            IO.inspect query_string
+                            IO.inspect arguments, limit: :infinity
+                            res = EdMarkaz.DB.Postgres.query(conn, query_string, arguments)
+                            IO.inspect res
+                            {:ok, res2} = res
+                            res2
+ 
+ 						"DELETE" ->
+ 
+ 							IO.puts "IN DELETE"
+ 
+ 							{query_section, arguments} = chunked_muts
+ 								|> Enum.with_index()
+ 								|> Enum.map(fn {[_, path, _, _], index} ->
+ 									{ "(path LIKE $#{index + 2})", [path <> "%"] }
+ 								end)
+ 								|> Enum.reduce({[], []}, fn {query, arg}, {queries, args} -> {
+ 									[ query | queries ],
+ 									args ++ arg
+ 								} end)
+ 
+ 							query_string = "DELETE FROM flattened_schools WHERE school_id = $1 and #{Enum.join(query_section, " OR ")}"
+                            IO.inspect query_string
+                            IO.inspect [school_id | arguments]
+                            # {:ok, res} = 
+                            res = EdMarkaz.DB.Postgres.query(conn, query_string, [school_id | arguments])
+                            IO.inspect res
+                            {:ok, res2} = res
+                            res2
+ 						_ ->
+ 
+ 					end
+ 				end)
+ 			end)
+ 		end, pool: DBConnection.Poolboy, timeout: 60_000*20)
+ 
+ 		IO.puts "-----QUERY TRANSACTION------"
+ 
+        IO.inspect results, limit: :infinity
+ 
+ 		IO.puts "-----QUERY TRANSACTION------"
+ 
 
 	end
 
