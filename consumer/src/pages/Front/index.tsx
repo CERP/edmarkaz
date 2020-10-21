@@ -71,22 +71,35 @@ const FrontPage = () => {
 				</div>
 			</div>
 		</div>
-		<div className="partition">
-			<div className="img-container">
-				<div className="circle-frame">
-					<img className="img" src={Flag} alt="student" />
-				</div>
+		<div className="partition" style={{ justifyContent: "space-between" }}>
+			<div className="gallery">
+				<figure className={"gallery-item gallery-item-1"}>
+					<img src={School} className="item-img" alt="Edkasa" />
+				</figure>
+				<figure className={"gallery-item gallery-item-2"}>
+					<img src={Student} className="item-img" alt="Books" />
+				</figure>
+				<figure className={"gallery-item gallery-item-3"}>
+					<img src={Teacher} className="item-img" alt="Loans" />
+				</figure>
+				<figure className={"gallery-item gallery-item-4"}>
+					<img src={Flag} className="item-img" alt="Abacus" />
+				</figure>
 			</div>
-			<div className="info-container">
-				<div className="heading">Ilmexchange Bazaar</div>
+			<div className="info-container bazaar">
+				<div className="heading">Ilm Exchange Taleemi Bazaar</div>
 				<div className="para">
-					We provide quality educational products across Pakistan
+					<ul className="arrow">
+						<li>More Variety Than Anywhere Else</li>
+						<li>Best Quality</li>
+						<li>Cheaper Prices</li>
+						<li>Convenient Delivery</li>
+					</ul>
 				</div>
-				<Link className="pill" to="/bazaar"> Enter </Link>
+				<Link className="pill" to="/bazaar"> Bazaar </Link>
 			</div>
 		</div>
-		<div className="partition bg-teal">
-
+		<div className="partition reverse bg-teal">
 			<div className="img-container">
 				<div className="circle-frame">
 					<img className="img" src={Flag} alt="student" />
@@ -114,7 +127,7 @@ const FrontPage = () => {
 				<Link className="pill" to="/sms"> Enter </Link>
 			</div>
 		</div>
-		<div className="partition bg-teal">
+		<div className="partition bg-teal reverse">
 			<div className="img-container">
 				<div className="circle-frame">
 					<img className="img" src={Student} alt="student" />
@@ -132,7 +145,7 @@ const FrontPage = () => {
 			</div>
 		</div>
 
-		<div className="partition reverse">
+		<div className="partition">
 			<div className="img-container">
 				<div className="circle-frame">
 					<img className="img" src={School} alt="school" />
@@ -148,7 +161,7 @@ const FrontPage = () => {
 			</div>
 		</div>
 
-		<div className="partition bg-teal">
+		<div className="partition bg-teal reverse">
 			<div className="img-container">
 				<div className="circle-frame">
 					<img className="img" src={Teacher} alt="teacher" />
@@ -174,6 +187,6 @@ const FrontPage = () => {
 			</div>
 		</div> */}
 
-	</div>
+	</div >
 }
 export default FrontPage

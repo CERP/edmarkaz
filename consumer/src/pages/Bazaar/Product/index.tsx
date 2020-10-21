@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { Link } from 'react-router-dom'
 import { getProducts, placeOrder } from '../../../actions';
 import Modal from "../../../components/Modal";
 import { Container, Grid, Typography, Paper } from '@material-ui/core';

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { RouteComponentProps, Route, Redirect } from "react-router";
+import { RouteComponentProps, Route } from "react-router";
 import ProductHome from "../Bazaar";
 import SupplierHome from "../Bazaar/Supplier";
 import ProductPage from "../Bazaar/Product";

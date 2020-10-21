@@ -84,7 +84,7 @@ class LoggedOutHome extends React.Component<P, S> {
 		return <div className="products">
 			<Container maxWidth="md">
 				<div className="tabs-home">
-					<Alert text="Product availability will be vary with location. Please contact 0348-1119-119 for more information." />
+					<Alert text="The availability of products and delivery charges may vary according to your location. Please contact 0348-1119-119 for more information." />
 					{
 						sorted
 							.map(([category, suppliers]) => {
