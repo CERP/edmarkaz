@@ -174,18 +174,75 @@ defmodule Sarkar.ActionHandler.Mis do
 		end
 	end
 
-	def handle_action(%{"type"=> "SIGN_UP", "sign_up_id" => sign_up_id, "payload" => %{"city" => city, "name" => name, "packageName" => packageName, "phone" => phone, "schoolName" => schoolName }}, state) do
-		payload = %{"city" => city, "name" => name, "packageName" => packageName, "phone" => phone, "schoolName" => schoolName }
+	def handle_action(
+		%{
+			"type"=> "SIGN_UP",
+			"sign_up_id" => sign_up_id,
+			"payload" => %{
+				"city" => city,
+				"name" => name,
+				"packageName" => packageName,
+				"phone" => phone,
+				"schoolName" => schoolName,
+				"schoolPassword" => password,
+				"typeOfLogin" => type
+			}
+		}, state) do
 
-		{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
-		"INSERT INTO mischool_sign_ups (id,form) VALUES ($1, $2)",
-		[sign_up_id, payload])
+		signupPyload = %{ "city" => city, "name" => name, "packageName" => packageName, "phone" => phone, "schoolName" => schoolName, "typeOfLogin" => type}
+			IO.inspect signupPyload
 
-		alert_message = Poison.encode!(%{"text" => "New Sign-Up\nSchool Name: #{schoolName},\nPhone: #{phone},\nPackage: #{packageName},\nName: #{name},\nCity: #{city}"})
+		case Postgrex.transaction(
+			EdMarkaz.DB,
+			fn(conn) ->
+				case EdMarkaz.DB.Postgres.query(
+					EdMarkaz.DB,
+						"INSERT INTO auth (id, password) values ($1, $2)",
+						[phone, hash(password, 52)]
+					)  do
+					{:ok, resp } -> {:ok, resp}
+					{:error, err} ->
+						DBConnection.rollback(
+							conn,
+							err
+						)
+				end
 
-		{:ok, resp} = EdMarkaz.Slack.send_alert(alert_message,"#platform-dev")
+				{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
+				"INSERT INTO mischool_sign_ups (id,form) VALUES ($1, $2)",
+				[sign_up_id, signupPyload])
+			end,
+			pool: DBConnection.Poolboy
+		) do
+			{:ok, _resp} ->
+				start_school(phone)
+				Sarkar.School.signup_init_trial(phone)
 
-		{:reply, succeed(), state}
+				Sarkar.Store.School.save(phone, %{
+					"max_students" => %{
+						"date" => :os.system_time(:millisecond),
+						"value" => 300,
+						"path" => ["db", "max_limit"],
+						"type" => "MERGE",
+						"client_id" => "backend"
+					}
+				})
+				case EdMarkaz.Telenor.send_sms(phone, "Thanks for signing up on mischool.pk . Here school_id: #{phone}, password: #{password} \n Kindly visit https://mischool.pk") do
+					{:ok, res} ->
+						{:reply, succeed(res), state}
+					{:error, msg} ->
+						{:reply, fail(msg), state}
+				end
+
+				alert_message = Poison.encode!(%{"text" => "New Sign-Up\nSchool Name: #{schoolName},\nPhone: #{phone},\nPackage: #{packageName},\nName: #{name},\nCity: #{city}"})
+				{:ok, resp} = EdMarkaz.Slack.send_alert(alert_message,"#platform-dev")
+
+			{:error, err} ->
+				IO.puts "ERROR CREATING SCHOOL"
+				#Will send the failure reason
+				{:err, err.postgres.detail}
+
+		end
 	end
 
 	def handle_action(%{ "type" => "SYNC", "payload" => %{"analytics" => analytics, "mutations" => mutations} = payload, "lastSnapshot" => last_sync_date }, %{ school_id: school_id, client_id: client_id } = state) do
@@ -292,6 +349,12 @@ defmodule Sarkar.ActionHandler.Mis do
 
 	defp succeed() do
 		%{type: "success"}
+	end
+
+	defp hash(text, length) do
+		:crypto.hash(:sha512, text)
+		|> Base.url_encode64
+		|> binary_part(0, length)
 	end
 
 end
