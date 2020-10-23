@@ -44,6 +44,25 @@ defmodule Sarkar.School do
 		},curr_time)
 	end
 
+	def signup_init_trial (school_id) do
+		curr_time = :os.system_time(:millisecond)
+
+		sync_changes(school_id, "backend", %{
+			"db,package_info" => %{
+				"date" => curr_time,
+				"action" => %{
+					"path" => ["db","package_info"],
+					"type" => "MERGE",
+					"value" => %{
+						"paid" => false,
+						"trial_period" => 15,
+						"date" => curr_time
+					}
+				}
+			}
+		},curr_time)
+	end
+
 	# API
 
 	def prepare_changes(changes) do
