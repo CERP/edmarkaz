@@ -181,7 +181,7 @@ defmodule Sarkar.ActionHandler.Mis do
 			"payload" => %{
 				"city" => city,
 				"name" => name,
-				"packageName" => packageName,
+				"packageName" => package_name,
 				"phone" => phone,
 				"schoolName" => schoolName,
 				"schoolPassword" => password,
@@ -189,8 +189,7 @@ defmodule Sarkar.ActionHandler.Mis do
 			}
 		}, state) do
 
-		signupPyload = %{ "city" => city, "name" => name, "packageName" => packageName, "phone" => phone, "schoolName" => schoolName, "typeOfLogin" => type}
-			IO.inspect signupPyload
+		signup_payload = %{ "city" => city, "name" => name, "packageName" => package_name, "phone" => phone, "schoolName" => schoolName, "typeOfLogin" => type}
 
 		case Postgrex.transaction(
 			EdMarkaz.DB,
@@ -210,7 +209,7 @@ defmodule Sarkar.ActionHandler.Mis do
 
 				{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
 				"INSERT INTO mischool_sign_ups (id,form) VALUES ($1, $2)",
-				[sign_up_id, signupPyload])
+				[sign_up_id, signup_payload])
 			end,
 			pool: DBConnection.Poolboy
 		) do
@@ -227,20 +226,20 @@ defmodule Sarkar.ActionHandler.Mis do
 						"client_id" => "backend"
 					}
 				})
-				case EdMarkaz.Telenor.send_sms(phone, "Thanks for signing up on mischool.pk . Here school_id: #{phone}, password: #{password} \n Kindly visit https://mischool.pk") do
+
+				alert_message = Poison.encode!(%{"text" => "New Sign-Up\nSchool Name: #{schoolName},\nPhone: #{phone},\nPackage: #{package_name},\nName: #{name},\nCity: #{city}"})
+				{:ok, resp} = EdMarkaz.Slack.send_alert(alert_message,"#platform-dev")
+
+				case EdMarkaz.Telenor.send_sms(phone, "Thanks for signing up on mischool.pk . Your MISchool credentials are: school_id: #{phone} and password: #{password} \n Please visit https://mischool.pk/school-login to login") do
 					{:ok, res} ->
 						{:reply, succeed(res), state}
 					{:error, msg} ->
 						{:reply, fail(msg), state}
 				end
 
-				alert_message = Poison.encode!(%{"text" => "New Sign-Up\nSchool Name: #{schoolName},\nPhone: #{phone},\nPackage: #{packageName},\nName: #{name},\nCity: #{city}"})
-				{:ok, resp} = EdMarkaz.Slack.send_alert(alert_message,"#platform-dev")
-
 			{:error, err} ->
-				IO.puts "ERROR CREATING SCHOOL"
-				#Will send the failure reason
-				{:err, err.postgres.detail}
+				IO.inspect err.postgres.detail
+				{:reply, fail(err.postgres.detail), state}
 
 		end
 	end
