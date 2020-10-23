@@ -579,6 +579,93 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 		{:reply, succeed(), state}
 
 	end
+
+	def handle_action(
+		%{
+			"type" => "PLACE_ORDER_AS_VISITOR",
+			"client_id" => client_id,
+			"payload" => %{
+				"product" => product,
+				"refcode" => refcode,
+				"request" => request
+			}
+		}, state) do
+
+		product_name = Map.get(product, "title")
+		product_id = Map.get(product,"id")
+		supplier_id = Map.get(product, "supplier_id")
+
+		phone_number = Map.get(request, "phone_number")
+		school_name = Map.get(request, "school_name")
+		school_owner = Map.get(request, "school_owner")
+		refcode = Map.get(request, "refcode")
+		password = Map.get(request, "password")
+
+
+		start_supplier(supplier_id)
+
+		# place order
+
+		EdMarkaz.Supplier.place_order(supplier_id, product, refcode, client_id)
+
+		spawn fn ->
+			EdMarkaz.Slack.send_alert("#{school_name} placed order for #{product_id} by #{supplier_id}. Their number is #{phone_number}", "#platform-orders")
+		end
+
+		spawn fn ->
+			EdMarkaz.Telenor.send_sms(phone_number, "#{school_owner} have requested information for #{product_name} and will be contacted soon with more information.")
+		end
+
+		# create account
+		case EdMarkaz.Auth.create({ phone_number, password }) do
+			{:ok, text} ->
+				{:ok, res} = EdMarkaz.DB.Postgres.query(
+					EdMarkaz.DB,
+					"INSERT INTO platform_schools (id, db)
+					VALUES ($1, $2)
+					ON CONFLICT (id) DO UPDATE set db=excluded.db",
+					[refcode, request]
+				)
+				{:ok, token} = EdMarkaz.Auth.login({phone_number, client_id, password})
+				{:ok, one_token} = EdMarkaz.Auth.gen_onetime_token(refcode)
+
+				spawn fn ->
+					res = EdMarkaz.Telenor.send_sms(
+						phone_number,
+						"Welcome #{school_owner} to Ilm Exchange. Please go to login https://ilmexchange.com/auth/#{one_token}"
+					)
+					IO.inspect res
+				end
+
+				spawn fn ->
+					time = :os.system_time(:millisecond)
+					case Sarkar.Analytics.Consumer.record(
+						client_id,
+						%{ "#{UUID.uuid4}" => %{
+								"type" => "SIGNUP",
+								"meta" => %{
+									"number" => phone_number,
+									"ref_code" => refcode
+								},
+								"time" => time
+							}
+						},
+						time
+					) do
+						%{"type" => "CONFIRM_ANALYTICS_SYNC", "time" => _} ->
+							IO.puts "SIGNUP ANALYTICS SUCCESS"
+						%{"type" => "ANALYTICS_SYNC_FAILED"} ->
+							IO.puts "SIGNUP ANALYTICS FAILED"
+					end
+				end
+
+				{:reply, succeed(%{token: token, user: "SCHOOL"}), %{id: phone_number, client_id: client_id}}
+			{:error, msg} ->
+				{:reply, fail(msg), state}
+		end
+
+	end
+
 	#For logged In
 	def handle_action(
 		%{

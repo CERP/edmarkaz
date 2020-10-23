@@ -1,4 +1,5 @@
 import Syncr from '@cerp/syncr'
+import { v4 } from 'uuid';
 import { createLoginSucceed, analyticsEvent, submitError } from './core';
 
 type Dispatch = (action: any) => any
@@ -572,6 +573,32 @@ export const placeOrder = (product: Product) => (dispatch: Dispatch, getState: G
 			product,
 			refcode: state.sync_state.profile.refcode,
 			school_name: state.sync_state.profile.school_name
+		}
+	})
+		.then(res => {
+			// get token back
+			console.log(res)
+		})
+		.catch(err => {
+			console.error(err)
+		})
+}
+
+export const placeOrderAsVisitor = (order: ProductOrderAsVisitor) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+
+	const state = getState();
+
+	syncr.send({
+		type: "PLACE_ORDER_AS_VISITOR",
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		payload: {
+			product: order.product,
+			request: {
+				...order.request,
+				refcode: v4(),
+				password: order.request.phone_number.substr(7) // last four digit, this is temporary
+			},
 		}
 	})
 		.then(res => {

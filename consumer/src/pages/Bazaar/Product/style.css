@@ -25,7 +25,7 @@
 .item-page {
 	display: flex;
 	flex-direction: column;
-	background: #ffffff;
+	/* background: #ffffff; */
 
 }
 .item-page .item-image{
@@ -52,6 +52,7 @@
 	margin-left: 30px;
 	text-decoration: none;
 	cursor: pointer;
+	border-radius: 4px;
 
 }
 .item-page .description {

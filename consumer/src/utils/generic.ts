@@ -9,4 +9,13 @@ const toTitleCase = (text: string, split_by?: string) => {
 		.join(split_by || ' ')
 }
 
-export { toTitleCase }
+
+// return false if every field is not blank
+// return an array of labels that are blank
+const checkCompulsoryFields = (obj: any, fields: string[]): boolean | string[] => {
+
+	const filteredList = fields.filter(field => field in obj && obj[field] === "")
+	return filteredList.length === 0 ? false : filteredList
+}
+
+export { toTitleCase, checkCompulsoryFields }
