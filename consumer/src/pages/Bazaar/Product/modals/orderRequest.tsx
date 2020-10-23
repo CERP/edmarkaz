@@ -20,7 +20,7 @@ type P = {
 	handleModalClose: () => void
 }
 
-const OrderRequestSubmit: React.FC<P> = ({ handleModalClose, handleRequestSubmit, productLocation }) => {
+const OrderRequestSubmit: React.FC<P> = ({ handleModalClose, handleRequestSubmit }) => {
 
 	const classes = useStyles()
 
@@ -42,9 +42,6 @@ const OrderRequestSubmit: React.FC<P> = ({ handleModalClose, handleRequestSubmit
 	const handle_submit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
 
-		console.log("product location", productLocation)
-
-
 		const check = checkCompulsoryFields(state, [...Object.keys(state)])
 
 		if (check) {
@@ -52,11 +49,12 @@ const OrderRequestSubmit: React.FC<P> = ({ handleModalClose, handleRequestSubmit
 			return
 		}
 
-		// if (productLocation ? productLocation.includes(state.location) : true) {
-		handleRequestSubmit(state)
-		// } else {
-		// 	window.alert("Sorry this product is not available in this selected district")
-		// }
+		if (state.phone_number.length === 11) {
+			handleRequestSubmit(state)
+		} else {
+			window.alert("Inavalid contact number")
+		}
+
 	}
 
 	return (<>

@@ -446,3 +446,16 @@ interface BaseAnalyticsEvent {
 interface RouteAnalyticsEvent extends BaseAnalyticsEvent {
 	type: "ROUTE";
 }
+
+type OrderRequestForm = {
+	school_owner: string
+	school_name: string
+	phone_number: string
+	school_address: string
+	school_district: string
+}
+
+type ProductOrderAsVisitor = {
+	product: Product
+	request: OrderRequestForm
+}

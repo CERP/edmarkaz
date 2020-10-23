@@ -14,7 +14,7 @@ const toTitleCase = (text: string, split_by?: string) => {
 // return an array of labels that are blank
 const checkCompulsoryFields = (obj: any, fields: string[]): boolean | string[] => {
 
-	const filteredList = fields.filter(field => field in obj && obj[field] === "")
+	const filteredList = fields.filter(field => field in obj && obj[field].trim() === "")
 	return filteredList.length === 0 ? false : filteredList
 }
 
