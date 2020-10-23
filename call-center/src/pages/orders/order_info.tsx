@@ -54,7 +54,10 @@ class OrderInfo extends Component<propTypes, S> {
 	constructor(props: propTypes) {
 		super(props)
 
-		const { order, school } = props.orders.db[props.supplier_id][props.order_time]
+		const empty_school = { school_name: '', school_address: '', phone_number: '' } as CERPSchool
+		const empty_order = { meta: {} } as Order
+
+		const { order = empty_order, school = empty_school } = props.orders.db[props.supplier_id] && props.orders.db[props.supplier_id][props.order_time]
 
 		const updated_order: Order = {
 			...order,
