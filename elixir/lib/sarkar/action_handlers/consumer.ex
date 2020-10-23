@@ -586,7 +586,6 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 			"client_id" => client_id,
 			"payload" => %{
 				"product" => product,
-				"refcode" => refcode,
 				"request" => request
 			}
 		}, state) do
@@ -609,11 +608,11 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 		EdMarkaz.Supplier.place_order(supplier_id, product, refcode, client_id)
 
 		spawn fn ->
-			EdMarkaz.Slack.send_alert("#{school_name} placed order for #{product_id} by #{supplier_id}. Their number is #{phone_number}", "#platform-orders")
+			EdMarkaz.Slack.send_alert("Mr./Mrs. #{school_name} placed an order for #{product_id} by #{supplier_id}. His/her contact number is #{phone_number}", "#platform-orders")
 		end
 
 		spawn fn ->
-			EdMarkaz.Telenor.send_sms(phone_number, "#{school_owner} have requested information for #{product_name} and will be contacted soon with more information.")
+			EdMarkaz.Telenor.send_sms(phone_number, "#Dear Mr./Mrs. #{school_owner},\nYou have requested information for #{product_name}. Our custom representative will contact you soon for more information.")
 		end
 
 		# create account
@@ -626,13 +625,13 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 					ON CONFLICT (id) DO UPDATE set db=excluded.db",
 					[refcode, request]
 				)
+
 				{:ok, token} = EdMarkaz.Auth.login({phone_number, client_id, password})
-				{:ok, one_token} = EdMarkaz.Auth.gen_onetime_token(refcode)
 
 				spawn fn ->
 					res = EdMarkaz.Telenor.send_sms(
 						phone_number,
-						"Welcome #{school_owner} to Ilm Exchange. Please go to login https://ilmexchange.com/auth/#{one_token}"
+						"Dear Mr./Mrs #{school_owner}, Welcome to ilmExchange. Your account has been created automatically. Please visit https://ilmexchange.com/log-in to login into ilmxExchange."
 					)
 					IO.inspect res
 				end
@@ -660,6 +659,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 				end
 
 				{:reply, succeed(%{token: token, user: "SCHOOL"}), %{id: phone_number, client_id: client_id}}
+
 			{:error, msg} ->
 				{:reply, fail(msg), state}
 		end
