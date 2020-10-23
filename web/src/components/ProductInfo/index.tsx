@@ -63,7 +63,10 @@ class ProductInfo extends React.Component<propTypes, S> {
 		}
 
 		this.state = {
-			product: this.props.product || newProduct,
+			product: {
+				...(this.props.product || newProduct),
+				location: this.props.product && this.props.product.location ? { ...this.props.product.location } : { ...newProduct.location }
+			},
 			imageDataString: "",
 			newCategory: ""
 
@@ -177,7 +180,7 @@ class ProductInfo extends React.Component<propTypes, S> {
 	getDistrictTehsils = () => {
 		const { location } = this.state.product
 		// @ts-ignore
-		return Locations[location.province !== null ? location.province : "PUNJAB"][location.district]
+		return Locations[location.province ? location.province : "PUNJAB"][location.district]
 	}
 
 	render() {
