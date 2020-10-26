@@ -74,16 +74,16 @@ const FrontPage = () => {
 		<div className="partition" style={{ justifyContent: "space-between" }}>
 			<div className="gallery">
 				<figure className={"gallery-item gallery-item-1"}>
-					<img src={School} className="item-img" alt="Edkasa" />
+					<img src="/images/students.jpg" className="item-img" alt="Edkasa" />
 				</figure>
 				<figure className={"gallery-item gallery-item-2"}>
-					<img src={Student} className="item-img" alt="Books" />
+					<img src="/images/books.jpg" className="item-img" alt="Books" />
 				</figure>
 				<figure className={"gallery-item gallery-item-3"}>
-					<img src={Teacher} className="item-img" alt="Loans" />
+					<img src="/images/loan.jpg" className="item-img" alt="Loans" />
 				</figure>
 				<figure className={"gallery-item gallery-item-4"}>
-					<img src={Flag} className="item-img" alt="Abacus" />
+					<img src="/images/abacus.jpg" className="item-img" alt="Abacus" />
 				</figure>
 			</div>
 			<div className="info-container bazaar">
