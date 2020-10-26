@@ -626,7 +626,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 					[refcode, request]
 				)
 
-				{:ok, token} = EdMarkaz.Auth.login({phone_number, client_id, password})
+				# {:ok, token} = EdMarkaz.Auth.login({phone_number, client_id, password})
 
 				spawn fn ->
 					res = EdMarkaz.Telenor.send_sms(
@@ -658,8 +658,8 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 					end
 				end
 
-				{:reply, succeed(%{token: token, user: "SCHOOL"}), %{id: phone_number, client_id: client_id}}
-
+				# {:reply, succeed(%{token: token, user: "SCHOOL"}), %{id: phone_number, client_id: client_id}}
+				{:reply, succeed(), state}
 			{:error, msg} ->
 				{:reply, fail(msg), state}
 		end
