@@ -612,7 +612,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 		end
 
 		spawn fn ->
-			EdMarkaz.Telenor.send_sms(phone_number, "Dear Mr./Mrs. #{school_owner},\nYou have requested information for #{product_name}. Our custom representative will contact you soon for more information.")
+			EdMarkaz.Telenor.send_sms(phone_number, "Mr./Mrs. #{school_owner},\nYou have requested information for #{product_name}. Our custom representative will contact you soon for more information.")
 		end
 
 		# create account
@@ -626,12 +626,12 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 					[refcode, request]
 				)
 
-				# {:ok, token} = EdMarkaz.Auth.login({phone_number, client_id, password})
+				{:ok, one_token} = EdMarkaz.Auth.gen_onetime_token(refcode)
 
 				spawn fn ->
 					res = EdMarkaz.Telenor.send_sms(
 						phone_number,
-						"Dear Mr./Mrs. #{school_owner}, Welcome to ilmExchange. Your account has been registered. Please visit https://ilmexchange.com/log-in to login into ilmxExchange."
+						"Mr./Mrs. #{school_owner}, Welcome to ilmExchange. Your account has been registered. Please visit https://ilmexchange.com/auth/#{one_token}to login into ilmxExchange."
 					)
 					IO.inspect res
 				end
