@@ -48,11 +48,11 @@ const AboutUs = () => {
 			url: "https://storage.googleapis.com/ilmx-product-images/aboutumer.jpg",
 			name: "Umer Farooq"
 		},
-		{
-			position: "Senior Developer",
-			url: "https://storage.googleapis.com/ilmx-product-images/rao_ali_ahmad.jpg",
-			name: "Ali Ahmad"
-		},
+		// {
+		// 	position: "Senior Developer",
+		// 	url: "https://storage.googleapis.com/ilmx-product-images/rao_ali_ahmad.jpg",
+		// 	name: "Ali Ahmad"
+		// },
 		{
 			url: "/images/bisma.jpg",
 			position: "Call Center Assistant",
