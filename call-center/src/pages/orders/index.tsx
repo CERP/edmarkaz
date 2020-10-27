@@ -156,6 +156,17 @@ const Orders = ({ orders, products, getOrders, getProducts }: P) => {
 					<label>End Date</label>
 					<input type="date" onChange={(e) => setEndDate(e.target.value)} value={end_date} />
 				</div>
+				<div className="row">
+					<label>Status</label>
+					<select>
+						<option value="">Select status</option>
+						<option value="ORDER_PLACED">Order Placed</option>
+						<option value="IN_PROGRESS">In Progress</option>
+						<option value="COMPLETED">Completed</option>
+						<option value="SCHOOL_CANCELLED">School Cancelled</option>
+						<option value="SUPPLIER_CANCELLED">Supplier Cancelled</option>
+					</select>
+				</div>
 			</>}
 		</div>
 		{
@@ -209,7 +220,7 @@ const Orders = ({ orders, products, getOrders, getProducts }: P) => {
 											<div className="newtable-row heading">
 												<div>Date</div>
 												<div>Supplier</div>
-												<div>Status</div>
+												<div>Type</div>
 												<div>Contact</div>
 												<div>Address </div>
 											</div>
