@@ -112,31 +112,31 @@ class OrderInfo extends Component<propTypes, S> {
 				<div className="divider">School Info</div>
 				<div className="row">
 					<label>Name</label>
-					<div> {school.school_name} </div>
+					<div> {(school && school.school_name) || ''} </div>
 				</div>
 				<div className="row">
 					<label>Address</label>
-					<div> {school.school_address} </div>
+					<div> {(school && school.school_address) || ''} </div>
 				</div>
 				<div className="row">
 					<label>Tehsil</label>
-					<div> {school.school_tehsil} </div>
+					<div> {(school && school.school_tehsil) || ''} </div>
 				</div>
 				<div className="row">
 					<label> District</label>
-					<div> {school.school_district} </div>
+					<div> {(school && school.school_district) || ''} </div>
 				</div>
 				<div className="row">
 					<label> Lowest Fee</label>
-					<div> {school.lowest_fee} </div>
+					<div> {(school && school.lowest_fee) || ''} </div>
 				</div>
 				<div className="row">
 					<label> Highest Fee</label>
-					<div> {school.highest_fee} </div>
+					<div> {(school && school.highest_fee) || ''} </div>
 				</div>
 				<div className="row">
 					<label> Enrollment </label>
-					<div> {school.enrolment_range} </div>
+					<div> {(school && school.enrolment_range) || ''} </div>
 				</div>
 				{
 					(schoolMatch.status === "DONE" || schoolMatch.status === "ORDERED") && <div className="button green" onClick={this.onShowNumber}>Show Number</div>

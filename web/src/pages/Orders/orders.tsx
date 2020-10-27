@@ -102,6 +102,17 @@ class Orders extends Component<propTypes, S> {
 					<label>End Date</label>
 					<input type="date" value={moment(filters.end_date).format("YYYY-MM-DD")} onChange={this.former.handle(["filters", "end_date"])} />
 				</div>
+				<div className="row">
+					<label>Status</label>
+					<select {...this.former.super_handle(["filters", "status"])}>
+						<option value="">Select status</option>
+						<option value="ORDER_PLACED">Order Placed</option>
+						<option value="IN_PROGRESS">In Progress</option>
+						<option value="COMPLETED">Completed</option>
+						<option value="SCHOOL_CANCELLED">School Cancelled</option>
+						<option value="SUPPLIER_CANCELLED">Supplier Cancelled</option>
+					</select>
+				</div>
 				{/* <div className="button blue" onClick={() => this.setState({ filterMenu: !filterMenu })}>Filters</div>
 				{
 					filterMenu && <>
@@ -115,6 +126,7 @@ class Orders extends Component<propTypes, S> {
 							</select>
 						</div>
 					</>
+
 				} */}
 			</div>
 			<div className="section newtable" style={{ width: "90%", padding: "5px" }}>
@@ -125,22 +137,25 @@ class Orders extends Component<propTypes, S> {
 					<div>Status</div>
 				</div>
 				{
-					orders.map(([id, order]) => {
-						const school = schools[order.meta.school_id]
-						const product = products.db[order.meta.product_id]
-						const schoolMatch = sync_state.matches[order.meta.school_id]
-						return <div key={id}>
-							<div className="newtable-row">
-								<div> {moment(order.time).format("DD-MM-YY")} </div>
-								<div className="clickable" onClick={() => this.setActive(id)}>{product.title}</div>
-								<div> {school.school_name} </div>
-								<div> {order.meta.status ? order.meta.status : "-"}</div>
+					orders
+						.filter(([id, order]) => order.verified === "VERIFIED" &&
+							(this.state.filters.status ? order.meta.status === this.state.filters.status : true))
+						.map(([id, order]) => {
+							const school = schools[order.meta.school_id]
+							const product = products.db[order.meta.product_id]
+							const schoolMatch = sync_state.matches[order.meta.school_id]
+							return <div key={id}>
+								<div className="newtable-row">
+									<div> {moment(order.time).format("DD-MM-YY")} </div>
+									<div className="clickable" onClick={() => this.setActive(id)}>{product.title}</div>
+									<div> {(school && school.school_name) || ''} </div>
+									<div> {order.meta.status ? order.meta.status : "-"}</div>
+								</div>
+								{
+									activeOrder === id && <OrderInfo key={`${id}-${JSON.stringify(order.meta)}`} order={order} product={product} school={school} schoolMatch={schoolMatch} />
+								}
 							</div>
-							{
-								activeOrder === id && <OrderInfo key={`${id}-${JSON.stringify(order.meta)}`} order={order} product={product} school={school} schoolMatch={schoolMatch} />
-							}
-						</div>
-					})
+						})
 				}
 			</div>
 

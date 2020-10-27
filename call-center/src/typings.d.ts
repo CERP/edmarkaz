@@ -85,7 +85,7 @@ interface Product {
 		order?: number
 	}
 	order?: number
-	location?: {
+	location: {
 		province: string
 		district: string
 		tehsil: string
