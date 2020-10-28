@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { RadioGroup, FormControlLabel, Radio, Typography, Paper, Divider, Button, Modal, Dialog } from '@material-ui/core'
+import { RadioGroup, FormControlLabel, Radio, Typography, Paper, Button } from '@material-ui/core'
 
 import Done from '@material-ui/icons/AssignmentTurnedIn'
 import Quit from '@material-ui/icons/Close'
@@ -95,8 +95,8 @@ const AssessmentForm: React.FC<Props> = ({ assessment, quit, startTime, path, me
 
 		<div style={{ overflow: "auto", height: "100%" }}>
 			{
-				Object.entries(assessment && assessment.questions || {})
-					.map(([qid, qs], index) => {
+				Object.entries((assessment && assessment.questions) || {})
+					.map(([qid, qs]) => {
 						return <Paper elevation={2} key={qid} style={submitted && responses[qid] === undefined ? { margin: "5px", padding: "20px", border: "1px solid red" } : { margin: "5px", padding: "20px" }}>
 							<div className="qs-row">
 								<Typography
@@ -107,10 +107,7 @@ const AssessmentForm: React.FC<Props> = ({ assessment, quit, startTime, path, me
 									{qs.title ? `Qs: ${(qs.title || "").replace("$", "______")}` : qs.title_urdu}
 								</Typography>
 								{
-									qs.image !== "" && <img
-										className="qs-img"
-										src={qs.image}
-									/>
+									qs.image !== "" && <img className="qs-img" src={qs.image} alt="qs-img" />
 								}
 							</div>
 
@@ -128,10 +125,7 @@ const AssessmentForm: React.FC<Props> = ({ assessment, quit, startTime, path, me
 												disabled={submitted}
 											/>
 											{
-												ans.image !== "" && <img
-													className="ans-img"
-													src={ans.image}
-												/>
+												ans.image !== "" && <img className="ans-img" src={ans.image} alt="ans-img" />
 											}
 										</div >
 									})

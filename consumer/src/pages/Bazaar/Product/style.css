@@ -1,10 +1,31 @@
 .item-page .item-info .heading {
 	color: var(--red);
 }
+
+@media (min-width: 768px) {
+	.product.modal-box {
+		width: 50%;
+	}
+}
+
+.product.modal-box .modal-box-inner {
+	padding: 15px;
+}
+
+.product.modal-box .button {
+	line-height: 28px;
+	width: 100%;
+	border-radius: 4px;
+}
+
+.product.modal-box .button.cancel {
+	background-color: #e0e0e0;
+}
+
 .item-page {
 	display: flex;
 	flex-direction: column;
-	background: #ffffff;
+	/* background: #ffffff; */
 
 }
 .item-page .item-image{
@@ -31,6 +52,7 @@
 	margin-left: 30px;
 	text-decoration: none;
 	cursor: pointer;
+	border-radius: 4px;
 
 }
 .item-page .description {
