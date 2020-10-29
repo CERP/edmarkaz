@@ -18,7 +18,7 @@ interface P {
 }
 
 interface S {
-	filterMenu: boolean
+	// filterMenu: boolean
 	activeOrder: string
 	filters: {
 		status: "IN_PROGRESS" | "DONE" | "ORDERED" | ""
@@ -37,7 +37,7 @@ class Orders extends Component<propTypes, S> {
 		super(props)
 
 		this.state = {
-			filterMenu: false,
+			// filterMenu: false,
 			activeOrder: "",
 			filters: {
 				status: "",
@@ -78,7 +78,7 @@ class Orders extends Component<propTypes, S> {
 
 	render() {
 		const { sync_state, schools, products } = this.props
-		const { filterMenu, activeOrder, filters } = this.state
+		const { activeOrder, filters } = this.state
 		const events = Object.entries(sync_state.matches)
 			.filter(([sid, { status, history }]) => (status !== "REJECTED" && status !== "NEW") && Object.values(history).find((e) => e.event === "ORDER_PLACED"))
 			.reduce((agg, [sid, { status, history }]) => ({ ...agg, ...history }), {} as SchoolMatch["history"])
