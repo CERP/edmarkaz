@@ -4,7 +4,7 @@ import { RouteComponentProps, withRouter } from 'react-router';
 import { v4 } from 'node-uuid'
 
 import { saveProductAction, saveProductImage } from '~/src/actions'
-import Former from '~/src/utils/former'
+import Former from '@cerp/former'
 
 import './style.css'
 import { getDownsizedImage } from '~src/utils/image';
@@ -178,9 +178,23 @@ class ProductInfo extends React.Component<propTypes, S> {
 	}
 
 	getDistrictTehsils = () => {
-		const { location } = this.state.product
+		const { province, district } = this.state.product.location
 		// @ts-ignore
-		return Locations[location.province ? location.province : "PUNJAB"][location.district]
+		return Locations[province][district] || []
+	}
+
+	onProvinceChange = () => {
+
+		this.setState({
+			product: {
+				...this.state.product,
+				location: {
+					...this.state.product.location,
+					district: '',
+					tehsil: ''
+				}
+			}
+		})
 	}
 
 	render() {
@@ -194,7 +208,7 @@ class ProductInfo extends React.Component<propTypes, S> {
 			"Solar Power"
 		]
 
-		const { location } = this.state.product
+		const { province, district } = this.state.product.location
 
 		return <div className="product-info page">
 			<div className="close" onClick={this.onClose}>Close</div>
@@ -223,7 +237,7 @@ class ProductInfo extends React.Component<propTypes, S> {
 
 				<div className="row">
 					<label>Location</label>
-					<select {...this.former.super_handle(["product", "location", "province"])}>
+					<select {...this.former.super_handle(["product", "location", "province"], () => true, () => this.onProvinceChange())}>
 						<option value="">Select Province</option>
 						{
 							Object.keys(Locations).map(p => <option key={p} value={p}>{toTitleCase(p)}</option>)
@@ -231,25 +245,26 @@ class ProductInfo extends React.Component<propTypes, S> {
 					</select>
 				</div>
 				{
-					location.province && <div className="row">
+					province && <div className="row">
 						<label></label>
 						<select {...this.former.super_handle(["product", "location", "district"])}>
 							<option value="">Select District</option>
 							{
 								// @ts-ignore
-								Object.keys(Locations[location.province !== null ? location.province : "PUNJAB"]).map(d => <option key={d} value={d}>{toTitleCase(d)}</option>)
+								Object.keys(Locations[province]).map(d => <option key={d} value={d}>{toTitleCase(d)}</option>)
 							}
 						</select>
 					</div>
 				}
 
 				{
-					location.province && location.district && <div className="row">
+
+					province && district && <div className="row">
 						<label></label>
 						<select {...this.former.super_handle(["product", "location", "tehsil"])}>
 							<option value="">Select Tehsil</option>
 							{
-								[...this.getDistrictTehsils()].map(t => <option key={t} value={t}>{toTitleCase(t)}</option>)
+								this.getDistrictTehsils().map((t: string) => <option key={t} value={t}>{toTitleCase(t)}</option>)
 							}
 						</select>
 					</div>
