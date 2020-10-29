@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { getProducts } from '../../actions';
 import { Container } from '@material-ui/core';
 import Alert from 'components/Alert';
-
+import { InactiveSuppliers } from 'constants/index'
 import './style.css'
 
 interface P {
@@ -96,6 +96,7 @@ class LoggedOutHome extends React.Component<P, S> {
 									<div className="items custom-scrollbar">
 										{
 											Object.entries(suppliers)
+												.filter(([sid, supplier]) => !(InactiveSuppliers.includes(sid)))
 												.sort(([, s1], [, s2]) => (s1.order || 9999) - (s2.order || 9999))
 												.map(([sid, profile]) => <Link className="item-card" to={`/supplier/${sid}`} key={`${category}-${sid}`}>
 													<img crossOrigin="anonymous" src={profile.logo && profile.logo.url} className="item-image" alt="product" />
