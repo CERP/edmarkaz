@@ -2,7 +2,6 @@ import React from 'react'
 import { Route, Link, RouteComponentProps, withRouter } from 'react-router-dom'
 import qs from 'query-string'
 
-import Home from '../Home'
 import New from '../New'
 import InProgress from '../InProgress'
 import Done from '../Done'
@@ -17,6 +16,7 @@ import ProductInfo from '~/src/components/ProductInfo'
 import './style.css'
 import Dashboard from '../Dashboard';
 import { connect } from 'react-redux'
+import { EmptyHome } from '../Home/emptyHome'
 
 interface P {
 	auth: RootBankState["auth"]
@@ -93,7 +93,7 @@ class Burger extends React.Component<propTypes, S> {
 			</div>}
 
 			{!panel_exists && <div className={visible ? "burger-stub" : "burger-stub full-view"}>
-				<Route exact path="/" component={Home} />
+				<Route exact path="/" component={EmptyHome} />
 				<Route path="/new" component={New} />
 				<Route path="/progress" component={InProgress} />
 				<Route path="/done" component={Done} />

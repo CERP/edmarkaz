@@ -71,7 +71,7 @@ class Survey extends React.Component<propTypes, stateType> {
 
 					const elem = [
 						`${moment(h.time).format("MM-DD-YYYY")}`,
-						`${curr_school.school_name}`,
+						`${curr_school && curr_school.school_name}`,
 						`${h.user.name ? h.user.name : "-"}`,
 						`${h.event}`,
 						`${h.event === "CALL_END_SURVEY" ? h.meta.customer_interest : "-"}`,
@@ -165,13 +165,13 @@ class Survey extends React.Component<propTypes, stateType> {
 							const curr_school = school_db[id]
 
 							return Object.entries(matches.history || {})
-								.filter(([timestamp, h]) => (h.time >= this.state.filters.startDate && h.time <= this.state.filters.endDate) && (this.state.filters.survey ? this.state.filters.survey === h.event : h.event === "MARK_COMPLETE_SURVEY" || "CALL_END_SURVEY_FOLLOWUP" || "CALL_END_SURVEY"))
+								.filter(([timestamp, h]) => (curr_school && curr_school.school_name && h.time >= this.state.filters.startDate && h.time <= this.state.filters.endDate) && (this.state.filters.survey ? this.state.filters.survey === h.event : h.event === "MARK_COMPLETE_SURVEY" || "CALL_END_SURVEY_FOLLOWUP" || "CALL_END_SURVEY"))
 								.map(([timestamp, h]) => {
-									const school = `${curr_school.school_name}-${timestamp}`
+									const school = `${curr_school && curr_school.school_name}-${timestamp}`
 									return <div key={timestamp}>
 										<div className="newtable-row">
 											<div>{moment(h.time).format("MM-DD-YYYY")}</div>
-											<div className="clickable" onClick={() => this.setActive(`${curr_school.school_name}-${timestamp}`)}>{curr_school.school_name}</div>
+											<div className="clickable" onClick={() => this.setActive(`${curr_school && curr_school.school_name}-${timestamp}`)}>{curr_school && curr_school.school_name}</div>
 											<div>{h.event}</div>
 										</div>
 										{

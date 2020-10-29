@@ -37,8 +37,8 @@ class Home extends React.Component<propTypes, stateType> {
 
 		const blank = Object.keys(props.sync_state.matches)
 			.filter(k => props.school_db[k] == undefined)
-		
-		if(blank.length > 0) {
+
+		if (blank.length > 0) {
 			props.addSchools(blank)
 		}
 
@@ -66,7 +66,7 @@ class Home extends React.Component<propTypes, stateType> {
 	}
 
 	onSurveyClick = (school_id: string) => () => {
-		
+
 		const num = Object.values(this.props.sync_state.matches[school_id].history || {})
 			.filter(x => x.event === "CALL_END_SURVEY")
 			.length
@@ -80,7 +80,7 @@ class Home extends React.Component<propTypes, stateType> {
 
 	saveSurvey = (survey: CallEndSurvey['meta'] | CallEndSurveyFollowUp['meta']) => {
 
-		if(this.state.current_school_survey_num === 0) {
+		if (this.state.current_school_survey_num === 0) {
 			this.props.saveCallEndSurvey(this.state.current_school, survey as CallEndSurvey['meta'])
 		}
 		else {
@@ -101,13 +101,13 @@ class Home extends React.Component<propTypes, stateType> {
 
 		const min_convo_length = 0;
 
-		const call_end_events: MergedEndEvent[]  = Object.entries(matches)
+		const call_end_events: MergedEndEvent[] = Object.entries(matches)
 			.filter(([, x]) => x.history)
 			.reduce((agg, [sid, curr]) => {
 				// interaction between user and school - need to just keep id and name here of school
 				// flatten all events, keeping match id and name as minimum extra info
 
-				if(curr.history) {
+				if (curr.history) {
 					return [
 						...agg,
 						...Object.values(curr.history)
@@ -131,26 +131,26 @@ class Home extends React.Component<propTypes, stateType> {
 					...agg,
 					[curr.school_id]: curr
 				}
-			}, {} as {[sid: string]: MergedEndEvent}))
+			}, {} as { [sid: string]: MergedEndEvent }))
 			.filter(x => x.meta.call_status === "CANCEL" || (!x.meta.call_status.toLowerCase().includes("answer") && parseInt(x.meta.duration) < min_convo_length))
 
 		const total_minutes_on_phone = call_end_events.reduce((agg, curr) => {
-			if(curr.meta && !isNaN(parseInt(curr.meta.duration))) {
+			if (curr.meta && !isNaN(parseInt(curr.meta.duration))) {
 				return agg + parseInt(curr.meta.duration)
 			}
 			return agg;
-		}, 0)/60.0
+		}, 0) / 60.0
 
 		const missing_surveys: MergedEndEvent[] = Object.entries(matches)
 			.reduce((agg, [id, curr]) => {
 
-				if(curr.history === undefined) {
+				if (curr.history === undefined) {
 					return agg
 				}
 
 				const last_event_key = Math.max(...Object.keys(curr.history).map(x => parseInt(x)))
 				const last_event = curr.history[last_event_key]
-				if((last_event.event === "CALL_END" || last_event.event === "CALL_BACK_END") && last_event.meta && last_event.meta.call_status.toLowerCase().includes("answer") && parseInt(last_event.meta.duration) > min_convo_length) {
+				if ((last_event.event === "CALL_END" || last_event.event === "CALL_BACK_END") && last_event.meta && last_event.meta.call_status.toLowerCase().includes("answer") && parseInt(last_event.meta.duration) > min_convo_length) {
 					return [
 						...agg,
 						{
@@ -180,7 +180,7 @@ class Home extends React.Component<propTypes, stateType> {
 				[curr.school_id]: curr
 			}
 		}, {})).length
-		
+
 
 		return <div className='home page school-info'>
 			<div className="title">Home Page</div>
@@ -191,13 +191,13 @@ class Home extends React.Component<propTypes, stateType> {
 
 			{
 				this.state.showSurvey && this.state.current_school_survey_num == 0 && <Modal>
-					<CallEndSurveyComponent saveSurvey={this.saveSurvey} call_number={this.state.current_school_survey_num} user_type={getUserType(this.props.username)}/>
+					<CallEndSurveyComponent saveSurvey={this.saveSurvey} call_number={this.state.current_school_survey_num} user_type={getUserType(this.props.username)} />
 				</Modal>
 			}
 
 			{
 				this.state.showSurvey && this.state.current_school_survey_num > 0 && <Modal>
-					<CallEndSurveyFollowUpComponent saveSurvey={this.saveSurvey} call_number={this.state.current_school_survey_num} user_type={getUserType(this.props.username)}/>
+					<CallEndSurveyFollowUpComponent saveSurvey={this.saveSurvey} call_number={this.state.current_school_survey_num} user_type={getUserType(this.props.username)} />
 				</Modal>
 			}
 
@@ -226,7 +226,7 @@ class Home extends React.Component<propTypes, stateType> {
 
 				<div className="row">
 					<label>Un-Answered Calls</label>
-					<div>{call_end_events.filter(x => x.meta && !x.meta.call_status.toLowerCase().includes("answer") && parseInt(x.meta.duration) < 60 ).length}</div>
+					<div>{call_end_events.filter(x => x.meta && !x.meta.call_status.toLowerCase().includes("answer") && parseInt(x.meta.duration) < 60).length}</div>
 				</div>
 
 				<div className="row">
@@ -266,7 +266,7 @@ class Home extends React.Component<propTypes, stateType> {
 
 type MergedEndEvent = CallEndEvent & { school_id: string }
 
-export default connect((state: RootBankState) => ({ 
+export default connect((state: RootBankState) => ({
 	sync_state: state.sync_state,
 	school_db: state.new_school_db,
 	username: state.auth.id
