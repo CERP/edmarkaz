@@ -189,7 +189,7 @@ const Orders = ({ orders, products, getOrders, getProducts }: P) => {
 		<div className="section form" style={{ width: "85%" }}>
 			<div className="row">
 				<p>Total Orders: {getOrdersCount()}</p>
-				<p>Total Ammount: {getOrdersAmount()}</p>
+				<p>Total Amount: {getOrdersAmount()}</p>
 			</div>
 		</div>
 		{
