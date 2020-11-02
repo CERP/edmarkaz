@@ -20,7 +20,7 @@ const Orders = ({ orders, products, getOrders, getProducts }: P) => {
 	}, [start_date])
 	const [viewBy, setViewBy] = useState("SCHOOL")
 	const [showFilters, setShowFilters] = useState(false)
-	const [verified, setVerified] = useState("NOT_VERIFIED")
+	const [status, setStatus] = useState("NOT_VERIFIED")
 	const [supplierFilter, setSupplierFilter] = useState("")
 	const [schoolFilter, setSchoolFilter] = useState("")
 	const [end_date, setEndDate] = useState(moment().add(1, "day").format("YYYY-MM-DD"))
@@ -83,14 +83,15 @@ const Orders = ({ orders, products, getOrders, getProducts }: P) => {
 	}
 
 	const filterOrder = (order: Order) => {
-		if (verified === "ORDER_VERIFIED") {
-			return Boolean(order.verified === "VERIFIED")
-		}
-		else if (verified === "NOT_VERIFIED") {
-			return order.verified === undefined || order.verified === "NOT_VERIFIED"
-		}
-		else
+
+		if (status === "" || !order.verified)
 			return true
+
+		if (status === "ORDER_VERIFIED" || order.verified === "NOT_VERIFIED" || status === order.meta.status) {
+			return true
+		}
+
+		return false
 	}
 
 	const order_by_school = viewBy === "SCHOOL" ? getOrdersBySchool() : {}
@@ -101,6 +102,28 @@ const Orders = ({ orders, products, getOrders, getProducts }: P) => {
 			return order.meta.status ? order.meta.status : "NOT_SET"
 		}
 		return "NOT_VERIFIED"
+	}
+
+	const getOrdersCount = () => {
+		return Object.values(db).reduce((agg, curr) => (agg + Object.values(curr).length), 0)
+	}
+
+	const getOrdersAmount = () => {
+		return Object.values(db).reduce((agg, curr) => {
+			const inner_sum = Object.values(curr)
+				.reduce((inner_agg, { order }) => {
+					return inner_agg + getIntegerAmount(order.meta.total_amount)
+				}, 0)
+			return agg + inner_sum
+		}, 0)
+	}
+
+	const getIntegerAmount = (amount: string): number => {
+		if (amount) {
+			const int_amount = amount.replace(/[^\d.]/g, '').split(".").filter(i => i).join(".")
+			return parseFloat(int_amount) || 0
+		}
+		return 0
 	}
 
 	return <div className="order page">
@@ -141,11 +164,16 @@ const Orders = ({ orders, products, getOrders, getProducts }: P) => {
 					}
 				</datalist>
 				<div className="row">
-					<label>Type</label>
-					<select onChange={(e) => setVerified(e.target.value)} value={verified}>
+					<label>Status</label>
+					<select onChange={(e) => setStatus(e.target.value)} value={status}>
 						<option value="">All</option>
 						<option value="ORDER_VERIFIED">Verified</option>
 						<option value="NOT_VERIFIED">Not Verified</option>
+						<option value="ORDER_PLACED">Order Placed</option>
+						<option value="IN_PROGRESS">In Progress</option>
+						<option value="COMPLETED">Completed</option>
+						<option value="SCHOOL_CANCELLED">School Cancelled</option>
+						<option value="SUPPLIER_CANCELLED">Supplier Cancelled</option>
 					</select>
 				</div>
 				<div className="row">
@@ -156,18 +184,13 @@ const Orders = ({ orders, products, getOrders, getProducts }: P) => {
 					<label>End Date</label>
 					<input type="date" onChange={(e) => setEndDate(e.target.value)} value={end_date} />
 				</div>
-				<div className="row">
-					<label>Status</label>
-					<select>
-						<option value="">Select status</option>
-						<option value="ORDER_PLACED">Order Placed</option>
-						<option value="IN_PROGRESS">In Progress</option>
-						<option value="COMPLETED">Completed</option>
-						<option value="SCHOOL_CANCELLED">School Cancelled</option>
-						<option value="SUPPLIER_CANCELLED">Supplier Cancelled</option>
-					</select>
-				</div>
 			</>}
+		</div>
+		<div className="section form" style={{ width: "85%" }}>
+			<div className="row">
+				<p>Total Orders: {getOrdersCount()}</p>
+				<p>Total Ammount: {getOrdersAmount()}</p>
+			</div>
 		</div>
 		{
 			(loading && product_loading) ? <div> Loading...</div> :
@@ -220,7 +243,7 @@ const Orders = ({ orders, products, getOrders, getProducts }: P) => {
 											<div className="newtable-row heading">
 												<div>Date</div>
 												<div>Supplier</div>
-												<div>Type</div>
+												<div>Status</div>
 												<div>Contact</div>
 												<div>Address </div>
 											</div>
