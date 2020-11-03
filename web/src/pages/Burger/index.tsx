@@ -86,7 +86,7 @@ class Burger extends React.Component<propTypes, S> {
 				<Link to={{ pathname: "/progress", search }} className={current === '/progress' ? "active" : ""}>In Progress</Link>
 				<Link to={{ pathname: "/done", search }} className={current === '/done' ? "active" : ""}>Done</Link>
 				<Link to={{ pathname: "/rejected", search }} className={current === '/rejected' ? "active" : ""}>Rejected</Link> */}
-				<Link to={{ pathname: "/orders", search }} className={current === '/orders' || '/' ? "active" : ""}>Orders</Link>
+				<Link to={{ pathname: "/orders", search }} className={current === '/orders' || current === '/' ? "active" : ""}>Orders</Link>
 				<Link to={{ pathname: "/products", search }} className={current === '/products' ? "active" : ""}>Products</Link>
 				<Link to="/dashboard/activities" className={current === '/dashboard' ? "active" : ""}>Dashboard</Link>
 				<Link to="/settings" className={current === '/settings' ? "active" : ""}>Settings</Link>

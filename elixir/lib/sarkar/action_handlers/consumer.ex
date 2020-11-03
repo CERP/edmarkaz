@@ -600,19 +600,8 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 		refcode = Map.get(request, "refcode")
 		password = Map.get(request, "password")
 
-
-		start_supplier(supplier_id)
-
-		# place order
-
-		EdMarkaz.Supplier.place_order(supplier_id, product, refcode, client_id)
-
 		spawn fn ->
 			EdMarkaz.Slack.send_alert("Mr./Mrs. #{school_name} placed an order for #{product_id} by #{supplier_id}. His/her contact number is #{phone_number}", "#platform-orders")
-		end
-
-		spawn fn ->
-			EdMarkaz.Telenor.send_sms(phone_number, "Mr./Mrs. #{school_owner},\nYou have requested information for #{product_name}. Our custom representative will contact you soon for more information.")
 		end
 
 		# create account
@@ -625,6 +614,16 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 					ON CONFLICT (id) DO UPDATE set db=excluded.db",
 					[refcode, request]
 				)
+
+				start_supplier(supplier_id)
+
+				# place order
+
+				EdMarkaz.Supplier.place_order(supplier_id, product, refcode, client_id)
+
+				spawn fn ->
+					EdMarkaz.Telenor.send_sms(phone_number, "Mr./Mrs. #{school_owner},\nYou have requested information for #{product_name}. Our custom representative will contact you soon for more information.")
+				end
 
 				{:ok, one_token} = EdMarkaz.Auth.gen_onetime_token(refcode)
 
