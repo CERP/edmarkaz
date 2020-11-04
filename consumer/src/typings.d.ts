@@ -453,6 +453,12 @@ type OrderRequestForm = {
 	phone_number: string
 	school_address: string
 	school_district: string
+
+	respondent_owner?: string
+	highest_fee?: string
+	lowest_fee?: string
+	school_tehsil?: string
+	total_enrolment?: string
 }
 
 type ProductOrderAsVisitor = {

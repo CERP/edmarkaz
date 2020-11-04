@@ -20,17 +20,17 @@ type P = {
 	handleModalClose: () => void
 }
 
+const initialState: OrderRequestForm = {
+	school_owner: '',
+	phone_number: '',
+	school_name: '',
+	school_address: '',
+	school_district: ''
+}
+
 const OrderRequestSubmit: React.FC<P> = ({ handleModalClose, handleRequestSubmit }) => {
 
 	const classes = useStyles()
-
-	const initialState = {
-		school_owner: '',
-		phone_number: '',
-		school_name: '',
-		school_address: '',
-		school_district: ''
-	}
 
 	const [state, setState] = useState<OrderRequestForm>(initialState)
 
@@ -49,8 +49,18 @@ const OrderRequestSubmit: React.FC<P> = ({ handleModalClose, handleRequestSubmit
 			return
 		}
 
-		if (state.phone_number.length === 11) {
-			handleRequestSubmit(state)
+		if (state.phone_number.length === 11 && state.phone_number.startsWith("03")) {
+
+			const mutated_state = {
+				...state,
+				school_tehsil: "",
+				total_enrolment: "",
+				lowest_fee: "",
+				highest_fee: "",
+				respondent_owner: ""
+			}
+
+			handleRequestSubmit(mutated_state)
 		} else {
 			window.alert("Inavalid contact number")
 		}
@@ -67,7 +77,7 @@ const OrderRequestSubmit: React.FC<P> = ({ handleModalClose, handleRequestSubmit
 			<select onChange={handle_change} name="school_district" style={{ height: 50, color: grey[500], borderRadius: 4 }} required={true}>
 				<option value="">Select District</option>
 				{
-					getDistricts().sort().map(district => <option key={district} value={district}>{toTitleCase(district)}</option>)
+					getDistricts().sort().map(d => <option key={d} value={d}>{toTitleCase(d)}</option>)
 				}
 			</select>
 			<div className="">

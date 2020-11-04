@@ -588,27 +588,36 @@ export const placeOrderAsVisitor = (order: ProductOrderAsVisitor) => (dispatch: 
 
 	const state = getState();
 
+	const profile = {
+		...order.request,
+		refcode: v4()
+	}
+
 	syncr.send({
 		type: "PLACE_ORDER_AS_VISITOR",
 		client_type: state.auth.client_type,
 		client_id: state.client_id,
 		payload: {
 			product: order.product,
-			request: {
-				...order.request,
-				refcode: v4(),
-				password: order.request.phone_number.substr(7) // last four digit, this is temporary
-			},
+			profile,
+			password: order.request.phone_number.substr(7) // last four digit, this is temporary
 		}
 	})
-		.then(res => {
+		.then((res: { token: string; user: RootReducerState["auth"]["user"] }) => {
 			// get token back
 			console.log(res)
+			const token: string = res.token;
+
+			dispatch(createLoginSucceed(profile.phone_number, token, res.user, { profile }))
 		})
 		.catch(err => {
 			console.error(err)
+			dispatch({
+				type: "SCHOOL_SIGNUP_FAILED"
+			})
 		})
 }
+
 
 export const trackRoute = (path: string) => (dispatch: Dispatch, getState: () => RootReducerState) => {
 

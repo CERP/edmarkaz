@@ -586,19 +586,20 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 			"client_id" => client_id,
 			"payload" => %{
 				"product" => product,
-				"request" => request
+				"profile" => profile,
+				"password" => password
 			}
 		}, state) do
+
 
 		product_name = Map.get(product, "title")
 		product_id = Map.get(product,"id")
 		supplier_id = Map.get(product, "supplier_id")
 
-		phone_number = Map.get(request, "phone_number")
-		school_name = Map.get(request, "school_name")
-		school_owner = Map.get(request, "school_owner")
-		refcode = Map.get(request, "refcode")
-		password = Map.get(request, "password")
+		phone_number = Map.get(profile, "phone_number")
+		school_name = Map.get(profile, "school_name")
+		school_owner = Map.get(profile, "school_owner")
+		refcode = Map.get(profile, "refcode")
 
 		spawn fn ->
 			EdMarkaz.Slack.send_alert("Mr./Mrs. #{school_name} placed an order for #{product_id} by #{supplier_id}. His/her contact number is #{phone_number}", "#platform-orders")
@@ -612,7 +613,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 					"INSERT INTO platform_schools (id, db)
 					VALUES ($1, $2)
 					ON CONFLICT (id) DO UPDATE set db=excluded.db",
-					[refcode, request]
+					[refcode, profile]
 				)
 
 				start_supplier(supplier_id)
@@ -625,6 +626,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 					EdMarkaz.Telenor.send_sms(phone_number, "Mr./Mrs. #{school_owner},\nYou have requested information for #{product_name}. Our custom representative will contact you soon for more information.")
 				end
 
+				{:ok, token} = EdMarkaz.Auth.login({phone_number, client_id, password})
 				{:ok, one_token} = EdMarkaz.Auth.gen_onetime_token(refcode)
 
 				spawn fn ->
@@ -657,8 +659,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 					end
 				end
 
-				# {:reply, succeed(%{token: token, user: "SCHOOL"}), %{id: phone_number, client_id: client_id}}
-				{:reply, succeed(), state}
+				{:reply, succeed(%{token: token, user: "SCHOOL"}), %{id: phone_number, client_id: client_id}}
 			{:error, msg} ->
 				{:reply, fail(msg), state}
 		end
