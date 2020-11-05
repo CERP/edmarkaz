@@ -26,27 +26,37 @@ defmodule Mix.Tasks.Platform do
 				end
 		end)
 
-		reduced_data = new_state |> Enum.reduce([], fn({ sid, history }, agg)  ->
+		csv_data = new_state |> Enum.reduce([], fn({ sid, history }, agg)  ->
 			row = history["history"] |> Enum.map(fn({time, order})->
 
-				{:ok, date}  = DateTime.from_unix(String.to_integer(time), :millisecond)
+				{:ok, order_date}  = DateTime.from_unix(String.to_integer(time), :millisecond)
 
-				iso_date = formatted_date(date)
+				iso_order_date = formatted_date(order_date)
 
-				meta_list = Map.values(order["meta"]) |> Enum.map( fn x )
+				meta_val_list = Map.values(order["meta"]) |> Enum.map( fn v ->
 
-				[iso_date, order["event"], order["verified"] ] ++ Map.values(order["meta"]) |> Map
+					# a bad way to convert unix to iso_date
+					if is_integer(v) and v > 1_500_000_000_000 do
+
+						{:ok, meta_date}  = DateTime.from_unix(v, :millisecond)
+
+						iso_meta_date = formatted_date(order_date)
+
+						else
+							v
+					end
+				end)
+
+				[iso_order_date, order["event"], order["verified"] ] ++ meta_val_list
+
 			end)
 
 			agg ++ row
 
 		end)
 
-		# iso_date = formatted_date(date)
 
-		IO.inspect reduced_data
-
-		# IO.inspect Dynamic.flatten(new_state)
+		IO.inspect csv_data
 
 	end
 

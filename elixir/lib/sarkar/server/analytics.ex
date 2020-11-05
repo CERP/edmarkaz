@@ -321,6 +321,89 @@ defmodule EdMarkaz.Server.Analytics do
 
 	end
 
+	match "/platform-orders-new.csv" do
+
+		{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
+		"SELECT
+			type, path, value, time
+			FROM platform_writes
+			WHERE path[4]='history' order by time asc
+	", [])
+
+		new_state = resp.rows
+			|> Enum.reduce(%{}, fn([type, path, value, time], agg) ->
+
+				[_, _ | rest] = path
+
+				case type do
+					"MERGE" ->
+						Dynamic.put(agg, rest, value)
+					"DELETE" -> Dynamic.delete(agg, rest)
+					other ->
+						agg
+				end
+		end)
+
+		csv_data = new_state |> Enum.reduce([], fn({ sid, history }, agg)  ->
+			row = history["history"] |> Enum.map(fn({time, order})->
+
+				{:ok, order_date}  = DateTime.from_unix(String.to_integer(time), :millisecond)
+
+				iso_order_date = formatted_date(order_date)
+
+				meta_val_list = Map.values(order["meta"]) |> Enum.map( fn v ->
+
+					# a bad way to convert unix to iso_date
+					if is_integer(v) and v > 1_500_000_000_000 do
+
+						{:ok, meta_date}  = DateTime.from_unix(v, :millisecond)
+
+						iso_meta_date = formatted_date(order_date)
+
+						else
+							v
+					end
+				end)
+
+				[iso_order_date, order["event"], order["verified"] ] ++ meta_val_list
+
+			end)
+
+			agg ++ row
+
+		end)
+
+		csv = [[
+				"date",
+				"event",
+				"verified_status",
+				"actual_date_of_delivery",
+				"actual_product_ordered",
+				"call_one",
+				"call_two",
+				"cancellation_reason",
+				"expected_completion_date",
+				"expected_date_of_delivery",
+				"notes",
+				"payment_received",
+				"product_id",
+				"quantity",
+				"sales_rep",
+				"school_id",
+				"status",
+				"strategy",
+				"total_amount"
+				] | csv_data]
+		|> CSV.encode
+		|> Enum.join()
+
+		conn
+		|> put_resp_header("content-type", "text/csv")
+		|> put_resp_header("cache-control", "no-cache")
+		|> send_resp( 200, csv)
+
+	end
+
 	match "/platform-orders.csv" do
 		{:ok, data} = case EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
 		"SELECT
@@ -584,6 +667,11 @@ defmodule EdMarkaz.Server.Analytics do
 
 	match _ do
 		send_resp(conn, 404, "not found")
+	end
+
+	defp formatted_date (date) do
+		[ date | _ ] = date |> DateTime.to_string |> String.split(" ")
+		date
 	end
 
 end
