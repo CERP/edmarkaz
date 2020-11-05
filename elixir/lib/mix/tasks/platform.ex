@@ -1,6 +1,55 @@
 defmodule Mix.Tasks.Platform do
 	use Mix.Task
 
+	def run(["platform-orders"]) do
+
+		Application.ensure_all_started(:edmarkaz)
+
+		{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
+			"SELECT
+				type, path, value, time
+				FROM platform_writes
+				WHERE path[4]='history' order by time asc
+		", [])
+
+		new_state = resp.rows
+			|> Enum.reduce(%{}, fn([type, path, value, time], agg) ->
+
+				[_, _ | rest] = path
+
+				case type do
+					"MERGE" ->
+						Dynamic.put(agg, rest, value)
+					"DELETE" -> Dynamic.delete(agg, rest)
+					other ->
+						agg
+				end
+		end)
+
+		reduced_data = new_state |> Enum.reduce([], fn({ sid, history }, agg)  ->
+			row = history["history"] |> Enum.map(fn({time, order})->
+
+				{:ok, date}  = DateTime.from_unix(String.to_integer(time), :millisecond)
+
+				iso_date = formatted_date(date)
+
+				meta_list = Map.values(order["meta"]) |> Enum.map( fn x )
+
+				[iso_date, order["event"], order["verified"] ] ++ Map.values(order["meta"]) |> Map
+			end)
+
+			agg ++ row
+
+		end)
+
+		# iso_date = formatted_date(date)
+
+		IO.inspect reduced_data
+
+		# IO.inspect Dynamic.flatten(new_state)
+
+	end
+
 	def run(["send_sms_messages", fname]) do
 
 		csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) do
@@ -667,6 +716,11 @@ defmodule Mix.Tasks.Platform do
 			[{_, _}] -> {:ok}
 			[] -> DynamicSupervisor.start_child(EdMarkaz.SupplierSupervisor, {EdMarkaz.Supplier, {id}})
 		end
+	end
+
+	defp formatted_date (date) do
+		[ date | _ ] = date |> DateTime.to_string |> String.split(" ")
+		date
 	end
 
 end
