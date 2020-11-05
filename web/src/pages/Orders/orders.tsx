@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import Former from '~src/utils/former'
-import { reserveMaskedNumber, releaseMaskedNumber, getOwnProducts } from '~src/actions'
+import { reserveMaskedNumber, releaseMaskedNumber, getOwnProducts, getSchoolProfiles } from '~src/actions'
 import { sendSlackAlert } from '~src/actions/core'
 import { connect } from 'react-redux'
 import moment from 'moment'
@@ -11,6 +11,7 @@ interface P {
 	reserveNumber: (school_id: string) => any
 	releaseNumber: (school_id: string) => any
 	getProducts: () => void
+	loadSchools: (ids: string[]) => void
 	sendSlackAlert: (message: string, channel: string) => any
 	sync_state: RootBankState["sync_state"]
 	schools: RootBankState["new_school_db"]
@@ -19,6 +20,7 @@ interface P {
 
 interface S {
 	// filterMenu: boolean
+	loadingSchools: boolean
 	activeOrder: string
 	filters: {
 		status: "IN_PROGRESS" | "DONE" | "ORDERED" | ""
@@ -30,14 +32,23 @@ interface S {
 
 type propTypes = RouteComponentProps & P
 
+
 class Orders extends Component<propTypes, S> {
 
 	former: Former
 	constructor(props: propTypes) {
 		super(props)
 
+		const blank = Object.keys(props.sync_state.matches)
+			.filter(k => props.schools[k] == undefined)
+
+		if (blank.length > 0) {
+			props.loadSchools(blank)
+		}
+
 		this.state = {
 			// filterMenu: false,
+			loadingSchools: blank.length > 0,
 			activeOrder: "",
 			filters: {
 				status: "",
@@ -54,6 +65,16 @@ class Orders extends Component<propTypes, S> {
 		this.props.getProducts()
 	}
 
+	componentWillReceiveProps(nextProps: propTypes) {
+
+		const blank = Object.keys(nextProps.sync_state.matches)
+			.filter(k => nextProps.schools[k] == undefined)
+
+		console.log("NEW PROPS: ", blank)
+		this.setState({ loadingSchools: blank.length > 0 })
+
+	}
+
 	setActive = (order_id: string) => {
 		const activeOrder = this.state.activeOrder === order_id ? "" : order_id
 
@@ -61,6 +82,7 @@ class Orders extends Component<propTypes, S> {
 			activeOrder
 		})
 	}
+
 	textfilter = (e: OrderPlacedEvent) => {
 		const { text } = this.state.filters
 		const school = this.props.schools[e.meta.school_id]
@@ -72,6 +94,7 @@ class Orders extends Component<propTypes, S> {
 		}
 		return true
 	}
+
 	dateFilter = (time: number) => {
 		return time > this.state.filters.start_date && time < this.state.filters.end_date
 	}
@@ -87,7 +110,7 @@ class Orders extends Component<propTypes, S> {
 			.filter(([id, e]) => e.event === "ORDER_PLACED" && e.verified && (this.textfilter(e) && this.dateFilter(e.time)))
 			.sort(([, a_e], [, b_e]) => b_e.time - a_e.time) as [string, OrderPlacedEvent][]
 
-		return products.loading ? <div> Loading </div> : <div className="orders page">
+		return (products.loading || this.state.loadingSchools) ? <div> Loading </div> : <div className="orders page">
 			<div className="title">Orders</div>
 			<div className="form" style={{ width: "90%", marginBottom: "20px" }}>
 				<div className="row">
@@ -170,5 +193,6 @@ export default connect((state: RootBankState) => ({
 	reserveNumber: (school_id: string) => dispatch(reserveMaskedNumber(school_id)),
 	releaseNumber: (school_id: string) => dispatch(releaseMaskedNumber(school_id)),
 	getProducts: () => dispatch(getOwnProducts()),
+	loadSchools: (school_ids: string[]) => dispatch(getSchoolProfiles(school_ids)),
 	sendSlackAlert: (message: string, channel: string) => dispatch(sendSlackAlert(message, channel))
 }))(Orders)

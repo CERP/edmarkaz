@@ -105,8 +105,6 @@ class OrderInfo extends Component<propTypes, S> {
 		const { school, schoolMatch } = this.props
 		const { order } = this.state
 
-		const reserved = schoolMatch && schoolMatch.status === "IN_PROGRESS"
-
 		return <div className="more">
 			<div className="form">
 				<div className="divider">School Info</div>
@@ -139,16 +137,13 @@ class OrderInfo extends Component<propTypes, S> {
 					<div> {school && school.enrolment_range} </div>
 				</div>
 				{
-					(schoolMatch.status === "DONE" || schoolMatch.status === "ORDERED") && <div className="button green" onClick={this.onShowNumber}>Show Number</div>
-				}
-				{
-					reserved && <>
+					<>
 						<div className="divider"> Contact Information </div>
 						<div className="row">
 							<label>Phone Number</label>
 							<div className="row" style={{ flexDirection: "row" }}>
-								<div style={{ width: "70%" }}> {schoolMatch.masked_number}</div>
-								<a href={`tel:${schoolMatch.masked_number}`} className="button green" style={{ width: "20%", marginRight: "10px" }}>Call</a>
+								<div style={{ width: '75%' }}> {school && school.phone_number}</div>
+								<a href={`tel:${school && school.phone_number}`} className="button green" style={{ width: "20%", marginRight: "10px" }}>Call</a>
 							</div>
 						</div>
 					</>
