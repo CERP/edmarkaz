@@ -179,17 +179,13 @@ defmodule Sarkar.ActionHandler.Mis do
 			"type"=> "SIGN_UP",
 			"sign_up_id" => sign_up_id,
 			"payload" => %{
-				"city" => city,
-				"name" => name,
-				"packageName" => package_name,
-				"phone" => phone,
-				"schoolName" => schoolName,
-				"schoolPassword" => password,
-				"typeOfLogin" => type
+				"signup" => signup,
+				"referral" => referral
 			}
 		}, state) do
 
-		signup_payload = %{ "city" => city, "name" => name, "packageName" => package_name, "phone" => phone, "schoolName" => schoolName, "typeOfLogin" => type}
+		phone = signup["phone"]
+		password = signup["schoolPassword"]
 
 		case Postgrex.transaction(
 			EdMarkaz.DB,
@@ -207,9 +203,22 @@ defmodule Sarkar.ActionHandler.Mis do
 						)
 				end
 
+				case EdMarkaz.DB.Postgres.query(
+					conn,
+					"INSERT INTO mischool_referrals (id, time, value) VALUES ($1, $2, $3)",
+					[phone, :os.system_time(:millisecond), referral]
+				) do
+					{:ok, resp} -> {:ok, resp}
+					{:error, err} ->
+						DBConnection.rollback(
+							conn,
+							err
+						)
+				end
+
 				{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
 				"INSERT INTO mischool_sign_ups (id,form) VALUES ($1, $2)",
-				[sign_up_id, signup_payload])
+				[sign_up_id, signup])
 			end,
 			pool: DBConnection.Poolboy
 		) do
