@@ -186,6 +186,12 @@ defmodule Sarkar.ActionHandler.Mis do
 
 		phone = signup["phone"]
 		password = signup["schoolPassword"]
+		city = signup["city"]
+		schoolName = signup["schoolName"]
+		package_name = signup["packageName"]
+		name = signup["name"]
+
+		signup = Map.delete(signup, "schoolPassword")
 
 		case Postgrex.transaction(
 			EdMarkaz.DB,
