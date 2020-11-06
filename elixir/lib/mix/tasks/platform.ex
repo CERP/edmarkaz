@@ -7,19 +7,23 @@ defmodule Mix.Tasks.Platform do
 
 		{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
 			"SELECT
-				type, path, value, time
+				id, type, path, value, time
 				FROM platform_writes
-				WHERE path[4]='history' order by time asc
-		", [])
+				WHERE path[4]='history' order by time asc", [])
 
 		new_state = resp.rows
-			|> Enum.reduce(%{}, fn([type, path, value, time], agg) ->
+			|> Enum.reduce(%{}, fn([supplier_id, type, path, value, time], agg) ->
 
 				[_, _ | rest] = path
-
+				
+				[sid, history, time | _] = rest
+				
+				path_for_supplier = [sid, history, time, "supplier"]
+				
 				case type do
 					"MERGE" ->
-						Dynamic.put(agg, rest, value)
+						new_agg = Dynamic.put(agg, rest, value)
+						Dynamic.put(new_agg, path_for_supplier, supplier_id)
 					"DELETE" -> Dynamic.delete(agg, rest)
 					other ->
 						agg
@@ -35,7 +39,7 @@ defmodule Mix.Tasks.Platform do
 
 				meta_val_list = Map.values(order["meta"]) |> Enum.map( fn v ->
 
-					# a bad way to convert unix to iso_date
+					# a bad way to guess and convert unix to iso_date
 					if is_integer(v) and v > 1_500_000_000_000 do
 
 						{:ok, meta_date}  = DateTime.from_unix(v, :millisecond)
@@ -47,7 +51,7 @@ defmodule Mix.Tasks.Platform do
 					end
 				end)
 
-				[iso_order_date, order["event"], order["verified"] ] ++ meta_val_list
+				[order["supplier"], iso_order_date, order["event"], order["verified"] ] ++ meta_val_list
 
 			end)
 
