@@ -68,11 +68,11 @@ class Orders extends Component<propTypes, S> {
 	componentWillReceiveProps(nextProps: propTypes) {
 
 		const blank = Object.keys(nextProps.sync_state.matches)
-			.filter(k => nextProps.schools[k] == undefined)
+			.filter(k => nextProps.schools[k] === undefined)
 
+		//  need to put some kind of threshold here.
 		console.log("NEW PROPS: ", blank)
-		this.setState({ loadingSchools: blank.length > 0 })
-
+		this.setState({ loadingSchools: false })
 	}
 
 	setActive = (order_id: string) => {
@@ -110,7 +110,7 @@ class Orders extends Component<propTypes, S> {
 			.filter(([id, e]) => e.event === "ORDER_PLACED" && e.verified && (this.textfilter(e) && this.dateFilter(e.time)))
 			.sort(([, a_e], [, b_e]) => b_e.time - a_e.time) as [string, OrderPlacedEvent][]
 
-		return (products.loading || this.state.loadingSchools) ? <div> Loading </div> : <div className="orders page">
+		return (products.loading || this.state.loadingSchools) ? <div> Loading... </div> : <div className="orders page">
 			<div className="title">Orders</div>
 			<div className="form" style={{ width: "90%", marginBottom: "20px" }}>
 				<div className="row">
