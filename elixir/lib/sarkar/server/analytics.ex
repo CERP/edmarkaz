@@ -321,6 +321,108 @@ defmodule EdMarkaz.Server.Analytics do
 
 	end
 
+	match "/platform-orders-new.csv" do
+
+		{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
+			"SELECT
+				id, type, path, value, time
+				FROM platform_writes
+				WHERE path[4]='history' order by time asc", [])
+
+		new_state = resp.rows
+			|> Enum.reduce(%{}, fn([supplier_id, type, path, value, time], agg) ->
+
+				[_, _ | rest] = path
+
+				[school_id, history, time | _] = rest
+
+				path_for_supplier = [school_id, history, time, "supplier"]
+
+				case type do
+					"MERGE" ->
+						new_agg = Dynamic.put(agg, rest, value)
+						Dynamic.put(new_agg, path_for_supplier, supplier_id)
+					"DELETE" -> Dynamic.delete(agg, rest)
+					other ->
+						agg
+				end
+		end)
+		csv_data = new_state
+			|> Enum.reduce([], fn({ school_id, history }, agg)  ->
+				row = history["history"]
+					|> Enum.map(fn({time, order})->
+
+						meta = order["meta"]
+
+						{_, order_date}  = DateTime.from_unix(String.to_integer(time), :millisecond)
+
+						{_, actual_dod}  = DateTime.from_unix(Map.get(meta, "actual_date_of_delivery"), :millisecond)
+						{_, expected_cd}  = DateTime.from_unix(Map.get(meta, "expected_completion_date"), :millisecond)
+						{_, expected_dod}  = DateTime.from_unix(Map.get(meta, "expected_date_of_delivery"), :millisecond)
+
+						[
+							time,
+							order["supplier"],
+							formatted_date(order_date),
+							order["event"],
+							order["verified"],
+							meta["call_one"],
+							meta["call_two"],
+							meta["cancellation_reason"],
+							meta["payment_received"],
+							meta["product_id"],
+							meta["quantity"],
+							meta["sales_rep"],
+							meta["school_id"],
+							meta["status"],
+							meta["strategy"],
+							meta["total_amount"],
+							meta["actual_product_ordered"],
+							formatted_date(actual_dod),
+							formatted_date(expected_cd),
+							formatted_date(expected_dod),
+							meta["notes"],
+						]
+
+					end)
+
+				agg ++ row
+			end)
+
+		csv = [[
+				"oid",
+				"supplier",
+				"date",
+				"event",
+				"verified_status",
+				"call_one",
+				"call_two",
+				"cancellation_reason",
+				"payment_received",
+				"product_id",
+				"quantity",
+				"sales_rep",
+				"school_id",
+				"status",
+				"strategy",
+				"total_amount",
+				"actual_product_ordered",
+				"actual_date_of_delivery",
+				"expected_completion_date",
+				"expected_date_of_delivery",
+				"notes"
+
+				] | csv_data]
+		|> CSV.encode
+		|> Enum.join()
+
+		conn
+		|> put_resp_header("content-type", "text/csv")
+		|> put_resp_header("cache-control", "no-cache")
+		|> send_resp( 200, csv)
+
+	end
+
 	match "/platform-orders.csv" do
 		{:ok, data} = case EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
 		"SELECT
@@ -584,6 +686,11 @@ defmodule EdMarkaz.Server.Analytics do
 
 	match _ do
 		send_resp(conn, 404, "not found")
+	end
+
+	defp formatted_date (date) do
+		[ date | _ ] = date |> DateTime.to_string |> String.split(" ")
+		date
 	end
 
 end
