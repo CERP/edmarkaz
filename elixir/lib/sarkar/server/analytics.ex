@@ -333,11 +333,11 @@ defmodule EdMarkaz.Server.Analytics do
 			|> Enum.reduce(%{}, fn([supplier_id, type, path, value, time], agg) ->
 
 				[_, _ | rest] = path
-				
+
 				[sid, history, time | _] = rest
-			
+
 				path_for_supplier = [sid, history, time, "supplier"]
-				
+
 				case type do
 					"MERGE" ->
 						new_agg = Dynamic.put(agg, rest, value)
@@ -368,7 +368,7 @@ defmodule EdMarkaz.Server.Analytics do
 					end
 				end)
 
-				[order["supplier"], iso_order_date, order["event"], order["verified"] ] ++ meta_val_list
+				[time ,order["supplier"], iso_order_date, order["event"], order["verified"] ] ++ meta_val_list
 
 			end)
 
@@ -377,6 +377,7 @@ defmodule EdMarkaz.Server.Analytics do
 		end)
 
 		csv = [[
+				"oid",
 				"supplier",
 				"date",
 				"event",
