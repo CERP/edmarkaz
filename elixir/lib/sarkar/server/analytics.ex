@@ -334,9 +334,9 @@ defmodule EdMarkaz.Server.Analytics do
 
 				[_, _ | rest] = path
 
-				[sid, history, time | _] = rest
+				[school_id, history, time | _] = rest
 
-				path_for_supplier = [sid, history, time, "supplier"]
+				path_for_supplier = [school_id, history, time, "supplier"]
 
 				case type do
 					"MERGE" ->
@@ -347,34 +347,47 @@ defmodule EdMarkaz.Server.Analytics do
 						agg
 				end
 		end)
-		csv_data = new_state |> Enum.reduce([], fn({ sid, history }, agg)  ->
-			row = history["history"] |> Enum.map(fn({time, order})->
+		csv_data = new_state
+			|> Enum.reduce([], fn({ school_id, history }, agg)  ->
+				row = history["history"]
+					|> Enum.map(fn({time, order})->
 
-				{:ok, order_date}  = DateTime.from_unix(String.to_integer(time), :millisecond)
+						meta = order["meta"]
 
-				iso_order_date = formatted_date(order_date)
+						{_, order_date}  = DateTime.from_unix(String.to_integer(time), :millisecond)
 
-				meta_val_list = Map.values(order["meta"]) |> Enum.map( fn v ->
+						{_, actual_dod}  = DateTime.from_unix(Map.get(meta, "actual_date_of_delivery"), :millisecond)
+						{_, expected_cd}  = DateTime.from_unix(Map.get(meta, "expected_completion_date"), :millisecond)
+						{_, expected_dod}  = DateTime.from_unix(Map.get(meta, "expected_date_of_delivery"), :millisecond)
 
-					# a bad way to guess and convert unix to iso_date
-					if is_integer(v) and v > 1_500_000_000_000 do
+						[
+							time,
+							order["supplier"],
+							formatted_date(order_date),
+							order["event"],
+							order["verified"],
+							meta["call_one"],
+							meta["call_two"],
+							meta["cancellation_reason"],
+							meta["payment_received"],
+							meta["product_id"],
+							meta["quantity"],
+							meta["sales_rep"],
+							meta["school_id"],
+							meta["status"],
+							meta["strategy"],
+							meta["total_amount"],
+							meta["actual_product_ordered"],
+							formatted_date(actual_dod),
+							formatted_date(expected_cd),
+							formatted_date(expected_dod),
+							meta["notes"],
+						]
 
-						{:ok, meta_date}  = DateTime.from_unix(v, :millisecond)
+					end)
 
-						iso_meta_date = formatted_date(order_date)
-
-						else
-							v
-					end
-				end)
-
-				[time ,order["supplier"], iso_order_date, order["event"], order["verified"] ] ++ meta_val_list
-
+				agg ++ row
 			end)
-
-			agg ++ row
-
-		end)
 
 		csv = [[
 				"oid",
@@ -382,14 +395,9 @@ defmodule EdMarkaz.Server.Analytics do
 				"date",
 				"event",
 				"verified_status",
-				"actual_date_of_delivery",
-				"actual_product_ordered",
 				"call_one",
 				"call_two",
 				"cancellation_reason",
-				"expected_completion_date",
-				"expected_date_of_delivery",
-				"notes",
 				"payment_received",
 				"product_id",
 				"quantity",
@@ -397,7 +405,13 @@ defmodule EdMarkaz.Server.Analytics do
 				"school_id",
 				"status",
 				"strategy",
-				"total_amount"
+				"total_amount",
+				"actual_product_ordered",
+				"actual_date_of_delivery",
+				"expected_completion_date",
+				"expected_date_of_delivery",
+				"notes"
+
 				] | csv_data]
 		|> CSV.encode
 		|> Enum.join()
