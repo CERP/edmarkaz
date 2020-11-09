@@ -5,7 +5,7 @@ import Youtube from 'react-youtube'
 import Play from '../../../icons/play.svg'
 import { trackVideoAnalytics, trackAssessmentAnalytics, getLessons } from '../../../actions'
 import Modal from '../../../components/Modal'
-import { List, ListItem, ListItemIcon, Typography, Divider, Container, Avatar } from '@material-ui/core'
+import { List, ListItem, ListItemIcon, Typography, Divider, Container } from '@material-ui/core'
 import BorderColorIcon from '@material-ui/icons/BorderColor';
 import { getColorsFromChapter } from 'utils/getColorsFromChapter'
 import { getIDFromYoutbeLink } from 'utils/getIdFromYoutubeLink'
@@ -46,7 +46,6 @@ const LessonPage: React.FC<Props> = ({ lessons, assessments, match, connected, l
 		assessments[medium][grade][subject][chapter] || {}
 		: {}
 
-	const [activeChapter] = useState("")
 	const [activeLesson, setActiveLesson] = useState("")
 	const [showVideoModal, setVideoModal] = useState(false)
 	const [showAssessmentModal, setAssessmentModal] = useState(false)

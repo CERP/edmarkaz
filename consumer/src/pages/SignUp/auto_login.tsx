@@ -35,7 +35,7 @@ const AutoLogin: React.FC<p & RouteComponentProps> = ({ connected, auth, createA
 
 	if (auth.loading) {
 		return <div className="loading">
-			<img className="icon" src={LoadingIcon} />
+			<img className="icon" src={LoadingIcon} alt="loader" />
 			<div className="text">Loading, might take a few seconds depending on your connection speed</div>
 		</div>
 	}

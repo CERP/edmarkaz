@@ -2,7 +2,6 @@ import React from 'react'
 import { Route, Link, RouteComponentProps, withRouter } from 'react-router-dom'
 import qs from 'query-string'
 
-import Home from '../Home'
 import New from '../New'
 import InProgress from '../InProgress'
 import Done from '../Done'
@@ -17,6 +16,7 @@ import ProductInfo from '~/src/components/ProductInfo'
 import './style.css'
 import Dashboard from '../Dashboard';
 import { connect } from 'react-redux'
+import { EmptyHome } from '../Home/emptyHome'
 
 interface P {
 	auth: RootBankState["auth"]
@@ -86,14 +86,14 @@ class Burger extends React.Component<propTypes, S> {
 				<Link to={{ pathname: "/progress", search }} className={current === '/progress' ? "active" : ""}>In Progress</Link>
 				<Link to={{ pathname: "/done", search }} className={current === '/done' ? "active" : ""}>Done</Link>
 				<Link to={{ pathname: "/rejected", search }} className={current === '/rejected' ? "active" : ""}>Rejected</Link> */}
-				<Link to={{ pathname: "/orders", search }} className={current === '/orders' ? "active" : ""}>Orders</Link>
+				<Link to={{ pathname: "/orders", search }} className={current === '/orders' || current === '/' ? "active" : ""}>Orders</Link>
 				<Link to={{ pathname: "/products", search }} className={current === '/products' ? "active" : ""}>Products</Link>
 				<Link to="/dashboard/activities" className={current === '/dashboard' ? "active" : ""}>Dashboard</Link>
 				<Link to="/settings" className={current === '/settings' ? "active" : ""}>Settings</Link>
 			</div>}
 
 			{!panel_exists && <div className={visible ? "burger-stub" : "burger-stub full-view"}>
-				<Route exact path="/" component={Home} />
+				<Route exact path="/" component={Orders} />
 				<Route path="/new" component={New} />
 				<Route path="/progress" component={InProgress} />
 				<Route path="/done" component={Done} />

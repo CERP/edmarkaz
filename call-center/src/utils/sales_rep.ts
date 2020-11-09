@@ -2,8 +2,8 @@
 export const getSalesReps = () => ({
 	ALI_HASNAIN: "Ali Hasnain",
 	ASIM_ZAHEER: "Asim Zaheer",
-	AWAIS_SAKHAWAT: "Awais Sakhawat",
 	KALEEM_MAJEED: "Kaleem Majeed",
-	MUHAMMAD_ZOHAIB: "Muhammad Zohaib",
-	NASIR_SAEED: "Nasir Saeed"
+	FAROOQ_AZHAR: "Farooq Azhar",
+	ZAHID_RIAZ: "Zahid Riaz",
+	ALI_ZOHAIB: "Ali Zohaib"
 })

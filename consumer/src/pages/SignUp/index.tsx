@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { Redirect } from 'react-router'
 import { v4 } from 'uuid'
 import { Typography, Button, TextField, FormControl, Box } from '@material-ui/core'
 import Visibility from '@material-ui/icons/Visibility'
@@ -163,11 +162,11 @@ class SignUp extends React.Component<P, S> {
 
 	render() {
 
-		const { auth, client_id } = this.props
+		const { auth } = this.props
 
 		if (auth.loading) {
 			return <div className="loading">
-				<img className="icon" src={LoadingIcon} />
+				<img className="icon" src={LoadingIcon} alt="loading" />
 				<div className="text">Loading, might take a few seconds depending on your connection speed</div>
 			</div>
 		}
@@ -204,7 +203,7 @@ class SignUp extends React.Component<P, S> {
 					<OutlinedInput
 						id="outlined-adornment-password"
 						type={showPassword ? 'text' : 'password'}
-						value={password}
+						defaultValue={password}
 						{...this.former.super_handle(["password"])}
 						endAdornment={
 							<InputAdornment position="end">

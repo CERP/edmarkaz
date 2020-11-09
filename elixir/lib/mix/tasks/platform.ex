@@ -1,6 +1,69 @@
 defmodule Mix.Tasks.Platform do
 	use Mix.Task
 
+	def run(["platform-orders"]) do
+
+		Application.ensure_all_started(:edmarkaz)
+
+		{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
+			"SELECT
+				id, type, path, value, time
+				FROM platform_writes
+				WHERE path[4]='history' order by time asc", [])
+
+		new_state = resp.rows
+			|> Enum.reduce(%{}, fn([supplier_id, type, path, value, time], agg) ->
+
+				[_, _ | rest] = path
+
+				[sid, history, time | _] = rest
+
+				path_for_supplier = [sid, history, time, "supplier"]
+
+				case type do
+					"MERGE" ->
+						new_agg = Dynamic.put(agg, rest, value)
+						Dynamic.put(new_agg, path_for_supplier, supplier_id)
+					"DELETE" -> Dynamic.delete(agg, rest)
+					other ->
+						agg
+				end
+		end)
+
+		csv_data = new_state |> Enum.reduce([], fn({ sid, history }, agg)  ->
+			row = history["history"] |> Enum.map(fn({time, order})->
+
+				{:ok, order_date}  = DateTime.from_unix(String.to_integer(time), :millisecond)
+
+				iso_order_date = formatted_date(order_date)
+
+				meta_val_list = Map.values(order["meta"]) |> Enum.map( fn v ->
+
+					# a bad way to guess and convert unix to iso_date
+					if is_integer(v) and v > 1_500_000_000_000 do
+
+						{:ok, meta_date}  = DateTime.from_unix(v, :millisecond)
+
+						iso_meta_date = formatted_date(order_date)
+
+						else
+							v
+					end
+				end)
+
+				[time, order["supplier"], iso_order_date, order["event"], order["verified"] ] ++ meta_val_list
+
+			end)
+
+			agg ++ row
+
+		end)
+
+
+		IO.inspect csv_data
+
+	end
+
 	def run(["send_sms_messages", fname]) do
 
 		csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) do
@@ -667,6 +730,11 @@ defmodule Mix.Tasks.Platform do
 			[{_, _}] -> {:ok}
 			[] -> DynamicSupervisor.start_child(EdMarkaz.SupplierSupervisor, {EdMarkaz.Supplier, {id}})
 		end
+	end
+
+	defp formatted_date (date) do
+		[ date | _ ] = date |> DateTime.to_string |> String.split(" ")
+		date
 	end
 
 end

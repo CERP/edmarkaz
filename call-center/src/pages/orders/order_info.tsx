@@ -198,11 +198,11 @@ class OrderInfo extends Component<propTypes, S> {
 					//IN_PROGRESS
 					(verified && order.meta.status === "IN_PROGRESS") && <>
 						<div className="row">
-							<label>Call 1</label>
+							<label>School Call</label>
 							<input type="text" placeholder="status" {...this.former.super_handle(["order", "meta", "call_one"])} />
 						</div>
 						<div className="row">
-							<label>Call 2</label>
+							<label>Supplier Call</label>
 							<input type="text" placeholder="status" {...this.former.super_handle(["order", "meta", "call_two"])} />
 						</div>
 						<div className="row">

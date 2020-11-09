@@ -23,7 +23,7 @@ const StudentRouter: React.FC<P> = ({ connected, auth, location, history, active
 	const params = qs.parse(location.search)
 
 	const student_token = params.referral as string | undefined
-	const std_id = params.std_id && params.std_id.toString() || ""
+	const std_id = (params.std_id && params.std_id.toString()) || ""
 
 	// if (auth.user === "STUDENT" && activeStudent === undefined) {
 	// 	return <Redirect to="/student-profile" />
