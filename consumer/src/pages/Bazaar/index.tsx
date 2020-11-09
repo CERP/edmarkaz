@@ -22,7 +22,7 @@ const getCategoryOrder = (category: string) => {
 		"Education Technology": 4,
 		"School Loans": 1,
 		"Textbooks": 2,
-		"Stationery and Printing": 6,
+		"School Supplies": 6,
 		"Learning Materials": 5,
 		"Solar Power": 7
 	} as { [k: string]: number }

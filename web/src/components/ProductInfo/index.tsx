@@ -34,6 +34,16 @@ interface S {
 	newCategory: string
 }
 
+const categories = [
+	"Library Books & Co-curricular Activities",
+	"Education Technology",
+	"School Loans",
+	"Textbooks",
+	"School Supplies",
+	"Learning Materials",
+	"Solar Power"
+]
+
 class ProductInfo extends React.Component<propTypes, S> {
 
 	former: Former
@@ -198,15 +208,6 @@ class ProductInfo extends React.Component<propTypes, S> {
 	}
 
 	render() {
-		const categories = [
-			"Library Books & Co-curricular Activities",
-			"Education Technology",
-			"School Loans",
-			"Textbooks",
-			"Stationery and Printing",
-			"Learning Materials",
-			"Solar Power"
-		]
 
 		const { province, district } = this.state.product.location
 
