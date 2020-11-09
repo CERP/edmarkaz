@@ -12,9 +12,9 @@ defmodule Sarkar.ActionHandler.Dashboard do
 	) do
 
 		{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
-			"SELECT
-				DISTINCT school_id
-			FROM flattened_schools",
+			"SELECT id FROM auth
+				WHERE id in ( SELECT school_id
+			FROM flattened_schools )",
 			[]
 		)
 
@@ -56,6 +56,7 @@ defmodule Sarkar.ActionHandler.Dashboard do
 			}
 		},
 		state
+
 	) do
 		# SCHOOL_INFO
 		{:ok, student_limit} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
