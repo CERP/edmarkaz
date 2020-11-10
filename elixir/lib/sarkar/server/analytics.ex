@@ -350,43 +350,54 @@ defmodule EdMarkaz.Server.Analytics do
 		csv_data = new_state
 			|> Enum.reduce([], fn({ school_id, history }, agg)  ->
 				row = history["history"]
+					#  need only order_placed event orders
+					|> Enum.filter(fn({_, order}) -> order["event"] == "ORDER_PLACED" end)
 					|> Enum.map(fn({time, order})->
 
 						meta = order["meta"]
 
-						{_, order_date}  = DateTime.from_unix(String.to_integer(time), :millisecond)
+						case meta do
+							nil -> []
+							_ ->
 
-						{_, actual_dod}  = DateTime.from_unix(Map.get(meta, "actual_date_of_delivery"), :millisecond)
-						{_, expected_cd}  = DateTime.from_unix(Map.get(meta, "expected_completion_date"), :millisecond)
-						{_, expected_dod}  = DateTime.from_unix(Map.get(meta, "expected_date_of_delivery"), :millisecond)
+								{_, order_date}  = DateTime.from_unix(String.to_integer(time), :millisecond)
 
-						[
-							time,
-							order["supplier"],
-							formatted_date(order_date),
-							order["event"],
-							order["verified"],
-							meta["call_one"],
-							meta["call_two"],
-							meta["cancellation_reason"],
-							meta["payment_received"],
-							meta["product_id"],
-							meta["quantity"],
-							meta["sales_rep"],
-							meta["school_id"],
-							meta["status"],
-							meta["strategy"],
-							meta["total_amount"],
-							meta["actual_product_ordered"],
-							formatted_date(actual_dod),
-							formatted_date(expected_cd),
-							formatted_date(expected_dod),
-							meta["notes"],
-						]
+								# put curr timestamp so that from_unix don't throw an error
 
+								{_, actual_dod}  = DateTime.from_unix(Map.get(meta, "actual_date_of_delivery", :os.system_time(:millisecond)), :millisecond)
+								{_, expected_cd}  = DateTime.from_unix(Map.get(meta, "expected_completion_date", :os.system_time(:millisecond)), :millisecond)
+								{_, expected_dod}  = DateTime.from_unix(Map.get(meta, "expected_date_of_delivery", :os.system_time(:millisecond)), :millisecond)
+
+								[
+									time,
+									order["supplier"],
+									formatted_date(order_date),
+									order["event"],
+									order["verified"],
+									meta["call_one"],
+									meta["call_two"],
+									meta["cancellation_reason"],
+									meta["payment_received"],
+									meta["product_id"],
+									meta["quantity"],
+									meta["sales_rep"],
+									meta["school_id"],
+									meta["status"],
+									meta["strategy"],
+									meta["total_amount"],
+									meta["actual_product_ordered"],
+									formatted_date(actual_dod),
+									formatted_date(expected_cd),
+									formatted_date(expected_dod),
+									meta["notes"],
+								]
+						end
 					end)
 
+				# return aggregatted data
+
 				agg ++ row
+
 			end)
 
 		csv = [[
