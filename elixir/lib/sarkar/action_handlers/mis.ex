@@ -242,10 +242,11 @@ defmodule Sarkar.ActionHandler.Mis do
 					}
 				})
 
-				alert_message = Poison.encode!(%{"text" => "New Sign-Up\nSchool Name: #{schoolName},\nPhone: #{phone},\nPackage: #{package_name},\nName: #{name},\nCity: #{city}"})
+				alert_message = "New MISchool Signup\nSchool Name: #{schoolName},\nPhone: #{phone},\nPackage: #{package_name},\nName: #{name},\nDistrict: #{city}"
+
 				{:ok, resp} = EdMarkaz.Slack.send_alert(alert_message,"#platform-dev")
 
-				case EdMarkaz.Telenor.send_sms(phone, "Thanks for signing up on mischool.pk . Your MISchool credentials are: school_id: #{phone} and password: #{password} \n Please visit https://mischool.pk/school-login to login") do
+				case EdMarkaz.Telenor.send_sms(phone, "Thank you for signing up on mischool.pk . Your MISchool credentials are: school_id: #{phone} and password: #{password} \n Please visit https://mischool.pk/school-login to login") do
 					{:ok, res} ->
 						{:reply, succeed(res), state}
 					{:error, msg} ->
