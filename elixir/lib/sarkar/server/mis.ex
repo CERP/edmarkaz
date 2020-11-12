@@ -13,15 +13,8 @@ defmodule EdMarkaz.Server.MIS do
 
 	options _ do
 		conn
-		|> append_headers()
+		|> append_headers
 		|> send_resp(200, "ok")
-	end
-
-	get "/hello" do
-		IO.puts "Working..."
-		conn
-		|> append_headers()
-		|> send_resp(200, "hello")
 	end
 
 	get "/server-time" do
@@ -33,7 +26,7 @@ defmodule EdMarkaz.Server.MIS do
 		body = Poison.encode!(time)
 
 		conn
-		|> append_headers()
+		|> append_headers
 		|> send_resp(200, body)
 	end
 
@@ -51,7 +44,6 @@ defmodule EdMarkaz.Server.MIS do
 		|> put_resp_header("access-control-allow-methods", "GET, OPTIONS")
 		|> put_resp_header("access-control-allow-origin", "*")
 		|> put_resp_header("access-control-allow-headers", "*")
-
 	end
 
 end
