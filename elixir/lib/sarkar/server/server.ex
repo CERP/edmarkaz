@@ -4,6 +4,7 @@ defmodule EdMarkaz.Router do
 	plug :match
 	plug :dispatch
 
+	forward "/mis", to: EdMarkaz.Server.MIS
 	forward "/ilmx/analytics", to: EdMarkaz.Server.Analytics
 	forward "/masking", to: EdMarkaz.Server.Masking
 
