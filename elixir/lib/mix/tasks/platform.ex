@@ -1,47 +1,7 @@
 defmodule Mix.Tasks.Platform do
 	use Mix.Task
 
-	def run(["ingest_diagnostic_result", fname]) do
-		Application.ensure_all_started(:edmarkaz)
-
-		csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) do
-			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) |> CSV.decode!
-			false -> File.stream!("priv/#{fname}.csv") |> CSV.decode!
-		end
-
-		[ _ | diagnostic_result] = csv
-		|> Enum.map(fn row -> row end)
-
-		result = diagnostic_result
-		|> Enum.reduce(%{}, fn([test_id, question_id, answer, isCorrect, slo]), agg ->
-			diagnostic = %{
-				"answer" => answer,
-				"isCorrect" => true,
-				"slo" => slo
-			}
-			Dynamic.put(agg, [test_id, question_id], diagnostic)
-		end)
-
-		# IO.inspect result
-
-		{:ok, res} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
-			"SELECT DISTINCT path[3] as school_id
-			FROM writes
-			WHERE path[2] ='students'
-			",
-			[])
-			state = res.rows
-			|> Enum.reduce([], fn([school_id], agg) ->
-				path = ["db", "students", school_id, "diagnostic_result"]
-				mappy = %{ "type" => "MERGE", "path" => path, "value" => result}
-				agg = agg ++ [mappy]
-			end)
-			res = start_school("cerp")
-			changes = Sarkar.School.prepare_changes(state)
-			Sarkar.School.sync_changes("cerp", "backend", changes, :os.system_time(:millisecond))
-	end
-
-	def run(["ingest_TI_tests", fname, fname2]) do
+	def run(["ingest_TI_tests", fname, fname2, fname3]) do
 		Application.ensure_all_started(:edmarkaz)
 
 		testCSV = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) do
@@ -54,10 +14,18 @@ defmodule Mix.Tasks.Platform do
 			false -> File.stream!("priv/#{fname2}.csv") |> CSV.decode!
 		end
 
+		curriculumCSV = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname3}.csv")) do
+			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{fname3}.csv")) |> CSV.decode!
+			false -> File.stream!("priv/#{fname3}.csv") |> CSV.decode!
+		end
+
 		[ _ | tests] = testCSV
 		|> Enum.map(fn row -> row end)
 
 		[ _ | slo_mapping] = sloMappingCSV
+		|> Enum.map(fn row -> row end)
+
+		[ _ | curriculum] = curriculumCSV
 		|> Enum.map(fn row -> row end)
 
 		targeted_instruction = tests
@@ -82,17 +50,69 @@ defmodule Mix.Tasks.Platform do
 			Dynamic.put(agg, [slo_id], sloMapping)
 		end)
 
+		curriculumObj = curriculum
+		|> Enum.reduce(%{}, fn([learning_level_id, lesson_number, lesson_name, lesson_description, subject, video_links, pdf_link]), agg ->
+			learning_levels = %{
+				"leasson_number" => lesson_number,
+				"lesson_name" => lesson_name,
+				"lesson_description" => lesson_description,
+				"subject" => subject,
+				"video_links" => video_links,
+				"pdf_link" => pdf_link
+			}
+			Dynamic.put(agg, [learning_level_id], learning_levels)
+		end)
+
 		targeted_instruction = Map.put(targeted_instruction, "slo_mapping", sloMappingObj)
+		targeted_instruction = Map.put(targeted_instruction, "curriculum", curriculumObj)
 
 		IO.inspect targeted_instruction
 
-		path = ["db", "targeted_instruction"]
-		targeted_inst = [%{ "type" => "MERGE", "path" => path, "value" => targeted_instruction}]
+		# path = ["db", "targeted_instruction"]
+		# targeted_inst = [%{ "type" => "MERGE", "path" => path, "value" => targeted_instruction}]
 
-		res = start_school("cerp")
-		IO.inspect res
-		changes = Sarkar.School.prepare_changes(targeted_inst)
-		Sarkar.School.sync_changes("cerp", "backend", changes, :os.system_time(:millisecond))
+		# res = start_school("cerp")
+		# IO.inspect res
+		# changes = Sarkar.School.prepare_changes(targeted_inst)
+		# Sarkar.School.sync_changes("cerp", "backend", changes, :os.system_time(:millisecond))
+	end
+
+	def run(["ingest_diagnostic_result", fname]) do
+		Application.ensure_all_started(:edmarkaz)
+
+		csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) do
+			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) |> CSV.decode!
+			false -> File.stream!("priv/#{fname}.csv") |> CSV.decode!
+		end
+
+		[ _ | diagnostic_result] = csv
+		|> Enum.map(fn row -> row end)
+
+		result = diagnostic_result
+		|> Enum.reduce(%{}, fn([test_id, question_id, answer, isCorrect, slo]), agg ->
+			diagnostic = %{
+				"answer" => answer,
+				"isCorrect" => true,
+				"slo" => slo
+			}
+			Dynamic.put(agg, [test_id, question_id], diagnostic)
+		end)
+
+		{:ok, res} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
+			"SELECT DISTINCT path[3] as school_id
+			FROM writes
+			WHERE path[2] ='students'
+			",
+			[])
+			state = res.rows
+			|> Enum.reduce([], fn([school_id], agg) ->
+				path = ["db", "students", school_id, "diagnostic_result"]
+				mappy = %{ "type" => "MERGE", "path" => path, "value" => result}
+				agg = agg ++ [mappy]
+			end)
+			res = start_school("cerp")
+			changes = Sarkar.School.prepare_changes(state)
+			Sarkar.School.sync_changes("cerp", "backend", changes, :os.system_time(:millisecond))
 	end
 
 	def run(["add_targeted_instruction"]) do
