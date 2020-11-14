@@ -112,47 +112,7 @@ defmodule Mix.Tasks.Platform do
 			Sarkar.School.sync_changes("cerp", "backend", changes, :os.system_time(:millisecond))
 	end
 
-	def run(["add_targeted_instruction"]) do
-		Application.ensure_all_started(:edmarkaz)
-		targeted_instruction = %{
-									"visible" => true,
-									"tests" => %{ "English" => %{ "name" => "English", "subject" => "English",
-															  "class" => "Grade 3", "type" => "Diagnostic",
-															  "label" => "Grade 3 Diagnostic Test! For English",
-															  "pdf_url" => "https://storage.googleapis.com/targeted-instructions/TI%20V0%20Test_English.pdf"},
-												"Mathematics" => %{  "name" => "Mathematics", "subject" => "Mathematics",
-																"class" => "Grade 3", "type" => "Diagnostic",
-																"label" => "Grade 3 Diagnostic Test! For Mathematics",
-																"pdf_url" => "https://storage.googleapis.com/targeted-instructions/TI%20V0%20Test_Math.pdf"},
-												"Urdu" => %{  "name" => "Urdu", "subject" => "Urdu",
-																"class" => "Grade 3", "type" => "Diagnostic",
-																"label" => "Grade 3 Diagnostic Test! For Urdu",
-																"pdf_url" => "https://storage.googleapis.com/targeted-instructions/TI%20V0%20Test_Urdu.pdf"}},
-									"slo_mapping" => %{
-										"Add" => %{ "description" => "Add", "category" => "Addition", "link" => "https://ilmexchange.com/library/Urdu/3/Math/2/Addition"},
-										"Subtract" => %{ "description" => "Subtract", "category" => "Subtraction", "link" => "https://ilmexchange.com/library/Urdu/3/Math/3/Subtration"},
-										"Count" => %{ "description" => "Count and write number", "category" => "Counting", "link" => "https://ilmexchange.com/library/Urdu/3/Math/1/Numbers"},
-										"Multiply" => %{ "description" => "Multiply", "category" => "Multiplication", "link" => "https://ilmexchange.com/library/Urdu/3/Math/4/Repeated%20Addition%20and%20Multiplication"},
-										"Divide" => %{ "description" => "Divide", "category" => "Division", "link" => "https://ilmexchange.com/library/Urdu/3/Math/5/Repeated%20Subtration%20and%20Division"},
-										"Fractions" => %{ "description" => "Convert fractions and percentages", "category" => "Fractions", "link" => "https://ilmexchange.com/library/Urdu/3/Math/7/Fraction"},
-										"Word Recognition" => %{ "description" => "Match picture with word", "category" => "Word Recognition", "link" => "https://ilmexchange.com/library/Urdu/3/English/1/Amazing%20Alphabet"},
-										"Alphabet and Word Construction" => %{ "description" => "Combine letters into joined word", "category" => "Alphabet and Word Construction", "link" => "https://ilmexchange.com/library/Urdu/3/English/1/Amazing%20Alphabet"},
-										"Grammar" => %{ "description" => "Complete passage for grammar", "category" => "Grammar", "link" => "https://ilmexchange.com/library/Urdu/3/English/7/Verbs"},
-										"Sentence Construction" => %{ "description" => "Construct a sentence with a given word", "category" => "Sentence Construction", "link" => "https://ilmexchange.com/library/Urdu/3/English/11/Sentences"},
-										"Write Alphabet/Word" => %{ "description" => "Fill in blank letters of word (w/ pictures)", "category" => "Write Alphabet/Word", "link" => "https://ilmexchange.com/library/Urdu/3/English/1/Amazing%20Alphabet"},
-									}
-								}
-		path = ["db", "targeted_instruction"]
-		targeted_inst = [%{ "type" => "MERGE", "path" => path, "value" => targeted_instruction}]
-
-		res = start_school("cerp")
-		IO.inspect res
-		changes = Sarkar.School.prepare_changes(targeted_inst)
-		Sarkar.School.sync_changes("cerp", "backend", changes, :os.system_time(:millisecond))
-	end
-
-def run(["platform-orders"]) do
-
+	def run(["platform-orders"]) do
 	Application.ensure_all_started(:edmarkaz)
 
 	{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
