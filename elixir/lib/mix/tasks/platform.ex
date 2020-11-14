@@ -4,31 +4,31 @@ defmodule Mix.Tasks.Platform do
 	def run(["ingest_TI_tests", fname, fname2, fname3]) do
 		Application.ensure_all_started(:edmarkaz)
 
-		testCSV = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) do
+		test_csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) do
 			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) |> CSV.decode!
 			false -> File.stream!("priv/#{fname}.csv") |> CSV.decode!
 		end
 
-		sloMappingCSV = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname2}.csv")) do
+		slo_mapping_csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname2}.csv")) do
 			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{fname2}.csv")) |> CSV.decode!
 			false -> File.stream!("priv/#{fname2}.csv") |> CSV.decode!
 		end
 
-		curriculumCSV = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname3}.csv")) do
+		curriculum_csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname3}.csv")) do
 			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{fname3}.csv")) |> CSV.decode!
 			false -> File.stream!("priv/#{fname3}.csv") |> CSV.decode!
 		end
 
-		[ _ | tests] = testCSV
+		[ _ | tests] = test_csv
 		|> Enum.map(fn row -> row end)
 
-		[ _ | slo_mapping] = sloMappingCSV
+		[ _ | slo_mapping] = slo_mapping_csv
 		|> Enum.map(fn row -> row end)
 
-		[ _ | curriculum] = curriculumCSV
+		[ _ | curriculum] = curriculum_csv
 		|> Enum.map(fn row -> row end)
 
-		targeted_instruction = tests
+		tests_obj = tests
 		|> Enum.reduce(%{}, fn([test_id, label, subject, grade, type, pdf_url]), agg ->
 			test = %{
 				"label" => label,
@@ -40,7 +40,7 @@ defmodule Mix.Tasks.Platform do
 			Dynamic.put(agg, ["tests", test_id], test)
 		end)
 
-		sloMappingObj = slo_mapping
+		slo_mapping_obj = slo_mapping
 		|> Enum.reduce(%{}, fn([slo_id, description, category, link]), agg ->
 			sloMapping = %{
 				"description" => description,
@@ -50,7 +50,7 @@ defmodule Mix.Tasks.Platform do
 			Dynamic.put(agg, [slo_id], sloMapping)
 		end)
 
-		curriculumObj = curriculum
+		curriculum_obj = curriculum
 		|> Enum.reduce(%{}, fn([learning_level_id, lesson_number, lesson_name, lesson_description, subject, video_links, pdf_link]), agg ->
 			learning_levels = %{
 				"leasson_number" => lesson_number,
@@ -63,18 +63,15 @@ defmodule Mix.Tasks.Platform do
 			Dynamic.put(agg, [learning_level_id], learning_levels)
 		end)
 
-		targeted_instruction = Map.put(targeted_instruction, "slo_mapping", sloMappingObj)
-		targeted_instruction = Map.put(targeted_instruction, "curriculum", curriculumObj)
+		targeted_instruction = %{"tests": tests_obj, "slo_mapping": slo_mapping_obj, "curriculum": curriculum_obj}
 
-		IO.inspect targeted_instruction
+		path = ["db", "targeted_instruction"]
+		targeted_inst = [%{ "type" => "MERGE", "path" => path, "value" => targeted_instruction}]
 
-		# path = ["db", "targeted_instruction"]
-		# targeted_inst = [%{ "type" => "MERGE", "path" => path, "value" => targeted_instruction}]
-
-		# res = start_school("cerp")
-		# IO.inspect res
-		# changes = Sarkar.School.prepare_changes(targeted_inst)
-		# Sarkar.School.sync_changes("cerp", "backend", changes, :os.system_time(:millisecond))
+		res = start_school("cerp")
+		IO.inspect res
+		changes = Sarkar.School.prepare_changes(targeted_inst)
+		Sarkar.School.sync_changes("cerp", "backend", changes, :os.system_time(:millisecond))
 	end
 
 	def run(["ingest_diagnostic_result", fname]) do
@@ -88,14 +85,14 @@ defmodule Mix.Tasks.Platform do
 		[ _ | diagnostic_result] = csv
 		|> Enum.map(fn row -> row end)
 
-		result = diagnostic_result
+		diagnostic_result_obj = diagnostic_result
 		|> Enum.reduce(%{}, fn([test_id, question_id, answer, isCorrect, slo]), agg ->
-			diagnostic = %{
+			result = %{
 				"answer" => answer,
 				"isCorrect" => true,
 				"slo" => slo
 			}
-			Dynamic.put(agg, [test_id, question_id], diagnostic)
+			Dynamic.put(agg, [test_id, question_id], result)
 		end)
 
 		{:ok, res} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
@@ -107,7 +104,7 @@ defmodule Mix.Tasks.Platform do
 			state = res.rows
 			|> Enum.reduce([], fn([school_id], agg) ->
 				path = ["db", "students", school_id, "diagnostic_result"]
-				mappy = %{ "type" => "MERGE", "path" => path, "value" => result}
+				mappy = %{ "type" => "MERGE", "path" => path, "value" => diagnostic_result_obj}
 				agg = agg ++ [mappy]
 			end)
 			res = start_school("cerp")
