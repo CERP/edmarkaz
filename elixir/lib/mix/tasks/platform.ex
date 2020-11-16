@@ -1,7 +1,7 @@
 defmodule Mix.Tasks.Platform do
 	use Mix.Task
 
-	def run(["ingest_TI_tests", fname, fname2, fname3]) do
+	def run(["ingest_TI_tests", school_id, fname, fname2, fname3]) do
 		Application.ensure_all_started(:edmarkaz)
 
 		test_csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) do
@@ -63,18 +63,18 @@ defmodule Mix.Tasks.Platform do
 			Dynamic.put(agg, [learning_level_id], learning_levels)
 		end)
 
-		targeted_instruction = %{"tests": tests_obj, "slo_mapping": slo_mapping_obj, "curriculum": curriculum_obj}
+		targeted_instruction = %{"visible": true, "tests": tests_obj, "slo_mapping": slo_mapping_obj, "curriculum": curriculum_obj}
 
 		path = ["db", "targeted_instruction"]
 		targeted_inst = [%{ "type" => "MERGE", "path" => path, "value" => targeted_instruction}]
 
-		res = start_school("cerp")
+		res = start_school(school_id)
 		IO.inspect res
 		changes = Sarkar.School.prepare_changes(targeted_inst)
-		Sarkar.School.sync_changes("cerp", "backend", changes, :os.system_time(:millisecond))
+		Sarkar.School.sync_changes(school_id, "backend", changes, :os.system_time(:millisecond))
 	end
 
-	def run(["ingest_diagnostic_result", fname]) do
+	def run(["ingest_diagnostic_result", school_id, fname]) do
 		Application.ensure_all_started(:edmarkaz)
 
 		csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) do
@@ -107,9 +107,9 @@ defmodule Mix.Tasks.Platform do
 				mappy = %{ "type" => "MERGE", "path" => path, "value" => diagnostic_result_obj}
 				agg = agg ++ [mappy]
 			end)
-			res = start_school("cerp")
+			res = start_school(school_id)
 			changes = Sarkar.School.prepare_changes(state)
-			Sarkar.School.sync_changes("cerp", "backend", changes, :os.system_time(:millisecond))
+			Sarkar.School.sync_changes(school_id, "backend", changes, :os.system_time(:millisecond))
 	end
 
 	def run(["platform-orders"]) do
