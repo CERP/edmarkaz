@@ -55,7 +55,7 @@ const Orders = ({ orders, products, getOrders, getProducts }: P) => {
 
 		const order_by_school = Object.entries(mutated_orders).reduce((agg, [time, order]) => {
 
-			const school_id = order.school.school_name
+			const school_id = order.school.school_name || "NO_SCHOOL"
 
 			if (agg[school_id]) {
 				return {
@@ -217,7 +217,7 @@ const Orders = ({ orders, products, getOrders, getProducts }: P) => {
 														<div>{moment(order.time).format("DD-MM-YY")}</div>
 														<div>
 															<Link to={`/orders?o_school_id=${order.meta.school_id}&o_supplier_id=${sid}&o_order_time=${time}&o_product_id=${order.meta.product_id}&start_date=${start_date}&end_date=${end_date}`} key={order.time}>
-																{school.school_name}
+																{school.school_name || 'NO_SCHOOL'}
 															</Link>
 														</div>
 														<div>{getOrderStatus(order)}</div>
@@ -254,7 +254,7 @@ const Orders = ({ orders, products, getOrders, getProducts }: P) => {
 														return <div key={time} className="newtable-row">
 															<div>{moment(order.time).format("DD-MM-YY")}</div>
 															<div>
-																<Link to={`/orders?o_school_id=${school_id}&o_supplier_id=${order.supplier_id}&o_order_time=${time}&o_product_id=${order.meta.product_id}&start_date=${start_date}&end_date=${end_date}`} key={order.time}>
+																<Link to={`/orders?o_school_id=${order.meta.school_id}&o_supplier_id=${order.supplier_id}&o_order_time=${time}&o_product_id=${order.meta.product_id}&start_date=${start_date}&end_date=${end_date}`} key={order.time}>
 																	{order.supplier_id}
 																</Link>
 															</div>
