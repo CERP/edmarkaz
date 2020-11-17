@@ -1,11 +1,11 @@
 defmodule Mix.Tasks.Platform do
 	use Mix.Task
 
-	def run (["mappy", school_id, new_school_id]) do
+	def run (["mappy", from_school, to_school]) do
 		Application.ensure_all_started(:edmarkaz)
 
-		IO.puts school_id
-		IO.puts new_school_id
+		IO.puts from_school
+		IO.puts to_school
 
 		# IO.puts "Fetching from writes for single student"
 		# {:ok, res} = EdMarkaz.DB.Postgres.query(
@@ -13,7 +13,7 @@ defmodule Mix.Tasks.Platform do
 		# 	"SELECT time, type, path, value, client_id
 		# 	FROM writes
 		# 	WHERE school_id=$1 AND path[3]='5f6d0983-3a46-4627-8303-82c8c47992f2' order by time asc",
-		# 	[school_id]
+		# 	[from_school]
 		# )
 
 		# Fetch writes for school
@@ -24,8 +24,10 @@ defmodule Mix.Tasks.Platform do
 			FROM writes
             WHERE school_id=$1
             order by time asc",
-			[school_id]
+			[from_school]
 		)
+
+		IO.puts "--------------- Fetching writes from #{from_school} done ---------------"
 
       # HERE is where the bad writes are filtered out.
       # note that there may be a student with a blank id that we actually WANT to keep --
@@ -35,7 +37,10 @@ defmodule Mix.Tasks.Platform do
 		|> Enum.map(fn ([time, type, path, value, client_id]) ->
 			%{"date" => time, "type" => type, "path" => path, "value" => value, "client_id" => client_id}
 		end)
+
 		# IO.inspect mapped_writes
+
+		IO.puts "--------------- Mapped writes from #{from_school} done ---------------"
 
 		# new_state = res.rows
 		# |> Enum.reduce(%{}, fn([time, type, path, value, client_id], agg) ->
@@ -69,7 +74,7 @@ defmodule Mix.Tasks.Platform do
 		# IO.inspect new_state
 
 		# IO.puts "Save into flattened"
-		save_school_writes(new_school_id, mapped_writes)
+		save_school_writes(to_school, mapped_writes)
 
 		# IO.inspect "NEW STATE"
 	end
@@ -751,13 +756,16 @@ defmodule Mix.Tasks.Platform do
 
 	defp save_school_writes(school_id, writes) do
 
-		IO.puts "INSERTING INTO FLATTENED_SCHOOL"
+		IO.puts "--- INSERTING INTO FLATTENED_SCHOOL ---"
 
 		save_flattened(school_id, writes)
 
-		IO.puts "INSERTED"
+		IO.puts "--- INSERTED INTO FLATTENED ---"
 
-		chunk_size = round(length(writes) / 4)
+
+		IO.puts "--- Inserting into writes ---"
+
+		chunk_size = round(length(writes) / 6)
 
 		chunks = Enum.chunk_every(writes, chunk_size)
 
