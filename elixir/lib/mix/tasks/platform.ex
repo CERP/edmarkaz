@@ -13,28 +13,59 @@ defmodule Mix.Tasks.Platform do
 		|> Enum.map(fn row -> row end)
 
 		mapped_assessments = assessments
-			|> Enum.reduce(%{}, fn([video_id, assessment_id, question_id, question_statement, opt_a, opt_b, opt_c, opt_d, correct_answer]), agg ->
+		|> Enum.reduce(%{}, fn([video_id, assessment_id, question_id, question_statement, opt_a, opt_b, opt_c, opt_d, correct_answer]), agg ->
 
+			ans_map = %{ 1 => "A", 2 => "B", 3 => "C", 4 => "D" }
+			options = %{ 1 => opt_a, 2 => opt_b, 3 => opt_c, 4 => opt_d }
 
-					ans_map = %{ 1 => "A", 2 => "B", 3 => "C", 4 => "D" }
-					options = %{ 1 => opt_a, 2 => opt_b, 3 => opt_c, 4 => opt_d }
+			answers = Enum.reduce(1..4, %{}, fn x, acc ->
+				is_correct = Map.get(ans_map, x) == correct_answer
+				answer = %{
+					"answer" => String.trim(Map.get(options, x)),
+					"correct_answer" =>  is_correct,
+					"urdu_answer" => "",
+					"id" => Integer.to_string(x),
+					"active" => true,
+					"image" => "",
+					"audio" => ""
+				}
+				Map.put(acc, Integer.to_string(x), answer)
+				end)
 
-					answers = Enum.reduce(1..4, %{}, fn x, acc ->
-						is_correct = Map.get(ans_map, x) == correct_answer
-						answer = %{
-							"answer" => String.trim(Map.get(options, x)),
-							"correct_answer" =>  is_correct,
-							"urdu_answer" => "",
-							"id" => Integer.to_string(x),
-							"active" => true,
-							"image" => "",
-							"audio" => ""
-						}
-						Map.put(acc, Integer.to_string(x), answer)
-						end)
-
-					if Map.has_key?(agg, assessment_id) do
-						question = %{
+			if Map.has_key?(agg, assessment_id) do
+				question = %{
+					"order" => String.trim(question_id),
+					"id" =>  String.trim(question_id),
+					"title" => String.trim(question_statement),
+					"title_urdu" => "",
+					"response_limit" => 0,
+					"multi_response" => false,
+					"image" => "",
+					"urdu_image" => "",
+					"audio" => "",
+					"active" => true,
+					"answers" => answers
+				}
+				Dynamic.put(agg, [assessment_id, "questions", question_id], question)
+			else
+				assessment = %{
+					"meta" => %{
+						"medium" => "",
+						"grade" => "",
+						"subject" => "",
+						"chapter_id" => "",
+						"lesson_id" => "",
+						"type" => "MCQs",
+						"title" => "",
+						"id" => String.trim(assessment_id),
+						"order" => String.trim(assessment_id),
+						"time" => 0,
+						"total_marks" => 0,
+						"active" => true,
+						"source" => "Ilmx"
+					},
+					"questions" => %{
+						question_id => %{
 							"order" => String.trim(question_id),
 							"id" =>  String.trim(question_id),
 							"title" => String.trim(question_statement),
@@ -47,51 +78,21 @@ defmodule Mix.Tasks.Platform do
 							"active" => true,
 							"answers" => answers
 						}
-						Dynamic.put(agg, [assessment_id, "questions", question_id], question)
-					else
-						assessment = %{
-							"meta" => %{
-								"medium" => "",
-								"grade" => "",
-								"subject" => "",
-								"chapter_id" => "",
-								"lesson_id" => "",
-								"type" => "MCQs",
-								"title" => "",
-								"id" => String.trim(assessment_id),
-								"order" => String.trim(assessment_id),
-								"time" => 0,
-								"total_marks" => 0,
-								"active" => true,
-								"source" => "Ilmx" # will change based on the source
-							},
-							"questions" => %{
-								question_id => %{
-									"order" => String.trim(question_id),
-									"id" =>  String.trim(question_id),
-									"title" => String.trim(question_statement),
-									"title_urdu" => "",
-									"response_limit" => 0,
-									"multi_response" => false,
-									"image" => "",
-									"urdu_image" => "",
-									"audio" => "",
-									"active" => true,
-									"answers" => answers
-								}
-							}
-						}
-						Map.put(agg, assessment_id, assessment)
-					end
-				end)
+					}
+				}
+				Map.put(agg, assessment_id, assessment)
+			end
+		end)
 
 		mapped_assessments
-			|> Enum.each(fn({id, value}) ->
-				quiz_meta = value["meta"]
-				quiz_questions = value["questions"]
+		|> Enum.each(fn({id, value}) ->
 
-				EdMarkaz.StudentPortal.merge_assessments([quiz_meta, quiz_questions])
-			end)
+			quiz_meta = value["meta"]
+			quiz_questions = value["questions"]
+
+			EdMarkaz.TeacherPortal.merge_assessments([quiz_meta, quiz_questions])
+
+		end)
 	end
 
 	def run(["platform-orders"]) do

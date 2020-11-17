@@ -1,9 +1,5 @@
 defmodule EdMarkaz.TeacherPortal do
 
-	def init(args) do
-		{:ok, args}
-	end
-
 	def merge_assessments(assessments) do
 
 		case EdMarkaz.DB.Postgres.query(
