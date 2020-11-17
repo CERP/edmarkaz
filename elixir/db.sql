@@ -119,3 +119,23 @@ create table platform_writes
 	);
 		-- chapter_id text not null,
 		-- lesson_id text not null,
+
+	create table teacher_portal
+	(
+		teacher_id text unique not null, -- id (teacher phone)
+		path text[], -- [id, "profile", "any key"]
+		profile jsonb,
+		-- attempted_assessment jsonb,
+		date timestamp default current_timestamp
+	);
+
+	create index on teacher_portal
+	(teacher_id);
+
+	create table teacher_assessments(
+		assessment_id text unique not null
+		meta jsonb,
+		questions jsonb,
+		date timestamp default current_timestamp
+	)
+	create
