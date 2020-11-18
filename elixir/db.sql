@@ -1,7 +1,8 @@
 create table auth
 (
 	id text unique not null,
-	password text not null
+	password text not null,
+	type text
 );
 
 create table tokens
@@ -123,8 +124,9 @@ create table assessments
 create table teachers
 (
 	id text unique not null, -- id (teacher phone)
-	path text, -- comma separated
-	value jsonb,
+	path text not null, -- comma separated
+	value jsonb not null,
+	time bigint not null
 	date timestamp default current_timestamp
 );
 
@@ -136,11 +138,11 @@ create table teacher_assessments(
 	meta jsonb,
 	questions jsonb,
 	date timestamp default current_timestamp
-)
+);
 
 create table tp_videos(
 	id text unique not null
 	assessment_id text
 	meta jsonb,
 	date timestamp default current_timestamp
-)
+);
