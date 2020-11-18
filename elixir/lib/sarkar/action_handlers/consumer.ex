@@ -880,7 +880,6 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 
 	end
 
-
 	def handle_action(
 		%{
 			"type" => "TEACHER_LOGIN",
@@ -890,13 +889,13 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 			},
 			"client_id" => client_id
 		},
-		%{client_id: client_id} = state)
+		%{client_id: client_id} = state
 	) do
 		case EdMarkaz.Auth.login({id, client_id, password}) do
 			{:ok, token} ->
 				case EdMarkaz.TeacherPortal.get_profile(id) do
 					{:ok, profile} ->
-						{:reply, succeed(%{token: token, sync_state: %{ "profile" => profile }, id: id, user: "TEACHER" }), %{id: username, client_id: client_id}}
+						{:reply, succeed(%{token: token, sync_state: %{ "profile" => profile }, id: id, user: "TEACHER" }), %{id: id, client_id: client_id}}
 					{:error, msg} ->
 						{:reply, fail(msg), %{}}
 				end
@@ -909,13 +908,13 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 		%{
 			"type" => "TEACHER_SIGNUP",
 			"payload" => %{
-				"id" => phone
-				"password" => password
-				"profile" => profile,
+				"id" => phone,
+				"password" => password,
+				"profile" => profile
 			},
 			"client_id" => client_id
 		},
-		%{client_id: client_id} = state)
+		%{client_id: client_id} = state
 	) do
 		# verify if already exists
 		# create auth table entry
