@@ -22,6 +22,10 @@ defmodule EdMarkaz.TeacherPortal do
 
 	def save_profile({id, profile}) do
 
+		# Here need to write logic to flattened the profile
+		# create comma separated path, time: server time and value
+		# create logic to insert into teachers table
+
 		query_string = ""
 
 		case EdMarkaz.DB.Postgres.query(EdMarkaz.DB, query_string, [id]) do

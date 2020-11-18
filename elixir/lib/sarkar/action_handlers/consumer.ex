@@ -916,11 +916,52 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 		},
 		%{client_id: client_id} = state
 	) do
-		# verify if already exists
-		# create auth table entry
-		# create teachers table entry
-		# send slack alet and welcome message to teacher
-		# retun success msg
+
+		name = Map.get(profile, "name", "")
+
+		case EdMarkaz.Auth.create({ phone, password, "teacher" }) do
+			{:ok, text} ->
+
+				{:ok, resp} = EdMarkaz.TeacherPortal.save_profile(phone, profile)
+
+				spawn fn ->
+					EdMarkaz.Slack.send_alert("New Teacher portal Signup.\n Name: #{name} \n Phone: #{phone}", "#platform-dev")
+				end
+
+				spawn fn ->
+					res = EdMarkaz.Telenor.send_sms(
+						phone,
+						"Welcome #{name} to Ilm Exchange. Please visit https://ilmexchange.com/teacher-login to login into teacher portal. Thanks"
+					)
+					IO.inspect res
+				end
+
+				# spawn fn ->
+				# 	time = :os.system_time(:millisecond)
+				# 	case Sarkar.Analytics.Consumer.record(
+				# 		client_id,
+				# 		%{ "#{UUID.uuid4}" => %{
+				# 				"type" => "TEACHER_SIGNUP",
+				# 				"meta" => %{
+				# 					"number" => phone,
+				# 					"ref_code" => ""
+				# 				},
+				# 				"time" => time
+				# 			}
+				# 		},
+				# 		time
+				# 	) do
+				# 		%{"type" => "CONFIRM_ANALYTICS_SYNC", "time" => _} ->
+				# 			IO.puts "SIGNUP ANALYTICS SUCCESS"
+				# 		%{"type" => "ANALYTICS_SYNC_FAILED"} ->
+				# 			IO.puts "SIGNUP ANALYTICS FAILED"
+				# 	end
+				# end
+
+				{:reply, succeed(%{}), state}
+			{:error, msg} ->
+				{:reply, fail(msg), state}
+		end
 	end
 
 	#old sync

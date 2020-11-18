@@ -19,6 +19,25 @@ defmodule EdMarkaz.Auth do
 		end
 	end
 
+	def create({id, password, type}) do
+		case EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
+			"INSERT INTO auth (id, password, type) values ($1, $2, $3)",
+			[id, hash(password, 52), type]) do
+				{:ok, res} ->
+					{:ok, "created #{id} with password #{password}"}
+				{:error, %Postgrex.Error{
+					postgres: %{
+						constraint: "auth_id_key"
+					}}} ->
+						IO.puts "already exists"
+						{:error, "id #{id} is already created"}
+
+				{:error, err} ->
+					IO.inspect err
+					{:error, "creation failed"}
+		end
+	end
+
 	def login({id, client_id, password}) do
 		# first check if password is correct.
 		# if correct, generate a new token, put in db
