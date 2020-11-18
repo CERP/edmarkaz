@@ -122,7 +122,7 @@ create table assessments
 
 create table teachers
 (
-	teacher_id text unique not null, -- id (teacher phone)
+	id text unique not null, -- id (teacher phone)
 	path text, -- comma separated
 	value jsonb,
 	date timestamp default current_timestamp
@@ -132,7 +132,7 @@ create index on teaches
 (teacher_id);
 
 create table teacher_assessments(
-	assessment_id text unique not null
+	id text unique not null
 	meta jsonb,
 	questions jsonb,
 	date timestamp default current_timestamp

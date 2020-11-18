@@ -1,18 +1,15 @@
 defmodule Mix.Tasks.Platform do
 	use Mix.Task
 
-	def run(["teacher_assessments", fname ]) do
+	def run(["teacher_assessments", file_name ]) do
 		Application.ensure_all_started(:edmarkaz)
 
-		csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) do
-			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) |> CSV.decode!
-			false -> File.stream!("priv/#{fname}.csv") |> CSV.decode!
-		end
+		csv = File.stream!(Application.app_dir(:edmarkaz, "priv/#{file_name}.csv")) |> CSV.decode!
 
 		[ _ | assessments] = csv
 		|> Enum.map(fn row -> row end)
 
-		mapped_assessments = assessments
+		reduced_assessments = assessments
 		|> Enum.reduce(%{}, fn([video_id, assessment_id, question_id, question_statement, opt_a, opt_b, opt_c, opt_d, correct_answer]), agg ->
 
 			ans_map = %{ 1 => "A", 2 => "B", 3 => "C", 4 => "D" }
@@ -84,14 +81,35 @@ defmodule Mix.Tasks.Platform do
 			end
 		end)
 
-		mapped_assessments
-		|> Enum.each(fn({id, value}) ->
+		reduced_assessments
+		|> Enum.each(fn({k, v}) ->
+			EdMarkaz.TeacherPortal.insert_assessments([k, v["meta"], v["questions"]])
+		end)
+	end
 
-			quiz_meta = value["meta"]
-			quiz_questions = value["questions"]
+	def run(["tp_videos", file_name ]) do
+		Application.ensure_all_started(:edmarkaz)
 
-			EdMarkaz.TeacherPortal.merge_assessments([quiz_meta, quiz_questions])
+		csv = File.stream!(Application.app_dir(:edmarkaz, "priv/#{file_name}.csv")) |> CSV.decode!
 
+		[ _ | videos] = csv
+		|> Enum.map(fn row -> row end)
+
+		reduced_videos = videos
+		|> Enum.reduce(%{}, fn([video_id, assessment_id, title, description, link]), agg ->
+
+			meta = %{
+					"assessment_id" => assessment_id,
+					"title" => title,
+					"description" => description,
+					"link" => link
+				}
+			Dynamic.put(agg, [video_id], meta)
+		end)
+
+		reduced_videos
+		|> Enum.each(fn({k, v}) ->
+			EdMarkaz.TeacherPortal.insert_videos([k, v["assessment_id"], v])
 		end)
 	end
 
