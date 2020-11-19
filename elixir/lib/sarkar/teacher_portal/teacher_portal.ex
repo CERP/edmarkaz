@@ -22,13 +22,23 @@ defmodule EdMarkaz.TeacherPortal do
 
 	def save_profile({id, profile}) do
 
-		# Here need to write logic to flattened the profile
-		# create comma separated path, time: server time and value
-		# create logic to insert into teachers table
+		date = :os.system_time(:millisecond)
 
-		query_string = ""
+		flattened_db_sequence = Dynamic.flatten(profile) |> Enum.map(fn {p, v} -> [id, Enum.join(["profile"] ++ p, ","), v, date] end)
 
-		case EdMarkaz.DB.Postgres.query(EdMarkaz.DB, query_string, [id]) do
+		gen_value_strings_db = 1..length(flattened_db_sequence)
+		|> Enum.map(fn num ->
+				x = (num - 1) * 4 + 1
+				"($#{x}, $#{x + 1}, $#{x + 2}, $#{x + 3})"
+			end
+		)
+		|> Enum.join(",")
+
+		query_string = "INSERT INTO teachers (id, path, value, time)
+		VALUES #{gen_value_strings_db}
+		ON CONFLICT (id, path) DO UPDATE set value=excluded.value, time=excluded.time"
+
+		case EdMarkaz.DB.Postgres.query(EdMarkaz.DB, query_string, flattened_db_sequence) do
 			{:ok, resp} ->
 				IO.inspect resp
 				{:ok, resp}

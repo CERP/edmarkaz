@@ -895,7 +895,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 			{:ok, token} ->
 				case EdMarkaz.TeacherPortal.get_profile(id) do
 					{:ok, profile} ->
-						{:reply, succeed(%{token: token, sync_state: %{ "profile" => profile }, id: id, user: "TEACHER" }), %{id: id, client_id: client_id}}
+						{:reply, succeed(%{token: token, teacher_portal: %{ "profile" => profile }, id: id, user: "TEACHER" }), %{id: id, client_id: client_id}}
 					{:error, msg} ->
 						{:reply, fail(msg), %{}}
 				end
@@ -936,27 +936,27 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 					IO.inspect res
 				end
 
-				# spawn fn ->
-				# 	time = :os.system_time(:millisecond)
-				# 	case Sarkar.Analytics.Consumer.record(
-				# 		client_id,
-				# 		%{ "#{UUID.uuid4}" => %{
-				# 				"type" => "TEACHER_SIGNUP",
-				# 				"meta" => %{
-				# 					"number" => phone,
-				# 					"ref_code" => ""
-				# 				},
-				# 				"time" => time
-				# 			}
-				# 		},
-				# 		time
-				# 	) do
-				# 		%{"type" => "CONFIRM_ANALYTICS_SYNC", "time" => _} ->
-				# 			IO.puts "SIGNUP ANALYTICS SUCCESS"
-				# 		%{"type" => "ANALYTICS_SYNC_FAILED"} ->
-				# 			IO.puts "SIGNUP ANALYTICS FAILED"
-				# 	end
-				# end
+				spawn fn ->
+					time = :os.system_time(:millisecond)
+					case Sarkar.Analytics.Consumer.record(
+						client_id,
+						%{ "#{UUID.uuid4}" => %{
+								"type" => "TEACHER_SIGNUP",
+								"meta" => %{
+									"number" => phone,
+									"ref_code" => ""
+								},
+								"time" => time
+							}
+						},
+						time
+					) do
+						%{"type" => "CONFIRM_ANALYTICS_SYNC", "time" => _} ->
+							IO.puts "SIGNUP ANALYTICS SUCCESS"
+						%{"type" => "ANALYTICS_SYNC_FAILED"} ->
+							IO.puts "SIGNUP ANALYTICS FAILED"
+					end
+				end
 
 				{:reply, succeed(%{}), state}
 			{:error, msg} ->
