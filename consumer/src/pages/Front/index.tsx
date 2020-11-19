@@ -47,13 +47,13 @@ const FrontPage = () => {
 				}
 				<img className="img" src={Demo} /> */}
 				<div className="image-card-container">
-					<div className="image-card" onClick={() => setShowModal(true)}>
+					<Link to="/teacher" className="image-card" >
 						<img className="img" src={TeacherMain} style={{ backgroundColor: "#B1E1E8", objectFit: "cover" }} alt="teacher-menu" />
 						<div className="pill" style={{ lineHeight: '40px' }}>
 							<div className="i-am-a">I am a</div>
 							<div className="i-am-a-title">Teacher</div>
 						</div>
-					</div>
+					</Link>
 					<Link to="/student" className="image-card">
 						<img className="img cen" src={StudentMain} alt="student-menu" />
 						<div className="pill" style={{ lineHeight: '40px' }}>
