@@ -37,7 +37,7 @@ defmodule Mix.Tasks.Platform do
 				"type" => type,
 				"pdf_url" => pdf_url
 			}
-			Dynamic.put(agg, ["tests", test_id], test)
+			Dynamic.put(agg, [test_id], test)
 		end)
 
 		slo_mapping_obj = slo_mapping
@@ -66,12 +66,7 @@ defmodule Mix.Tasks.Platform do
 		targeted_instruction = %{"visible": true, "tests": tests_obj, "slo_mapping": slo_mapping_obj, "curriculum": curriculum_obj}
 
 		path = ["db", "targeted_instruction"]
-		targeted_inst = [%{ "type" => "MERGE", "path" => path, "value" => targeted_instruction}]
-
-		res = start_school(school_id)
-		IO.inspect res
-		changes = Sarkar.School.prepare_changes(targeted_inst)
-		Sarkar.School.sync_changes(school_id, "backend", changes, :os.system_time(:millisecond))
+		EdMarkaz.StudentPortal.insert_targeted_instruction([path, targeted_instruction])
 	end
 
 	def run(["ingest_diagnostic_result", school_id, fname]) do
@@ -86,8 +81,9 @@ defmodule Mix.Tasks.Platform do
 		|> Enum.map(fn row -> row end)
 
 		diagnostic_result_obj = diagnostic_result
-		|> Enum.reduce(%{}, fn([test_id, question_id, answer, isCorrect, slo]), agg ->
+		|> Enum.reduce(%{}, fn([test_id, question_id, question_text, answer, isCorrect, slo]), agg ->
 			result = %{
+				"question_text" => question_text
 				"answer" => answer,
 				"isCorrect" => true,
 				"slo" => slo

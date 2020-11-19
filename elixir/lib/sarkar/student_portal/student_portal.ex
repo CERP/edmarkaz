@@ -97,4 +97,26 @@ defmodule EdMarkaz.StudentPortal do
 		end
 	end
 
+	def insert_targeted_instruction(targeted_instruction) do
+		case EdMarkaz.DB.Postgres.query(
+			EdMarkaz.DB,
+			"INSERT INTO targeted_instruction (
+				path,
+				value,
+				date
+			) VALUES ($1,$2,current_timestamp)",
+			targeted_instruction
+		) do
+			{:ok, resp} ->
+				[head | tail ] = targeted_instruction
+				IO.puts "OK #{head}"
+				{:ok}
+			{:error, err} ->
+				[head | tail ] = targeted_instruction
+				IO.puts "targeted_instruction merge failed #{head}"
+				IO.inspect err
+				{:error, err}
+		end
+	end
+
 end

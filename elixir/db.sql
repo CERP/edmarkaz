@@ -117,5 +117,13 @@ create table platform_writes
 		questions jsonb,
 		date timestamp default current_timestamp
 	);
+
+	create table targeted_instruction
+	(
+		path text
+		[] unique not null,
+		value jsonb not null,
+		date timestamp default current_timestamp
+	);
 		-- chapter_id text not null,
 		-- lesson_id text not null,
