@@ -466,6 +466,41 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 					}
 				}
 			}
+		case TeacherActionTypes.GET_TEACHER_ASSESSMENT:
+			{
+				return {
+					...state,
+					teacher_portal: {
+						...state.teacher_portal,
+						assessments: {},
+						videos: {}
+					}
+				}
+			}
+
+		case TeacherActionTypes.GET_TEACHER_ASSESSMENT_FAILURE:
+		{
+			return {
+				...state,
+				teacher_portal: {
+					...state.teacher_portal,
+					assessments: {},
+					videos: {}
+				}
+			}
+		}
+
+		case TeacherActionTypes.GET_TEACHER_ASSESSMENT_SUCCEED:
+		{
+			return {
+				...state,
+				teacher_portal: {
+					...state.teacher_portal,
+					assessments: action.payload.assessments,
+					videos: action.payload.videos
+				}
+			}
+		}
 
 		case LOAD_PROFILE:
 			{
