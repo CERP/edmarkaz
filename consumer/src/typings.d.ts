@@ -62,8 +62,36 @@ interface Lesson {
 		module_id?: string
 	}
 }
+
+interface TeacherProfile {
+	id: string
+	name: string
+	phone: string
+	gender?: "M" | "F"
+	teaching_class?: string
+	teachign_subject?: string
+	attempted_assessments: any
+}
+
+
+interface TeacherPortalVideo {
+	assessment_id: string
+	title: string
+	description: string
+	link: string
+}
+
 interface RootReducerState {
 	sync_state: SyncState;
+	teacher_portal: {
+		profile: Partial<TeacherProfile>
+		assessments: {
+			[id: string]: ILMXAssessment
+		}
+		videos: {
+			[id: string]: TeacherPortalVideo
+		}
+	},
 	auth: {
 		id?: string;
 		token?: string;

@@ -1,0 +1,11 @@
+enum AppUserRole {
+	STUDENT = "STUDENT",
+	GUEST_STUDENT = "GUEST_STUDENT",
+	TEACHER = "TEACHER",
+	GUEST_TEACHER = "GUEST_TEACHER",
+	SCHOOL = "SCHOOL"
+}
+
+export {
+	AppUserRole
+}

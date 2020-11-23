@@ -86,7 +86,7 @@ const getSteps = () => {
 }
 
 const getStepContent = (step: number) => {
-	const [id, video] = flattened_data[step]
+	const [_, video] = flattened_data[step]
 	return (
 		<VideoCard video={video} />
 	)

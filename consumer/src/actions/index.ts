@@ -1,6 +1,8 @@
 import Syncr from '@cerp/syncr'
 import { v4 } from 'uuid';
 import { createLoginSucceed, analyticsEvent, submitError } from './core';
+import { TeacherActionTypes } from 'constants/index';
+import { AppUserRole } from 'constants/app';
 
 type Dispatch = (action: any) => any
 type GetState = () => RootReducerState
@@ -520,6 +522,7 @@ export const loadProfile = (number: string) => (dispatch: Dispatch, getState: Ge
 
 }
 
+
 export const SIGN_UP = "SIGN_UP"
 export const signUp = (number: string, password: string, profile: Partial<CERPSchool>) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 
@@ -556,6 +559,95 @@ export const signUp = (number: string, password: string, profile: Partial<CERPSc
 				type: "SCHOOL_SIGNUP_FAILED"
 			})
 			// dispatch sign-up failed (phone number not unique?)
+		})
+
+}
+
+export const teacherLogin = (phone: string, password: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+
+	const state = getState()
+
+	dispatch({
+		type: TeacherActionTypes.LOGIN
+	})
+
+	syncr.send({
+		type: TeacherActionTypes.LOGIN,
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		payload: {
+			id: phone,
+			password
+		}
+	})
+		.then((res: { token: string, teacher_profile: TeacherProfile }) => {
+
+			const { token, teacher_profile } = res
+
+			dispatch({
+				type: TeacherActionTypes.LOGIN_SUCCEED,
+				payload: {
+					id: phone,
+					user: AppUserRole.TEACHER,
+					token,
+					profile: teacher_profile
+				}
+			})
+
+		})
+		.catch(err => {
+			console.error(err)
+
+			alert(err)
+
+			dispatch({
+				type: TeacherActionTypes.LOGIN_FAILURE
+			})
+		})
+
+}
+
+export const teacherSignup = (phone: string, password: string, profile: TeacherProfile) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+
+	const state = getState()
+
+	dispatch({
+		type: TeacherActionTypes.SIGNUP
+	})
+
+	syncr.send({
+		type: TeacherActionTypes.SIGNUP,
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		payload: {
+			id: phone,
+			password,
+			profile
+		}
+	})
+		.then((res: { token: string }) => {
+
+			const { token } = res
+
+			dispatch({
+				type: TeacherActionTypes.SIGNUP_SUCCEED,
+				payload: {
+					id: phone,
+					user: AppUserRole.TEACHER,
+					token,
+					profile: profile
+				}
+			})
+
+		})
+		.catch(err => {
+			console.error(err)
+
+			alert(err)
+
+			dispatch({
+				type: TeacherActionTypes.SIGNUP_FAILURE
+			})
 		})
 
 }

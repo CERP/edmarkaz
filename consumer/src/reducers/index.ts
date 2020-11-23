@@ -1,4 +1,5 @@
 import Dynamic from '@ironbay/dynamic'
+import { AnyAction } from 'redux'
 
 import { MERGES, MergeAction, ON_CONNECT, ON_DISCONNECT, DELETES, DeletesAction, QUEUE, CONFIRM_SYNC_DIFF, ConfirmSyncAction, SnapshotDiffAction, SNAPSHOT_DIFF, LOGIN_SUCCEED, LoginSucceed, ConfirmAnalyticsSync, QueueAction } from '../actions/core'
 import {
@@ -13,7 +14,7 @@ import {
 	GET_ANALYTICS_EVENTS_FAILURE
 } from '../actions'
 
-import { AnyAction } from 'redux';
+import { TeacherActionTypes } from 'constants/index'
 
 const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerState => {
 
@@ -414,6 +415,35 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 						id: login_action.id,
 						token: login_action.token,
 						user: login_action.user,
+						loading: false
+					}
+				}
+			}
+
+		case TeacherActionTypes.SIGNUP || TeacherActionTypes.LOGIN_SUCCEED:
+			{
+				return {
+					...state,
+					auth: {
+						...state.auth,
+						loading: true
+					}
+				}
+			}
+
+		case TeacherActionTypes.LOGIN_SUCCEED:
+			{
+				const { profile, ...rest } = action.payload
+
+				return {
+					...state,
+					teacher_portal: {
+						...state.teacher_portal,
+						profile
+					},
+					auth: {
+						...state.auth,
+						...rest,
 						loading: false
 					}
 				}
