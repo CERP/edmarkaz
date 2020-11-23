@@ -13,6 +13,7 @@ defmodule EdMarkaz.TeacherPortal do
 					path = String.split(p, ",")
 					Dynamic.put(agg, path, v)
 				end)
+				{:ok, inflated}
 			{:error, err} ->
 				IO.inspect err
 				{:error, err}
@@ -24,7 +25,7 @@ defmodule EdMarkaz.TeacherPortal do
 
 		date = :os.system_time(:millisecond)
 
-		flattened_db_sequence = Dynamic.flatten(profile) |> Enum.map(fn {p, v} -> [id, Enum.join(["profile"] ++ p, ","), v, date] end)
+		flattened_db_sequence = Dynamic.flatten(profile) |> Enum.map(fn {p, v} -> [id, Enum.join(p, ","), v, date] end)
 
 		gen_value_strings_db = 1..length(flattened_db_sequence)
 		|> Enum.map(fn num ->
@@ -76,7 +77,7 @@ defmodule EdMarkaz.TeacherPortal do
 		end
 	end
 
-	# videos: [id, assessment_id, meta]
+	# videos: [id, meta]
 
 	def insert_videos(videos) do
 
@@ -84,13 +85,11 @@ defmodule EdMarkaz.TeacherPortal do
 			EdMarkaz.DB,
 			"INSERT INTO tp_videos (
 				id,
-				assessment_id,
 				meta
-			) VALUES ($1,$2,$3)
+			) VALUES ($1,$2)
 			ON CONFLICT (id) DO
 			UPDATE SET
-				assessment_id=$2,
-				meta=$3,
+				meta=$2,
 				date=current_timestamp",
 			videos
 		) do
@@ -102,6 +101,57 @@ defmodule EdMarkaz.TeacherPortal do
 				IO.inspect err
 				{:error, err}
 		end
+	end
+
+	def get_assessments( ) do
+
+		query_string = "SELECT id, meta, questions FROM teacher_assessments"
+
+		case EdMarkaz.DB.Postgres.query(EdMarkaz.DB, query_string, [])do
+			{:ok, resp} ->
+				inflated = resp.rows
+				|> Enum.reduce(%{}, fn([id, meta, questions], agg) ->
+
+					value = %{
+						"meta" => meta,
+						"questions" => questions
+					}
+
+					Dynamic.put(agg, [id], value)
+				end)
+
+				IO.inspect inflated
+
+				{:ok, inflated}
+
+			{:error, err} ->
+				IO.inspect err
+				{:error, err}
+		end
+
+	end
+
+
+	def get_videos( ) do
+
+		query_string = "SELECT id, meta FROM tp_videos"
+
+		case EdMarkaz.DB.Postgres.query(EdMarkaz.DB, query_string, [])do
+			{:ok, resp} ->
+				inflated = resp.rows
+				|> Enum.reduce(%{}, fn([id, meta], agg) ->
+					Dynamic.put(agg, [id], meta)
+				end)
+
+				IO.inspect inflated
+
+				{:ok, inflated}
+
+			{:error, err} ->
+				IO.inspect err
+				{:error, err}
+		end
+
 	end
 
 end

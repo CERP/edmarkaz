@@ -895,7 +895,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 			{:ok, token} ->
 				case EdMarkaz.TeacherPortal.get_profile(id) do
 					{:ok, profile} ->
-						{:reply, succeed(%{token: token, teacher_portal: %{ "profile" => profile }, id: id, user: "TEACHER" }), %{id: id, client_id: client_id}}
+						{:reply, succeed(%{token: token, teacher_profile: profile}), state}
 					{:error, msg} ->
 						{:reply, fail(msg), %{}}
 				end
@@ -924,6 +924,8 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 
 				{:ok, resp} = EdMarkaz.TeacherPortal.save_profile(phone, profile)
 
+				{:ok, token} = EdMarkaz.Auth.login({phone, client_id, password})
+
 				spawn fn ->
 					EdMarkaz.Slack.send_alert("New Teacher portal Signup.\n Name: #{name} \n Phone: #{phone}", "#platform-dev")
 				end
@@ -931,7 +933,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 				spawn fn ->
 					res = EdMarkaz.Telenor.send_sms(
 						phone,
-						"Welcome #{name} to Ilm Exchange. Please visit https://ilmexchange.com/teacher-login to login into teacher portal. Thanks"
+						"Welcome #{name} to Ilm Exchange. Please visit https://ilmexchange.com/teacher-login to login into teacher portal."
 					)
 					IO.inspect res
 				end
@@ -958,11 +960,29 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 					end
 				end
 
-				{:reply, succeed(%{}), state}
+				{:reply, succeed(%{token: token}), state}
+
 			{:error, msg} ->
 				{:reply, fail(msg), state}
 		end
 	end
+
+
+	def handle_action(
+		%{
+			"type" => "TEACHER_PORTAL_VIDEOS_ASSESSMENTS",
+			"payload" => %{},
+			"client_id" => client_id
+		},
+		%{client_id: client_id} = state
+	) do
+
+		{:ok, tp_assessments} = EdMarkaz.TeacherPortal.get_assessments()
+		{:ok, tp_videos} = EdMarkaz.TeacherPortal.get_videos()
+
+		{:reply, succeed(%{assessments: tp_assessments, videos: tp_videos}), state}
+	end
+
 
 	#old sync
 	def handle_action(%{"type" => "SYNC", "payload" => payload, "last_snapshot" => last_sync_date}, %{id: id, client_id: client_id} = state) do

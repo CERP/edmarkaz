@@ -109,7 +109,7 @@ defmodule Mix.Tasks.Platform do
 
 		reduced_videos
 		|> Enum.each(fn({k, v}) ->
-			EdMarkaz.TeacherPortal.insert_videos([k, v["assessment_id"], v])
+			EdMarkaz.TeacherPortal.insert_videos([k, v])
 		end)
 	end
 

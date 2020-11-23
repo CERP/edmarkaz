@@ -126,7 +126,7 @@ create table teachers
 	id text unique not null, -- id (teacher phone)
 	path text not null, -- comma separated
 	value jsonb not null,
-	time bigint not null
+	time bigint not null,
 	date timestamp default current_timestamp
 );
 
@@ -134,15 +134,14 @@ create index on teaches
 (teacher_id);
 
 create table teacher_assessments(
-	id text unique not null
+	id text unique not null,
 	meta jsonb,
 	questions jsonb,
 	date timestamp default current_timestamp
 );
 
 create table tp_videos(
-	id text unique not null
-	assessment_id text
+	id text unique not null,
 	meta jsonb,
 	date timestamp default current_timestamp
 );
