@@ -478,7 +478,7 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 				}
 			}
 
-		case TeacherActionTypes.GET_TEACHER_ASSESSMENT_FAILURE:
+		case TeacherActionTypes.TEACHER_PORTAL_VIDEOS_ASSESSMENTS_FAILURE:
 		{
 			return {
 				...state,
@@ -490,7 +490,7 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 			}
 		}
 
-		case TeacherActionTypes.GET_TEACHER_ASSESSMENT_SUCCEED:
+		case TeacherActionTypes.TEACHER_PORTAL_VIDEOS_ASSESSMENTS_SUCCEED:
 		{
 			return {
 				...state,
