@@ -821,3 +821,30 @@ export const fetchAnalyticsEvents = () => (dispatch: Dispatch, getState: () => R
 			dispatch(getAnalyticsEventsFailure())
 		})
 }
+
+export const getTeacherPortalVideos = () => ({
+	type: "TEACHER_PORTAL_VIDEOS_ASSESSMENTS"
+})
+
+export const getTeacherPortalVideosSuccess = (targeted_instruction: any) => ({
+	type: "TEACHER_PORTAL_VIDEOS_ASSESSMENTS_SUCCESS",
+	payload: targeted_instruction
+})
+
+export const getTeacherPortalVideosFailure = () => ({
+	type: "TEACHER_PORTAL_VIDEOS_ASSESSMENTS_FAILURE"
+})
+
+export const fetchTargetedInstruction = () => (dispatch: Dispatch, getState: () => RootReducerState, syncr: Syncr) => {
+	const state = getState()
+	dispatch(getTeacherPortalVideos())
+	syncr.send({
+		type: "TEACHER_PORTAL_VIDEOS_ASSESSMENTS",
+		client_type: state.auth.client_type,
+		payload: {
+			client_id: state.client_id
+		}
+	})
+		.then(response => dispatch(getTeacherPortalVideosSuccess(response)))
+		.catch(err => dispatch(getTeacherPortalVideosFailure()))
+}
