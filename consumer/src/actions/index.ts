@@ -332,11 +332,11 @@ export const getProducts = (filters = {}) => (dispatch: Dispatch, getState: GetS
 		})
 }
 
-export const trackAssessmentAnalytics = (score: number, total_score: number, assessment_meta: any) => (dispatch: Dispatch, getState: GetState) => {
+export const trackAssessmentAnalytics = (path:string, score: number, total_score: number, assessment_meta: any) => (dispatch: Dispatch, getState: GetState) => {
 
 	const state = getState()
 	const generalMeta = {
-		// route: path.split("/").splice(1),
+		route: path.split("/").splice(1),
 		score,
 		total_score,
 		assessment_meta
@@ -822,32 +822,27 @@ export const fetchAnalyticsEvents = () => (dispatch: Dispatch, getState: () => R
 		})
 }
 
-export const getTeacherPortalVideos = () => ({
-	type: "TEACHER_PORTAL_VIDEOS_ASSESSMENTS"
-})
-
-export const getTeacherPortalVideosSuccess = (data: any) => ({
-	type: "TEACHER_PORTAL_VIDEOS_ASSESSMENTS_SUCCESS",
-	payload: data
-})
-
-export const getTeacherPortalVideosFailure = () => ({
-	type: "TEACHER_PORTAL_VIDEOS_ASSESSMENTS_FAILURE"
-})
-
 export const fetchTeacherPortalVideos = () => (dispatch: Dispatch, getState: () => RootReducerState, syncr: Syncr) => {
 	const state = getState()
-	dispatch(getTeacherPortalVideos())
+
+	dispatch({
+		type: TeacherActionTypes.VIDEOS_ASSESSMENTS
+	})
+
 	syncr.send({
-		type: "TEACHER_PORTAL_VIDEOS_ASSESSMENTS",
+		type: TeacherActionTypes.VIDEOS_ASSESSMENTS,
 		client_type: state.auth.client_type,
 		client_id: state.client_id,
 		payload: {}
 	})
 		.then(response =>{
-			dispatch(getTeacherPortalVideosSuccess(response))
+			debugger
+			dispatch({
+				type: TeacherActionTypes.VIDEOS_ASSESSMENTS_SUCCESS,
+				payload: response
+			})
 		})
 		.catch(err => {
-			dispatch(getTeacherPortalVideosFailure())
+			dispatch({type: TeacherActionTypes.VIDEOS_ASSESSMENTS_FAILURE})
 		})
 }

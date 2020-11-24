@@ -24,7 +24,7 @@ interface Props {
  * can only think of these right now
  */
 
-const AssessmentForm: React.FC<Props> = ({ assessment, quit, startTime, path, medium, subject, chapter_id, submitAssessment }) => {
+const AssessmentForm: React.FC<Props> = ({ assessment, quit, startTime, medium, path, chapter_id, subject, submitAssessment }) => {
 	const [responses, setResponse] = useState<{ [id: string]: string }>({})
 	const [submitted, setSubmitted] = useState(false)
 
