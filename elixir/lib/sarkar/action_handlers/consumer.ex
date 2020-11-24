@@ -980,6 +980,26 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 		{:reply, succeed(response), state}
 	end
 
+	def handle_action(
+		%{
+			"type" => "TEACHER_UPDATE_PROFILE",
+			"payload" => %{
+				"id" => teacher_id,
+				"value" => value
+			},
+			"client_id" => client_id
+		}, %{client_id: client, id: id} = state) do
+
+		case EdMarkaz.TeacherPortal.save_profile(teacher_id, value) do
+			{:ok, _} ->
+				response = %{message: "changes saved successfully"}
+				{:reply, succeed(response), state}
+			{:error, _} ->
+				response = %{message: "unable to save the changes"}
+				{:reply, fail(response), state}
+		end
+	end
+
 
 	#old sync
 	def handle_action(%{"type" => "SYNC", "payload" => payload, "last_snapshot" => last_sync_date}, %{id: id, client_id: client_id} = state) do

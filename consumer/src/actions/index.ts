@@ -652,6 +652,43 @@ export const teacherSignup = (phone: string, password: string, profile: TeacherP
 
 }
 
+export const teacherUpdateProfile = (profile: Partial<TeacherProfile>) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+
+	const state = getState()
+
+	dispatch({
+		type: TeacherActionTypes.UPDATE_PROFILE,
+	})
+
+	syncr.send({
+		type: TeacherActionTypes.UPDATE_PROFILE,
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		id: state.auth.id,
+		payload: {
+			id: state.auth.id,
+			value: profile
+		}
+	})
+		.then(resp => {
+
+			console.log(resp)
+
+			dispatch({
+				type: TeacherActionTypes.UPDATE_PROFILE_SUCCEED,
+				payload: profile
+			})
+
+		})
+		.catch(err => {
+			console.error(err)
+			dispatch({
+				type: TeacherActionTypes.UPDATE_PROFILE_FAILURE
+			})
+		})
+
+}
+
 export const placeOrder = (product: Product) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 
 	const state = getState();

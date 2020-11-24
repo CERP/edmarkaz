@@ -69,10 +69,18 @@ interface TeacherProfile {
 	phone: string
 	gender?: "M" | "F"
 	teaching_class?: string
-	teachign_subject?: string
-	attempted_assessments: any
+	teaching_subject?: string
+	attempted_assessments?: {
+		[id]: TeacherAttemptedAssessment
+	}
 }
 
+interface TeacherAttemptedAssessment {
+	questions: {
+		[question_id]: { correct: boolean }
+	}
+	date: number
+}
 
 interface TeacherPortalVideo {
 	assessment_id: string

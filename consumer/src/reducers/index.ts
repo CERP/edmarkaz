@@ -449,6 +449,24 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 				}
 			}
 
+		case TeacherActionTypes.UPDATE_PROFILE_SUCCEED:
+			{
+
+				const flattened_update_profile = Dynamic.flatten(action.payload)
+
+				const { profile } = state.teacher_portal
+
+				const updated_profile = flattened_update_profile.reduce((agg, { path, value }) => Dynamic.put(agg, path, value), profile)
+
+				return {
+					...state,
+					teacher_portal: {
+						...state.teacher_portal,
+						profile: updated_profile
+					}
+				}
+			}
+
 		case LOAD_PROFILE:
 			{
 				return {
