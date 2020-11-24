@@ -1,0 +1,10 @@
+.teacher-portal .video-card {
+	height: 400px;
+	width: 100%;
+}
+
+@media (max-width: 600px) {
+	.teacher-portal .video-card {
+			height: 320px;
+		}
+}

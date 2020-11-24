@@ -5,6 +5,7 @@ import HelpFooter from 'components/Footer/HelpFooter'
 import Layout from 'components/Layout'
 import ilmxLogo from 'components/Header/ilmx.svg'
 import Youtube from 'react-youtube'
+import './style.css'
 
 
 type P = {
@@ -61,11 +62,12 @@ const useStyles = makeStyles((theme: Theme) => ({
 		marginBottom: '4rem'
 	},
 	button: {
+		padding: theme.spacing(0.5),
 		marginTop: theme.spacing(1),
 		marginRight: theme.spacing(1),
 	},
 	actionsContainer: {
-		marginBottom: theme.spacing(4),
+		marginBottom: theme.spacing(3),
 	},
 	resetContainer: {
 		padding: theme.spacing(4),
@@ -74,8 +76,23 @@ const useStyles = makeStyles((theme: Theme) => ({
 		fontSize: '1rem'
 	},
 	stepLabelActive: {
-		fontSize: '1.5rem',
+		fontSize: '1.25rem',
 		fontWeight: 'bold'
+	},
+	pageMain: {
+		marginTop: theme.spacing(4),
+		marginBottom: theme.spacing(4),
+	},
+	pageHeading: {
+
+	},
+	ilmxLogo: {
+		margin: 'auto',
+		width: '280px',
+		height: '100%'
+	},
+	videoCard: {
+		padding: theme.spacing(2)
 	}
 }))
 
@@ -101,21 +118,20 @@ const VideoCard = ({ video }: CardProps) => {
 	const classes = useStyles()
 
 	return (
-		<div>
-			<Typography variant="h5">Description:</Typography>
-			<Typography variant="body1" className={classes.actionsContainer}>{video.description}</Typography>
+		<div className={classes.videoCard}>
 			<Youtube
 				videoId={video.link}
+				className={"video-card"}
 				opts={{
-					width: "100%",
-					height: "480px",
 					playerVars: {
 						rel: 0,
 						showinfo: 0,
-						autoplay: 1
+						autoplay: 0
 					}
 
 				}} />
+			<Typography variant="h6" color={"primary"}>Description:</Typography>
+			<Typography variant="body2" style={{ margin: 0 }} className={classes.actionsContainer}>{video.description}</Typography>
 		</div>
 	)
 }
@@ -138,20 +154,11 @@ const TeacherPortal: React.FC<P> = () => {
 
 	return (
 		<Layout>
-			<div className={classes.root} >
+			<div className={"teacher-portal " + classes.root} >
 				<Container maxWidth="lg">
-					<div
-						className="section"
-						style={{
-							border: "none",
-							display: "flex",
-							flexDirection: "column",
-						}}>
-						<Avatar variant="square" style={{
-							height: "100%",
-							width: "280px",
-							margin: "auto"
-						}} src={ilmxLogo} alt="ilmx-logo" />
+					<div className={classes.pageMain}>
+						<Avatar variant="square" className={classes.ilmxLogo} src={ilmxLogo} alt="ilmx-logo" />
+						<Typography variant="h4" align="center" color="primary">Teacher Portal</Typography>
 					</div>
 					<Stepper activeStep={activeStep} variant="elevation" orientation="vertical">
 						{steps.map((label, index) => (
