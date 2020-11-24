@@ -822,7 +822,7 @@ export const fetchAnalyticsEvents = () => (dispatch: Dispatch, getState: () => R
 		})
 }
 
-export const fetchTeacherPortalVideos = () => (dispatch: Dispatch, getState: () => RootReducerState, syncr: Syncr) => {
+export const fetchTeacherVideosAssessments = () => (dispatch: Dispatch, getState: () => RootReducerState, syncr: Syncr) => {
 	const state = getState()
 
 	dispatch({
@@ -836,7 +836,6 @@ export const fetchTeacherPortalVideos = () => (dispatch: Dispatch, getState: () 
 		payload: {}
 	})
 		.then(response =>{
-			debugger
 			dispatch({
 				type: TeacherActionTypes.VIDEOS_ASSESSMENTS_SUCCESS,
 				payload: response

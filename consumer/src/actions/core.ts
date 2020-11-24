@@ -1,7 +1,7 @@
 import { Dispatch } from 'redux'
 import Syncr from '@cerp/syncr';
 import { v4 } from 'uuid';
-
+import { fetchTeacherVideosAssessments } from 'actions'
 type GetState = () => RootReducerState
 
 const SYNC = "SYNC"
@@ -353,6 +353,7 @@ export const connected = () => (dispatch: (a: any) => any, getState: () => RootR
 	const action = { type: ON_CONNECT }
 
 	dispatch(action)
+	dispatch(fetchTeacherVideosAssessments())
 
 	const state = getState();
 
