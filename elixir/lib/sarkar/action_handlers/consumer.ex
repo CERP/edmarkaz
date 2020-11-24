@@ -888,9 +888,8 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 				"password" => password
 			},
 			"client_id" => client_id
-		},
-		%{client_id: client_id} = state
-	) do
+		}, state) do
+
 		case EdMarkaz.Auth.login({id, client_id, password}) do
 			{:ok, token} ->
 				case EdMarkaz.TeacherPortal.get_profile(id) do
@@ -913,9 +912,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 				"profile" => profile
 			},
 			"client_id" => client_id
-		},
-		%{client_id: client_id} = state
-	) do
+		}, state) do
 
 		name = Map.get(profile, "name", "")
 
@@ -971,16 +968,16 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 	def handle_action(
 		%{
 			"type" => "TEACHER_PORTAL_VIDEOS_ASSESSMENTS",
-			"payload" => %{},
+			"payload" => payload,
 			"client_id" => client_id
-		},
-		%{client_id: client_id} = state
-	) do
+		}, state) do
 
 		{:ok, tp_assessments} = EdMarkaz.TeacherPortal.get_assessments()
 		{:ok, tp_videos} = EdMarkaz.TeacherPortal.get_videos()
 
-		{:reply, succeed(%{assessments: tp_assessments, videos: tp_videos}), state}
+		response = %{assessments: tp_assessments, videos: tp_videos}
+
+		{:reply, succeed(response), state}
 	end
 
 
