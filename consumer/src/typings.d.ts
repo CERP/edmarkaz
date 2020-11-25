@@ -64,7 +64,6 @@ interface Lesson {
 }
 
 interface TeacherProfile {
-	id: string
 	name: string
 	phone: string
 	gender?: "M" | "F"
