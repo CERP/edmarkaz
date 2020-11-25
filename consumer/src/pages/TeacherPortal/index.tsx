@@ -28,39 +28,6 @@ type VideoMeta = {
 	link: string
 }
 
-const vdata: VData = {
-	"1": {
-		"assessment_id": "1",
-		"title": "What makes a good teacher great?",
-		"description": "Azul Terronez is the author of the best-selling book 'The art of Apprenticeship' Azul has coached teachers and schools leaders around the world",
-		"link": "vrU6YJle6Q4",
-	},
-	"2": {
-		"assessment_id": "1",
-		"title": "Teaching Methods for Inspiring",
-		"description": "Joe Ruhl received his bachelors and masters degrees at Purdue University and he has been sharing the joys of biology with kids for 37 years.",
-		"link": "UCFg9bcW7Bk",
-	},
-	"3": {
-		"assessment_id": "1",
-		"title": "Teaching science: we're doing it wrong",
-		"description": "The world needs scientists and engineers more than ever, but our approach to raising them is backwards and ineffective. ",
-		"link": "5duz42kHqPs",
-	},
-	"4": {
-		"assessment_id": "1",
-		"title": "Teaching Methods for Inspiring",
-		"description": "Joe Ruhl received his bachelors and masters degrees at Purdue University and he has been sharing the joys of biology with kids for 37 years.",
-		"link": "UCFg9bcW7Bk",
-	},
-	"5": {
-		"assessment_id": "1",
-		"title": "Teaching science: we're doing it wrong",
-		"description": "The world needs scientists and engineers more than ever, but our approach to raising them is backwards and ineffective. ",
-		"link": "5duz42kHqPs",
-	},
-}
-
 const useStyles = makeStyles((theme: Theme) => ({
 	root: {
 		width: '100%',
