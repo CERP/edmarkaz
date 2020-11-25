@@ -5,13 +5,12 @@ import Done from '@material-ui/icons/AssignmentTurnedIn'
 import Quit from '@material-ui/icons/Close'
 
 interface Props {
-	assessment_id: string
 	assessment: ILMXAssessment | undefined
 	submitAssessment: (assessment_meta: any) => void
 	quit: () => void
 }
 
-const AssessmentForm: React.FC<Props> = ({ assessment, assessment_id, quit, submitAssessment }) => {
+const AssessmentForm: React.FC<Props> = ({ assessment, quit, submitAssessment }) => {
 	const [responses, setResponse] = useState<{ [id: string]: string }>({})
 	const [submitted, setSubmitted] = useState(false)
 
@@ -32,21 +31,13 @@ const AssessmentForm: React.FC<Props> = ({ assessment, assessment_id, quit, subm
 				//@ts-ignore
 				.reduce((agg, [q_id, question]) => {
 					const correct_ans = Object.entries(question.answers).find(([a_id, ans]) => responses[q_id] === a_id && ans.correct_answer)
-					if (!Boolean(correct_ans)) {
-						return {
-							...agg,
-							[q_id]: true
-						}
-					}
 					return {
 						...agg,
-						[q_id]: false
+						[q_id]: { correct: Array.isArray(correct_ans) }
 					}
 				}, {} as { [id: string]: boolean })
-			const attempted_assessments = {
-				[assessment_id]: questions
-			}
-			submitAssessment(attempted_assessments)
+
+			submitAssessment(questions)
 			setSubmitted(true)
 		}
 	}

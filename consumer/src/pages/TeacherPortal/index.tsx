@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Container, Avatar, makeStyles, Theme, Button, Paper, Step, StepContent, StepLabel, Stepper, Typography } from '@material-ui/core'
 import { connect } from 'react-redux';
-import { trackTeacherAssessmentAnalytics } from '../../actions'
+import { teacherUpdateProfile } from 'actions'
 
 import Modal from '../../components/Modal'
 import AssessmentGeneric from '../Library/Lesson/AssessmentGeneric'
@@ -14,6 +14,7 @@ import './style.css'
 
 type P = {
 	teacher_portal: RootReducerState["teacher_portal"]
+	submitAssessment: (teacherAssessment: Partial<TeacherProfile>) => void
 }
 
 type VData = {
@@ -100,14 +101,6 @@ const useStyles = makeStyles((theme: Theme) => ({
 	}
 }))
 
-const flattened_data = Object.entries(vdata)
-
-const getStepContent = (step: number) => {
-	const [_, video] = flattened_data[step]
-	return (
-		<VideoCard video={video} />
-	)
-}
 
 type CardProps = {
 	video: VideoMeta
@@ -136,13 +129,23 @@ const VideoCard = ({ video }: CardProps) => {
 	)
 }
 
-const TeacherPortal: React.FC<P> = ({ teacher_portal }) => {
+const TeacherPortal: React.FC<P> = ({ teacher_portal, submitAssessment }) => {
 
 	const classes = useStyles()
 	const [activeStep, setActiveStep] = useState(0)
 	const [showAssessmentModal, setAssessmentModal] = useState(false)
-	const [assessment, serAssessment] = useState<ILMXAssessment | undefined>(undefined)
 	const [assessmentId, setAssessmentId] = useState('')
+	const [videoId, setVideoId] = useState('')
+
+	const { videos, assessments } = teacher_portal
+	const flattened_data = Object.entries(videos)
+
+	const getStepContent = (step: number) => {
+		const [_, video] = flattened_data[step]
+		return (
+			<VideoCard video={video} />
+		)
+	}
 
 	const handleNext = () => {
 		setActiveStep((prevActiveStep) => prevActiveStep + 1)
@@ -152,14 +155,23 @@ const TeacherPortal: React.FC<P> = ({ teacher_portal }) => {
 		setActiveStep((prevActiveStep) => prevActiveStep - 1)
 	}
 
-	const takeAssessment = (id: any) => {
+	const takeAssessment = (videoId: string, assessmentId: string) => {
 		setAssessmentModal(true)
-		serAssessment(teacher_portal.assessments[id])
-		setAssessmentId(id)
+		setAssessmentId(assessmentId)
+		setVideoId(videoId)
 	}
 
 	const quitAssessment = () => {
 		setAssessmentModal(false)
+	}
+
+	const submit = (questions: any) => {
+		const teacherProfile = {
+			attempted_assessments: {
+				[`${videoId}-${assessmentId}`]: questions
+			}
+		}
+		submitAssessment(teacherProfile)
 	}
 
 	const callLink = false ? "https://api.whatsapp.com/send?phone=923481119119" : "tel:0348-1119-119"
@@ -170,9 +182,8 @@ const TeacherPortal: React.FC<P> = ({ teacher_portal }) => {
 				showAssessmentModal && <Modal>
 					<div className="modal-box video-modal" style={{ height: "90%" }}>
 						<AssessmentGeneric
-							assessment_id={assessmentId}
-							assessment={assessment}
-							submitAssessment={trackTeacherAssessmentAnalytics}
+							assessment={assessments[assessmentId]}
+							submitAssessment={submit}
 							quit={quitAssessment} />
 					</div>
 				</Modal>
@@ -212,7 +223,7 @@ const TeacherPortal: React.FC<P> = ({ teacher_portal }) => {
 											variant="outlined"
 											color="primary"
 											className={classes.button}
-											onClick={() => takeAssessment(value.assessment_id)}
+											onClick={() => takeAssessment(id, value.assessment_id)}
 										>
 											Take Assessment
 											</Button>
@@ -236,4 +247,6 @@ const TeacherPortal: React.FC<P> = ({ teacher_portal }) => {
 
 export default connect((state: RootReducerState) => ({
 	teacher_portal: state.teacher_portal
+}), (dispatch: Function) => ({
+	submitAssessment: (teacherProfile: Partial<TeacherProfile>) => dispatch(teacherUpdateProfile(teacherProfile))
 }))(TeacherPortal);
