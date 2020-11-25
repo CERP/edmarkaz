@@ -1,25 +1,23 @@
-import React, { useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Container, Avatar, makeStyles, Theme, Button, Paper, Step, StepContent, StepLabel, Stepper, Typography } from '@material-ui/core'
-import { connect } from 'react-redux';
-import { teacherUpdateProfile } from 'actions'
-
+import { connect } from 'react-redux'
+import { fetchTeacherVideosAssessments, teacherUpdateProfile } from 'actions'
+import AssessmentForm from 'pages/Library/Lesson/AssessmentForm'
 import Modal from '../../components/Modal'
-import AssessmentGeneric from '../Library/Lesson/AssessmentGeneric'
 import HelpFooter from 'components/Footer/HelpFooter'
 import Layout from 'components/Layout'
 import ilmxLogo from 'components/Header/ilmx.svg'
 import Youtube from 'react-youtube'
+
 import './style.css'
 
 
 type P = {
 	teacher_portal: RootReducerState["teacher_portal"]
-	submitAssessment: (teacherAssessment: Partial<TeacherProfile>) => void
+	fetchTeacherPortalData: () => void
+	updateTeacherProfile: (teacherAssessment: Partial<TeacherProfile>) => void
 }
 
-type VData = {
-	[id: string]: VideoMeta
-}
 
 type VideoMeta = {
 	assessment_id: string
@@ -69,11 +67,148 @@ const useStyles = makeStyles((theme: Theme) => ({
 }))
 
 
+const TeacherPortal: React.FC<P> = ({ teacher_portal, updateTeacherProfile, fetchTeacherPortalData }) => {
+
+	const { videos, assessments } = teacher_portal
+
+	const classes = useStyles()
+
+	const [activeStep, setActiveStep] = useState(0)
+	const [showAssessmentModal, setAssessmentModal] = useState(false)
+	const [assessmentId, setAssessmentId] = useState('')
+	const [videoId, setVideoId] = useState('')
+
+	const flattened_videos = useMemo(() => (Object.entries(videos)), [videos])
+
+	useEffect(() => {
+		if (Object.keys(videos).length === 0) {
+			fetchTeacherPortalData()
+		}
+	}, [videos, fetchTeacherPortalData])
+
+	const handleTakeAssessment = (videoId: string, assessmentId: string) => {
+		setAssessmentModal(true)
+		setAssessmentId(assessmentId)
+		setVideoId(videoId)
+	}
+
+	const handleQuitAssessment = () => {
+		setAssessmentModal(false)
+		setAssessmentId('')
+		setVideoId('')
+	}
+
+	const handleNext = useCallback(() => {
+		setActiveStep((prevActiveStep) => prevActiveStep + 1)
+	}, [])
+
+	const handleBack = useCallback(() => {
+		setActiveStep((prevActiveStep) => prevActiveStep - 1)
+	}, [])
+
+	const handleAssessmentSubmission = (attemptedAssessment: AttemptedAssessment) => {
+
+		const teacherProfile: Partial<TeacherProfile> = {
+			attempted_assessments: {
+				[videoId + assessmentId]: {
+					questions: attemptedAssessment,
+					date: new Date().getTime()
+				}
+			}
+		}
+
+		updateTeacherProfile(teacherProfile)
+	}
+
+	return (
+		<Layout>
+			{
+				showAssessmentModal && <Modal>
+					<div className="modal-box video-modal" style={{ height: "90%" }}>
+						<AssessmentForm
+							assessment={assessments[assessmentId]}
+							submitAssessment={handleAssessmentSubmission}
+							quit={handleQuitAssessment} />
+					</div>
+				</Modal>
+			}
+			<div className={"teacher-portal " + classes.root} >
+
+				<Container maxWidth="lg">
+					<div className={classes.pageMain}>
+						<Avatar variant="square" className={classes.ilmxLogo} src={ilmxLogo} alt="ilmx-logo" />
+						<Typography variant="h4" align="center" color="primary">Teacher Portal</Typography>
+					</div>
+					{Object.keys(videos).length === 0 ? <div>Loading ...</div>
+						: <>
+							<Stepper activeStep={activeStep} variant="elevation" orientation="vertical">
+								{flattened_videos.map(([id, value], index) => (<Step key={id + index}>
+									<StepLabel>
+										<Typography color="primary" className={activeStep === index ? classes.stepLabelActive : classes.stepLabel}>
+											{value.title}
+										</Typography>
+									</StepLabel>
+									<StepContent>
+										<VideoCard video={flattened_videos[activeStep][1]} />
+										<div className={classes.actionsContainer}>
+											<div>
+												<Button
+													disabled={activeStep === 0}
+													onClick={handleBack}
+													className={classes.button}
+												>
+													Back </Button>
+												<Button
+													variant="contained"
+													color="primary"
+													onClick={handleNext}
+													className={classes.button}
+												>
+													{activeStep === flattened_videos.length - 1 ? 'Finish' : 'Next'}
+												</Button>
+												<Button
+													variant="outlined"
+													color="primary"
+													className={classes.button}
+													onClick={() => handleTakeAssessment(id, value.assessment_id)}
+												>
+													Take Assessment
+											</Button>
+											</div>
+										</div>
+									</StepContent>
+								</Step>))}
+							</Stepper>
+							{activeStep === flattened_videos.length && (
+								<Paper square elevation={0} className={classes.resetContainer}>
+									<Typography>All steps completed - you&apos;re finished</Typography>
+								</Paper>
+							)}
+						</>
+					}
+				</Container>
+
+
+				<HelpFooter hlink={'tel:0348-1119-119'} />
+			</div>
+
+		</Layout>
+	)
+}
+
+export default connect((state: RootReducerState) => ({
+	teacher_portal: state.teacher_portal
+}), (dispatch: Function) => ({
+	fetchTeacherPortalData: () => dispatch(fetchTeacherVideosAssessments()),
+	updateTeacherProfile: (teacherProfile: Partial<TeacherProfile>) => dispatch(teacherUpdateProfile(teacherProfile))
+}))(TeacherPortal)
+
+
 type CardProps = {
 	video: VideoMeta
 }
 
-const VideoCard = ({ video }: CardProps) => {
+const VideoCard: React.FC<CardProps> = ({ video }) => {
 
 	const classes = useStyles()
 
@@ -95,125 +230,3 @@ const VideoCard = ({ video }: CardProps) => {
 		</div>
 	)
 }
-
-const TeacherPortal: React.FC<P> = ({ teacher_portal, submitAssessment }) => {
-
-	const classes = useStyles()
-	const [activeStep, setActiveStep] = useState(0)
-	const [showAssessmentModal, setAssessmentModal] = useState(false)
-	const [assessmentId, setAssessmentId] = useState('')
-	const [videoId, setVideoId] = useState('')
-
-	const { videos, assessments } = teacher_portal
-	const flattened_data = Object.entries(videos)
-
-	const getStepContent = (step: number) => {
-		const [_, video] = flattened_data[step]
-		return (
-			<VideoCard video={video} />
-		)
-	}
-
-	const handleNext = () => {
-		setActiveStep((prevActiveStep) => prevActiveStep + 1)
-	}
-
-	const handleBack = () => {
-		setActiveStep((prevActiveStep) => prevActiveStep - 1)
-	}
-
-	const takeAssessment = (videoId: string, assessmentId: string) => {
-		setAssessmentModal(true)
-		setAssessmentId(assessmentId)
-		setVideoId(videoId)
-	}
-
-	const quitAssessment = () => {
-		setAssessmentModal(false)
-	}
-
-	const submit = (questions: any) => {
-		const teacherProfile = {
-			attempted_assessments: {
-				[`${videoId}-${assessmentId}`]: questions
-			}
-		}
-		submitAssessment(teacherProfile)
-	}
-
-	const callLink = false ? "https://api.whatsapp.com/send?phone=923481119119" : "tel:0348-1119-119"
-
-	return (
-		<Layout>
-			{
-				showAssessmentModal && <Modal>
-					<div className="modal-box video-modal" style={{ height: "90%" }}>
-						<AssessmentGeneric
-							assessment={assessments[assessmentId]}
-							submitAssessment={submit}
-							quit={quitAssessment} />
-					</div>
-				</Modal>
-			}
-			<div className={"teacher-portal " + classes.root} >
-				<Container maxWidth="lg">
-					<div className={classes.pageMain}>
-						<Avatar variant="square" className={classes.ilmxLogo} src={ilmxLogo} alt="ilmx-logo" />
-						<Typography variant="h4" align="center" color="primary">Teacher Portal</Typography>
-					</div>
-					<Stepper activeStep={activeStep} variant="elevation" orientation="vertical">
-						{flattened_data.map(([id, value], index) => (<Step key={id + index}>
-							<StepLabel>
-								<Typography color="primary" className={activeStep === index ? classes.stepLabelActive : classes.stepLabel}>
-									{value.title}
-								</Typography>
-							</StepLabel>
-							<StepContent>
-								{getStepContent(index)}
-								<div className={classes.actionsContainer}>
-									<div>
-										<Button
-											disabled={activeStep === 0}
-											onClick={handleBack}
-											className={classes.button}
-										>
-											Back </Button>
-										<Button
-											variant="contained"
-											color="primary"
-											onClick={handleNext}
-											className={classes.button}
-										>
-											{activeStep === flattened_data.length - 1 ? 'Finish' : 'Next'}
-										</Button>
-										<Button
-											variant="outlined"
-											color="primary"
-											className={classes.button}
-											onClick={() => takeAssessment(id, value.assessment_id)}
-										>
-											Take Assessment
-											</Button>
-									</div>
-								</div>
-							</StepContent>
-						</Step>))}
-					</Stepper>
-					{activeStep === flattened_data.length && (
-						<Paper square elevation={0} className={classes.resetContainer}>
-							<Typography>All steps completed - you&apos;re finished</Typography>
-						</Paper>
-					)}
-				</Container>
-
-				<HelpFooter hlink={callLink} />
-			</div>
-		</Layout>
-	)
-}
-
-export default connect((state: RootReducerState) => ({
-	teacher_portal: state.teacher_portal
-}), (dispatch: Function) => ({
-	submitAssessment: (teacherProfile: Partial<TeacherProfile>) => dispatch(teacherUpdateProfile(teacherProfile))
-}))(TeacherPortal);

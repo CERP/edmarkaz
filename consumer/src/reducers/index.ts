@@ -466,41 +466,20 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 					}
 				}
 			}
-		case TeacherActionTypes.VIDEOS_ASSESSMENTS:
+
+		case TeacherActionTypes.VIDEOS_ASSESSMENTS_SUCCESS:
 			{
+				const { assessments, videos } = action.payload
+
 				return {
 					...state,
 					teacher_portal: {
 						...state.teacher_portal,
-						assessments: {},
-						videos: {}
+						assessments,
+						videos
 					}
 				}
 			}
-
-		case TeacherActionTypes.VIDEOS_ASSESSMENTS_FAILURE:
-		{
-			return {
-				...state,
-				teacher_portal: {
-					...state.teacher_portal,
-					assessments: {},
-					videos: {}
-				}
-			}
-		}
-
-		case TeacherActionTypes.VIDEOS_ASSESSMENTS_SUCCESS:
-		{
-			return {
-				...state,
-				teacher_portal: {
-					...state.teacher_portal,
-					assessments: action.payload.assessments,
-					videos: action.payload.videos
-				}
-			}
-		}
 
 		case LOAD_PROFILE:
 			{

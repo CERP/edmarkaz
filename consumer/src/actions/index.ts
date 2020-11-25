@@ -332,7 +332,7 @@ export const getProducts = (filters = {}) => (dispatch: Dispatch, getState: GetS
 		})
 }
 
-export const trackAssessmentAnalytics = (path:string, score: number, total_score: number, assessment_meta: any) => (dispatch: Dispatch, getState: GetState) => {
+export const trackAssessmentAnalytics = (path: string, score: number, total_score: number, assessment_meta: any) => (dispatch: Dispatch, getState: GetState) => {
 
 	const state = getState()
 	const generalMeta = {
@@ -823,11 +823,13 @@ export const fetchAnalyticsEvents = () => (dispatch: Dispatch, getState: () => R
 }
 
 export const fetchTeacherVideosAssessments = () => (dispatch: Dispatch, getState: () => RootReducerState, syncr: Syncr) => {
-	const state = getState()
 
-	dispatch({
-		type: TeacherActionTypes.VIDEOS_ASSESSMENTS
-	})
+	if (!syncr.ready) {
+		syncr.onNext("connect", () => dispatch(fetchTeacherVideosAssessments()))
+		return
+	}
+
+	const state = getState()
 
 	syncr.send({
 		type: TeacherActionTypes.VIDEOS_ASSESSMENTS,
@@ -835,13 +837,14 @@ export const fetchTeacherVideosAssessments = () => (dispatch: Dispatch, getState
 		client_id: state.client_id,
 		payload: {}
 	})
-		.then(response =>{
+		.then(resp => {
 			dispatch({
 				type: TeacherActionTypes.VIDEOS_ASSESSMENTS_SUCCESS,
-				payload: response
+				payload: resp
 			})
 		})
 		.catch(err => {
-			dispatch({type: TeacherActionTypes.VIDEOS_ASSESSMENTS_FAILURE})
+			console.log("teacher video assessments", err)
+			dispatch({ type: TeacherActionTypes.VIDEOS_ASSESSMENTS_FAILURE })
 		})
 }
