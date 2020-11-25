@@ -4,10 +4,10 @@ import { Container, Avatar } from '@material-ui/core'
 import HelpFooter from 'components/Footer/HelpFooter'
 import Layout from 'components/Layout'
 import ilmxLogo from 'components/Header/ilmx.svg'
-
+import TeacherRegister from './register'
+import { TeacherLogin } from './login'
 
 type P = {
-
 }
 
 const TeacherSignin: React.FC<P> = () => {
@@ -31,6 +31,10 @@ const TeacherSignin: React.FC<P> = () => {
 							margin: "auto"
 						}} src={ilmxLogo} alt="ilmx-logo" />
 					</div>
+
+					<TeacherLogin />
+					<TeacherRegister />
+
 				</Container>
 				<HelpFooter hlink={callLink} />
 			</div>
