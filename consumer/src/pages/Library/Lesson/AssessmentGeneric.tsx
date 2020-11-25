@@ -5,17 +5,15 @@ import Done from '@material-ui/icons/AssignmentTurnedIn'
 import Quit from '@material-ui/icons/Close'
 
 interface Props {
-	path: string
-	data: {}
+	assessment_id: string
 	assessment: ILMXAssessment | undefined
-	submitAssessment: (path: string, score: number, total_score: number, assessment_meta: any) => void
+	submitAssessment: (assessment_meta: any) => void
 	quit: () => void
 }
 
-const AssessmentForm: React.FC<Props> = ({ assessment, path, data, quit, submitAssessment }) => {
+const AssessmentForm: React.FC<Props> = ({ assessment, assessment_id, quit, submitAssessment }) => {
 	const [responses, setResponse] = useState<{ [id: string]: string }>({})
 	const [submitted, setSubmitted] = useState(false)
-	const [meta, setMeta] = useState(data)
 
 	const chooseAnswer = (question_id: string, answer_id: string) => {
 		setResponse({
@@ -29,10 +27,9 @@ const AssessmentForm: React.FC<Props> = ({ assessment, path, data, quit, submitA
 			return
 		}
 		if (assessment !== undefined) {
-			const total_marks = Object.keys(assessment.questions).length
-			let obtained_marks = 0
 
-			const wrong_responses = Object.entries(assessment.questions)
+			const questions = Object.entries(assessment.questions)
+				//@ts-ignore
 				.reduce((agg, [q_id, question]) => {
 					const correct_ans = Object.entries(question.answers).find(([a_id, ans]) => responses[q_id] === a_id && ans.correct_answer)
 					if (!Boolean(correct_ans)) {
@@ -41,15 +38,15 @@ const AssessmentForm: React.FC<Props> = ({ assessment, path, data, quit, submitA
 							[q_id]: true
 						}
 					}
-					return agg
+					return {
+						...agg,
+						[q_id]: false
+					}
 				}, {} as { [id: string]: boolean })
-
-			setMeta({
-				...meta,
-				wrong_responses
-			})
-
-			submitAssessment(path, obtained_marks, total_marks, meta)
+			const attempted_assessments = {
+				[assessment_id]: questions
+			}
+			submitAssessment(attempted_assessments)
 			setSubmitted(true)
 		}
 	}

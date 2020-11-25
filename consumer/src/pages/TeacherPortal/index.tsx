@@ -1,6 +1,10 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Container, Avatar, makeStyles, Theme, Button, Paper, Step, StepContent, StepLabel, Stepper, Typography } from '@material-ui/core'
+import { connect } from 'react-redux';
+import { trackTeacherAssessmentAnalytics } from '../../actions'
 
+import Modal from '../../components/Modal'
+import AssessmentGeneric from '../Library/Lesson/AssessmentGeneric'
 import HelpFooter from 'components/Footer/HelpFooter'
 import Layout from 'components/Layout'
 import ilmxLogo from 'components/Header/ilmx.svg'
@@ -9,7 +13,7 @@ import './style.css'
 
 
 type P = {
-
+	teacher_portal: RootReducerState["teacher_portal"]
 }
 
 type VData = {
@@ -98,10 +102,6 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const flattened_data = Object.entries(vdata)
 
-const getSteps = () => {
-	return flattened_data.reduce<string[]>((agg, [id, value]) => ([...agg, value.title]), [])
-}
-
 const getStepContent = (step: number) => {
 	const [_, video] = flattened_data[step]
 	return (
@@ -136,11 +136,13 @@ const VideoCard = ({ video }: CardProps) => {
 	)
 }
 
-const TeacherPortal: React.FC<P> = () => {
+const TeacherPortal: React.FC<P> = ({ teacher_portal }) => {
 
 	const classes = useStyles()
-	const [activeStep, setActiveStep] = React.useState(0)
-	const steps = getSteps()
+	const [activeStep, setActiveStep] = useState(0)
+	const [showAssessmentModal, setAssessmentModal] = useState(false)
+	const [assessment, serAssessment] = useState<ILMXAssessment | undefined>(undefined)
+	const [assessmentId, setAssessmentId] = useState('')
 
 	const handleNext = () => {
 		setActiveStep((prevActiveStep) => prevActiveStep + 1)
@@ -150,10 +152,31 @@ const TeacherPortal: React.FC<P> = () => {
 		setActiveStep((prevActiveStep) => prevActiveStep - 1)
 	}
 
+	const takeAssessment = (id: any) => {
+		setAssessmentModal(true)
+		serAssessment(teacher_portal.assessments[id])
+		setAssessmentId(id)
+	}
+
+	const quitAssessment = () => {
+		setAssessmentModal(false)
+	}
+
 	const callLink = false ? "https://api.whatsapp.com/send?phone=923481119119" : "tel:0348-1119-119"
 
 	return (
 		<Layout>
+			{
+				showAssessmentModal && <Modal>
+					<div className="modal-box video-modal" style={{ height: "90%" }}>
+						<AssessmentGeneric
+							assessment_id={assessmentId}
+							assessment={assessment}
+							submitAssessment={trackTeacherAssessmentAnalytics}
+							quit={quitAssessment} />
+					</div>
+				</Modal>
+			}
 			<div className={"teacher-portal " + classes.root} >
 				<Container maxWidth="lg">
 					<div className={classes.pageMain}>
@@ -161,45 +184,44 @@ const TeacherPortal: React.FC<P> = () => {
 						<Typography variant="h4" align="center" color="primary">Teacher Portal</Typography>
 					</div>
 					<Stepper activeStep={activeStep} variant="elevation" orientation="vertical">
-						{steps.map((label, index) => (
-							<Step key={label + index}>
-								<StepLabel>
-									<Typography color="primary" className={activeStep === index ? classes.stepLabelActive : classes.stepLabel}>
-										{label}
-									</Typography>
-								</StepLabel>
-								<StepContent>
-									{getStepContent(index)}
-									<div className={classes.actionsContainer}>
-										<div>
-											<Button
-												disabled={activeStep === 0}
-												onClick={handleBack}
-												className={classes.button}
-											>
-												Back </Button>
-											<Button
-												variant="contained"
-												color="primary"
-												onClick={handleNext}
-												className={classes.button}
-											>
-												{activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+						{flattened_data.map(([id, value], index) => (<Step key={id + index}>
+							<StepLabel>
+								<Typography color="primary" className={activeStep === index ? classes.stepLabelActive : classes.stepLabel}>
+									{value.title}
+								</Typography>
+							</StepLabel>
+							<StepContent>
+								{getStepContent(index)}
+								<div className={classes.actionsContainer}>
+									<div>
+										<Button
+											disabled={activeStep === 0}
+											onClick={handleBack}
+											className={classes.button}
+										>
+											Back </Button>
+										<Button
+											variant="contained"
+											color="primary"
+											onClick={handleNext}
+											className={classes.button}
+										>
+											{activeStep === flattened_data.length - 1 ? 'Finish' : 'Next'}
+										</Button>
+										<Button
+											variant="outlined"
+											color="primary"
+											className={classes.button}
+											onClick={() => takeAssessment(value.assessment_id)}
+										>
+											Take Assessment
 											</Button>
-											<Button
-												variant="outlined"
-												color="primary"
-												className={classes.button}
-											>
-												Take Assessment
-											</Button>
-										</div>
 									</div>
-								</StepContent>
-							</Step>
-						))}
+								</div>
+							</StepContent>
+						</Step>))}
 					</Stepper>
-					{activeStep === steps.length && (
+					{activeStep === flattened_data.length && (
 						<Paper square elevation={0} className={classes.resetContainer}>
 							<Typography>All steps completed - you&apos;re finished</Typography>
 						</Paper>
@@ -212,4 +234,6 @@ const TeacherPortal: React.FC<P> = () => {
 	)
 }
 
-export { TeacherPortal }
+export default connect((state: RootReducerState) => ({
+	teacher_portal: state.teacher_portal
+}))(TeacherPortal);
