@@ -4,13 +4,8 @@ import { RadioGroup, FormControlLabel, Radio, Typography, Paper, Button } from '
 import Done from '@material-ui/icons/AssignmentTurnedIn'
 import Quit from '@material-ui/icons/Close'
 interface Props {
-	startTime: number
-	path: string
-	medium: string
-	subject: string
-	chapter_id: string
-	assessment: ILMXAssessment | undefined
-	submitAssessment: (path: string, score: number, total_score: number, assessment_meta: any) => void
+	assessment?: ILMXAssessment
+	submitAssessment: (attemptedAssessment: AttemptedAssessment) => void
 	quit: () => void
 }
 /**
@@ -24,7 +19,7 @@ interface Props {
  * can only think of these right now
  */
 
-const AssessmentForm: React.FC<Props> = ({ assessment, quit, startTime, path, medium, subject, chapter_id, submitAssessment }) => {
+const AssessmentForm: React.FC<Props> = ({ assessment, quit, submitAssessment }) => {
 	const [responses, setResponse] = useState<{ [id: string]: string }>({})
 	const [submitted, setSubmitted] = useState(false)
 
@@ -39,33 +34,20 @@ const AssessmentForm: React.FC<Props> = ({ assessment, quit, startTime, path, me
 			return
 		}
 		if (assessment !== undefined) {
-			const total_marks = Object.keys(assessment.questions).length
-			let obtained_marks = 0
 
-			const wrong_responses = Object.entries(assessment.questions)
-				.reduce((agg, [q_id, question]) => {
-					const correct_ans = Object.entries(question.answers).find(([a_id, ans]) => responses[q_id] === a_id && ans.correct_answer)
-					if (!Boolean(correct_ans)) {
-						return {
-							...agg,
-							[q_id]: true
+			const attemptedResponse = Object.entries(assessment.questions)
+				.reduce<AttemptedAssessment>((agg, [q_id, question]) => {
+					const is_correct = Object.entries(question.answers).find(([a_id, ans]) => responses[q_id] === a_id && ans.correct_answer) ? true : false
+					return {
+						...agg,
+						[q_id]: {
+							correct: is_correct
 						}
 					}
-					obtained_marks += 1;
-					return agg
-				}, {} as { [id: string]: boolean })
+				}, {})
 
-			const meta = {
-				medium,
-				subject,
-				chapter_id,
-				lesson_id: assessment.lesson_id,
-				excercise_id: assessment.order,
-				total_duration: assessment.time,
-				attempt_time: (Date.now() - startTime) / 1000,
-				wrong_responses
-			}
-			submitAssessment(path, obtained_marks, total_marks, meta)
+
+			submitAssessment(attemptedResponse)
 			setSubmitted(true)
 		}
 	}

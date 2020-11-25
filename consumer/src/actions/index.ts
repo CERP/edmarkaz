@@ -821,3 +821,30 @@ export const fetchAnalyticsEvents = () => (dispatch: Dispatch, getState: () => R
 			dispatch(getAnalyticsEventsFailure())
 		})
 }
+
+export const fetchTeacherVideosAssessments = () => (dispatch: Dispatch, getState: () => RootReducerState, syncr: Syncr) => {
+
+	if (!syncr.ready) {
+		syncr.onNext("connect", () => dispatch(fetchTeacherVideosAssessments()))
+		return
+	}
+
+	const state = getState()
+
+	syncr.send({
+		type: TeacherActionTypes.VIDEOS_ASSESSMENTS,
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		payload: {}
+	})
+		.then(resp => {
+			dispatch({
+				type: TeacherActionTypes.VIDEOS_ASSESSMENTS_SUCCESS,
+				payload: resp
+			})
+		})
+		.catch(err => {
+			console.log("teacher video assessments", err)
+			dispatch({ type: TeacherActionTypes.VIDEOS_ASSESSMENTS_FAILURE })
+		})
+}

@@ -467,6 +467,20 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 				}
 			}
 
+		case TeacherActionTypes.VIDEOS_ASSESSMENTS_SUCCESS:
+			{
+				const { assessments, videos } = action.payload
+
+				return {
+					...state,
+					teacher_portal: {
+						...state.teacher_portal,
+						assessments,
+						videos
+					}
+				}
+			}
+
 		case LOAD_PROFILE:
 			{
 				return {

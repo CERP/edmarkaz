@@ -1,59 +1,29 @@
-import React from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Container, Avatar, makeStyles, Theme, Button, Paper, Step, StepContent, StepLabel, Stepper, Typography } from '@material-ui/core'
-
+import { connect } from 'react-redux'
+import { fetchTeacherVideosAssessments, teacherUpdateProfile } from 'actions'
+import AssessmentForm from 'pages/Library/Lesson/AssessmentForm'
+import Modal from '../../components/Modal'
 import HelpFooter from 'components/Footer/HelpFooter'
 import Layout from 'components/Layout'
 import ilmxLogo from 'components/Header/ilmx.svg'
 import Youtube from 'react-youtube'
+
 import './style.css'
 
 
 type P = {
-
+	teacher_portal: RootReducerState["teacher_portal"]
+	fetchTeacherPortalData: () => void
+	updateTeacherProfile: (teacherAssessment: Partial<TeacherProfile>) => void
 }
 
-type VData = {
-	[id: string]: VideoMeta
-}
 
 type VideoMeta = {
 	assessment_id: string
 	title: string
 	description: string
 	link: string
-}
-
-const vdata: VData = {
-	"1": {
-		"assessment_id": "1",
-		"title": "What makes a good teacher great?",
-		"description": "Azul Terronez is the author of the best-selling book 'The art of Apprenticeship' Azul has coached teachers and schools leaders around the world",
-		"link": "vrU6YJle6Q4",
-	},
-	"2": {
-		"assessment_id": "1",
-		"title": "Teaching Methods for Inspiring",
-		"description": "Joe Ruhl received his bachelors and masters degrees at Purdue University and he has been sharing the joys of biology with kids for 37 years.",
-		"link": "UCFg9bcW7Bk",
-	},
-	"3": {
-		"assessment_id": "1",
-		"title": "Teaching science: we're doing it wrong",
-		"description": "The world needs scientists and engineers more than ever, but our approach to raising them is backwards and ineffective. ",
-		"link": "5duz42kHqPs",
-	},
-	"4": {
-		"assessment_id": "1",
-		"title": "Teaching Methods for Inspiring",
-		"description": "Joe Ruhl received his bachelors and masters degrees at Purdue University and he has been sharing the joys of biology with kids for 37 years.",
-		"link": "UCFg9bcW7Bk",
-	},
-	"5": {
-		"assessment_id": "1",
-		"title": "Teaching science: we're doing it wrong",
-		"description": "The world needs scientists and engineers more than ever, but our approach to raising them is backwards and ineffective. ",
-		"link": "5duz42kHqPs",
-	},
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -96,24 +66,149 @@ const useStyles = makeStyles((theme: Theme) => ({
 	}
 }))
 
-const flattened_data = Object.entries(vdata)
 
-const getSteps = () => {
-	return flattened_data.reduce<string[]>((agg, [id, value]) => ([...agg, value.title]), [])
-}
+const TeacherPortal: React.FC<P> = ({ teacher_portal, updateTeacherProfile, fetchTeacherPortalData }) => {
 
-const getStepContent = (step: number) => {
-	const [_, video] = flattened_data[step]
+	const { videos, assessments } = teacher_portal
+
+	const classes = useStyles()
+
+	const [activeStep, setActiveStep] = useState(0)
+	const [showAssessmentModal, setAssessmentModal] = useState(false)
+	const [assessmentId, setAssessmentId] = useState('')
+	const [videoId, setVideoId] = useState('')
+
+	const flattened_videos = useMemo(() => (Object.entries(videos)), [videos])
+
+	useEffect(() => {
+		if (Object.keys(videos).length === 0) {
+			fetchTeacherPortalData()
+		}
+	}, [videos, fetchTeacherPortalData])
+
+	const handleTakeAssessment = (videoId: string, assessmentId: string) => {
+		setAssessmentModal(true)
+		setAssessmentId(assessmentId)
+		setVideoId(videoId)
+	}
+
+	const handleQuitAssessment = () => {
+		setAssessmentModal(false)
+		setAssessmentId('')
+		setVideoId('')
+	}
+
+	const handleNext = useCallback(() => {
+		setActiveStep((prevActiveStep) => prevActiveStep + 1)
+	}, [])
+
+	const handleBack = useCallback(() => {
+		setActiveStep((prevActiveStep) => prevActiveStep - 1)
+	}, [])
+
+	const handleAssessmentSubmission = (attemptedAssessment: AttemptedAssessment) => {
+
+		const teacherProfile: Partial<TeacherProfile> = {
+			attempted_assessments: {
+				[videoId + assessmentId]: {
+					questions: attemptedAssessment,
+					date: new Date().getTime()
+				}
+			}
+		}
+
+		updateTeacherProfile(teacherProfile)
+	}
+
 	return (
-		<VideoCard video={video} />
+		<Layout>
+			{
+				showAssessmentModal && <Modal>
+					<div className="modal-box video-modal" style={{ height: "90%" }}>
+						<AssessmentForm
+							assessment={assessments[assessmentId]}
+							submitAssessment={handleAssessmentSubmission}
+							quit={handleQuitAssessment} />
+					</div>
+				</Modal>
+			}
+			<div className={"teacher-portal " + classes.root} >
+
+				<Container maxWidth="lg">
+					<div className={classes.pageMain}>
+						<Avatar variant="square" className={classes.ilmxLogo} src={ilmxLogo} alt="ilmx-logo" />
+						<Typography variant="h4" align="center" color="primary">Teacher Portal</Typography>
+					</div>
+					{Object.keys(videos).length === 0 ? <div>Loading ...</div>
+						: <>
+							<Stepper activeStep={activeStep} variant="elevation" orientation="vertical">
+								{flattened_videos.map(([id, value], index) => (<Step key={id + index}>
+									<StepLabel>
+										<Typography color="primary" className={activeStep === index ? classes.stepLabelActive : classes.stepLabel}>
+											{value.title}
+										</Typography>
+									</StepLabel>
+									<StepContent>
+										<VideoCard video={flattened_videos[activeStep][1]} />
+										<div className={classes.actionsContainer}>
+											<div>
+												<Button
+													disabled={activeStep === 0}
+													onClick={handleBack}
+													className={classes.button}
+												>
+													Back </Button>
+												<Button
+													variant="contained"
+													color="primary"
+													onClick={handleNext}
+													className={classes.button}
+												>
+													{activeStep === flattened_videos.length - 1 ? 'Finish' : 'Next'}
+												</Button>
+												<Button
+													variant="outlined"
+													color="primary"
+													className={classes.button}
+													onClick={() => handleTakeAssessment(id, value.assessment_id)}
+												>
+													Take Assessment
+											</Button>
+											</div>
+										</div>
+									</StepContent>
+								</Step>))}
+							</Stepper>
+							{activeStep === flattened_videos.length && (
+								<Paper square elevation={0} className={classes.resetContainer}>
+									<Typography>All steps completed - you&apos;re finished</Typography>
+								</Paper>
+							)}
+						</>
+					}
+				</Container>
+
+
+				<HelpFooter hlink={'tel:0348-1119-119'} />
+			</div>
+
+		</Layout>
 	)
 }
+
+export default connect((state: RootReducerState) => ({
+	teacher_portal: state.teacher_portal
+}), (dispatch: Function) => ({
+	fetchTeacherPortalData: () => dispatch(fetchTeacherVideosAssessments()),
+	updateTeacherProfile: (teacherProfile: Partial<TeacherProfile>) => dispatch(teacherUpdateProfile(teacherProfile))
+}))(TeacherPortal)
+
 
 type CardProps = {
 	video: VideoMeta
 }
 
-const VideoCard = ({ video }: CardProps) => {
+const VideoCard: React.FC<CardProps> = ({ video }) => {
 
 	const classes = useStyles()
 
@@ -135,81 +230,3 @@ const VideoCard = ({ video }: CardProps) => {
 		</div>
 	)
 }
-
-const TeacherPortal: React.FC<P> = () => {
-
-	const classes = useStyles()
-	const [activeStep, setActiveStep] = React.useState(0)
-	const steps = getSteps()
-
-	const handleNext = () => {
-		setActiveStep((prevActiveStep) => prevActiveStep + 1)
-	}
-
-	const handleBack = () => {
-		setActiveStep((prevActiveStep) => prevActiveStep - 1)
-	}
-
-	const callLink = false ? "https://api.whatsapp.com/send?phone=923481119119" : "tel:0348-1119-119"
-
-	return (
-		<Layout>
-			<div className={"teacher-portal " + classes.root} >
-				<Container maxWidth="lg">
-					<div className={classes.pageMain}>
-						<Avatar variant="square" className={classes.ilmxLogo} src={ilmxLogo} alt="ilmx-logo" />
-						<Typography variant="h4" align="center" color="primary">Teacher Portal</Typography>
-					</div>
-					<Stepper activeStep={activeStep} variant="elevation" orientation="vertical">
-						{steps.map((label, index) => (
-							<Step key={label + index}>
-								<StepLabel>
-									<Typography color="primary" className={activeStep === index ? classes.stepLabelActive : classes.stepLabel}>
-										{label}
-									</Typography>
-								</StepLabel>
-								<StepContent>
-									{getStepContent(index)}
-									<div className={classes.actionsContainer}>
-										<div>
-											<Button
-												disabled={activeStep === 0}
-												onClick={handleBack}
-												className={classes.button}
-											>
-												Back </Button>
-											<Button
-												variant="contained"
-												color="primary"
-												onClick={handleNext}
-												className={classes.button}
-											>
-												{activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-											</Button>
-											<Button
-												variant="outlined"
-												color="primary"
-												className={classes.button}
-											>
-												Take Assessment
-											</Button>
-										</div>
-									</div>
-								</StepContent>
-							</Step>
-						))}
-					</Stepper>
-					{activeStep === steps.length && (
-						<Paper square elevation={0} className={classes.resetContainer}>
-							<Typography>All steps completed - you&apos;re finished</Typography>
-						</Paper>
-					)}
-				</Container>
-
-				<HelpFooter hlink={callLink} />
-			</div>
-		</Layout>
-	)
-}
-
-export { TeacherPortal }

@@ -76,9 +76,7 @@ interface TeacherProfile {
 }
 
 interface TeacherAttemptedAssessment {
-	questions: {
-		[question_id]: { correct: boolean }
-	}
+	questions: AttemptedAssessment
 	date: number
 }
 
@@ -500,4 +498,10 @@ type OrderRequestForm = {
 type ProductOrderAsVisitor = {
 	product: Product
 	request: OrderRequestForm
+}
+
+type AttemptedAssessment = {
+	[qid: string]: {
+		correct: boolean
+	}
 }

@@ -52,7 +52,7 @@ const LessonPage: React.FC<Props> = ({ lessons, assessments, match, connected, l
 	const [videoId, setVideoID] = useState("")
 	const [startTime, setStartTime] = useState(0)
 	const [currentLessonURL, setCurrentLessonURL] = useState("")
-	const [currentAssessment, setCurrentAssessment] = useState<ILMXAssessment | undefined>(undefined)
+	const [currentAssessment, setCurrentAssessment] = useState({} as ILMXAssessment)
 
 	const playLesson = (val: Lesson) => {
 
@@ -66,6 +66,7 @@ const LessonPage: React.FC<Props> = ({ lessons, assessments, match, connected, l
 				trackVideoAnalytics(location.pathname, val.chapter_id, val.lesson_id, 0)
 			}
 		}
+
 		setVideoModal(true)
 	}
 
@@ -93,10 +94,37 @@ const LessonPage: React.FC<Props> = ({ lessons, assessments, match, connected, l
 	const takeAssessment = (assessment: ILMXAssessment) => {
 		setCurrentAssessment(assessment)
 		setAssessmentModal(true)
+		setStartTime(new Date().getTime())
 	}
 	const quitAssessment = () => {
 		setAssessmentModal(false)
-		setCurrentAssessment(undefined)
+		setCurrentAssessment({} as ILMXAssessment)
+	}
+
+	const handleAssessmentSubmission = (attemptedAssessment: AttemptedAssessment) => {
+
+		const attempted_questions = Object.entries(attemptedAssessment || {})
+
+		const totalScore = attempted_questions.length
+		const obtainedScore = attempted_questions.reduce((agg, [id, value]) => value.correct ? agg + 1 : agg, 0)
+
+		const wrongResponses = attempted_questions.reduce((agg, [id, value]) => value.correct ? agg : { ...agg, [id]: value.correct }, {})
+
+		const path = location.pathname
+
+		const meta = {
+			medium,
+			subject,
+			chapter_id: chapter,
+			lesson_id: currentAssessment.lesson_id,
+			excercise_id: currentAssessment.order,
+			total_duration: currentAssessment.time,
+			attempt_time: (startTime - startTime) / 1000,
+			wrong_responses: wrongResponses
+		}
+
+		// submit the assessment
+		trackAssessmentAnalytics(path, obtainedScore, totalScore, meta)
 	}
 
 	const additional_videos = Object.entries(curr_unit).filter(([lesson_id, lesson]) => lesson.meta.video_type && lesson.meta.video_type === "Additional Video")
@@ -140,13 +168,8 @@ const LessonPage: React.FC<Props> = ({ lessons, assessments, match, connected, l
 			!showVideoModal && showAssessmentModal && <Modal>
 				<div className="modal-box video-modal" style={{ height: "90%" }}>
 					<AssessmentForm
-						path={location.pathname}
-						medium={medium}
-						subject={subject}
-						chapter_id={chapter}
 						assessment={currentAssessment}
-						startTime={Date.now()}
-						submitAssessment={trackAssessmentAnalytics}
+						submitAssessment={handleAssessmentSubmission}
 						quit={quitAssessment} />
 				</div>
 			</Modal>
