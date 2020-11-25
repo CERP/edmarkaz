@@ -27,8 +27,8 @@ const TeacherLogin: React.FC<P> = () => {
 		event.preventDefault();
 	}
 
-	const inputFieldHandler = () => {
-
+	const handleChange = (type: string, event: any) => {
+		setState({ ...state, [type]: event.target.value });
 	}
 
 	const { phone_number, password, showPassword } = state
@@ -46,6 +46,8 @@ const TeacherLogin: React.FC<P> = () => {
 			fullWidth
 			placeholder="e.g. 0300 1110000"
 			type="number"
+			error={phone_number.length < 11 || phone_number.length > 11}
+			onChange={(event) => handleChange("phone_number", event)}
 		/>
 		<FormControl variant="outlined" component="section" style={{ marginTop: 5 }} fullWidth>
 			<InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
@@ -53,6 +55,7 @@ const TeacherLogin: React.FC<P> = () => {
 				id="outlined-adornment-password"
 				type={showPassword ? 'text' : 'password'}
 				defaultValue={password}
+				onChange={(event) => handleChange("password", event)}
 				endAdornment={
 					<InputAdornment position="end">
 						<IconButton

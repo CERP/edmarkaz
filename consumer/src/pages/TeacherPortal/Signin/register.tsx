@@ -19,6 +19,8 @@ type P = {
 type S = {
 	phone_number: string;
 	password: string;
+	gender: string;
+	name: string;
 	showPassword: boolean
 	redirect: boolean;
 }
@@ -28,9 +30,15 @@ const TeacherRegister: React.FC<P> = ({ profile, createAccount }) => {
 	const [state, setState] = useState<S>({
 		phone_number: "",
 		password: "",
+		gender: "",
+		name: "",
 		showPassword: false,
 		redirect: false
 	})
+
+	const handleChange = (type: string, event: any) => {
+		setState({ ...state, [type]: event.target.value });
+	}
 
 	const onSave = () => {
 		const number = state.phone_number;
@@ -93,6 +101,7 @@ const TeacherRegister: React.FC<P> = ({ profile, createAccount }) => {
 				fullWidth
 				placeholder="Name"
 				type="text"
+				onChange={(event) => handleChange("name", event)}
 			/>
 			<TextField
 				variant="outlined"
@@ -102,6 +111,7 @@ const TeacherRegister: React.FC<P> = ({ profile, createAccount }) => {
 				placeholder="e.g. 0300 1110000"
 				type="number"
 				error={phone_number.length < 11 || phone_number.length > 11}
+				onChange={(event) => handleChange("phone_number", event)}
 			/>
 
 			<FormControl variant="outlined" component="section" style={{ marginTop: 5 }} fullWidth>
@@ -110,6 +120,7 @@ const TeacherRegister: React.FC<P> = ({ profile, createAccount }) => {
 					id="outlined-adornment-password"
 					type={showPassword ? 'text' : 'password'}
 					defaultValue={password}
+					onChange={(event) => handleChange("password", event)}
 					endAdornment={
 						<InputAdornment position="end">
 							<IconButton
@@ -131,6 +142,7 @@ const TeacherRegister: React.FC<P> = ({ profile, createAccount }) => {
 				select
 				label="Gender"
 				fullWidth
+				onChange={(event) => handleChange("gender", event)}
 			>
 				<MenuItem value="M">Male</MenuItem>
 				<MenuItem value="F">Female</MenuItem>
