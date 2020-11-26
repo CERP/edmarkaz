@@ -123,11 +123,12 @@ create table assessments
 
 create table teachers
 (
-	id text unique not null, -- id (teacher phone)
+	id text not null, -- id (teacher phone)
 	path text not null, -- comma separated
 	value jsonb not null,
 	time bigint not null,
-	date timestamp default current_timestamp
+	date timestamp default current_timestamp,
+	UNIQUE (id, path)
 );
 
 create index on teaches
