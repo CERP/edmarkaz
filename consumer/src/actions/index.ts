@@ -635,7 +635,7 @@ export const teacherSignup = (phone: string, password: string, profile: TeacherP
 					id: phone,
 					user: AppUserRole.TEACHER,
 					token,
-					profile: profile
+					profile
 				}
 			})
 

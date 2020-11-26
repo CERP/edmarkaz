@@ -420,7 +420,7 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 				}
 			}
 
-		case TeacherActionTypes.SIGNUP || TeacherActionTypes.LOGIN_SUCCEED:
+		case TeacherActionTypes.SIGNUP || TeacherActionTypes.LOGIN:
 			{
 				return {
 					...state,
@@ -431,7 +431,7 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 				}
 			}
 
-		case TeacherActionTypes.LOGIN_SUCCEED:
+		case TeacherActionTypes.LOGIN_SUCCEED || TeacherActionTypes.SIGNUP_SUCCEED:
 			{
 				const { profile, ...rest } = action.payload
 
