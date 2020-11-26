@@ -919,7 +919,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 		case EdMarkaz.Auth.create({ phone, password, "teacher" }) do
 			{:ok, text} ->
 
-				{:ok, resp} = EdMarkaz.TeacherPortal.save_profile(phone, profile)
+				{:ok, resp} = EdMarkaz.TeacherPortal.save_profile({phone, profile})
 
 				{:ok, token} = EdMarkaz.Auth.login({phone, client_id, password})
 

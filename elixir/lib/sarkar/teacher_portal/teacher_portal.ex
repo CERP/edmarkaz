@@ -21,13 +21,16 @@ defmodule EdMarkaz.TeacherPortal do
 
 	end
 
+
 	def save_profile({id, profile}) do
 
 		date = :os.system_time(:millisecond)
 
-		flattened_db_sequence = Dynamic.flatten(profile) |> Enum.map(fn {p, v} -> [id, Enum.join(p, ","), v, date] end)
+		flattened_profile = Dynamic.flatten(profile)
 
-		gen_value_strings_db = 1..length(flattened_db_sequence)
+		flattened_db_sequence = flattened_profile |> Enum.reduce([], fn ({p, v}, agg) -> agg ++ [id, Enum.join(p, ","), v, date] end)
+
+		gen_value_strings_db = 1..length(flattened_profile)
 		|> Enum.map(fn num ->
 				x = (num - 1) * 4 + 1
 				"($#{x}, $#{x + 1}, $#{x + 2}, $#{x + 3})"
@@ -37,7 +40,7 @@ defmodule EdMarkaz.TeacherPortal do
 
 		query_string = "INSERT INTO teachers (id, path, value, time)
 		VALUES #{gen_value_strings_db}
-		ON CONFLICT (id, path) DO UPDATE set value=excluded.value, time=excluded.time"
+		ON CONFLICT (id, path) DO UPDATE set value=excluded.value, time=excluded.time, date=current_timestamp"
 
 		case EdMarkaz.DB.Postgres.query(EdMarkaz.DB, query_string, flattened_db_sequence) do
 			{:ok, resp} ->
