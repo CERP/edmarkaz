@@ -95,13 +95,9 @@ const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile
 	}, [videos, fetchTeacherPortalData])
 
 	const handleTakeAssessment = (videoId: string, assessmentId: string) => {
-		if (auth.token) {
-			setAssessmentModal(true)
-			setAssessmentId(assessmentId)
-			setVideoId(videoId)
-		} else {
-			window.location.replace("/teacher-login")
-		}
+		setAssessmentModal(true)
+		setAssessmentId(assessmentId)
+		setVideoId(videoId)
 	}
 
 	const handleQuitAssessment = () => {

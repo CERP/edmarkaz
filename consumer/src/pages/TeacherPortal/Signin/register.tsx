@@ -15,11 +15,11 @@ type P = {
 }
 
 type S = {
-	phone_number: string;
-	password: string;
-	gender: "M" | "F" | undefined;
-	name: string;
-	showPassword: boolean;
+	phone_number: string
+	password: string
+	gender?: "M" | "F"
+	name: string
+	showPassword: boolean
 }
 
 const TeacherRegister: React.FC<P> = ({ validation, createAccount }) => {
@@ -34,8 +34,9 @@ const TeacherRegister: React.FC<P> = ({ validation, createAccount }) => {
 
 	const { phone_number, password, gender, name, showPassword } = state
 
-	const handleChange = (type: string, event: any) => {
-		setState({ ...state, [type]: event.target.value });
+	const handle_change = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const { name, value } = event.target
+		setState({ ...state, [name]: value })
 	}
 
 	const onSave = () => {
@@ -49,14 +50,6 @@ const TeacherRegister: React.FC<P> = ({ validation, createAccount }) => {
 				name: name
 			})
 		}
-	}
-
-	const handleClickShowPassword = () => {
-		setState({ ...state, showPassword: !state.showPassword })
-	}
-
-	const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
-		event.preventDefault();
 	}
 
 	return (
@@ -74,7 +67,8 @@ const TeacherRegister: React.FC<P> = ({ validation, createAccount }) => {
 				fullWidth
 				placeholder="Name"
 				type="text"
-				onChange={(event) => handleChange("name", event)}
+				name="name"
+				onChange={handle_change}
 			/>
 			<TextField
 				variant="outlined"
@@ -83,23 +77,23 @@ const TeacherRegister: React.FC<P> = ({ validation, createAccount }) => {
 				fullWidth
 				placeholder="e.g. 0300 1110000"
 				type="number"
+				name="phone_number"
 				error={phone_number.length < 11 || phone_number.length > 11}
-				onChange={(event) => handleChange("phone_number", event)}
+				onChange={handle_change}
 			/>
-
 			<FormControl variant="outlined" component="section" style={{ marginTop: 5 }} fullWidth>
 				<InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
 				<OutlinedInput
 					id="outlined-adornment-password"
 					type={showPassword ? 'text' : 'password'}
 					defaultValue={password}
-					onChange={(event) => handleChange("password", event)}
+					name="password"
+					onChange={handle_change}
 					endAdornment={
 						<InputAdornment position="end">
 							<IconButton
 								aria-label="toggle password visibility"
-								onClick={handleClickShowPassword}
-								onMouseDown={handleMouseDownPassword}
+								onClick={() => setState({ ...state, showPassword: !state.showPassword })}
 								edge="end"
 							>
 								{showPassword ? <Visibility /> : <VisibilityOff />}
@@ -115,14 +109,15 @@ const TeacherRegister: React.FC<P> = ({ validation, createAccount }) => {
 				select
 				label="Gender"
 				fullWidth
-				onChange={(event) => handleChange("gender", event)}
+				name="gender"
+				onChange={handle_change}
 			>
 				<MenuItem value="M">Male</MenuItem>
 				<MenuItem value="F">Female</MenuItem>
 			</TextField>
 			<Box width="1" style={{ textAlign: "center" }} >
 				<Button
-					style={{ width: "20ch", marginBottom: 20, marginTop: 20, background: "#f05967", color: "white", borderRadius: "32px", fontWeight: "bold", fontSize: "1.25rem" }}
+					style={{ width: "20ch", margin: "auto", marginBottom: 20, marginTop: 20, background: "#f05967", color: "white", borderRadius: "32px", fontWeight: "bold", fontSize: "1.25rem" }}
 					variant="contained"
 					onClick={onSave}>
 					Register

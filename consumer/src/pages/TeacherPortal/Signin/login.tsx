@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
+import { Redirect } from 'react-router-dom'
 import { Typography, Button, TextField, FormControl, Box } from '@material-ui/core'
 import Visibility from '@material-ui/icons/Visibility'
 import VisibilityOff from '@material-ui/icons/VisibilityOff'
@@ -16,10 +17,9 @@ type P = {
 }
 
 type S = {
-	phone_number: string;
-	password: string;
-	redirect: boolean;
-	showPassword: boolean;
+	phone_number: string
+	password: string
+	showPassword: boolean
 }
 
 const TeacherLogin: React.FC<P> = ({ auth, validation, createLogin }) => {
@@ -27,28 +27,14 @@ const TeacherLogin: React.FC<P> = ({ auth, validation, createLogin }) => {
 	const [state, setState] = useState<S>({
 		phone_number: "",
 		password: "",
-		showPassword: false,
-		redirect: false
+		showPassword: false
 	})
 
-	useEffect(() => {
-		if (auth.token) {
-			setState({ ...state, redirect: true })
-		}
-	}, [auth.token])
+	const { phone_number, password, showPassword } = state
 
-	const { phone_number, password, showPassword, redirect } = state
-
-	const handleClickShowPassword = () => {
-		setState({ ...state, showPassword: !state.showPassword })
-	}
-
-	const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
-		event.preventDefault();
-	}
-
-	const handleChange = (type: string, event: any) => {
-		setState({ ...state, [type]: event.target.value });
+	const handle_change = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const { name, value } = event.target
+		setState({ ...state, [name]: value })
 	}
 
 	const login = () => {
@@ -60,10 +46,8 @@ const TeacherLogin: React.FC<P> = ({ auth, validation, createLogin }) => {
 		}
 	}
 
-	if (redirect) {
-		setTimeout(() => {
-			window.location.replace("/teacher")
-		}, 1500)
+	if (auth.token) {
+		return <Redirect exact from="/teacher-login" to="/teacher" />
 	}
 
 	return <>
@@ -79,8 +63,9 @@ const TeacherLogin: React.FC<P> = ({ auth, validation, createLogin }) => {
 			fullWidth
 			placeholder="e.g. 0300 1110000"
 			type="number"
+			name="phone_number"
 			error={phone_number.length < 11 || phone_number.length > 11}
-			onChange={(event) => handleChange("phone_number", event)}
+			onChange={handle_change}
 		/>
 		<FormControl variant="outlined" component="section" style={{ marginTop: 5 }} fullWidth>
 			<InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
@@ -88,13 +73,13 @@ const TeacherLogin: React.FC<P> = ({ auth, validation, createLogin }) => {
 				id="outlined-adornment-password"
 				type={showPassword ? 'text' : 'password'}
 				defaultValue={password}
-				onChange={(event) => handleChange("password", event)}
+				name="password"
+				onChange={handle_change}
 				endAdornment={
 					<InputAdornment position="end">
 						<IconButton
 							aria-label="toggle password visibility"
-							onClick={handleClickShowPassword}
-							onMouseDown={handleMouseDownPassword}
+							onClick={() => setState({ ...state, showPassword: !state.showPassword })}
 							edge="end"
 						>
 							{showPassword ? <Visibility /> : <VisibilityOff />}

@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { teacherLogin, teacherSignup } from 'actions'
 import { TeacherRegister } from './register'
 import { TeacherLogin } from './login'
-import { validation } from '../../../utils/teacherPortal'
+import { validation } from 'utils/teacherPortal'
 
 import HelpFooter from 'components/Footer/HelpFooter'
 import Layout from 'components/Layout'
