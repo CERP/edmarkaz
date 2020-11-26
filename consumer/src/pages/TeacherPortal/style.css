@@ -3,8 +3,23 @@
 	width: 100%;
 }
 
+.teacher-portal .alert-banner {
+	width: 95%;
+	margin: auto;
+}
+
+.teacher-portal .login-button {
+	width: 95%;
+	display: flex;
+	justify-content: flex-end;
+}
+
 @media (max-width: 600px) {
 	.teacher-portal .video-card {
 			height: 320px;
-		}
+	}
+
+	.teacher-portal .alert-banner {
+		width: 90%;
+	}
 }
