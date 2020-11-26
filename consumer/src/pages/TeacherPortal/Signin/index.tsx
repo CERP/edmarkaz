@@ -17,7 +17,7 @@ type P = {
 
 	validation: (number: string, password: string) => void;
 	createLogin: (number: string, password: string) => void;
-	createAccount: (number: string, password: string, profile: Partial<TeacherProfile>) => void;
+	createAccount: (number: string, password: string, profile: TeacherProfile) => void;
 }
 
 const TeacherSignin: React.FC<P> = ({ auth, createLogin, createAccount }) => {
@@ -63,6 +63,5 @@ export default connect((state: RootReducerState) => ({
 	auth: state.auth,
 }), (dispatch: Function) => ({
 	createLogin: (number: string, password: string) => dispatch(teacherLogin(number, password)),
-	//@ts-ignore
-	createAccount: (number: string, password: string, profile: Partial<TeacherProfile>) => dispatch(teacherSignup(number, password, profile))
+	createAccount: (number: string, password: string, profile: TeacherProfile) => dispatch(teacherSignup(number, password, profile))
 }))(TeacherSignin)

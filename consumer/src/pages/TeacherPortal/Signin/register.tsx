@@ -7,17 +7,15 @@ import OutlinedInput from '@material-ui/core/OutlinedInput'
 import InputLabel from '@material-ui/core/InputLabel'
 import InputAdornment from '@material-ui/core/InputAdornment'
 
-import '../../SignUp/style.css'
-
 type P = {
 	validation: (number: string, password: string) => void;
-	createAccount: (number: string, password: string, profile: Partial<TeacherProfile>) => void;
+	createAccount: (number: string, password: string, profile: TeacherProfile) => void;
 }
 
 type S = {
 	phone_number: string
 	password: string
-	gender?: "M" | "F"
+	gender?: Partial<TeacherProfile>["gender"]
 	name: string
 	showPassword: boolean
 }
@@ -117,7 +115,7 @@ const TeacherRegister: React.FC<P> = ({ validation, createAccount }) => {
 			</TextField>
 			<Box width="1" style={{ textAlign: "center" }} >
 				<Button
-					style={{ width: "20ch", margin: "auto", marginBottom: 20, marginTop: 20, background: "#f05967", color: "white", borderRadius: "32px", fontWeight: "bold", fontSize: "1.25rem" }}
+					style={{ width: "20ch", margin: "20 auto", background: "#f05967", color: "white", borderRadius: "32px", fontWeight: "bold", fontSize: "1.25rem" }}
 					variant="contained"
 					onClick={onSave}>
 					Register
