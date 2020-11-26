@@ -111,8 +111,7 @@ const TeacherPortal: React.FC<P> = ({ teacher_portal, updateTeacherProfile, fetc
 		const teacherProfile: Partial<TeacherProfile> = {
 			attempted_assessments: {
 				[`${videoId}-${assessmentId}`]: {
-					questions: attemptedAssessment,
-					date: new Date().getTime()
+					questions: attemptedAssessment
 				}
 			}
 		}
