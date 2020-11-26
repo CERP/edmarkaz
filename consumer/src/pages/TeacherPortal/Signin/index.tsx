@@ -1,16 +1,25 @@
 import React from 'react'
 import { Container, Avatar } from '@material-ui/core'
+import { connect } from 'react-redux'
+import { teacherLogin, teacherSignup } from 'actions'
+import { TeacherRegister } from './register'
+import { TeacherLogin } from './login'
 
 import HelpFooter from 'components/Footer/HelpFooter'
 import Layout from 'components/Layout'
 import ilmxLogo from 'components/Header/ilmx.svg'
-import TeacherRegister from './register'
-import { TeacherLogin } from './login'
+
+
 
 type P = {
+	auth: RootReducerState['auth'];
+	profile: RootReducerState['teacher_portal']['profile'];
+
+	createLogin: (number: string, password: string) => void
+	createAccount: (number: string, password: string, profile: Partial<TeacherProfile>) => void;
 }
 
-const TeacherSignin: React.FC<P> = () => {
+const TeacherSignin: React.FC<P> = ({ auth, profile, createLogin, createAccount }) => {
 
 	const callLink = false ? "https://api.whatsapp.com/send?phone=923481119119" : "tel:0348-1119-119"
 
@@ -32,8 +41,14 @@ const TeacherSignin: React.FC<P> = () => {
 						}} src={ilmxLogo} alt="ilmx-logo" />
 					</div>
 
-					<TeacherLogin />
-					<TeacherRegister />
+					<TeacherLogin
+						auth={auth}
+						createLogin={createLogin}
+					/>
+					<TeacherRegister
+						profile={profile}
+						createAccount={createAccount}
+					/>
 
 				</Container>
 				<HelpFooter hlink={callLink} />
@@ -42,4 +57,11 @@ const TeacherSignin: React.FC<P> = () => {
 	)
 }
 
-export { TeacherSignin }
+export default connect((state: RootReducerState) => ({
+	auth: state.auth,
+	profile: state.teacher_portal.profile,
+}), (dispatch: Function) => ({
+	createLogin: (number: string, password: string) => dispatch(teacherLogin(number, password)),
+	//@ts-ignore
+	createAccount: (number: string, password: string, profile: Partial<TeacherProfile>) => dispatch(teacherSignup(number, password, profile))
+}))(TeacherSignin)

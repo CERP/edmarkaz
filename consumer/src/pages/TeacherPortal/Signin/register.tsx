@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { connect } from 'react-redux'
 import { Typography, Button, TextField, FormControl, Box, MenuItem } from '@material-ui/core'
 import Visibility from '@material-ui/icons/Visibility'
 import VisibilityOff from '@material-ui/icons/VisibilityOff'
@@ -7,7 +6,6 @@ import IconButton from '@material-ui/core/IconButton'
 import OutlinedInput from '@material-ui/core/OutlinedInput'
 import InputLabel from '@material-ui/core/InputLabel'
 import InputAdornment from '@material-ui/core/InputAdornment'
-import { teacherSignup } from 'actions'
 
 import '../../SignUp/style.css'
 
@@ -62,7 +60,6 @@ const TeacherRegister: React.FC<P> = ({ profile, createAccount }) => {
 
 		if (password) {
 			createAccount(phone_number, password, {
-				// ...profile,
 				phone: phone_number,
 				gender: gender,
 				name: name
@@ -158,9 +155,4 @@ const TeacherRegister: React.FC<P> = ({ profile, createAccount }) => {
 	)
 }
 
-export default connect((state: RootReducerState) => ({
-	profile: state.teacher_portal.profile,
-}), (dispatch: Function) => ({
-	//@ts-ignore
-	createAccount: (number: string, password: string, profile: Partial<TeacherProfile>) => dispatch(teacherSignup(number, password, profile))
-}))(TeacherRegister)
+export { TeacherRegister };

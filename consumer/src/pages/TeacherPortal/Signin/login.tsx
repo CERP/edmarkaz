@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Typography, Button, TextField, FormControl, Box } from '@material-ui/core'
 import Visibility from '@material-ui/icons/Visibility'
 import VisibilityOff from '@material-ui/icons/VisibilityOff'
@@ -7,17 +7,29 @@ import OutlinedInput from '@material-ui/core/OutlinedInput'
 import InputLabel from '@material-ui/core/InputLabel'
 import InputAdornment from '@material-ui/core/InputAdornment'
 
-type P = {
 
+type P = {
+	auth: RootReducerState['auth'];
+	createLogin: (number: string, password: string) => void
 }
 
-const TeacherLogin: React.FC<P> = () => {
+
+const TeacherLogin: React.FC<P> = ({ auth, createLogin }) => {
 
 	const [state, setState] = useState({
 		phone_number: "",
 		password: "",
 		showPassword: false,
+		redirect: false
 	})
+
+	useEffect(() => {
+		if (auth.token) {
+			setState({ ...state, redirect: true })
+		}
+	}, [auth.token])
+
+	const { phone_number, password, showPassword, redirect } = state
 
 	const handleClickShowPassword = () => {
 		setState({ ...state, showPassword: !state.showPassword })
@@ -31,7 +43,33 @@ const TeacherLogin: React.FC<P> = () => {
 		setState({ ...state, [type]: event.target.value });
 	}
 
-	const { phone_number, password, showPassword } = state
+	const login = () => {
+		if (!phone_number) {
+			alert("Phone Number is required")
+		}
+
+		if (!phone_number.startsWith("03")) {
+			return alert("phone number must start with 03")
+		}
+
+		if (phone_number.length > 11 || phone_number.length < 11) {
+			return alert("please enter a valid number")
+		}
+
+		if (!password) {
+			alert("Password is required")
+		}
+
+		if (password) {
+			createLogin(phone_number, password)
+		}
+	}
+
+	if (redirect) {
+		setTimeout(() => {
+			window.location.replace("/teacher")
+		}, 1500)
+	}
 
 	return <>
 		<Typography
@@ -75,6 +113,7 @@ const TeacherLogin: React.FC<P> = () => {
 			<Button
 				style={{ width: "20ch", margin: "auto", marginBottom: 20, marginTop: 20, background: "#f05967", color: "white", borderRadius: "32px", fontWeight: "bold", fontSize: "1.25rem" }}
 				variant="contained"
+				onClick={login}
 			>
 				Sign In
 			</Button>
@@ -86,4 +125,4 @@ const TeacherLogin: React.FC<P> = () => {
 
 }
 
-export { TeacherLogin }
+export { TeacherLogin };
