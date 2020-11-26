@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { teacherLogin, teacherSignup } from 'actions'
 import { TeacherRegister } from './register'
 import { TeacherLogin } from './login'
+import { validation } from '../../../utils/teacherPortal'
 
 import HelpFooter from 'components/Footer/HelpFooter'
 import Layout from 'components/Layout'
@@ -15,7 +16,8 @@ type P = {
 	auth: RootReducerState['auth'];
 	profile: RootReducerState['teacher_portal']['profile'];
 
-	createLogin: (number: string, password: string) => void
+	validation: (number: string, password: string) => void;
+	createLogin: (number: string, password: string) => void;
 	createAccount: (number: string, password: string, profile: Partial<TeacherProfile>) => void;
 }
 
@@ -43,10 +45,11 @@ const TeacherSignin: React.FC<P> = ({ auth, profile, createLogin, createAccount 
 
 					<TeacherLogin
 						auth={auth}
+						validation={validation}
 						createLogin={createLogin}
 					/>
 					<TeacherRegister
-						profile={profile}
+						validation={validation}
 						createAccount={createAccount}
 					/>
 

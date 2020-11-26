@@ -10,7 +10,7 @@ import InputAdornment from '@material-ui/core/InputAdornment'
 import '../../SignUp/style.css'
 
 type P = {
-	profile: RootReducerState['teacher_portal']['profile'];
+	validation: (number: string, password: string) => void;
 	createAccount: (number: string, password: string, profile: Partial<TeacherProfile>) => void;
 }
 
@@ -23,7 +23,7 @@ type S = {
 	redirect: boolean;
 }
 
-const TeacherRegister: React.FC<P> = ({ profile, createAccount }) => {
+const TeacherRegister: React.FC<P> = ({ validation, createAccount }) => {
 
 	const [state, setState] = useState<S>({
 		phone_number: "",
@@ -42,21 +42,7 @@ const TeacherRegister: React.FC<P> = ({ profile, createAccount }) => {
 
 	const onSave = () => {
 
-		if (!phone_number) {
-			alert("Phone Number is required")
-		}
-
-		if (!phone_number.startsWith("03")) {
-			return alert("phone number must start with 03")
-		}
-
-		if (phone_number.length > 11 || phone_number.length < 11) {
-			return alert("please enter a valid number")
-		}
-
-		if (!password) {
-			alert("Password is required")
-		}
+		validation(phone_number, password)
 
 		if (password) {
 			createAccount(phone_number, password, {
@@ -65,7 +51,6 @@ const TeacherRegister: React.FC<P> = ({ profile, createAccount }) => {
 				name: name
 			})
 		}
-
 	}
 
 	const handleClickShowPassword = () => {

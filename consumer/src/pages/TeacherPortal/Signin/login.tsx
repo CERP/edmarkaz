@@ -10,11 +10,13 @@ import InputAdornment from '@material-ui/core/InputAdornment'
 
 type P = {
 	auth: RootReducerState['auth'];
-	createLogin: (number: string, password: string) => void
+
+	validation: (number: string, password: string) => void;
+	createLogin: (number: string, password: string) => void;
 }
 
 
-const TeacherLogin: React.FC<P> = ({ auth, createLogin }) => {
+const TeacherLogin: React.FC<P> = ({ auth, validation, createLogin }) => {
 
 	const [state, setState] = useState({
 		phone_number: "",
@@ -44,21 +46,8 @@ const TeacherLogin: React.FC<P> = ({ auth, createLogin }) => {
 	}
 
 	const login = () => {
-		if (!phone_number) {
-			alert("Phone Number is required")
-		}
 
-		if (!phone_number.startsWith("03")) {
-			return alert("phone number must start with 03")
-		}
-
-		if (phone_number.length > 11 || phone_number.length < 11) {
-			return alert("please enter a valid number")
-		}
-
-		if (!password) {
-			alert("Password is required")
-		}
+		validation(phone_number, password)
 
 		if (password) {
 			createLogin(phone_number, password)
