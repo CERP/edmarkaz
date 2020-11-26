@@ -18,6 +18,7 @@ import { CompetitionWinners } from 'pages/Challenge/winners'
 import { ScrollToTop } from 'components/ScrollToTop'
 import TeacherPortal from 'pages/TeacherPortal'
 import { TeacherSignin } from 'pages/TeacherPortal/Signin'
+import { TeacherProfile } from 'pages/TeacherPortal/Profile/TeacherProfile'
 
 const Routes = ({ store }: { store: Store }) => (
 	<Provider store={store}>
@@ -36,6 +37,7 @@ const Routes = ({ store }: { store: Store }) => (
 					<TrackedRoute exact path="/student" component={StudentPortal} />
 					<TrackedRoute exact path="/teacher" component={TeacherPortal} />
 					<TrackedRoute exact path="/teacher-login" component={TeacherSignin} />
+					<TrackedRoute exact path="/teacher-profile" component={TeacherProfile} />
 					<TrackedRoute exact path="/14th-august-competition-winners" component={CompetitionWinners} />
 					<Route path="/" component={TabsBar} />
 				</Switch>
