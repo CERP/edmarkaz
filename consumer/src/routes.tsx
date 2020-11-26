@@ -17,8 +17,8 @@ import Campaign from 'pages/Front/campaign'
 import { CompetitionWinners } from 'pages/Challenge/winners'
 import { ScrollToTop } from 'components/ScrollToTop'
 import TeacherPortal from 'pages/TeacherPortal'
+import TeacherProfile from 'pages/TeacherPortal/Profile/TeacherProfile'
 import { TeacherSignin } from 'pages/TeacherPortal/Signin'
-import { TeacherProfile } from 'pages/TeacherPortal/Profile/TeacherProfile'
 
 const Routes = ({ store }: { store: Store }) => (
 	<Provider store={store}>
