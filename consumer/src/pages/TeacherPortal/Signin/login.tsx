@@ -15,10 +15,16 @@ type P = {
 	createLogin: (number: string, password: string) => void;
 }
 
+type S = {
+	phone_number: string;
+	password: string;
+	redirect: boolean;
+	showPassword: boolean;
+}
 
 const TeacherLogin: React.FC<P> = ({ auth, validation, createLogin }) => {
 
-	const [state, setState] = useState({
+	const [state, setState] = useState<S>({
 		phone_number: "",
 		password: "",
 		showPassword: false,

@@ -19,8 +19,7 @@ type S = {
 	password: string;
 	gender: "M" | "F" | undefined;
 	name: string;
-	showPassword: boolean
-	redirect: boolean;
+	showPassword: boolean;
 }
 
 const TeacherRegister: React.FC<P> = ({ validation, createAccount }) => {
@@ -31,10 +30,9 @@ const TeacherRegister: React.FC<P> = ({ validation, createAccount }) => {
 		gender: "M",
 		name: "",
 		showPassword: false,
-		redirect: false
 	})
 
-	const { phone_number, password, gender, name, showPassword, redirect } = state
+	const { phone_number, password, gender, name, showPassword } = state
 
 	const handleChange = (type: string, event: any) => {
 		setState({ ...state, [type]: event.target.value });
@@ -59,12 +57,6 @@ const TeacherRegister: React.FC<P> = ({ validation, createAccount }) => {
 
 	const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
 		event.preventDefault();
-	}
-
-	if (state.redirect) {
-		setTimeout(() => {
-			window.location.replace("/teacher")
-		}, 1500)
 	}
 
 	return (
