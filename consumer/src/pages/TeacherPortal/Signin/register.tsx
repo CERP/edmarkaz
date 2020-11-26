@@ -7,7 +7,7 @@ import IconButton from '@material-ui/core/IconButton'
 import OutlinedInput from '@material-ui/core/OutlinedInput'
 import InputLabel from '@material-ui/core/InputLabel'
 import InputAdornment from '@material-ui/core/InputAdornment'
-import { signUp } from 'actions'
+import { teacherSignup } from 'actions'
 
 import '../../SignUp/style.css'
 
@@ -19,7 +19,7 @@ type P = {
 type S = {
 	phone_number: string;
 	password: string;
-	gender: string;
+	gender: "M" | "F" | undefined;
 	name: string;
 	showPassword: boolean
 	redirect: boolean;
@@ -30,29 +30,29 @@ const TeacherRegister: React.FC<P> = ({ profile, createAccount }) => {
 	const [state, setState] = useState<S>({
 		phone_number: "",
 		password: "",
-		gender: "",
+		gender: "M",
 		name: "",
 		showPassword: false,
 		redirect: false
 	})
+
+	const { phone_number, password, gender, name, showPassword, redirect } = state
 
 	const handleChange = (type: string, event: any) => {
 		setState({ ...state, [type]: event.target.value });
 	}
 
 	const onSave = () => {
-		const number = state.phone_number;
-		const password = state.password;
 
-		if (!number) {
+		if (!phone_number) {
 			alert("Phone Number is required")
 		}
 
-		if (!number.startsWith("03")) {
+		if (!phone_number.startsWith("03")) {
 			return alert("phone number must start with 03")
 		}
 
-		if (number.length > 11 || number.length < 11) {
+		if (phone_number.length > 11 || phone_number.length < 11) {
 			return alert("please enter a valid number")
 		}
 
@@ -61,10 +61,11 @@ const TeacherRegister: React.FC<P> = ({ profile, createAccount }) => {
 		}
 
 		if (password) {
-			createAccount(number, password, {
-				...profile,
-				//@ts-ignore
-				phone_number: number
+			createAccount(phone_number, password, {
+				// ...profile,
+				phone: phone_number,
+				gender: gender,
+				name: name
 			})
 		}
 
@@ -83,8 +84,6 @@ const TeacherRegister: React.FC<P> = ({ profile, createAccount }) => {
 			window.location.replace("/teacher")
 		}, 1500)
 	}
-
-	const { password, showPassword, phone_number } = state
 
 	return (
 		<div className="register-account">
@@ -163,5 +162,5 @@ export default connect((state: RootReducerState) => ({
 	profile: state.teacher_portal.profile,
 }), (dispatch: Function) => ({
 	//@ts-ignore
-	createAccount: (number: string, password: string, profile: Partial<TeacherProfile>) => dispatch(signUp(number, password, profile))
+	createAccount: (number: string, password: string, profile: Partial<TeacherProfile>) => dispatch(teacherSignup(number, password, profile))
 }))(TeacherRegister)
