@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Container, Avatar, makeStyles, Theme, Button, Paper, Step, StepContent, StepLabel, Stepper, Typography } from '@material-ui/core'
 import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
 import { fetchTeacherVideosAssessments, teacherUpdateProfile } from 'actions'
 import AssessmentForm from 'pages/Library/Lesson/AssessmentForm'
 import Modal from '../../components/Modal'
@@ -8,13 +9,16 @@ import HelpFooter from 'components/Footer/HelpFooter'
 import Layout from 'components/Layout'
 import ilmxLogo from 'components/Header/ilmx.svg'
 import Youtube from 'react-youtube'
+import { AppUserRole } from 'constants/app'
+import Alert from 'components/Alert'
 
 import './style.css'
 
 
+
 type P = {
-	token: RootReducerState["auth"]["token"]
 	teacher_portal: RootReducerState["teacher_portal"]
+	auth: RootReducerState["auth"],
 	fetchTeacherPortalData: () => void
 	updateTeacherProfile: (teacherAssessment: Partial<TeacherProfile>) => void
 }
@@ -34,11 +38,14 @@ const useStyles = makeStyles((theme: Theme) => ({
 	},
 	button: {
 		padding: theme.spacing(0.5),
-		marginTop: theme.spacing(1),
-		marginRight: theme.spacing(1),
+		marginTop: theme.spacing(0.5),
+		marginRight: theme.spacing(0.5),
+	},
+	buttonLogin: {
+		padding: theme.spacing(0.75),
 	},
 	actionsContainer: {
-		marginBottom: theme.spacing(3),
+		marginBottom: theme.spacing(2),
 	},
 	resetContainer: {
 		padding: theme.spacing(4),
@@ -68,7 +75,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 }))
 
 
-const TeacherPortal: React.FC<P> = ({ token, teacher_portal, updateTeacherProfile, fetchTeacherPortalData }) => {
+const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile, fetchTeacherPortalData }) => {
 
 	const { videos, assessments } = teacher_portal
 
@@ -88,7 +95,7 @@ const TeacherPortal: React.FC<P> = ({ token, teacher_portal, updateTeacherProfil
 	}, [videos, fetchTeacherPortalData])
 
 	const handleTakeAssessment = (videoId: string, assessmentId: string) => {
-		if (token) {
+		if (auth.token) {
 			setAssessmentModal(true)
 			setAssessmentId(assessmentId)
 			setVideoId(videoId)
@@ -115,9 +122,8 @@ const TeacherPortal: React.FC<P> = ({ token, teacher_portal, updateTeacherProfil
 
 		const teacherProfile: Partial<TeacherProfile> = {
 			attempted_assessments: {
-				[videoId + assessmentId]: {
-					questions: attemptedAssessment,
-					date: new Date().getTime()
+				[`${videoId}-${assessmentId}`]: {
+					questions: attemptedAssessment
 				}
 			}
 		}
@@ -146,6 +152,23 @@ const TeacherPortal: React.FC<P> = ({ token, teacher_portal, updateTeacherProfil
 					</div>
 					{Object.keys(videos).length === 0 ? <div>Loading ...</div>
 						: <>
+							{
+								!auth.token && auth.user !== AppUserRole.TEACHER && <div className="alert-banner">
+									<Alert text="Please login as a teacher to take Assessment to get a certificate" />
+								</div>
+							}
+							{
+								!auth.token && auth.user !== AppUserRole.TEACHER && <div className="login-button">
+									<Link to="/teacher-login">
+										<Button
+											variant={"contained"}
+											color="primary"
+											onClick={handleBack}
+											className={classes.buttonLogin} >
+											Login as Teacher</Button>
+									</Link>
+								</div>
+							}
 							<Stepper activeStep={activeStep} variant="elevation" orientation="vertical">
 								{flattened_videos.map(([id, value], index) => (<Step key={id + index}>
 									<StepLabel>
@@ -172,13 +195,14 @@ const TeacherPortal: React.FC<P> = ({ token, teacher_portal, updateTeacherProfil
 													{activeStep === flattened_videos.length - 1 ? 'Finish' : 'Next'}
 												</Button>
 												<Button
+													disabled={!auth.token && auth.user !== AppUserRole.TEACHER}
 													variant="outlined"
 													color="primary"
 													className={classes.button}
 													onClick={() => handleTakeAssessment(id, value.assessment_id)}
 												>
 													Take Assessment
-											</Button>
+												</Button>
 											</div>
 										</div>
 									</StepContent>
@@ -203,7 +227,7 @@ const TeacherPortal: React.FC<P> = ({ token, teacher_portal, updateTeacherProfil
 
 export default connect((state: RootReducerState) => ({
 	teacher_portal: state.teacher_portal,
-	token: state.auth.token
+	auth: state.auth
 }), (dispatch: Function) => ({
 	fetchTeacherPortalData: () => dispatch(fetchTeacherVideosAssessments()),
 	updateTeacherProfile: (teacherProfile: Partial<TeacherProfile>) => dispatch(teacherUpdateProfile(teacherProfile))

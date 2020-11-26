@@ -990,12 +990,12 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 			"client_id" => client_id
 		}, %{client_id: client, id: id} = state) do
 
-		case EdMarkaz.TeacherPortal.save_profile(teacher_id, value) do
+		case EdMarkaz.TeacherPortal.save_profile({teacher_id, value}) do
 			{:ok, _} ->
-				response = %{message: "changes saved successfully"}
+				response = %{message: "profile updated successfully"}
 				{:reply, succeed(response), state}
-			{:error, _} ->
-				response = %{message: "unable to save the changes"}
+			{:error, err} ->
+				response = %{message: "db error while updating profile", error: err}
 				{:reply, fail(response), state}
 		end
 	end

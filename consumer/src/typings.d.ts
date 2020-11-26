@@ -76,7 +76,6 @@ interface TeacherProfile {
 
 interface TeacherAttemptedAssessment {
 	questions: AttemptedAssessment
-	date: number
 }
 
 interface TeacherPortalVideo {

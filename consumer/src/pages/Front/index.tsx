@@ -174,7 +174,7 @@ const FrontPage = () => {
 					We curate and organize high quality materials and teacher training content
 					to help you and your classroom be the very best!
 				</div>
-				<div className="pill" onClick={() => setShowModal(true)}> Teacher Portal</div>
+				<Link className="pill" to="/teacher"> Teacher Portal</Link>
 			</div>
 		</div>
 
