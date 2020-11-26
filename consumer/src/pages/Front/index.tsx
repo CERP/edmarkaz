@@ -47,7 +47,7 @@ const FrontPage = () => {
 				}
 				<img className="img" src={Demo} /> */}
 				<div className="image-card-container">
-					<Link to="/teacher-login" className="image-card" >
+					<Link to="/teacher" className="image-card" >
 						<img className="img" src={TeacherMain} style={{ backgroundColor: "#B1E1E8", objectFit: "cover" }} alt="teacher-menu" />
 						<div className="pill" style={{ lineHeight: '40px' }}>
 							<div className="i-am-a">I am a</div>

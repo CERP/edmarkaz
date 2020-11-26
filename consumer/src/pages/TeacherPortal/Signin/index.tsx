@@ -14,14 +14,13 @@ import ilmxLogo from 'components/Header/ilmx.svg'
 
 type P = {
 	auth: RootReducerState['auth'];
-	profile: RootReducerState['teacher_portal']['profile'];
 
 	validation: (number: string, password: string) => void;
 	createLogin: (number: string, password: string) => void;
 	createAccount: (number: string, password: string, profile: Partial<TeacherProfile>) => void;
 }
 
-const TeacherSignin: React.FC<P> = ({ auth, profile, createLogin, createAccount }) => {
+const TeacherSignin: React.FC<P> = ({ auth, createLogin, createAccount }) => {
 
 	const callLink = false ? "https://api.whatsapp.com/send?phone=923481119119" : "tel:0348-1119-119"
 
@@ -62,7 +61,6 @@ const TeacherSignin: React.FC<P> = ({ auth, profile, createLogin, createAccount 
 
 export default connect((state: RootReducerState) => ({
 	auth: state.auth,
-	profile: state.teacher_portal.profile,
 }), (dispatch: Function) => ({
 	createLogin: (number: string, password: string) => dispatch(teacherLogin(number, password)),
 	//@ts-ignore

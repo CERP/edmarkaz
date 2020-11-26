@@ -13,6 +13,7 @@ import './style.css'
 
 
 type P = {
+	token: RootReducerState["auth"]["token"]
 	teacher_portal: RootReducerState["teacher_portal"]
 	fetchTeacherPortalData: () => void
 	updateTeacherProfile: (teacherAssessment: Partial<TeacherProfile>) => void
@@ -67,7 +68,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 }))
 
 
-const TeacherPortal: React.FC<P> = ({ teacher_portal, updateTeacherProfile, fetchTeacherPortalData }) => {
+const TeacherPortal: React.FC<P> = ({ token, teacher_portal, updateTeacherProfile, fetchTeacherPortalData }) => {
 
 	const { videos, assessments } = teacher_portal
 
@@ -87,9 +88,13 @@ const TeacherPortal: React.FC<P> = ({ teacher_portal, updateTeacherProfile, fetc
 	}, [videos, fetchTeacherPortalData])
 
 	const handleTakeAssessment = (videoId: string, assessmentId: string) => {
-		setAssessmentModal(true)
-		setAssessmentId(assessmentId)
-		setVideoId(videoId)
+		if (token) {
+			setAssessmentModal(true)
+			setAssessmentId(assessmentId)
+			setVideoId(videoId)
+		} else {
+			window.location.replace("/teacher-login")
+		}
 	}
 
 	const handleQuitAssessment = () => {
@@ -197,7 +202,8 @@ const TeacherPortal: React.FC<P> = ({ teacher_portal, updateTeacherProfile, fetc
 }
 
 export default connect((state: RootReducerState) => ({
-	teacher_portal: state.teacher_portal
+	teacher_portal: state.teacher_portal,
+	token: state.auth.token
 }), (dispatch: Function) => ({
 	fetchTeacherPortalData: () => dispatch(fetchTeacherVideosAssessments()),
 	updateTeacherProfile: (teacherProfile: Partial<TeacherProfile>) => dispatch(teacherUpdateProfile(teacherProfile))
