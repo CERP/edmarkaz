@@ -469,6 +469,24 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 				}
 			}
 
+		case TeacherActionTypes.LOGOUT:
+			{
+				return {
+					...state,
+					auth: {
+						...state.auth,
+						id: undefined,
+						user: undefined,
+						token: undefined
+					},
+					teacher_portal: {
+						...state.teacher_portal,
+						profile: {}
+					}
+
+				}
+			}
+
 		case TeacherActionTypes.VIDEOS_ASSESSMENTS_SUCCESS:
 			{
 				const { assessments, videos } = action.payload

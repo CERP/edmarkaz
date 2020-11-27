@@ -689,6 +689,12 @@ export const teacherUpdateProfile = (profile: Partial<TeacherProfile>) => (dispa
 
 }
 
+export const teacherLogout = () => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+	dispatch({
+		type: TeacherActionTypes.LOGOUT,
+	})
+}
+
 export const placeOrder = (product: Product) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 
 	const state = getState();

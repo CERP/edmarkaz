@@ -1,5 +1,16 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { Container, Avatar, makeStyles, Theme, Button, Paper, Step, StepContent, StepLabel, Stepper, Typography } from '@material-ui/core'
+import {
+	Container,
+	Avatar,
+	makeStyles,
+	Theme,
+	Button,
+	Step,
+	StepContent,
+	Stepper,
+	Typography,
+	StepButton
+} from '@material-ui/core'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { fetchTeacherVideosAssessments, teacherUpdateProfile } from 'actions'
@@ -14,15 +25,12 @@ import Alert from 'components/Alert'
 
 import './style.css'
 
-
-
 type P = {
 	teacher_portal: RootReducerState["teacher_portal"]
 	auth: RootReducerState["auth"],
 	fetchTeacherPortalData: () => void
 	updateTeacherProfile: (teacherAssessment: Partial<TeacherProfile>) => void
 }
-
 
 type VideoMeta = {
 	assessment_id: string
@@ -77,7 +85,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile, fetchTeacherPortalData }) => {
 
-	const { videos, assessments } = teacher_portal
+	const { profile, videos, assessments } = teacher_portal
 
 	const classes = useStyles()
 
@@ -167,11 +175,11 @@ const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile
 							}
 							<Stepper activeStep={activeStep} variant="elevation" orientation="vertical">
 								{flattened_videos.map(([id, value], index) => (<Step key={id + index}>
-									<StepLabel>
+									<StepButton completed={checkAssessmentTaken(id, value.assessment_id, profile)}>
 										<Typography color="primary" className={activeStep === index ? classes.stepLabelActive : classes.stepLabel}>
 											{value.title}
 										</Typography>
-									</StepLabel>
+									</StepButton>
 									<StepContent>
 										<VideoCard video={flattened_videos[activeStep][1]} />
 										<div className={classes.actionsContainer}>
@@ -185,38 +193,37 @@ const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile
 												<Button
 													variant="contained"
 													color="primary"
-													onClick={handleNext}
+													onClick={(activeStep !== flattened_videos.length - 1) ? handleNext : () => { }}
 													className={classes.button}
 												>
-													{activeStep === flattened_videos.length - 1 ? 'Finish' : 'Next'}
+													{activeStep === flattened_videos.length - 1 ? 'Give Feedback' : 'Next'}
 												</Button>
 												<Button
-													disabled={!auth.token && auth.user !== AppUserRole.TEACHER}
+													disabled={(auth.token ? auth.user !== AppUserRole.TEACHER : true) || checkAssessmentTaken(id, value.assessment_id, profile)}
 													variant="outlined"
 													color="primary"
 													className={classes.button}
 													onClick={() => handleTakeAssessment(id, value.assessment_id)}
 												>
-													Take Assessment
+													{checkAssessmentTaken(id, value.assessment_id, profile) ? 'Assessment Taken' : 'Take Assessment'}
 												</Button>
 											</div>
 										</div>
 									</StepContent>
 								</Step>))}
 							</Stepper>
-							{activeStep === flattened_videos.length && (
-								<Paper square elevation={0} className={classes.resetContainer}>
-									<Typography>All steps completed - you&apos;re finished</Typography>
-								</Paper>
-							)}
 						</>
 					}
+					{
+						// activeStep === flattened_videos.length - 1 && (
+						// 	<Paper square elevation={0} className={classes.resetContainer}>
+						// 		<Typography>You have completed the source!</Typography>
+						// 	</Paper>
+						// )
+					}
 				</Container>
-
-
-				<HelpFooter hlink={'tel:0348-1119-119'} />
 			</div>
-
+			<HelpFooter hlink={'tel:0348-1119-119'} />
 		</Layout>
 	)
 }
@@ -255,4 +262,12 @@ const VideoCard: React.FC<CardProps> = ({ video }) => {
 			<Typography variant="body2" style={{ margin: 0 }} className={classes.actionsContainer}>{video.description}</Typography>
 		</div>
 	)
+}
+
+const checkAssessmentTaken = (videoId: string, assessmentId: string, profile: Partial<TeacherProfile>): boolean => {
+
+	const assessment_key = videoId + "-" + assessmentId
+	const { attempted_assessments } = profile
+	// @ts-ignore
+	return attempted_assessments ? Boolean(attempted_assessments[assessment_key]) : false
 }

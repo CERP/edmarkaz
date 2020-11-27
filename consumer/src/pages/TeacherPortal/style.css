@@ -34,3 +34,11 @@
 	font-weight: bold;
 	font-size: 1.25rem;
 }
+
+.teacher-portal.profile {
+	margin-top: 30px;
+}
+
+.teacher-portal.profile span {
+	font-weight: bold;
+}
