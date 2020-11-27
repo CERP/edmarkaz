@@ -79,9 +79,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 		width: '280px',
 		height: '100%'
 	},
-	videoCard: {
-		// padding: theme.spacing(2)
-	}
+	videoCard: {}
 }))
 
 
@@ -220,13 +218,6 @@ const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile
 										</Step>))}
 							</Stepper>
 						</>
-					}
-					{
-						// activeStep === flattened_videos.length - 1 && (
-						// 	<Paper square elevation={0} className={classes.resetContainer}>
-						// 		<Typography>You have completed the source!</Typography>
-						// 	</Paper>
-						// )
 					}
 				</Container>
 			</div>

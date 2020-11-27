@@ -1,15 +1,12 @@
 import React from 'react'
-import { Container, Avatar } from '@material-ui/core'
+import { Container, Avatar, Typography } from '@material-ui/core'
 import { connect } from 'react-redux'
 import { teacherLogin, teacherSignup } from 'actions'
 import { TeacherRegister } from './register'
 import { TeacherLogin } from './login'
-
 import HelpFooter from 'components/Footer/HelpFooter'
 import Layout from 'components/Layout'
 import ilmxLogo from 'components/Header/ilmx.svg'
-
-
 
 interface P {
 	auth: RootReducerState['auth']
@@ -35,6 +32,7 @@ const TeacherSignin: React.FC<P> = ({ auth, createLogin, createAccount }) => {
 							width: "70%",
 							margin: "auto"
 						}} src={ilmxLogo} alt="ilmx-logo" />
+						<Typography variant="h4" align="center" color="primary">Teacher Portal</Typography>
 					</div>
 
 					<TeacherLogin

@@ -9,7 +9,6 @@ import InputLabel from '@material-ui/core/InputLabel'
 import InputAdornment from '@material-ui/core/InputAdornment'
 import { AppUserRole } from 'constants/app'
 
-
 type P = {
 	auth: RootReducerState['auth']
 	createLogin: (number: string, password: string) => void
