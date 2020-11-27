@@ -1,27 +1,27 @@
 .teacher-portal .video-card {
 	height: 400px;
 	width: 100%;
+	margin: 15px 0px;
 }
 
 .teacher-portal .alert-banner {
-	width: 95%;
-	margin: auto;
+	width: 100%;
+	margin: 20px 0px;
 }
 
 .teacher-portal .login-button {
-	width: 95%;
-	display: flex;
-	justify-content: flex-end;
+	margin-right: 20px;
+    margin-left: 20px;
 }
 
 @media (max-width: 600px) {
 	.teacher-portal .video-card {
 			height: 320px;
 	}
-
-	.teacher-portal .alert-banner {
-		width: 90%;
+	.teacher-portal .login-button {
+		margin: 0px;
 	}
+
 }
 
 .teacher-portal .pill-button {

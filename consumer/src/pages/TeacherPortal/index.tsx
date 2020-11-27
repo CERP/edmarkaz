@@ -41,16 +41,18 @@ type VideoMeta = {
 
 const useStyles = makeStyles((theme: Theme) => ({
 	root: {
-		width: '100%',
-		marginBottom: '4rem'
+		marginBottom: '8rem'
 	},
 	button: {
-		padding: theme.spacing(0.5),
-		marginTop: theme.spacing(0.5),
-		marginRight: theme.spacing(0.5),
+		padding: theme.spacing(0.75),
+		marginRight: theme.spacing(0.25),
 	},
 	buttonLogin: {
 		padding: theme.spacing(0.75),
+	},
+	buttonLoginContainer: {
+		width: '100%',
+		textAlign: 'right',
 	},
 	actionsContainer: {
 		marginBottom: theme.spacing(2),
@@ -78,7 +80,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 		height: '100%'
 	},
 	videoCard: {
-		padding: theme.spacing(2)
+		// padding: theme.spacing(2)
 	}
 }))
 
@@ -154,26 +156,28 @@ const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile
 						<Avatar variant="square" className={classes.ilmxLogo} src={ilmxLogo} alt="ilmx-logo" />
 						<Typography variant="h4" align="center" color="primary">Teacher Portal</Typography>
 					</div>
-					{Object.keys(videos).length === 0 ? <div>Loading ...</div>
+					{Object.keys(videos).length === 0 ? <div>Loading, Please wait...</div>
 						: <>
 							{
-								!auth.token && auth.user !== AppUserRole.TEACHER && <div className="alert-banner">
-									<Alert text="Please login as a teacher to take Assessment to get a certificate" />
-								</div>
+								(auth.token ? auth.user !== AppUserRole.TEACHER : true) && <>
+									<div className={classes.buttonLoginContainer}>
+										<div className="login-button">
+											<Link to="/teacher-login">
+												<Button
+													variant={"contained"}
+													color="primary"
+													onClick={handleBack}
+													className={classes.buttonLogin} >
+													Login as Teacher</Button>
+											</Link>
+										</div>
+									</div>
+									<div className="alert-banner">
+										<Alert text="Please login as a teacher to take Assessment to get a certificate" />
+									</div>
+								</>
 							}
-							{
-								!auth.token && auth.user !== AppUserRole.TEACHER && <div className="login-button">
-									<Link to="/teacher-login">
-										<Button
-											variant={"contained"}
-											color="primary"
-											onClick={handleBack}
-											className={classes.buttonLogin} >
-											Login as Teacher</Button>
-									</Link>
-								</div>
-							}
-							<Stepper activeStep={activeStep} variant="elevation" orientation="vertical">
+							<Stepper activeStep={activeStep} variant="elevation" orientation="vertical" style={{ padding: 4 }}>
 								{
 									flattened_videos
 										.sort(([, a], [, b]) => a.order - b.order)
@@ -199,7 +203,7 @@ const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile
 															onClick={(activeStep !== flattened_videos.length - 1) ? handleNext : () => { }}
 															className={classes.button}
 														>
-															{activeStep === flattened_videos.length - 1 ? 'Give Feedback' : 'Next'}
+															{activeStep === flattened_videos.length - 1 ? 'Feedback' : 'Next'}
 														</Button>
 														<Button
 															disabled={(auth.token ? auth.user !== AppUserRole.TEACHER : true) || checkAssessmentTaken(id, value.assessment_id, profile)}
