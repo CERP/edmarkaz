@@ -174,43 +174,46 @@ const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile
 								</div>
 							}
 							<Stepper activeStep={activeStep} variant="elevation" orientation="vertical">
-								{flattened_videos.map(([id, value], index) => (<Step key={id + index}>
-									<StepButton completed={checkAssessmentTaken(id, value.assessment_id, profile)}>
-										<Typography color="primary" className={activeStep === index ? classes.stepLabelActive : classes.stepLabel}>
-											{value.title}
-										</Typography>
-									</StepButton>
-									<StepContent>
-										<VideoCard video={flattened_videos[activeStep][1]} />
-										<div className={classes.actionsContainer}>
-											<div>
-												<Button
-													disabled={activeStep === 0}
-													onClick={handleBack}
-													className={classes.button}
-												>
-													Back </Button>
-												<Button
-													variant="contained"
-													color="primary"
-													onClick={(activeStep !== flattened_videos.length - 1) ? handleNext : () => { }}
-													className={classes.button}
-												>
-													{activeStep === flattened_videos.length - 1 ? 'Give Feedback' : 'Next'}
-												</Button>
-												<Button
-													disabled={(auth.token ? auth.user !== AppUserRole.TEACHER : true) || checkAssessmentTaken(id, value.assessment_id, profile)}
-													variant="outlined"
-													color="primary"
-													className={classes.button}
-													onClick={() => handleTakeAssessment(id, value.assessment_id)}
-												>
-													{checkAssessmentTaken(id, value.assessment_id, profile) ? 'Assessment Taken' : 'Take Assessment'}
-												</Button>
-											</div>
-										</div>
-									</StepContent>
-								</Step>))}
+								{
+									flattened_videos
+										.sort(([, a], [, b]) => a.order - b.order)
+										.map(([id, value], index) => (<Step key={id + index}>
+											<StepButton completed={checkAssessmentTaken(id, value.assessment_id, profile)}>
+												<Typography color="primary" className={activeStep === index ? classes.stepLabelActive : classes.stepLabel}>
+													{value.title}
+												</Typography>
+											</StepButton>
+											<StepContent>
+												<VideoCard video={flattened_videos[activeStep][1]} />
+												<div className={classes.actionsContainer}>
+													<div>
+														<Button
+															disabled={activeStep === 0}
+															onClick={handleBack}
+															className={classes.button}
+														>
+															Back </Button>
+														<Button
+															variant="contained"
+															color="primary"
+															onClick={(activeStep !== flattened_videos.length - 1) ? handleNext : () => { }}
+															className={classes.button}
+														>
+															{activeStep === flattened_videos.length - 1 ? 'Give Feedback' : 'Next'}
+														</Button>
+														<Button
+															disabled={(auth.token ? auth.user !== AppUserRole.TEACHER : true) || checkAssessmentTaken(id, value.assessment_id, profile)}
+															variant="outlined"
+															color="primary"
+															className={classes.button}
+															onClick={() => handleTakeAssessment(id, value.assessment_id)}
+														>
+															{checkAssessmentTaken(id, value.assessment_id, profile) ? 'Assessment Taken' : 'Take Assessment'}
+														</Button>
+													</div>
+												</div>
+											</StepContent>
+										</Step>))}
 							</Stepper>
 						</>
 					}

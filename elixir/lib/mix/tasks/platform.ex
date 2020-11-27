@@ -96,13 +96,14 @@ defmodule Mix.Tasks.Platform do
 		|> Enum.map(fn row -> row end)
 
 		reduced_videos = videos
-		|> Enum.reduce(%{}, fn([video_id, assessment_id, title, description, link]), agg ->
+		|> Enum.reduce(%{}, fn([video_id, assessment_id, title, description, link, order]), agg ->
 
 			meta = %{
 					"assessment_id" => assessment_id,
 					"title" => title,
 					"description" => description,
-					"link" => link
+					"link" => link,
+					"order" => String.to_integer(order)
 				}
 			Dynamic.put(agg, [video_id], meta)
 		end)

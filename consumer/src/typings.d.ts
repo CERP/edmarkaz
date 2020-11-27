@@ -68,8 +68,6 @@ interface TeacherProfile {
 	phone: string
 	school_name: string
 	gender?: "M" | "F"
-	teaching_class?: string
-	teaching_subject?: string
 	attempted_assessments?: {
 		[id]: TeacherAttemptedAssessment
 	}
@@ -83,7 +81,8 @@ interface TeacherPortalVideo {
 	assessment_id: string
 	title: string
 	description: string
-	link: string
+	link: string,
+	order: number
 }
 
 interface RootReducerState {

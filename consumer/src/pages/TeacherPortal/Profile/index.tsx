@@ -69,11 +69,15 @@ const TeacherProfile: React.FC<P> = ({ teacher_portal, auth, logout }) => {
 				<Paper style={{ padding: '30px', marginTop: '15px' }}>
 					<div className="title">Your Course Progress</div>
 					<Stepper nonLinear variant="elevation" orientation="vertical">
-						{Object.entries(videos).map(([id, value], index) => (<Step key={id + index}>
-							<StepButton completed={checkAssessmentTaken(id, value.assessment_id, profile)}>
-								{value.title}
-							</StepButton>
-						</Step>))}
+						{
+							Object.entries(videos)
+								.sort(([, a], [, b]) => a.order - b.order)
+								.map(([id, value], index) => (<Step key={id + index}>
+									<StepButton completed={checkAssessmentTaken(id, value.assessment_id, profile)}>
+										{value.title}
+									</StepButton>
+								</Step>))
+						}
 					</Stepper>
 					<Typography
 						color="error"

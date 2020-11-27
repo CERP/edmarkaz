@@ -123,8 +123,6 @@ defmodule EdMarkaz.TeacherPortal do
 					Dynamic.put(agg, [id], value)
 				end)
 
-				IO.inspect inflated
-
 				{:ok, inflated}
 
 			{:error, err} ->
@@ -145,8 +143,6 @@ defmodule EdMarkaz.TeacherPortal do
 				|> Enum.reduce(%{}, fn([id, meta], agg) ->
 					Dynamic.put(agg, [id], meta)
 				end)
-
-				IO.inspect inflated
 
 				{:ok, inflated}
 
