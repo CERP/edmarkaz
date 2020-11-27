@@ -1,31 +1,23 @@
 defmodule Mix.Tasks.Platform do
 	use Mix.Task
 
-	def run(["ingest_TI_tests", school_id, fname, fname2, fname3]) do
+	def run(["ingest_TI_assessments", school_id, tests_csv_fname, slo_mapping_fname]) do
 		Application.ensure_all_started(:edmarkaz)
 
-		test_csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) do
-			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) |> CSV.decode!
-			false -> File.stream!("priv/#{fname}.csv") |> CSV.decode!
+		test_csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{tests_csv_fname}.csv")) do
+			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{tests_csv_fname}.csv")) |> CSV.decode!
+			false -> File.stream!("priv/#{tests_csv_fname}.csv") |> CSV.decode!
 		end
 
-		slo_mapping_csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname2}.csv")) do
-			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{fname2}.csv")) |> CSV.decode!
-			false -> File.stream!("priv/#{fname2}.csv") |> CSV.decode!
-		end
-
-		curriculum_csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname3}.csv")) do
-			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{fname3}.csv")) |> CSV.decode!
-			false -> File.stream!("priv/#{fname3}.csv") |> CSV.decode!
+		slo_mapping_csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{slo_mapping_fname}.csv")) do
+			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{slo_mapping_fname}.csv")) |> CSV.decode!
+			false -> File.stream!("priv/#{slo_mapping_fname}.csv") |> CSV.decode!
 		end
 
 		[ _ | tests] = test_csv
 		|> Enum.map(fn row -> row end)
 
 		[ _ | slo_mapping] = slo_mapping_csv
-		|> Enum.map(fn row -> row end)
-
-		[ _ | curriculum] = curriculum_csv
 		|> Enum.map(fn row -> row end)
 
 		tests_obj = tests
@@ -50,6 +42,23 @@ defmodule Mix.Tasks.Platform do
 			Dynamic.put(agg, [slo_id], sloMapping)
 		end)
 
+		assessments = %{"tests": tests_obj, "slo_mapping": slo_mapping_obj}
+
+		path = ["db", "targeted_instruction"]
+		EdMarkaz.StudentPortal.insert_targeted_instruction_assessments([path, assessments])
+	end
+
+	def run(["ingest_TI_curriculum", school_id, curriculum_csv_fname]) do
+		Application.ensure_all_started(:edmarkaz)
+
+		curriculum_csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{curriculum_csv_fname}.csv")) do
+			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{curriculum_csv_fname}.csv")) |> CSV.decode!
+			false -> File.stream!("priv/#{curriculum_csv_fname}.csv") |> CSV.decode!
+		end
+
+		[ _ | curriculum] = curriculum_csv
+		|> Enum.map(fn row -> row end)
+
 		curriculum_obj = curriculum
 		|> Enum.reduce(%{}, fn([learning_level_id, lesson_number, lesson_name, lesson_description, subject, video_links, pdf_link]), agg ->
 			learning_levels = %{
@@ -63,10 +72,8 @@ defmodule Mix.Tasks.Platform do
 			Dynamic.put(agg, [learning_level_id], learning_levels)
 		end)
 
-		targeted_instruction = %{"visible": true, "tests": tests_obj, "slo_mapping": slo_mapping_obj, "curriculum": curriculum_obj}
-
 		path = ["db", "targeted_instruction"]
-		EdMarkaz.StudentPortal.insert_targeted_instruction([path, targeted_instruction])
+		EdMarkaz.StudentPortal.insert_targeted_instruction_curriculum([path, curriculum_obj])
 	end
 
 	def run(["ingest_diagnostic_result", school_id, fname]) do
@@ -81,9 +88,9 @@ defmodule Mix.Tasks.Platform do
 		|> Enum.map(fn row -> row end)
 
 		diagnostic_result_obj = diagnostic_result
-		|> Enum.reduce(%{}, fn([test_id, question_id, question_text, answer, isCorrect, slo]), agg ->
+		|> Enum.reduce(%{}, fn([test_id, question_id, answer, isCorrect, slo]), agg ->
 			result = %{
-				"question_text" => question_text
+				# "question_text" => question_text
 				"answer" => answer,
 				"isCorrect" => true,
 				"slo" => slo
