@@ -23,3 +23,14 @@
 		width: 90%;
 	}
 }
+
+.teacher-portal .pill-button {
+	width: "20ch";
+	margin-bottom: 20px;
+	margin-top: 20px;
+	background-color: var(--red);
+	color: white;
+	border-radius: 32px;
+	font-weight: bold;
+	font-size: 1.25rem;
+}

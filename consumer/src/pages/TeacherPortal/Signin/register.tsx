@@ -8,29 +8,27 @@ import InputLabel from '@material-ui/core/InputLabel'
 import InputAdornment from '@material-ui/core/InputAdornment'
 
 type P = {
-	validation: (number: string, password: string) => void;
-	createAccount: (number: string, password: string, profile: TeacherProfile) => void;
+	createAccount: (number: string, password: string, profile: Partial<TeacherProfile>) => void
 }
 
-type S = {
+type S = Partial<TeacherProfile> & {
 	phone_number: string
 	password: string
-	gender?: Partial<TeacherProfile>["gender"]
-	name: string
 	showPassword: boolean
 }
 
-const TeacherRegister: React.FC<P> = ({ validation, createAccount }) => {
+export const TeacherRegister: React.FC<P> = ({ createAccount }) => {
 
 	const [state, setState] = useState<S>({
 		phone_number: "",
 		password: "",
 		gender: "M",
 		name: "",
+		school_name: '',
 		showPassword: false,
 	})
 
-	const { phone_number, password, gender, name, showPassword } = state
+	const { phone_number, password, gender, name, showPassword, school_name } = state
 
 	const handle_change = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = event.target
@@ -38,14 +36,12 @@ const TeacherRegister: React.FC<P> = ({ validation, createAccount }) => {
 	}
 
 	const onSave = () => {
-
-		validation(phone_number, password)
-
 		if (password) {
 			createAccount(phone_number, password, {
 				phone: phone_number,
-				gender: gender,
-				name: name
+				gender,
+				name,
+				school_name
 			})
 		}
 	}
@@ -61,7 +57,7 @@ const TeacherRegister: React.FC<P> = ({ validation, createAccount }) => {
 			<TextField
 				variant="outlined"
 				label="Name"
-				margin="normal"
+				style={{ marginTop: 10 }}
 				fullWidth
 				placeholder="Name"
 				type="text"
@@ -71,15 +67,27 @@ const TeacherRegister: React.FC<P> = ({ validation, createAccount }) => {
 			<TextField
 				variant="outlined"
 				label="Phone Number"
-				margin="normal"
+				style={{ marginTop: 10 }}
 				fullWidth
 				placeholder="e.g. 0300 1110000"
 				type="number"
 				name="phone_number"
-				error={phone_number.length < 11 || phone_number.length > 11}
+				error={!phone_number.startsWith('03') || phone_number.length < 11 || phone_number.length > 11}
 				onChange={handle_change}
 			/>
-			<FormControl variant="outlined" component="section" style={{ marginTop: 5 }} fullWidth>
+
+			<TextField
+				variant="outlined"
+				label="School Name"
+				style={{ marginTop: 10 }}
+				fullWidth
+				placeholder="School Name"
+				type="text"
+				name="school_name"
+				onChange={handle_change}
+			/>
+
+			<FormControl variant="outlined" component="section" style={{ marginTop: 10 }} fullWidth>
 				<InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
 				<OutlinedInput
 					id="outlined-adornment-password"
@@ -102,7 +110,7 @@ const TeacherRegister: React.FC<P> = ({ validation, createAccount }) => {
 				/>
 			</FormControl>
 			<TextField
-				style={{ marginTop: 10 }}
+				style={{ marginTop: 10, marginBottom: 20 }}
 				variant="outlined"
 				select
 				label="Gender"
@@ -113,9 +121,11 @@ const TeacherRegister: React.FC<P> = ({ validation, createAccount }) => {
 				<MenuItem value="M">Male</MenuItem>
 				<MenuItem value="F">Female</MenuItem>
 			</TextField>
+
 			<Box width="1" style={{ textAlign: "center" }} >
 				<Button
-					style={{ width: "20ch", margin: "20 auto", background: "#f05967", color: "white", borderRadius: "32px", fontWeight: "bold", fontSize: "1.25rem" }}
+					disabled={!name || !password || !phone_number || !phone_number.startsWith('03')}
+					style={{ width: "20ch", background: "#f05967", color: "white", borderRadius: "32px", fontWeight: "bold", fontSize: "1.25rem" }}
 					variant="contained"
 					onClick={onSave}>
 					Register
@@ -124,5 +134,3 @@ const TeacherRegister: React.FC<P> = ({ validation, createAccount }) => {
 		</div>
 	)
 }
-
-export { TeacherRegister };

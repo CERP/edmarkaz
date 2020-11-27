@@ -607,7 +607,7 @@ export const teacherLogin = (phone: string, password: string) => (dispatch: Disp
 
 }
 
-export const teacherSignup = (phone: string, password: string, profile: TeacherProfile) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+export const teacherSignup = (phone: string, password: string, profile: Partial<TeacherProfile>) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 
 	const state = getState()
 

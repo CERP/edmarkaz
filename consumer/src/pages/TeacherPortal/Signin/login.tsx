@@ -7,13 +7,12 @@ import IconButton from '@material-ui/core/IconButton'
 import OutlinedInput from '@material-ui/core/OutlinedInput'
 import InputLabel from '@material-ui/core/InputLabel'
 import InputAdornment from '@material-ui/core/InputAdornment'
+import { AppUserRole } from 'constants/app'
 
 
 type P = {
-	auth: RootReducerState['auth'];
-
-	validation: (number: string, password: string) => void;
-	createLogin: (number: string, password: string) => void;
+	auth: RootReducerState['auth']
+	createLogin: (number: string, password: string) => void
 }
 
 type S = {
@@ -22,7 +21,7 @@ type S = {
 	showPassword: boolean
 }
 
-const TeacherLogin: React.FC<P> = ({ auth, validation, createLogin }) => {
+export const TeacherLogin: React.FC<P> = ({ auth, createLogin }) => {
 
 	const [state, setState] = useState<S>({
 		phone_number: "",
@@ -38,15 +37,10 @@ const TeacherLogin: React.FC<P> = ({ auth, validation, createLogin }) => {
 	}
 
 	const login = () => {
-
-		validation(phone_number, password)
-
-		if (password) {
-			createLogin(phone_number, password)
-		}
+		createLogin(phone_number, password)
 	}
 
-	if (auth.token) {
+	if (auth.token && auth.user === AppUserRole.TEACHER) {
 		return <Redirect exact from="/teacher-login" to="/teacher" />
 	}
 
@@ -64,7 +58,7 @@ const TeacherLogin: React.FC<P> = ({ auth, validation, createLogin }) => {
 			placeholder="e.g. 0300 1110000"
 			type="number"
 			name="phone_number"
-			error={phone_number.length < 11 || phone_number.length > 11}
+			error={!phone_number.startsWith('03') || phone_number.length < 11 || phone_number.length > 11}
 			onChange={handle_change}
 		/>
 		<FormControl variant="outlined" component="section" style={{ marginTop: 5 }} fullWidth>
@@ -91,6 +85,8 @@ const TeacherLogin: React.FC<P> = ({ auth, validation, createLogin }) => {
 		</FormControl>
 		<Box width="1" style={{ textAlign: "center" }} >
 			<Button
+				className=""
+				disabled={!password || !phone_number || !phone_number.startsWith('03') || phone_number.length < 11 || phone_number.length > 11}
 				style={{ width: "20ch", margin: "auto", marginBottom: 20, marginTop: 20, background: "#f05967", color: "white", borderRadius: "32px", fontWeight: "bold", fontSize: "1.25rem" }}
 				variant="contained"
 				onClick={login}
@@ -104,5 +100,3 @@ const TeacherLogin: React.FC<P> = ({ auth, validation, createLogin }) => {
 	</>
 
 }
-
-export { TeacherLogin };
