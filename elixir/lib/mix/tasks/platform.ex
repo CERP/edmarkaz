@@ -44,8 +44,7 @@ defmodule Mix.Tasks.Platform do
 
 		assessments = %{"tests": tests_obj, "slo_mapping": slo_mapping_obj}
 
-		path = ["db", "targeted_instruction"]
-		EdMarkaz.StudentPortal.insert_targeted_instruction_assessments([path, assessments])
+		EdMarkaz.StudentPortal.insert_targeted_instruction_assessments([assessments])
 	end
 
 	def run(["ingest_TI_curriculum", school_id, curriculum_csv_fname]) do
@@ -72,16 +71,15 @@ defmodule Mix.Tasks.Platform do
 			Dynamic.put(agg, [learning_level_id], learning_levels)
 		end)
 
-		path = ["db", "targeted_instruction"]
-		EdMarkaz.StudentPortal.insert_targeted_instruction_curriculum([path, curriculum_obj])
+		EdMarkaz.StudentPortal.insert_targeted_instruction_curriculum([curriculum_obj])
 	end
 
-	def run(["ingest_diagnostic_result", school_id, fname]) do
+	def run(["ingest_diagnostic_result", school_id, diagnostic_result]) do
 		Application.ensure_all_started(:edmarkaz)
 
-		csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) do
-			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) |> CSV.decode!
-			false -> File.stream!("priv/#{fname}.csv") |> CSV.decode!
+		csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{diagnostic_result}.csv")) do
+			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{diagnostic_result}.csv")) |> CSV.decode!
+			false -> File.stream!("priv/#{diagnostic_result}.csv") |> CSV.decode!
 		end
 
 		[ _ | diagnostic_result] = csv

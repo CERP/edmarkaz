@@ -101,7 +101,6 @@ defmodule EdMarkaz.StudentPortal do
 		case EdMarkaz.DB.Postgres.query(
 			EdMarkaz.DB,
 			"INSERT INTO targeted_instruction_assessments (
-				path,
 				value,
 				date
 			) VALUES ($1,current_timestamp)",
@@ -123,7 +122,6 @@ defmodule EdMarkaz.StudentPortal do
 		case EdMarkaz.DB.Postgres.query(
 			EdMarkaz.DB,
 			"INSERT INTO targeted_instruction_curriculum (
-				path,
 				value,
 				date
 			) VALUES ($1,current_timestamp)",
