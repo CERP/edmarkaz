@@ -64,9 +64,9 @@ interface Lesson {
 }
 
 interface TeacherProfile {
-	id: string
 	name: string
 	phone: string
+	school_name: string
 	gender?: "M" | "F"
 	teaching_class?: string
 	teaching_subject?: string
