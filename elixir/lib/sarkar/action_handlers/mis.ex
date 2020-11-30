@@ -136,22 +136,12 @@ defmodule Sarkar.ActionHandler.Mis do
 	end
 
 	def handle_action(%{"type" => "GET_TARGETED_INSTRUCTIONS", "payload" => payload }, %{ school_id: school_id, client_id: client_id } = state ) do
-		case EdMarkaz.DB.Postgres.query(
-			EdMarkaz.DB,
-			"SELECT path, value FROM targeted_instruction",
-			[]
-		) do
-			{:ok, resp} ->
-				[ mapped | _ ] = resp.rows
-				|> Enum.map(fn ([path, value])->
-					value
-				end)
-				{:reply, succeed(mapped), %{school_id: school_id, client_id: client_id}}
-			{:error, msg} ->
-				IO.puts "Error getting targeted_instructions for MIS"
-				IO.inspect msg
-				{:reply, fail(msg), %{school_id: school_id, client_id: client_id}}
-		end
+
+		{:ok, assessments} = EdMarkaz.TargetedInstructions.get_assessments()
+		{:ok, curriculum} = EdMarkaz.TargetedInstructions.get_curriculum()
+
+		response = Map.merge(assessments, curriculum)
+		{:reply, succeed(response), state}
 
 	end
 

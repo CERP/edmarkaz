@@ -118,10 +118,16 @@ create table platform_writes
 		date timestamp default current_timestamp
 	);
 
-	create table targeted_instruction
+	create table targeted_instruction_assessments
 	(
-		path text
-		[] unique not null,
+		id text unique not null,
+		value jsonb not null,
+		date timestamp default current_timestamp
+	);
+
+	create table targeted_instruction_curriculum
+	(
+		id text unique not null,
 		value jsonb not null,
 		date timestamp default current_timestamp
 	);

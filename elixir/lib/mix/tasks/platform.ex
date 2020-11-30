@@ -44,7 +44,7 @@ defmodule Mix.Tasks.Platform do
 
 		assessments = %{"tests": tests_obj, "slo_mapping": slo_mapping_obj}
 
-		EdMarkaz.StudentPortal.insert_targeted_instruction_assessments([assessments])
+		EdMarkaz.TargetedInstructions.insert_targeted_instruction_assessments(["targeted_instruction_assessments",assessments])
 	end
 
 	def run(["ingest_TI_curriculum", school_id, curriculum_csv_fname]) do
@@ -71,7 +71,9 @@ defmodule Mix.Tasks.Platform do
 			Dynamic.put(agg, [learning_level_id], learning_levels)
 		end)
 
-		EdMarkaz.StudentPortal.insert_targeted_instruction_curriculum([curriculum_obj])
+		curriculum = %{"curriculum": curriculum_obj}
+
+		EdMarkaz.TargetedInstructions.insert_targeted_instruction_curriculum(["targeted_instruction_curriculum", curriculum])
 	end
 
 	def run(["ingest_diagnostic_result", school_id, diagnostic_result]) do
