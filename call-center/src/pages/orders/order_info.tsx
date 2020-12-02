@@ -10,6 +10,7 @@ import compareObjects from '../../utils/compareObjects'
 interface S {
 	order: Order
 	school: CERPSchool
+	showForm: boolean
 }
 
 interface SelfProps {
@@ -70,6 +71,7 @@ class OrderInfo extends Component<propTypes, S> {
 		this.state = {
 			order: updated_order,
 			school,
+			showForm: false
 		}
 
 		this.former = new Former(this, [])
@@ -117,6 +119,10 @@ class OrderInfo extends Component<propTypes, S> {
 		this.props.updateOrderMeta(this.state.order, changes, this.props.supplier_id, moment(start_date).valueOf())
 	}
 
+	showFeedbackForm = () => {
+		this.setState({ showForm: true })
+	}
+
 	render() {
 
 		const { product_id, order_time, products, start_date } = this.props
@@ -128,40 +134,40 @@ class OrderInfo extends Component<propTypes, S> {
 		return <div className="order-info page">
 			<div className="section form" style={{ width: "90%" }}>
 				<div className="button red" onClick={() => this.onClose()} style={{ backgroundColor: "red" }}>Close</div>
-				<div className="divider">School Info</div>
-				<div className="row">
-					<label>School Name</label>
-					<div>{school.school_name}</div>
-				</div>
-				<div className="row">
-					<label>School Number</label>
-					<div>{school.phone_number}</div>
-				</div>
-				<div className="row">
-					<label>School Address</label>
-					<div>{school.school_address}</div>
-				</div>
-				<div className="divider">Order Info</div>
-				<div className="row">
-					<label>Product title</label>
-					<div>{product_title}</div>
-				</div>
-				<div className="row">
-					<label>Order time</label>
-					<div>{new Date(order_time).toLocaleString()}</div>
-				</div>
-				<div className="row">
-					<label>Order Status</label>
-					<select {...this.former.super_handle(["order", "meta", "status"])} disabled={!verified}>
-						<option value="">Select</option>
-						<option value="ORDER_PLACED">Order Placed</option>
-						<option value="IN_PROGRESS">In Progress</option>
-						<option value="COMPLETED">Completed</option>
-						<option value="SCHOOL_CANCELLED">School Cancelled</option>
-						<option value="SUPPLIER_CANCELLED">Supplier Cancelled</option>
-					</select>
-				</div>
-				{/* <div className="row"> //In case they want to be able to set strategy for prev orders
+				{!this.state.showForm && <><div className="divider">School Info</div>
+					<div className="row">
+						<label>School Name</label>
+						<div>{school.school_name}</div>
+					</div>
+					<div className="row">
+						<label>School Number</label>
+						<div>{school.phone_number}</div>
+					</div>
+					<div className="row">
+						<label>School Address</label>
+						<div>{school.school_address}</div>
+					</div>
+					<div className="divider">Order Info</div>
+					<div className="row">
+						<label>Product title</label>
+						<div>{product_title}</div>
+					</div>
+					<div className="row">
+						<label>Order time</label>
+						<div>{new Date(order_time).toLocaleString()}</div>
+					</div>
+					<div className="row">
+						<label>Order Status</label>
+						<select {...this.former.super_handle(["order", "meta", "status"])} disabled={!verified}>
+							<option value="">Select</option>
+							<option value="ORDER_PLACED">Order Placed</option>
+							<option value="IN_PROGRESS">In Progress</option>
+							<option value="COMPLETED">Completed</option>
+							<option value="SCHOOL_CANCELLED">School Cancelled</option>
+							<option value="SUPPLIER_CANCELLED">Supplier Cancelled</option>
+						</select>
+					</div>
+					{/* <div className="row"> //In case they want to be able to set strategy for prev orders
 					<label>Strategy</label>
 					<select {...this.former.super_handle(["order", "meta", "strategy"])}>
 						<option value="ONLINE">Online</option>
@@ -169,119 +175,166 @@ class OrderInfo extends Component<propTypes, S> {
 						<option value="SALES_REP">Sales Rep</option>
 					</select>
 				</div> */}
-				{
-					!verified && <div style={{ marginBottom: "5px" }} className="button blue" onClick={() => this.props.verifyOrder(order, ordered_product, school, moment(start_date).valueOf())}>
-						Verify Order
+					{
+						!verified && <div style={{ marginBottom: "5px" }} className="button blue" onClick={() => this.props.verifyOrder(order, ordered_product, school, moment(start_date).valueOf())}>
+							Verify Order
 					</div>
-				}
-				{
-					!verified && <div className="button blue" onClick={() => this.reject_order(order, ordered_product)}>
-						Reject Order
+					}
+					{
+						!verified && <div className="button blue" onClick={() => this.reject_order(order, ordered_product)}>
+							Reject Order
 					</div>
-				}
-				{
-					//VERIFIED
-					verified && <>
-						<div className="row">
-							<label>Sales Rep</label>
-							<select {...this.former.super_handle(["order", "meta", "sales_rep"])}>
-								<option value="">Select</option>
-								{
-									Object.entries(getSalesReps())
-										.map(([val, name]) => <option key={val} value={val}>{name}</option>)
-								}
-							</select>
-						</div>
-					</>
-				}
-				{
-					//IN_PROGRESS
-					(verified && order.meta.status === "IN_PROGRESS") && <>
-						<div className="row">
-							<label>School Call</label>
-							<input type="text" placeholder="status" {...this.former.super_handle(["order", "meta", "call_one"])} />
-						</div>
-						<div className="row">
-							<label>Supplier Call</label>
-							<input type="text" placeholder="status" {...this.former.super_handle(["order", "meta", "call_two"])} />
-						</div>
-						<div className="row">
-							<label>Actual Product Ordered</label>
-							<input type="text" placeholder="product name" {...this.former.super_handle(["order", "meta", "actual_product_ordered"])} />
-						</div>
-						<div className="row">
-							<label>Quantity</label>
-							<input type="number" {...this.former.super_handle(["order", "meta", "quantity"])} />
-						</div>
-						<div className="row">
-							<label>Expected Completion Date</label>
-							<input
-								type="date"
-								value={moment(this.state.order.meta.expected_completion_date).format("YYYY-MM-DD")}
-								onChange={this.former.handle(["order", "meta", "expected_completion_date"])}
-							/>
-						</div>
-						<div className="row">
-							<label>Notes</label>
-							<textarea placeholder="notes" {...this.former.super_handle(["order", "meta", "notes"])} />
-						</div>
-					</>
-				}
-				{
-					//COMPLETED
-					(verified && order.meta.status === "COMPLETED") && <>
-						<div className="row">
-							<label>Actual Product Ordered</label>
-							<input type="text" placeholder="product name" {...this.former.super_handle(["order", "meta", "actual_product_ordered"])} />
-						</div>
-						<div className="row">
-							<label>Quantity</label>
-							<input type="number" {...this.former.super_handle(["order", "meta", "quantity"])} />
-						</div>
-						<div className="row">
-							<label>Expected Date of Delivery</label>
-							<input
-								type="date"
-								value={moment(this.state.order.meta.expected_date_of_delivery).format("YYYY-MM-DD")}
-								onChange={this.former.handle(["order", "meta", "expected_date_of_delivery"])}
-							/>
-						</div>
-						<div className="row">
-							<label>Date of Delivery</label>
-							<input
-								type="date"
-								value={moment(this.state.order.meta.actual_date_of_delivery).format("YYYY-MM-DD")}
-								onChange={this.former.handle(["order", "meta", "actual_date_of_delivery"])}
-							/>
-						</div>
-						<div className="row">
-							<label>Total Amount</label>
-							<input type="number" {...this.former.super_handle(["order", "meta", "total_amount"])} />
-						</div>
-						<div className="row">
-							<label>Payment Received</label>
-							<select {...this.former.super_handle(["order", "meta", "payment_received"])}>
-								<option value="YES">Yes</option>
-								<option value="NO">No</option>
-							</select>
-						</div>
-						<div className="row">
-							<label>Notes</label>
-							<textarea placeholder="notes" {...this.former.super_handle(["order", "meta", "notes"])} />
-						</div>
-					</>
-				}
-				{
-					(verified && order.meta.status === "SCHOOL_CANCELLED" || order.meta.status === "SUPPLIER_CANCELLED") && <>
-						<div className="row">
-							<label>Cancellation Reason</label>
-							<input type="text" placeholder="reason" {...this.former.super_handle(["order", "meta", "cancellation_reason"])} />
-						</div>
-					</>
-				}
-				{verified && <div className="button blue" onClick={() => this.save_meta()}>Save</div>}
+					}
+					{
+						//VERIFIED
+						verified && <>
+							<div className="row">
+								<label>Sales Rep</label>
+								<select {...this.former.super_handle(["order", "meta", "sales_rep"])}>
+									<option value="">Select</option>
+									{
+										Object.entries(getSalesReps())
+											.map(([val, name]) => <option key={val} value={val}>{name}</option>)
+									}
+								</select>
+							</div>
+						</>
+					}
+					{
+						//IN_PROGRESS
+						(verified && order.meta.status === "IN_PROGRESS") && <>
+							<div className="row">
+								<label>Call 1</label>
+								<input type="text" placeholder="status" {...this.former.super_handle(["order", "meta", "call_one"])} />
+							</div>
+							<div className="row">
+								<label>Call 2</label>
+								<input type="text" placeholder="status" {...this.former.super_handle(["order", "meta", "call_two"])} />
+							</div>
+							<div className="row">
+								<label>Actual Product Ordered</label>
+								<input type="text" placeholder="product name" {...this.former.super_handle(["order", "meta", "actual_product_ordered"])} />
+							</div>
+							<div className="row">
+								<label>Quantity</label>
+								<input type="number" {...this.former.super_handle(["order", "meta", "quantity"])} />
+							</div>
+							<div className="row">
+								<label>Expected Completion Date</label>
+								<input
+									type="date"
+									value={moment(this.state.order.meta.expected_completion_date).format("YYYY-MM-DD")}
+									onChange={this.former.handle(["order", "meta", "expected_completion_date"])}
+								/>
+							</div>
+							<div className="row">
+								<label>Notes</label>
+								<textarea placeholder="notes" {...this.former.super_handle(["order", "meta", "notes"])} />
+							</div>
+						</>
+					}
+					{
+						//COMPLETED
+						(verified && order.meta.status === "COMPLETED") && <>
+							<div className="row">
+								<label>Actual Product Ordered</label>
+								<input type="text" placeholder="product name" {...this.former.super_handle(["order", "meta", "actual_product_ordered"])} />
+							</div>
+							<div className="row">
+								<label>Quantity</label>
+								<input type="number" {...this.former.super_handle(["order", "meta", "quantity"])} />
+							</div>
+							<div className="row">
+								<label>Expected Date of Delivery</label>
+								<input
+									type="date"
+									value={moment(this.state.order.meta.expected_date_of_delivery).format("YYYY-MM-DD")}
+									onChange={this.former.handle(["order", "meta", "expected_date_of_delivery"])}
+								/>
+							</div>
+							<div className="row">
+								<label>Date of Delivery</label>
+								<input
+									type="date"
+									value={moment(this.state.order.meta.actual_date_of_delivery).format("YYYY-MM-DD")}
+									onChange={this.former.handle(["order", "meta", "actual_date_of_delivery"])}
+								/>
+							</div>
+							<div className="row">
+								<label>Total Amount</label>
+								<input type="number" {...this.former.super_handle(["order", "meta", "total_amount"])} />
+							</div>
+							<div className="row">
+								<label>Payment Received</label>
+								<select {...this.former.super_handle(["order", "meta", "payment_received"])}>
+									<option value="YES">Yes</option>
+									<option value="NO">No</option>
+								</select>
+							</div>
+							<div className="row">
+								<label>Notes</label>
+								<textarea placeholder="notes" {...this.former.super_handle(["order", "meta", "notes"])} />
+							</div>
+						</>
+					}
+					{
+						(verified && order.meta.status === "SCHOOL_CANCELLED" || order.meta.status === "SUPPLIER_CANCELLED") && <>
+							<div className="row">
+								<label>Cancellation Reason</label>
+								<input type="text" placeholder="reason" {...this.former.super_handle(["order", "meta", "cancellation_reason"])} />
+							</div>
+						</>
+					}</>}
+
+				{this.state.showForm && <> <div className="divider">Feedback</div>
+					<div className="row">
+						<label>School Name</label>
+						<input
+							type="text"
+						// onChange={this.former.handle(["order", "meta", "actual_date_of_delivery"])}
+						/>
+					</div>
+					<div className="row">
+						<label>Contact Number</label>
+						<input
+							type="number"
+						// onChange={this.former.handle(["order", "meta", "actual_date_of_delivery"])}
+						/>
+					</div>
+					<div className="row">
+						<label>Location</label>
+						<input
+							type="text"
+						// onChange={this.former.handle(["order", "meta", "actual_date_of_delivery"])}
+						/>
+					</div>
+					<div className="row">
+						<label>Sales Representative</label>
+						<input
+							type="text"
+						// onChange={this.former.handle(["order", "meta", "actual_date_of_delivery"])}
+						/>
+					</div>
+					<div className="row">
+						<label>Product Ordered</label>
+						<input
+							type="text"
+						// onChange={this.former.handle(["order", "meta", "actual_date_of_delivery"])}
+						/>
+					</div>
+					<div className="row">
+						<label>Date of Delivery</label>
+						<input
+							type="date"
+							value={moment(this.state.order.meta.actual_date_of_delivery).format("YYYY-MM-DD")}
+						// onChange={this.former.handle(["order", "meta", "actual_date_of_delivery"])}
+						/>
+					</div>
+				</>}
+				{verified && !this.state.showForm && <div className="button blue" style={{ marginBottom: "5px" }} onClick={() => this.save_meta()}>Save</div>}
+				{verified && <div className="button blue" onClick={this.showFeedbackForm}>Customer Experience Form</div>}
 			</div>
-		</div>
+		</div >
 	}
 }
 export default connect((state: RootReducerState) => ({
