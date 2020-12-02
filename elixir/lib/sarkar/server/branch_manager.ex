@@ -22,27 +22,43 @@ defmodule EdMarkaz.Server.BranchManager do
 		|> send_resp(200, "ok")
 	end
 
-	post "/users/authenticate" do
-		%{
-			"username" => username,
-			"password" => password,
-			"client_id" => client_id
-		} = conn.body_params
+	post "/user/authenticate" do
+
+		[client_id] = get_req_header(conn, "client-id")
+
+		%{ "username" => username, "password" => password } = conn.body_params
 
 		conn = append_resp_headers(conn)
 
 		case EdMarkaz.Auth.BranchManager.login({ username, client_id, password }) do
 			{:ok, resp} ->
 
-				%{ "schools" => schools, "token" => _ } = resp
+
+				%{ "schools" => schools, "token" => token } = resp
 
 				# start all the schools related with branch manager
 
-				schools |> Enum.each(fn sid -> start_school(sid) end)
+				schools_with_classes = schools
+				|> Enum.reduce(%{}, fn (sid, agg) ->
 
-				# send schools and token
+					case start_school(sid) do
+						{:ok} ->
+							db = Sarkar.School.get_db(sid)
+							Dynamic.put(agg, [sid], db["classes"])
+						_ ->
+							db = Sarkar.School.get_db(sid)
+							Dynamic.put(agg, [sid], db["classes"])
+					end
 
-				body = Poison.encode!(%{data: resp})
+				end)
+
+				# send schools with classes and token
+
+				response = %{ "schools" => schools_with_classes, "token" => token }
+
+				IO.inspect response
+
+				body = Poison.encode!(response)
 				send_resp(conn, 200, body)
 
 			{:error, err} ->
@@ -104,11 +120,26 @@ defmodule EdMarkaz.Server.BranchManager do
 
 				db = Sarkar.School.get_db(school_id)
 
-				daily_stats = db["students"] |> Enum.reduce(%{"attendance" =>  %{ "present" => 0, "absent" => 0, "leave" => 0 } , "payment" => %{"count" => 0, "amount" => 0 } }, fn {id, student}, agg ->
+				daily_stats= %{
+					"attendance" =>  %{
+						"present" => 0,
+						"absent" => 0,
+						"leave" => 0
+					},
+					"payment" => %{
+						"count" => 0,
+						"amount" => 0
+					}
+				}
 
-					single_attendance = student["attendance"] |> Enum.reduce(%{ "present" => 0, "absent" => 0, "leave" => 0 }, fn {date, value}, inner_agg ->
+				# get the current date in ISO (YYYY-MM-DD) format
+				current_date = DateTime.utc_now |> formatted_iso_date
 
-						current_date = DateTime.utc_now |> formatted_iso_date
+				daily_students_stats = db["students"] |> Enum.reduce(daily_stats, fn {id, student}, agg ->
+
+					# get the student attendance
+
+					student_attendance = student["attendance"] |> Enum.reduce(daily_stats["attendance"], fn {date, value}, inner_agg ->
 
 						case current_date == date do
 
@@ -130,9 +161,9 @@ defmodule EdMarkaz.Server.BranchManager do
 
 					end)
 
-					student_payment_sum = student["payments"] |> Enum.reduce(0, fn {id, value}, inner_agg ->
+					# get the submitted payment
 
-						current_date = DateTime.utc_now |> formatted_iso_date
+					fee_collection = student["payments"] |> Enum.reduce(0, fn {id, value}, inner_agg ->
 
 						{:ok, payment_date } = DateTime.from_unix(value["date"], :millisecond)
 
@@ -148,18 +179,20 @@ defmodule EdMarkaz.Server.BranchManager do
 
 					end)
 
+					# merge attedance and payment stats into agg
+
 					%{ "present" => present, "absent" => absent, "leave" => leave } = agg["attendance"]
 					%{ "amount" => amount, "count" => count } = agg["payment"]
 
 					attendance = %{
-						"present" => present + single_attendance["present"],
-						"absent" => absent + single_attendance["absent"],
-						"leave" =>  leave + single_attendance["leave"]
+						"present" => present + student_attendance["present"],
+						"absent" => absent + student_attendance["absent"],
+						"leave" =>  leave + student_attendance["leave"]
 					}
 
-					payment = case student_payment_sum > 0 do
+					payment = case fee_collection > 0 do
 						true ->
-							%{ "amount" => amount + student_payment_sum, "count" => count + 1 }
+							%{ "amount" => amount + fee_collection, "count" => count + 1 }
 						false ->
 							agg["payment"]
 					end
@@ -169,8 +202,36 @@ defmodule EdMarkaz.Server.BranchManager do
 
 				end)
 
+				# get the teacher attendance stats for the current day
 
-				body = Poison.encode!(%{data: daily_stats})
+				teacher_attendance = db["faculty"] |> Enum.reduce(daily_stats["attendance"], fn {fid, teacher}, agg ->
+
+
+					# get the current attendance
+
+					curr_attendance = Dynamic.get(teacher, ["attedance", current_date])
+
+					if curr_attendance == nil do
+						agg
+					else
+
+						[ item | _] =  curr_attendance |> Map.keys()
+
+						status = if item == "check_in" or item == "checkout", do: "present", else: item
+
+						Dynamic.put(agg, [status], agg[status] + 1)
+
+					end
+
+				end)
+
+				# merge the students and teachers stats
+
+				response = Dynamic.put(daily_students_stats, ["teacher_attendance"], teacher_attendance)
+
+				# send back the response
+
+				body = Poison.encode!(response)
 				send_resp(conn, 200, body)
 
 			{:error, err} ->
@@ -209,7 +270,7 @@ defmodule EdMarkaz.Server.BranchManager do
 
 	end
 
-	get "/analytics-students-attendance" do
+	get "/students-attendance" do
 
 		# get the auth from req_headers
 		[ username, client_id, auth_token ] = get_auth_from_req_headers(conn)
@@ -273,7 +334,7 @@ defmodule EdMarkaz.Server.BranchManager do
 
 				end)
 
-				body = Poison.encode!(%{data: attendance_list})
+				body = Poison.encode!(attendance_list)
 				conn = append_resp_headers(conn)
 				send_resp(conn, 200, body)
 
@@ -281,6 +342,40 @@ defmodule EdMarkaz.Server.BranchManager do
 				body = Poison.encode!(%{message: err})
 				send_resp(conn, 400, body)
 		end
+
+	end
+
+	get "/analytics-fee" do
+
+		# get the auth from req_headers
+		[ username, client_id, auth_token ] = get_auth_from_req_headers(conn)
+
+		# get the school id param from body
+		school_id = conn.params["school_id"]
+
+		db = Sarkar.School.get_db(school_id)
+
+
+		body = Poison.encode!(%{message: "Load db for exams"})
+		conn = append_resp_headers(conn)
+		send_resp(conn, 200, body)
+
+	end
+
+	get "/analytics-expense" do
+
+		# get the auth from req_headers
+		[ username, client_id, auth_token ] = get_auth_from_req_headers(conn)
+
+		# get the school id param from body
+		school_id = conn.params["school_id"]
+
+		db = Sarkar.School.get_db(school_id)
+
+
+		body = Poison.encode!(%{message: "Load db for exams"})
+		conn = append_resp_headers(conn)
+		send_resp(conn, 200, body)
 
 	end
 
@@ -301,7 +396,7 @@ defmodule EdMarkaz.Server.BranchManager do
 
 	end
 
-	get "/analytics-teacher-attendance" do
+	get "/teachers-attendance" do
 
 		# get the auth from req_headers
 		[ username, client_id, auth_token ] = get_auth_from_req_headers(conn)
@@ -339,7 +434,7 @@ defmodule EdMarkaz.Server.BranchManager do
 				end)
 
 
-				body = Poison.encode!(%{data: teacher_attendance})
+				body = Poison.encode!(teacher_attendance)
 				conn = append_resp_headers(conn)
 				send_resp(conn, 200, body)
 
