@@ -314,6 +314,19 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 		{:reply, succeed(resp), state}
 	end
 
+	def handle_action(
+		%{
+			"type" => "SAVE_CUSTOMER_EXPERIENCE",
+			"payload" => %{
+				"customer_experience" => customer_experience
+			}
+		},
+		%{client_id: client_id, id: id } = state
+	) do
+		{:ok, resp} = EdMarkaz.Customer.save_customer_experience(customer_experience, id)
+		{:reply, succeed(resp), state}
+	end
+
 	def handle_action(%{"type" => "GET_PRODUCTS", "last_sync" => last_sync}, %{id: _id, client_id: _client_id} = state) do
 
 		_dt = DateTime.from_unix!(last_sync, :millisecond)

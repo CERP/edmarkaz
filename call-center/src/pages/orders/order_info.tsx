@@ -347,7 +347,8 @@ class OrderInfo extends Component<propTypes, S> {
 					<div className="row">
 						<label>Product Price</label>
 						<Rating
-							name="simple-controlled"
+							name="product_price"
+							value={this.state.customer_experience.complete_orders.rating.product_price}
 							//@ts-ignore
 							onChange={this.former.handle(["customer_experience", "complete_orders", "rating", "product_price"])}
 						/>
@@ -355,7 +356,8 @@ class OrderInfo extends Component<propTypes, S> {
 					<div className="row">
 						<label>Product Quality</label>
 						<Rating
-							name="simple-controlled"
+							name="complete_product_quality"
+							value={this.state.customer_experience.complete_orders.rating.product_quality}
 							//@ts-ignore
 							onChange={this.former.handle(["customer_experience", "complete_orders", "rating", "product_quality"])}
 						/>
@@ -363,7 +365,8 @@ class OrderInfo extends Component<propTypes, S> {
 					<div className="row">
 						<label>Product Range</label>
 						<Rating
-							name="simple-controlled"
+							name="complete_product_range"
+							value={this.state.customer_experience.complete_orders.rating.product_range}
 							//@ts-ignore
 							onChange={this.former.handle(["customer_experience", "complete_orders", "rating", "product_range"])}
 						/>
@@ -371,7 +374,8 @@ class OrderInfo extends Component<propTypes, S> {
 					<div className="row">
 						<label>delivery</label>
 						<Rating
-							name="simple-controlled"
+							name="complete_delivery"
+							value={this.state.customer_experience.complete_orders.rating.delivery}
 							//@ts-ignore
 							onChange={this.former.handle(["customer_experience", "complete_orders", "rating", "delivery"])}
 						/>
@@ -379,7 +383,8 @@ class OrderInfo extends Component<propTypes, S> {
 					<div className="row">
 						<label>Processing Time</label>
 						<Rating
-							name="simple-controlled"
+							name="complete_processing_time"
+							value={this.state.customer_experience.complete_orders.rating.processing_time}
 							//@ts-ignore
 							onChange={this.former.handle(["customer_experience", "complete_orders", "rating", "processing_time"])}
 						/>
@@ -387,7 +392,8 @@ class OrderInfo extends Component<propTypes, S> {
 					<div className="row">
 						<label>Customer Service</label>
 						<Rating
-							name="simple-controlled"
+							name="complete_customer_service"
+							value={this.state.customer_experience.complete_orders.rating.customer_service}
 							//@ts-ignore
 							onChange={this.former.handle(["customer_experience", "complete_orders", "rating", "customer_service"])}
 						/>
@@ -400,7 +406,8 @@ class OrderInfo extends Component<propTypes, S> {
 					<div className="row">
 						<label>Product Price</label>
 						<Rating
-							name="simple-controlled"
+							name="cancel_product_price"
+							value={this.state.customer_experience.complete_orders.rating.product_price}
 							//@ts-ignore
 							onChange={this.former.handle(["customer_experience", "cancel_orders", "rating", "product_price"])}
 						/>
@@ -408,7 +415,8 @@ class OrderInfo extends Component<propTypes, S> {
 					<div className="row">
 						<label>Product Quality</label>
 						<Rating
-							name="simple-controlled"
+							name="cancel_product_quality"
+							value={this.state.customer_experience.complete_orders.rating.product_range}
 							//@ts-ignore
 							onChange={this.former.handle(["customer_experience", "cancel_orders", "rating", "product_quality"])}
 						/>
@@ -416,7 +424,8 @@ class OrderInfo extends Component<propTypes, S> {
 					<div className="row">
 						<label>Product Range</label>
 						<Rating
-							name="simple-controlled"
+							name="cancel_product_range"
+							value={this.state.customer_experience.complete_orders.rating.product_range}
 							//@ts-ignore
 							onChange={this.former.handle(["customer_experience", "cancel_orders", "rating", "product_range"])}
 						/>
@@ -424,7 +433,8 @@ class OrderInfo extends Component<propTypes, S> {
 					<div className="row">
 						<label>Customer Service</label>
 						<Rating
-							name="simple-controlled"
+							name="cancel_customer_service"
+							value={this.state.customer_experience.complete_orders.rating.customer_service}
 							//@ts-ignore
 							onChange={this.former.handle(["customer_experience", "cancel_orders", "rating", "customer_service"])}
 						/>

@@ -169,6 +169,34 @@ export const updateOrderMeta = (order: Order, meta: any, supplier_id: string, st
 
 }
 
+export const saveCustomerExperience = (customer_experience: CustomerExperience) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+
+	const state = getState()
+
+	if (!state.connected) {
+		syncr.onNext('connect', () => dispatch(saveCustomerExperience(customer_experience)))
+		return
+	}
+
+	syncr.send({
+		type: "SAVE_CUSTOMER_EXPERIENCE",
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		id: state.auth.id,
+		payload: {
+			customer_experience
+		}
+	})
+		.then(res => {
+			debugger
+			alert(res)
+		})
+		.catch(err => {
+			debugger
+			alert(err)
+		})
+}
+
 export const getOrders = (start_date = moment().subtract(3, "days").valueOf()) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 	const state = getState();
 
