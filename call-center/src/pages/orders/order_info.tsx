@@ -4,13 +4,15 @@ import { RouteComponentProps, withRouter } from 'react-router'
 import { connect } from 'react-redux'
 import { verifyOrder, rejectOrder, updateOrderMeta } from '../../actions'
 import moment from 'moment'
+import Rating from "@material-ui/lab/Rating";
 import { getSalesReps } from '../../utils/sales_rep'
 import compareObjects from '../../utils/compareObjects'
 
 interface S {
 	order: Order
 	school: CERPSchool
-	showForm: boolean
+	show_form: boolean
+	customer_experience: CustomerExperience
 }
 
 interface SelfProps {
@@ -57,6 +59,7 @@ class OrderInfo extends Component<propTypes, S> {
 
 		const empty_school = { school_name: '', school_address: '', phone_number: '' } as CERPSchool
 		const empty_order = { meta: {} } as Order
+		const empty_customer_experience = { complete_orders: { rating: {} }, cancel_orders: { rating: {} } } as CustomerExperience
 
 		const { order = empty_order, school = empty_school } = props.orders.db[props.supplier_id] && props.orders.db[props.supplier_id][props.order_time]
 
@@ -71,7 +74,8 @@ class OrderInfo extends Component<propTypes, S> {
 		this.state = {
 			order: updated_order,
 			school,
-			showForm: false
+			show_form: false,
+			customer_experience: empty_customer_experience
 		}
 
 		this.former = new Former(this, [])
@@ -95,32 +99,37 @@ class OrderInfo extends Component<propTypes, S> {
 
 	save_meta = () => {
 
+		debugger
 		const { meta } = this.state.order
 		const { start_date } = this.props
 
-		if (isNaN(parseFloat(meta.total_amount)) || parseFloat(meta.total_amount) < 0) {
-			alert("Amount can't be less than zero")
-			return
-		}
+		// if (isNaN(parseFloat(meta.total_amount)) || parseFloat(meta.total_amount) < 0) {
+		// 	alert("Amount can't be less than zero")
+		// 	return
+		// }
 
-		if (isNaN(parseFloat(meta.quantity)) || parseFloat(meta.quantity) < 1) {
-			alert("Quantity can't be less than 1")
-			return
-		}
+		// if (isNaN(parseFloat(meta.quantity)) || parseFloat(meta.quantity) < 1) {
+		// 	alert("Quantity can't be less than 1")
+		// 	return
+		// }
 
-		const old_meta = this.props.orders.db[this.props.supplier_id][this.props.order_time].order.meta
-		const changes = compareObjects<Order["meta"]>(old_meta, meta)
+		// const old_meta = this.props.orders.db[this.props.supplier_id][this.props.order_time].order.meta
+		// const changes = compareObjects<Order["meta"]>(old_meta, meta)
 
-		if (Object.keys(changes).length < 1) {
-			alert("No Changes to Save !")
-			return
-		}
+		// if (Object.keys(changes).length < 1) {
+		// 	alert("No Changes to Save !")
+		// 	return
+		// }
 
-		this.props.updateOrderMeta(this.state.order, changes, this.props.supplier_id, moment(start_date).valueOf())
+		// this.props.updateOrderMeta(this.state.order, changes, this.props.supplier_id, moment(start_date).valueOf())
 	}
 
 	showFeedbackForm = () => {
-		this.setState({ showForm: true })
+		this.setState({ show_form: true })
+	}
+
+	test = () => {
+		this.former.handle(["customer_experience", "complete_orders", "product_price"])
 	}
 
 	render() {
@@ -134,7 +143,7 @@ class OrderInfo extends Component<propTypes, S> {
 		return <div className="order-info page">
 			<div className="section form" style={{ width: "90%" }}>
 				<div className="button red" onClick={() => this.onClose()} style={{ backgroundColor: "red" }}>Close</div>
-				{!this.state.showForm && <><div className="divider">School Info</div>
+				{!this.state.show_form && <><div className="divider">School Info</div>
 					<div className="row">
 						<label>School Name</label>
 						<div>{school.school_name}</div>
@@ -286,53 +295,147 @@ class OrderInfo extends Component<propTypes, S> {
 						</>
 					}</>}
 
-				{this.state.showForm && <> <div className="divider">Feedback</div>
+				{this.state.show_form && <> <div className="divider">Feedback</div>
 					<div className="row">
 						<label>School Name</label>
 						<input
 							type="text"
-						// onChange={this.former.handle(["order", "meta", "actual_date_of_delivery"])}
+							onChange={this.former.handle(["customer_experience", "school_name"])}
 						/>
 					</div>
 					<div className="row">
 						<label>Contact Number</label>
 						<input
 							type="number"
-						// onChange={this.former.handle(["order", "meta", "actual_date_of_delivery"])}
+							onChange={this.former.handle(["customer_experience", "contact_number"])}
 						/>
 					</div>
 					<div className="row">
 						<label>Location</label>
 						<input
 							type="text"
-						// onChange={this.former.handle(["order", "meta", "actual_date_of_delivery"])}
+							onChange={this.former.handle(["customer_experience", "location"])}
 						/>
 					</div>
 					<div className="row">
 						<label>Sales Representative</label>
 						<input
 							type="text"
-						// onChange={this.former.handle(["order", "meta", "actual_date_of_delivery"])}
+							onChange={this.former.handle(["customer_experience", "sales_representative"])}
 						/>
 					</div>
 					<div className="row">
 						<label>Product Ordered</label>
 						<input
 							type="text"
-						// onChange={this.former.handle(["order", "meta", "actual_date_of_delivery"])}
+							onChange={this.former.handle(["customer_experience", "product_odered"])}
 						/>
 					</div>
 					<div className="row">
 						<label>Date of Delivery</label>
 						<input
 							type="date"
-							value={moment(this.state.order.meta.actual_date_of_delivery).format("YYYY-MM-DD")}
-						// onChange={this.former.handle(["order", "meta", "actual_date_of_delivery"])}
+							value={moment(this.state.customer_experience.date_of_delivery).format("YYYY-MM-DD")}
+							onChange={this.former.handle(["customer_experience", "date_of_delivery"])}
 						/>
 					</div>
+					<div className="divider">For Complete Orders</div>
+					<div className="row">
+						<label>Will you be ordering again from Ilm Exchange? If no, why not?</label>
+						<textarea placeholder="Reason" {...this.former.super_handle(["customer_experience", "complete_orders", "again_order"])} />
+					</div>
+					<div className="row">
+						<label>Product Price</label>
+						<Rating
+							name="simple-controlled"
+							//@ts-ignore
+							onChange={this.former.handle(["customer_experience", "complete_orders", "rating", "product_price"])}
+						/>
+					</div>
+					<div className="row">
+						<label>Product Quality</label>
+						<Rating
+							name="simple-controlled"
+							//@ts-ignore
+							onChange={this.former.handle(["customer_experience", "complete_orders", "rating", "product_quality"])}
+						/>
+					</div>
+					<div className="row">
+						<label>Product Range</label>
+						<Rating
+							name="simple-controlled"
+							//@ts-ignore
+							onChange={this.former.handle(["customer_experience", "complete_orders", "rating", "product_range"])}
+						/>
+					</div>
+					<div className="row">
+						<label>delivery</label>
+						<Rating
+							name="simple-controlled"
+							//@ts-ignore
+							onChange={this.former.handle(["customer_experience", "complete_orders", "rating", "delivery"])}
+						/>
+					</div>
+					<div className="row">
+						<label>Processing Time</label>
+						<Rating
+							name="simple-controlled"
+							//@ts-ignore
+							onChange={this.former.handle(["customer_experience", "complete_orders", "rating", "processing_time"])}
+						/>
+					</div>
+					<div className="row">
+						<label>Customer Service</label>
+						<Rating
+							name="simple-controlled"
+							//@ts-ignore
+							onChange={this.former.handle(["customer_experience", "complete_orders", "rating", "customer_service"])}
+						/>
+					</div>
+					<div className="divider">For Cancelled Orders</div>
+					<div className="row">
+						<label>Why did you not go ahead with the purchase? </label>
+						<textarea placeholder="Reason" {...this.former.super_handle(["customer_experience", "cancel_orders", "why_not_go_ahead"])} />
+					</div>
+					<div className="row">
+						<label>Product Price</label>
+						<Rating
+							name="simple-controlled"
+							//@ts-ignore
+							onChange={this.former.handle(["customer_experience", "cancel_orders", "rating", "product_price"])}
+						/>
+					</div>
+					<div className="row">
+						<label>Product Quality</label>
+						<Rating
+							name="simple-controlled"
+							//@ts-ignore
+							onChange={this.former.handle(["customer_experience", "cancel_orders", "rating", "product_quality"])}
+						/>
+					</div>
+					<div className="row">
+						<label>Product Range</label>
+						<Rating
+							name="simple-controlled"
+							//@ts-ignore
+							onChange={this.former.handle(["customer_experience", "cancel_orders", "rating", "product_range"])}
+						/>
+					</div>
+					<div className="row">
+						<label>Customer Service</label>
+						<Rating
+							name="simple-controlled"
+							//@ts-ignore
+							onChange={this.former.handle(["customer_experience", "cancel_orders", "rating", "customer_service"])}
+						/>
+					</div>
+					<div className="row">
+						<label>Will you be ordering again from Ilm Exchange? If no, why not?</label>
+						<textarea placeholder="Reason" {...this.former.super_handle(["customer_experience", "cancel_orders", "again_order"])} />
+					</div>
 				</>}
-				{verified && !this.state.showForm && <div className="button blue" style={{ marginBottom: "5px" }} onClick={() => this.save_meta()}>Save</div>}
-				{verified && <div className="button blue" onClick={this.showFeedbackForm}>Customer Experience Form</div>}
+				{verified && <div className="button blue" style={{ marginBottom: "5px" }} onClick={() => this.save_meta()}>Save</div>}
+				{verified && !this.state.show_form && <div className="button blue" onClick={this.showFeedbackForm}>Customer Experience Form</div>}
 			</div>
 		</div >
 	}

@@ -118,7 +118,8 @@ create table platform_writes
 		date timestamp default current_timestamp
 	);
 
-	CREATE TABLE branch_manager(
+	CREATE TABLE branch_manager
+	(
 		username text unique not null,
 		password text not null,
 		branches jsonb not null
@@ -142,6 +143,12 @@ create table platform_writes
 	(
 		id text unique not null,
 		value jsonb not null,
+		date timestamp default current_timestamp
+	);
+	create table customer_experience
+	(
+		phone text unique not null,
+		feedback jsonb not null,
 		date timestamp default current_timestamp
 	);
 		-- chapter_id text not null,
