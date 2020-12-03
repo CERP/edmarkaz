@@ -44,10 +44,10 @@ defmodule EdMarkaz.Server.BranchManager do
 					case start_school(sid) do
 						{:ok} ->
 							db = Sarkar.School.get_db(sid)
-							Dynamic.put(agg, [sid], db["classes"])
+							Dynamic.put(agg, [sid, "classes"], db["classes"])
 						_ ->
 							db = Sarkar.School.get_db(sid)
-							Dynamic.put(agg, [sid], db["classes"])
+							Dynamic.put(agg, [sid, "classes"], db["classes"])
 					end
 
 				end)
@@ -209,9 +209,9 @@ defmodule EdMarkaz.Server.BranchManager do
 
 					# get the current attendance
 
-					curr_attendance = Dynamic.get(teacher, ["attedance", current_date])
+					curr_attendance = Dynamic.get(teacher, ["attendance", current_date])
 
-					if curr_attendance == nil do
+					if blank?(curr_attendance) do
 						agg
 					else
 
@@ -330,7 +330,15 @@ defmodule EdMarkaz.Server.BranchManager do
 
 						end)
 
-					Dynamic.put(agg, [id], monthvise)
+					sub_student = %{
+						"attendance" => monthvise,
+						"name" => student["Name"],
+						"fname" => student["ManName"],
+						"phone" => student["Phone"],
+						"section_id" => student["section_id"]
+					}
+
+					Dynamic.put(agg, [id], sub_student)
 
 				end)
 
@@ -345,7 +353,7 @@ defmodule EdMarkaz.Server.BranchManager do
 
 	end
 
-	get "/analytics-fee" do
+	get "/fee-analytics" do
 
 		# get the auth from req_headers
 		[ username, client_id, auth_token ] = get_auth_from_req_headers(conn)
@@ -362,7 +370,7 @@ defmodule EdMarkaz.Server.BranchManager do
 
 	end
 
-	get "/analytics-expense" do
+	get "/expense-analytics" do
 
 		# get the auth from req_headers
 		[ username, client_id, auth_token ] = get_auth_from_req_headers(conn)
@@ -379,7 +387,7 @@ defmodule EdMarkaz.Server.BranchManager do
 
 	end
 
-	get "/analytics-exams" do
+	get "/exams-analytics" do
 
 		# get the auth from req_headers
 		[ username, client_id, auth_token ] = get_auth_from_req_headers(conn)
@@ -445,6 +453,65 @@ defmodule EdMarkaz.Server.BranchManager do
 
 	end
 
+	get "/school-enrollment" do
+
+		# get the auth from req_headers
+		[ username, client_id, auth_token ] = get_auth_from_req_headers(conn)
+
+		# get the school id param from body
+		school_id = conn.params["school_id"]
+
+		conn = append_resp_headers(conn)
+
+		case EdMarkaz.Auth.BranchManager.verify({ username, client_id, auth_token }) do
+			{:ok, _} ->
+
+				# start the school
+				start_school(school_id)
+
+				db = Sarkar.School.get_db(school_id)
+
+				school_students = db["students"] |> Enum.reduce(%{}, fn ({k, v}, agg) ->
+
+					if blank?(v), do: agg
+
+					# get filter variables
+
+					section_id = Dynamic.get(v, ["section_id"], nil)
+					name = Dynamic.get(v, ["Name"], nil)
+
+					if blank?(section_id) && blank?(name) do
+						agg
+					else
+
+						sub_student = %{
+							"name" => v["Name"],
+							"fname" => v["ManName"],
+							"phone" => v["Phone"],
+							"dob" => v["Birthdate"],
+							"start_date" => v["StartDate"],
+							"section_id" => v["section_id"],
+							"gender" => v["Gender"],
+							"active" => v["Active"]
+						}
+
+						Dynamic.put(agg, [k], sub_student)
+
+					end
+				end)
+
+
+				body = Poison.encode!(school_students)
+				conn = append_resp_headers(conn)
+				send_resp(conn, 200, body)
+
+			{:error, err} ->
+				body = Poison.encode!(%{message: err})
+				send_resp(conn, 400, body)
+		end
+
+	end
+
 	get "/hello" do
 		body = Poison.encode!(%{message: "Hello world"})
 		conn = append_resp_headers(conn)
@@ -494,5 +561,7 @@ defmodule EdMarkaz.Server.BranchManager do
 		# YYYY-MM-DD
 		date
 	end
+
+	def blank?(str_or_nil), do: str_or_nil == "" or str_or_nil == nil
 
 end
