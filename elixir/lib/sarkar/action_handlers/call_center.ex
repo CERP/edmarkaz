@@ -323,8 +323,24 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 		},
 		%{client_id: client_id, id: id } = state
 	) do
-		{:ok, resp} = EdMarkaz.Customer.save_customer_experience(customer_experience, id)
-		{:reply, succeed(resp), state}
+		case EdMarkaz.DB.Postgres.query(
+			EdMarkaz.DB,
+			"INSERT INTO customer_experience (
+				phone,
+				feedback,
+				date
+			) VALUES ($1,$2,current_timestamp)
+			",
+			["03078662285", customer_experience]
+		) do
+			{:ok, resp} ->
+				IO.puts "Customer experience saved"
+				{:reply, succeed(resp), state}
+			{:error, err} ->
+				IO.puts "insertion failed"
+				IO.inspect err
+				{:reply, fail(err), state}
+		end
 	end
 
 	def handle_action(%{"type" => "GET_PRODUCTS", "last_sync" => last_sync}, %{id: _id, client_id: _client_id} = state) do
@@ -390,8 +406,8 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 	end
 
 	def handle_action(action, state) do
-		IO.inspect action
-		IO.inspect state
+		# IO.inspect action
+		# IO.inspect state
 		IO.puts "NOT YET READY"
 		{:ok, state}
 		# {:reply, fail(), state}

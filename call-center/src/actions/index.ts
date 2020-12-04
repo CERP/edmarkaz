@@ -173,16 +173,10 @@ export const saveCustomerExperience = (customer_experience: CustomerExperience) 
 
 	const state = getState()
 
-	if (!state.connected) {
-		syncr.onNext('connect', () => dispatch(saveCustomerExperience(customer_experience)))
-		return
-	}
-
 	syncr.send({
 		type: "SAVE_CUSTOMER_EXPERIENCE",
 		client_type: state.auth.client_type,
 		client_id: state.client_id,
-		id: state.auth.id,
 		payload: {
 			customer_experience
 		}
@@ -192,7 +186,6 @@ export const saveCustomerExperience = (customer_experience: CustomerExperience) 
 			alert(res)
 		})
 		.catch(err => {
-			debugger
 			alert(err)
 		})
 }

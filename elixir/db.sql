@@ -147,8 +147,8 @@ create table platform_writes
 	);
 	create table customer_experience
 	(
-		phone text unique not null,
-		feedback jsonb not null,
+		phone text not null,
+		feedback jsonb,
 		date timestamp default current_timestamp
 	);
 		-- chapter_id text not null,
