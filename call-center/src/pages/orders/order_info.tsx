@@ -100,7 +100,7 @@ class OrderInfo extends Component<propTypes, S> {
 	}
 
 	save_meta = () => {
-
+		debugger
 		const { meta } = this.state.order
 		const { start_date } = this.props
 		const { phone_number } = this.state.school
@@ -123,7 +123,7 @@ class OrderInfo extends Component<propTypes, S> {
 			return
 		}
 
-		this.props.saveCustomerExperience(phone_number, this.state.customer_experience)
+		this.state.show_form && this.props.saveCustomerExperience(phone_number, this.state.customer_experience)
 		this.props.updateOrderMeta(this.state.order, changes, this.props.supplier_id, moment(start_date).valueOf())
 	}
 
@@ -297,37 +297,26 @@ class OrderInfo extends Component<propTypes, S> {
 				{this.state.show_form && <> <div className="divider">Feedback</div>
 					<div className="row">
 						<label>School Name</label>
-						<input
-							type="text"
-							onChange={this.former.handle(["customer_experience", "school_name"])}
-						/>
+						<input type="text" {...this.former.handle(["customer_experience", "school_name"])} />
 					</div>
 					<div className="row">
 						<label>Contact Number</label>
-						<input
-							type="number"
-							onChange={this.former.handle(["customer_experience", "contact_number"])}
+						<input type="number" {...this.former.handle(["customer_experience", "contact_number"])}
 						/>
 					</div>
 					<div className="row">
 						<label>Location</label>
-						<input
-							type="text"
-							onChange={this.former.handle(["customer_experience", "location"])}
+						<input type="text" {...this.former.handle(["customer_experience", "location"])}
 						/>
 					</div>
 					<div className="row">
 						<label>Sales Representative</label>
-						<input
-							type="text"
-							onChange={this.former.handle(["customer_experience", "sales_representative"])}
+						<input type="text" {...this.former.handle(["customer_experience", "sales_representative"])}
 						/>
 					</div>
 					<div className="row">
 						<label>Product Ordered</label>
-						<input
-							type="text"
-							onChange={this.former.handle(["customer_experience", "product_odered"])}
+						<input type="text" {...this.former.handle(["customer_experience", "product_odered"])}
 						/>
 					</div>
 					<div className="row">
@@ -335,21 +324,20 @@ class OrderInfo extends Component<propTypes, S> {
 						<input
 							type="date"
 							value={moment(this.state.customer_experience.date_of_delivery).format("YYYY-MM-DD")}
-							onChange={this.former.handle(["customer_experience", "date_of_delivery"])}
+							{...this.former.handle(["customer_experience", "date_of_delivery"])}
 						/>
 					</div>
 					<div className="divider">For Complete Orders</div>
 					<div className="row">
 						<label>Will you be ordering again from Ilm Exchange? If no, why not?</label>
-						<textarea placeholder="Reason" {...this.former.super_handle(["customer_experience", "complete_orders", "again_order"])} />
+						<textarea placeholder="Reason" {...this.former.super_handle(["customer_experience", "complete_orders", "will_order_again"])} />
 					</div>
 					<div className="row">
 						<label>Product Price</label>
 						<Rating
 							name="product_price"
 							value={this.state.customer_experience.complete_orders.rating.product_price}
-							//@ts-ignore
-							onChange={this.former.handle(["customer_experience", "complete_orders", "rating", "product_price"])}
+							{...this.former.handle(["customer_experience", "complete_orders", "rating", "product_price"])}
 						/>
 					</div>
 					<div className="row">
@@ -357,8 +345,7 @@ class OrderInfo extends Component<propTypes, S> {
 						<Rating
 							name="complete_product_quality"
 							value={this.state.customer_experience.complete_orders.rating.product_quality}
-							//@ts-ignore
-							onChange={this.former.handle(["customer_experience", "complete_orders", "rating", "product_quality"])}
+							{...this.former.handle(["customer_experience", "complete_orders", "rating", "product_quality"])}
 						/>
 					</div>
 					<div className="row">
@@ -366,8 +353,7 @@ class OrderInfo extends Component<propTypes, S> {
 						<Rating
 							name="complete_product_range"
 							value={this.state.customer_experience.complete_orders.rating.product_range}
-							//@ts-ignore
-							onChange={this.former.handle(["customer_experience", "complete_orders", "rating", "product_range"])}
+							{...this.former.handle(["customer_experience", "complete_orders", "rating", "product_range"])}
 						/>
 					</div>
 					<div className="row">
@@ -375,8 +361,7 @@ class OrderInfo extends Component<propTypes, S> {
 						<Rating
 							name="complete_delivery"
 							value={this.state.customer_experience.complete_orders.rating.delivery}
-							//@ts-ignore
-							onChange={this.former.handle(["customer_experience", "complete_orders", "rating", "delivery"])}
+							{...this.former.handle(["customer_experience", "complete_orders", "rating", "delivery"])}
 						/>
 					</div>
 					<div className="row">
@@ -384,8 +369,7 @@ class OrderInfo extends Component<propTypes, S> {
 						<Rating
 							name="complete_processing_time"
 							value={this.state.customer_experience.complete_orders.rating.processing_time}
-							//@ts-ignore
-							onChange={this.former.handle(["customer_experience", "complete_orders", "rating", "processing_time"])}
+							{...this.former.handle(["customer_experience", "complete_orders", "rating", "processing_time"])}
 						/>
 					</div>
 					<div className="row">
@@ -393,22 +377,20 @@ class OrderInfo extends Component<propTypes, S> {
 						<Rating
 							name="complete_customer_service"
 							value={this.state.customer_experience.complete_orders.rating.customer_service}
-							//@ts-ignore
-							onChange={this.former.handle(["customer_experience", "complete_orders", "rating", "customer_service"])}
+							{...this.former.handle(["customer_experience", "complete_orders", "rating", "customer_service"])}
 						/>
 					</div>
 					<div className="divider">For Cancelled Orders</div>
 					<div className="row">
 						<label>Why did you not go ahead with the purchase? </label>
-						<textarea placeholder="Reason" {...this.former.super_handle(["customer_experience", "cancel_orders", "why_not_go_ahead"])} />
+						<textarea placeholder="Reason" {...this.former.super_handle(["customer_experience", "cancel_orders", "purchase_cancel_reason"])} />
 					</div>
 					<div className="row">
 						<label>Product Price</label>
 						<Rating
 							name="cancel_product_price"
 							value={this.state.customer_experience.complete_orders.rating.product_price}
-							//@ts-ignore
-							onChange={this.former.handle(["customer_experience", "cancel_orders", "rating", "product_price"])}
+							{...this.former.handle(["customer_experience", "cancel_orders", "rating", "product_price"])}
 						/>
 					</div>
 					<div className="row">
@@ -416,8 +398,7 @@ class OrderInfo extends Component<propTypes, S> {
 						<Rating
 							name="cancel_product_quality"
 							value={this.state.customer_experience.complete_orders.rating.product_range}
-							//@ts-ignore
-							onChange={this.former.handle(["customer_experience", "cancel_orders", "rating", "product_quality"])}
+							{...this.former.handle(["customer_experience", "cancel_orders", "rating", "product_quality"])}
 						/>
 					</div>
 					<div className="row">
@@ -425,8 +406,7 @@ class OrderInfo extends Component<propTypes, S> {
 						<Rating
 							name="cancel_product_range"
 							value={this.state.customer_experience.complete_orders.rating.product_range}
-							//@ts-ignore
-							onChange={this.former.handle(["customer_experience", "cancel_orders", "rating", "product_range"])}
+							{...this.former.handle(["customer_experience", "cancel_orders", "rating", "product_range"])}
 						/>
 					</div>
 					<div className="row">
@@ -434,13 +414,12 @@ class OrderInfo extends Component<propTypes, S> {
 						<Rating
 							name="cancel_customer_service"
 							value={this.state.customer_experience.complete_orders.rating.customer_service}
-							//@ts-ignore
-							onChange={this.former.handle(["customer_experience", "cancel_orders", "rating", "customer_service"])}
+							{...this.former.handle(["customer_experience", "cancel_orders", "rating", "customer_service"])}
 						/>
 					</div>
 					<div className="row">
 						<label>Will you be ordering again from Ilm Exchange? If no, why not?</label>
-						<textarea placeholder="Reason" {...this.former.super_handle(["customer_experience", "cancel_orders", "again_order"])} />
+						<textarea placeholder="Reason" {...this.former.super_handle(["customer_experience", "cancel_orders", "will_order_again"])} />
 					</div>
 				</>}
 				{verified && <div className="button blue" style={{ marginBottom: "5px" }} onClick={() => this.save_meta()}>Save</div>}

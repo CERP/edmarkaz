@@ -132,7 +132,7 @@ interface CustomerExperience {
 }
 
 interface CompleteOrders {
-	again_order: string
+	will_order_again: string
 	rating: RatingCompleteOrders
 }
 
@@ -146,8 +146,8 @@ interface RatingCompleteOrders {
 }
 
 interface CancelOrders {
-	why_not_go_ahead: string
-	again_order: string
+	purchase_cancel_reason: string
+	will_order_again: string
 	rating: RatingCancelOrders
 }
 
