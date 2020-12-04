@@ -100,7 +100,7 @@ class OrderInfo extends Component<propTypes, S> {
 	}
 
 	save_meta = () => {
-		debugger
+
 		const { meta } = this.state.order
 		const { start_date } = this.props
 		const { phone_number } = this.state.school
@@ -124,11 +124,7 @@ class OrderInfo extends Component<propTypes, S> {
 		}
 
 		this.state.show_form && this.props.saveCustomerExperience(phone_number, this.state.customer_experience)
-		this.props.updateOrderMeta(this.state.order, changes, this.props.supplier_id, moment(start_date).valueOf())
-	}
-
-	showFeedbackForm = () => {
-		this.setState({ show_form: true })
+		!this.state.show_form && this.props.updateOrderMeta(this.state.order, changes, this.props.supplier_id, moment(start_date).valueOf())
 	}
 
 	render() {
@@ -423,7 +419,7 @@ class OrderInfo extends Component<propTypes, S> {
 					</div>
 				</>}
 				{verified && <div className="button blue" style={{ marginBottom: "5px" }} onClick={() => this.save_meta()}>Save</div>}
-				{verified && !this.state.show_form && <div className="button blue" onClick={this.showFeedbackForm}>Customer Experience Form</div>}
+				{verified && !this.state.show_form && <div className="button blue" onClick={() => this.setState({ show_form: true })}>Customer Experience Form</div>}
 			</div>
 		</div >
 	}
