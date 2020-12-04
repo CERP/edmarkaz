@@ -290,7 +290,7 @@ class OrderInfo extends Component<propTypes, S> {
 						</>
 					}</>}
 
-				{<> <div className="divider">Feedback</div>
+				{this.state.show_form && <> <div className="divider">Feedback</div>
 					<div className="row">
 						<label>School Name</label>
 						<input type="text" {...this.former.handle(["customer_experience", "school_name"])} />
@@ -331,7 +331,7 @@ class OrderInfo extends Component<propTypes, S> {
 					<div className="row">
 						<label>Product Price</label>
 						<Rating
-							name="product_price"
+							name="complete_product_price"
 							value={this.state.customer_experience.complete_orders.rating.product_price}
 							//@ts-ignore
 							onChange={this.former.handle(["customer_experience", "complete_orders", "rating", "product_price"])}
@@ -340,7 +340,7 @@ class OrderInfo extends Component<propTypes, S> {
 					<div className="row">
 						<label>Product Quality</label>
 						<Rating
-							name="complete_product_qucomplete_product_qualityality"
+							name="complete_product_quality"
 							value={this.state.customer_experience.complete_orders.rating.product_quality}
 							//@ts-ignore
 							onChange={this.former.handle(["customer_experience", "complete_orders", "rating", "product_quality"])}
