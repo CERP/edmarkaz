@@ -405,8 +405,8 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 	end
 
 	def handle_action(action, state) do
-		# IO.inspect action
-		# IO.inspect state
+		IO.inspect action
+		IO.inspect state
 		IO.puts "NOT YET READY"
 		{:ok, state}
 		# {:reply, fail(), state}
