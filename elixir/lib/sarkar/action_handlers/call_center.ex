@@ -318,10 +318,11 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 		%{
 			"type" => "SAVE_CUSTOMER_EXPERIENCE",
 			"payload" => %{
+				"id" -> id
 				"customer_experience" => customer_experience
 			}
 		},
-		%{client_id: client_id, id: id } = state
+		state
 	) do
 		case EdMarkaz.DB.Postgres.query(
 			EdMarkaz.DB,
@@ -331,7 +332,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 				date
 			) VALUES ($1,$2,current_timestamp)
 			",
-			["03078662285", customer_experience]
+			[id, customer_experience]
 		) do
 			{:ok, resp} ->
 				IO.puts "Customer experience saved"

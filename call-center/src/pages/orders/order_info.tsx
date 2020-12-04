@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import Former from '@cerp/former'
 import { RouteComponentProps, withRouter } from 'react-router'
 import { connect } from 'react-redux'
-import { verifyOrder, rejectOrder, updateOrderMeta } from '../../actions'
+import { verifyOrder, rejectOrder, updateOrderMeta, saveCustomerExperience } from '../../actions'
 import moment from 'moment'
 import Rating from "@material-ui/lab/Rating";
 import { getSalesReps } from '../../utils/sales_rep'
@@ -27,6 +27,8 @@ interface SelfProps {
 interface P {
 	products: RootReducerState["products"]
 	orders: RootReducerState["orders"]
+
+	saveCustomerExperience: (id: string, customer_experience: CustomerExperience) => void
 	updateOrderMeta: (order: Order, meta: any, supplier_id: string, start_date: number) => any
 	verifyOrder: (order: Order, product: Product, school: CERPSchool, start_date: number) => any
 	rejectOrder: (order: Order, product: Product, start_date: number) => any
@@ -99,37 +101,34 @@ class OrderInfo extends Component<propTypes, S> {
 
 	save_meta = () => {
 
-		debugger
 		const { meta } = this.state.order
 		const { start_date } = this.props
+		const { phone_number } = this.state.school
 
-		// if (isNaN(parseFloat(meta.total_amount)) || parseFloat(meta.total_amount) < 0) {
-		// 	alert("Amount can't be less than zero")
-		// 	return
-		// }
+		if (isNaN(parseFloat(meta.total_amount)) || parseFloat(meta.total_amount) < 0) {
+			alert("Amount can't be less than zero")
+			return
+		}
 
-		// if (isNaN(parseFloat(meta.quantity)) || parseFloat(meta.quantity) < 1) {
-		// 	alert("Quantity can't be less than 1")
-		// 	return
-		// }
+		if (isNaN(parseFloat(meta.quantity)) || parseFloat(meta.quantity) < 1) {
+			alert("Quantity can't be less than 1")
+			return
+		}
 
-		// const old_meta = this.props.orders.db[this.props.supplier_id][this.props.order_time].order.meta
-		// const changes = compareObjects<Order["meta"]>(old_meta, meta)
+		const old_meta = this.props.orders.db[this.props.supplier_id][this.props.order_time].order.meta
+		const changes = compareObjects<Order["meta"]>(old_meta, meta)
 
-		// if (Object.keys(changes).length < 1) {
-		// 	alert("No Changes to Save !")
-		// 	return
-		// }
+		if (Object.keys(changes).length < 1) {
+			alert("No Changes to Save !")
+			return
+		}
 
-		// this.props.updateOrderMeta(this.state.order, changes, this.props.supplier_id, moment(start_date).valueOf())
+		this.props.saveCustomerExperience(phone_number, this.state.customer_experience)
+		this.props.updateOrderMeta(this.state.order, changes, this.props.supplier_id, moment(start_date).valueOf())
 	}
 
 	showFeedbackForm = () => {
 		this.setState({ show_form: true })
-	}
-
-	test = () => {
-		this.former.handle(["customer_experience", "complete_orders", "product_price"])
 	}
 
 	render() {
@@ -454,6 +453,7 @@ export default connect((state: RootReducerState) => ({
 	products: state.products,
 	orders: state.orders
 }), (dispatch: Function) => ({
+	saveCustomerExperience: (id: string, customer_experience: CustomerExperience) => dispatch(saveCustomerExperience(id, customer_experience)),
 	updateOrderMeta: (order: Order, meta: any, supplier_id: string, start_date: number) => dispatch(updateOrderMeta(order, meta, supplier_id, start_date)),
 	verifyOrder: (order: Order, product: Product, school: CERPSchool, start_date: number) => dispatch(verifyOrder(order, product, school, start_date)),
 	rejectOrder: (order: Order, product: Product, start_date: number) => dispatch(rejectOrder(order, product, start_date))

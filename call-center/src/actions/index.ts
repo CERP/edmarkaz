@@ -169,7 +169,7 @@ export const updateOrderMeta = (order: Order, meta: any, supplier_id: string, st
 
 }
 
-export const saveCustomerExperience = (customer_experience: CustomerExperience) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+export const saveCustomerExperience = (id: string, customer_experience: CustomerExperience) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 
 	const state = getState()
 
@@ -178,6 +178,7 @@ export const saveCustomerExperience = (customer_experience: CustomerExperience) 
 		client_type: state.auth.client_type,
 		client_id: state.client_id,
 		payload: {
+			id,
 			customer_experience
 		}
 	})
