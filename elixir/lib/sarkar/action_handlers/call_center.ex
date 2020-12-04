@@ -335,12 +335,10 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 			[id, customer_experience]
 		) do
 			{:ok, resp} ->
-				IO.puts "Customer experience saved"
-				{:reply, succeed(resp), state}
+				{:reply, succeed("Customer experience saved"), state}
 			{:error, err} ->
-				IO.puts "insertion failed"
 				IO.inspect err
-				{:reply, fail(err), state}
+				{:reply, fail("insertion failed"), state}
 		end
 	end
 

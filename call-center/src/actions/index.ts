@@ -182,13 +182,8 @@ export const saveCustomerExperience = (id: string, customer_experience: Customer
 			customer_experience
 		}
 	})
-		.then(res => {
-			debugger
-			alert(res)
-		})
-		.catch(err => {
-			alert(err)
-		})
+		.then(res => { alert(res) })
+		.catch(err => { alert(err) })
 }
 
 export const getOrders = (start_date = moment().subtract(3, "days").valueOf()) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
