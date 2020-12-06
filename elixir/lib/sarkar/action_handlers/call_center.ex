@@ -318,7 +318,7 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 		%{
 			"type" => "SAVE_CUSTOMER_EXPERIENCE",
 			"payload" => %{
-				"id" -> id
+				"id" => id,
 				"customer_experience" => customer_experience
 			}
 		},
