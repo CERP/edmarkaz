@@ -1,6 +1,6 @@
 defmodule EdMarkaz.TargetedInstructions do
 
-	def insert_targeted_instruction_assessments(assessments) do
+	def insert_targeted_instruction_assessments([id, assessments]) do
 		case EdMarkaz.DB.Postgres.query(
 			EdMarkaz.DB,
 			"INSERT INTO targeted_instruction_assessments (
@@ -8,7 +8,7 @@ defmodule EdMarkaz.TargetedInstructions do
 				value,
 				date
 			) VALUES ($1,$2,current_timestamp)",
-			assessments
+			[id, assessments]
 		) do
 			{:ok, resp} ->
 				[head | tail ] = assessments
@@ -22,7 +22,8 @@ defmodule EdMarkaz.TargetedInstructions do
 		end
 	end
 
-	def insert_targeted_instruction_curriculum(curriculum) do
+	def insert_targeted_instruction_curriculum([id, curriculum]) do
+
 		case EdMarkaz.DB.Postgres.query(
 			EdMarkaz.DB,
 			"INSERT INTO targeted_instruction_curriculum (
@@ -30,7 +31,7 @@ defmodule EdMarkaz.TargetedInstructions do
 				value,
 				date
 			) VALUES ($1,$2,current_timestamp)",
-			curriculum
+			[id, curriculum]
 		) do
 			{:ok, resp} ->
 				[head | tail ] = curriculum
@@ -39,6 +40,29 @@ defmodule EdMarkaz.TargetedInstructions do
 			{:error, err} ->
 				[head | tail ] = curriculum
 				IO.puts "curriculum merge failed #{head}"
+				IO.inspect err
+				{:error, err}
+		end
+	end
+
+	def insert_targeted_instruction_slo_mapping([id, slo_mapping]) do
+
+		case EdMarkaz.DB.Postgres.query(
+			EdMarkaz.DB,
+			"INSERT INTO targeted_instruction_slo_mapping (
+				id,
+				value,
+				date
+			) VALUES ($1,$2,current_timestamp)",
+			[id, slo_mapping]
+		) do
+			{:ok, resp} ->
+				[head | tail ] = slo_mapping
+				IO.puts "OK"
+				{:ok}
+			{:error, err} ->
+				[head | tail ] = slo_mapping
+				IO.puts "slo_mapping merge failed #{head}"
 				IO.inspect err
 				{:error, err}
 		end
