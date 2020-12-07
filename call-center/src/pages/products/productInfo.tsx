@@ -61,7 +61,7 @@ const categories = [
 	"Education Technology",
 	"School Loans",
 	"Textbooks",
-	"School supplies",
+	"School Supplies",
 	"Learning Materials",
 	"Solar Power"
 ]

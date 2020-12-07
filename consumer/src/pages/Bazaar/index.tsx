@@ -79,6 +79,7 @@ class LoggedOutHome extends React.Component<P, S> {
 		})
 
 		const sorted = Object.entries(categories)
+			.filter(([c,]) => c)
 			.sort(([c1,], [c2,]) => getCategoryOrder(c1) - getCategoryOrder(c2))
 
 		return <div className="products">
