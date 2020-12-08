@@ -73,11 +73,8 @@ defmodule EdMarkaz.TargetedInstructions do
 		query_string = "SELECT value FROM targeted_instruction_assessments"
 
 		{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB, query_string, [])
-		response = resp.rows
-		|> Enum.reduce(%{}, fn([value], agg) ->
-			value
-		end)
-
+		[head | _] = resp.rows |> Enum.map(fn[value] -> value end)
+		{:ok, head}
 	end
 
 	def get_slo_mapping() do
@@ -85,10 +82,8 @@ defmodule EdMarkaz.TargetedInstructions do
 		query_string = "SELECT value FROM targeted_instruction_slo_mapping"
 
 		{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB, query_string, [])
-		response = resp.rows
-		|> Enum.reduce(%{}, fn([value], agg) ->
-			value
-		end)
+		[head | _] = resp.rows |> Enum.map(fn[value] -> value end)
+		{:ok, head}
 
 	end
 
@@ -98,10 +93,8 @@ defmodule EdMarkaz.TargetedInstructions do
 		query_string = "SELECT value FROM targeted_instruction_curriculum"
 
 		{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB, query_string, [])
-		response = resp.rows
-		|> Enum.reduce(%{}, fn([value], agg) ->
-			value
-		end)
+		[head | _] = resp.rows |> Enum.map(fn[value] -> value end)
+		{:ok, head}
 
 	end
 

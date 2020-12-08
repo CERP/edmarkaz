@@ -137,9 +137,9 @@ defmodule Sarkar.ActionHandler.Mis do
 
 	def handle_action(%{"type" => "GET_TARGETED_INSTRUCTIONS", "payload" => payload }, %{ school_id: school_id, client_id: client_id } = state ) do
 
-		assessments = EdMarkaz.TargetedInstructions.get_assessments()
-		slo_mapping = EdMarkaz.TargetedInstructions.get_slo_mapping()
-		curriculum = EdMarkaz.TargetedInstructions.get_curriculum()
+		{:ok, assessments} = EdMarkaz.TargetedInstructions.get_assessments()
+		{:ok, slo_mapping} = EdMarkaz.TargetedInstructions.get_slo_mapping()
+		{:ok, curriculum} = EdMarkaz.TargetedInstructions.get_curriculum()
 
 		targeted_instructions = %{
 			:tests => assessments,
