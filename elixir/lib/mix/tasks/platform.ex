@@ -9,29 +9,49 @@ defmodule Mix.Tasks.Platform do
 			false -> File.stream!("priv/#{tests_csv_fname}.csv") |> CSV.decode!
 		end
 
-		diagnostic_test_csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{tests_csv_fname}.csv")) do
-			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{tests_csv_fname}.csv")) |> CSV.decode!
-			false -> File.stream!("priv/#{tests_csv_fname}.csv") |> CSV.decode!
+		[ _ | tests] = test_csv
+		|> Enum.map(fn row -> row end)
+
+		testsss = getTest(diagnostic_test_csv_fname)
+
+		tests_obj = tests
+		|> Enum.reduce(%{}, fn([test_id, label, subject, grade, type, pdf_url]), agg ->
+			testssss = Map.take(testsss, [test_id])
+				test = %{
+					"label" => label,
+					"subject" => subject,
+					"grade" => grade,
+					"type" => type,
+					"pdf_url" => pdf_url,
+					"questions" => testssss
+				}
+				Dynamic.put(agg, [test_id], test)
+			end)
+		IO.inspect tests_obj
+		assessments = %{"tests": tests_obj}
+
+		EdMarkaz.TargetedInstructions.insert_targeted_instruction_assessments(["targeted_instruction_assessments",assessments])
+	end
+
+	defp getTest(diagnostic_test_csv_fname) do
+
+		diagnostic_test_csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{diagnostic_test_csv_fname}.csv")) do
+			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{diagnostic_test_csv_fname}.csv")) |> CSV.decode!
+			false -> File.stream!("priv/#{diagnostic_test_csv_fname}.csv") |> CSV.decode!
 		end
 
 		[ _ | diagnostic_test] = diagnostic_test_csv
 		|> Enum.map(fn row -> row end)
 
-		tests_obj = tests
-		|> Enum.reduce(%{}, fn([test_id, label, subject, grade, type, pdf_url]), agg ->
-			test = %{
-				"label" => label,
-				"subject" => subject,
-				"grade" => grade,
-				"type" => type,
-				"pdf_url" => pdf_url
+		diagnostic_result_obj = diagnostic_test
+		|> Enum.reduce(%{}, fn([test_id, question_id, question_text, answer, slo]), agg ->
+			result = %{
+				"question_text" => question_text,
+				"answer" => answer,
+				"slo" => slo
 			}
-			Dynamic.put(agg, [test_id], test)
+			Dynamic.put(agg, [test_id, question_id], result)
 		end)
-
-		assessments = %{"tests": tests_obj}
-
-		EdMarkaz.TargetedInstructions.insert_targeted_instruction_assessments(["targeted_instruction_assessments",assessments])
 	end
 
 	def run(["ingest_TI_slo_mapping", school_id, slo_mapping_csv_fname]) do
@@ -87,44 +107,6 @@ defmodule Mix.Tasks.Platform do
 		curriculum = %{"curriculum": curriculum_obj}
 
 		EdMarkaz.TargetedInstructions.insert_targeted_instruction_curriculum(["targeted_instruction_curriculum", curriculum])
-	end
-
-	def run(["ingest_diagnostic_result", school_id, diagnostic_test]) do
-		Application.ensure_all_started(:edmarkaz)
-
-		csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{diagnostic_result}.csv")) do
-			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{diagnostic_result}.csv")) |> CSV.decode!
-			false -> File.stream!("priv/#{diagnostic_result}.csv") |> CSV.decode!
-		end
-
-		[ _ | diagnostic_result] = csv
-		|> Enum.map(fn row -> row end)
-
-		diagnostic_result_obj = diagnostic_result
-		|> Enum.reduce(%{}, fn([test_id, question_id, answer, slo]), agg ->
-			result = %{
-				# "question_text" => question_text
-				"answer" => answer,
-				"slo" => slo
-			}
-			Dynamic.put(agg, [test_id, question_id], result)
-		end)
-
-		{:ok, res} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
-			"SELECT DISTINCT path[3] as school_id
-			FROM writes
-			WHERE path[2] ='students'
-			",
-			[])
-			state = res.rows
-			|> Enum.reduce([], fn([school_id], agg) ->
-				path = ["db", "students", school_id, "diagnostic_result"]
-				mappy = %{ "type" => "MERGE", "path" => path, "value" => diagnostic_result_obj}
-				agg = agg ++ [mappy]
-			end)
-			res = start_school(school_id)
-			changes = Sarkar.School.prepare_changes(state)
-			Sarkar.School.sync_changes(school_id, "backend", changes, :os.system_time(:millisecond))
 	end
 
 	def run(["platform-orders"]) do
