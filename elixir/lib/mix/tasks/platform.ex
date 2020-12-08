@@ -1,49 +1,26 @@
 defmodule Mix.Tasks.Platform do
 	use Mix.Task
 
-	def run(["ingest_TI_assessments", school_id, tests_csv_fname, diagnostic_test_csv_fname]) do
+	def run(["ingest_TI_assessments", school_id, assessments_csv_fname, diagnostic_test_csv_fname]) do
 		Application.ensure_all_started(:edmarkaz)
 
-		test_csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{tests_csv_fname}.csv")) do
-			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{tests_csv_fname}.csv")) |> CSV.decode!
-			false -> File.stream!("priv/#{tests_csv_fname}.csv") |> CSV.decode!
+		assessments_csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{assessments_csv_fname}.csv")) do
+			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{assessments_csv_fname}.csv")) |> CSV.decode!
+			false -> File.stream!("priv/#{assessments_csv_fname}.csv") |> CSV.decode!
 		end
-
-		[ _ | tests] = test_csv
-		|> Enum.map(fn row -> row end)
-
-		testsss = getTest(diagnostic_test_csv_fname)
-
-		tests_obj = tests
-		|> Enum.reduce(%{}, fn([test_id, label, subject, grade, type, pdf_url]), agg ->
-			testssss = Map.take(testsss, [test_id])
-				test = %{
-					"label" => label,
-					"subject" => subject,
-					"grade" => grade,
-					"type" => type,
-					"pdf_url" => pdf_url,
-					"questions" => testssss
-				}
-				Dynamic.put(agg, [test_id], test)
-			end)
-		IO.inspect tests_obj
-		assessments = %{"tests": tests_obj}
-
-		EdMarkaz.TargetedInstructions.insert_targeted_instruction_assessments(["targeted_instruction_assessments",assessments])
-	end
-
-	defp getTest(diagnostic_test_csv_fname) do
 
 		diagnostic_test_csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{diagnostic_test_csv_fname}.csv")) do
 			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{diagnostic_test_csv_fname}.csv")) |> CSV.decode!
 			false -> File.stream!("priv/#{diagnostic_test_csv_fname}.csv") |> CSV.decode!
 		end
 
+		[ _ | assessments] = assessments_csv
+		|> Enum.map(fn row -> row end)
+
 		[ _ | diagnostic_test] = diagnostic_test_csv
 		|> Enum.map(fn row -> row end)
 
-		diagnostic_result_obj = diagnostic_test
+		diagnostic_test_obj = diagnostic_test
 		|> Enum.reduce(%{}, fn([test_id, question_id, question_text, answer, slo]), agg ->
 			result = %{
 				"question_text" => question_text,
@@ -52,6 +29,23 @@ defmodule Mix.Tasks.Platform do
 			}
 			Dynamic.put(agg, [test_id, question_id], result)
 		end)
+
+		assessments_obj = assessments
+		|> Enum.reduce(%{}, fn([test_id, label, subject, grade, type, pdf_url]), agg ->
+			test = %{
+					"label" => label,
+					"subject" => subject,
+					"grade" => grade,
+					"type" => type,
+					"pdf_url" => pdf_url,
+					"questions" => Map.take(diagnostic_test_obj, [test_id])
+				}
+				Dynamic.put(agg, [test_id], test)
+			end)
+
+		assessments = %{"assessments": assessments_obj}
+
+		EdMarkaz.TargetedInstructions.insert_targeted_instruction_assessments(["targeted_instruction_assessments",assessments])
 	end
 
 	def run(["ingest_TI_slo_mapping", school_id, slo_mapping_csv_fname]) do
