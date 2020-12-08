@@ -72,39 +72,36 @@ defmodule EdMarkaz.TargetedInstructions do
 
 		query_string = "SELECT value FROM targeted_instruction_assessments"
 
-		case EdMarkaz.DB.Postgres.query(EdMarkaz.DB, query_string, [])do
-			{:ok, resp} ->
-				[ assessments | _ ] = resp.rows
-					|> Enum.map(fn ([value])->
-						value
-				end)
-
-				{:ok, assessments}
-
-			{:error, err} ->
-				IO.inspect err
-				{:error, err}
-		end
+		{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB, query_string, [])
+		response = resp.rows
+		|> Enum.reduce(%{}, fn([value], agg) ->
+			value
+		end)
 
 	end
+
+	def get_slo_mapping() do
+
+		query_string = "SELECT value FROM targeted_instruction_slo_mapping"
+
+		{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB, query_string, [])
+		response = resp.rows
+		|> Enum.reduce(%{}, fn([value], agg) ->
+			value
+		end)
+
+	end
+
 
 	def get_curriculum() do
 
 		query_string = "SELECT value FROM targeted_instruction_curriculum"
 
-		case EdMarkaz.DB.Postgres.query(EdMarkaz.DB, query_string, [])do
-			{:ok, resp} ->
-				[ curriculum | _ ] = resp.rows
-					|> Enum.map(fn ([value])->
-						value
-				end)
-
-				{:ok, curriculum}
-
-			{:error, err} ->
-				IO.inspect err
-				{:error, err}
-		end
+		{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB, query_string, [])
+		response = resp.rows
+		|> Enum.reduce(%{}, fn([value], agg) ->
+			value
+		end)
 
 	end
 

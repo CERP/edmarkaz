@@ -137,11 +137,17 @@ defmodule Sarkar.ActionHandler.Mis do
 
 	def handle_action(%{"type" => "GET_TARGETED_INSTRUCTIONS", "payload" => payload }, %{ school_id: school_id, client_id: client_id } = state ) do
 
-		{:ok, assessments} = EdMarkaz.TargetedInstructions.get_assessments()
-		{:ok, curriculum} = EdMarkaz.TargetedInstructions.get_curriculum()
+		assessments = EdMarkaz.TargetedInstructions.get_assessments()
+		slo_mapping = EdMarkaz.TargetedInstructions.get_slo_mapping()
+		curriculum = EdMarkaz.TargetedInstructions.get_curriculum()
 
-		response = Map.merge(assessments, curriculum)
-		{:reply, succeed(response), state}
+		targeted_instructions = %{
+			:tests => assessments,
+			:slo_mapping => slo_mapping,
+			:curriculum => curriculum
+		}
+
+		{:reply, succeed(targeted_instructions), state}
 
 	end
 

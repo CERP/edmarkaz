@@ -32,20 +32,19 @@ defmodule Mix.Tasks.Platform do
 
 		assessments_obj = assessments
 		|> Enum.reduce(%{}, fn([test_id, label, subject, grade, type, pdf_url]), agg ->
+
 			test = %{
 					"label" => label,
 					"subject" => subject,
 					"grade" => grade,
 					"type" => type,
 					"pdf_url" => pdf_url,
-					"questions" => Map.take(diagnostic_test_obj, [test_id])
+					"questions" => Dynamic.get(diagnostic_test_obj, [test_id])
 				}
 				Dynamic.put(agg, [test_id], test)
 			end)
 
-		assessments = %{"assessments": assessments_obj}
-
-		EdMarkaz.TargetedInstructions.insert_targeted_instruction_assessments(["targeted_instruction_assessments",assessments])
+		EdMarkaz.TargetedInstructions.insert_targeted_instruction_assessments(["tests", assessments_obj])
 	end
 
 	def run(["ingest_TI_slo_mapping", school_id, slo_mapping_csv_fname]) do
@@ -69,9 +68,7 @@ defmodule Mix.Tasks.Platform do
 			Dynamic.put(agg, [slo_id], sloMapping)
 		end)
 
-		slo_mappingg = %{"slo_mapping": slo_mapping_obj}
-
-		EdMarkaz.TargetedInstructions.insert_targeted_instruction_slo_mapping(["targeted_instruction_slo_mapping", slo_mappingg])
+		EdMarkaz.TargetedInstructions.insert_targeted_instruction_slo_mapping(["slo_mapping", slo_mapping_obj])
 	end
 
 	def run(["ingest_TI_curriculum", school_id, curriculum_csv_fname]) do
@@ -98,9 +95,7 @@ defmodule Mix.Tasks.Platform do
 			Dynamic.put(agg, [learning_level_id], learning_levels)
 		end)
 
-		curriculum = %{"curriculum": curriculum_obj}
-
-		EdMarkaz.TargetedInstructions.insert_targeted_instruction_curriculum(["targeted_instruction_curriculum", curriculum])
+		EdMarkaz.TargetedInstructions.insert_targeted_instruction_curriculum(["curriculum", curriculum_obj])
 	end
 
 	def run(["platform-orders"]) do
