@@ -25,13 +25,13 @@ defmodule Mix.Tasks.Platform do
 			result = %{
 				"question_text" => question_text,
 				"answer" => answer,
-				"slo" => slo
+				"slo" => [slo]
 			}
 			Dynamic.put(agg, [test_id, question_id], result)
 		end)
 
 		assessments_obj = assessments
-		|> Enum.reduce(%{}, fn([test_id, label, subject, grade, type, pdf_url]), agg ->
+		|> Enum.reduce(%{}, fn([test_id, subject, grade, label, type, pdf_url]), agg ->
 
 			test = %{
 					"label" => label,
@@ -83,7 +83,7 @@ defmodule Mix.Tasks.Platform do
 		|> Enum.map(fn row -> row end)
 
 		curriculum_obj = curriculum
-		|> Enum.reduce(%{}, fn([learning_level_id, lesson_number, lesson_name, lesson_description, subject, video_links, pdf_link]), agg ->
+		|> Enum.reduce(%{}, fn([learning_level_id, subject, lesson_number, lesson_name, lesson_description, video_links, pdf_link]), agg ->
 			learning_levels = %{
 				"leasson_number" => lesson_number,
 				"lesson_name" => lesson_name,
