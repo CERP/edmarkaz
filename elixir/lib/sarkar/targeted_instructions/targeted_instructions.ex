@@ -11,12 +11,10 @@ defmodule EdMarkaz.TargetedInstructions do
 			[id, assessments]
 		) do
 			{:ok, resp} ->
-				[head | tail ] = assessments
-				IO.puts "OK #{head}"
+				IO.puts "OK"
 				{:ok}
 			{:error, err} ->
-				[head | tail ] = assessments
-				IO.puts "assessments merge failed #{head}"
+				IO.puts "assessments merge failed"
 				IO.inspect err
 				{:error, err}
 		end
@@ -34,12 +32,10 @@ defmodule EdMarkaz.TargetedInstructions do
 			[id, curriculum]
 		) do
 			{:ok, resp} ->
-				[head | tail ] = curriculum
-				IO.puts "OK #{head}"
+				IO.puts "OK"
 				{:ok}
 			{:error, err} ->
-				[head | tail ] = curriculum
-				IO.puts "curriculum merge failed #{head}"
+				IO.puts "curriculum merge failed"
 				IO.inspect err
 				{:error, err}
 		end
@@ -57,12 +53,10 @@ defmodule EdMarkaz.TargetedInstructions do
 			[id, slo_mapping]
 		) do
 			{:ok, resp} ->
-				[head | tail ] = slo_mapping
 				IO.puts "OK"
 				{:ok}
 			{:error, err} ->
-				[head | tail ] = slo_mapping
-				IO.puts "slo_mapping merge failed #{head}"
+				IO.puts "slo_mapping merge failed"
 				IO.inspect err
 				{:error, err}
 		end
