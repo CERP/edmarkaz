@@ -135,6 +135,22 @@ defmodule Sarkar.ActionHandler.Mis do
 
 	end
 
+	def handle_action(%{"type" => "GET_TARGETED_INSTRUCTIONS", "payload" => payload }, %{ school_id: school_id, client_id: client_id } = state ) do
+
+		{:ok, assessments} = EdMarkaz.TargetedInstructions.get_assessments()
+		{:ok, slo_mapping} = EdMarkaz.TargetedInstructions.get_slo_mapping()
+		{:ok, curriculum} = EdMarkaz.TargetedInstructions.get_curriculum()
+
+		targeted_instructions = %{
+			"tests" => assessments,
+			"slo_mapping" => slo_mapping,
+			"curriculum" => curriculum
+		}
+
+		{:reply, succeed(targeted_instructions), state}
+
+	end
+
 	def handle_action(%{ "type" => "LOGIN",  "payload" => %{"school_id" => school_id, "client_id" => client_id, "password" => password }}, state) do
 		case Sarkar.Auth.login({school_id, client_id, password}) do
 			{:ok, token} ->

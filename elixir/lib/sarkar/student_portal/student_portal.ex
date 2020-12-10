@@ -96,5 +96,4 @@ defmodule EdMarkaz.StudentPortal do
 				{:error, err}
 		end
 	end
-
 end
