@@ -327,12 +327,12 @@ defmodule EdMarkaz.Server.BranchManager do
 
 					end)
 
-					agg_payments = monthvise_payments |> Enum.reduce(p_map, fn({_, v}, agg) ->
+					agg_payments = monthvise_payments |> Enum.reduce(p_map, fn({_, v}, agg_payment) ->
 						%{
-							"OWED" => agg["OWED"] + v["OWED"],
-							"SUBMITTED" => agg["SUBMITTED"] + v["SUBMITTED"],
-							"FORGIVEN" => agg["FORGIVEN"] + v["FORGIVEN"],
-							"SCHOLARSHIP" => agg["SCHOLARSHIP"] + v["SCHOLARSHIP"]
+							"OWED" => agg_payment["OWED"] + v["OWED"],
+							"SUBMITTED" => agg_payment["SUBMITTED"] + v["SUBMITTED"],
+							"FORGIVEN" => agg_payment["FORGIVEN"] + v["FORGIVEN"],
+							"SCHOLARSHIP" => agg_payment["SCHOLARSHIP"] + v["SCHOLARSHIP"]
 						}
 					end)
 
@@ -449,7 +449,7 @@ defmodule EdMarkaz.Server.BranchManager do
 	end
 
 
-	get "/expense-analytics" do
+	get "/school-expense" do
 
 		# get the auth from req_headers
 		[ username, client_id, auth_token ] = get_auth_from_req_headers(conn)
@@ -457,12 +457,188 @@ defmodule EdMarkaz.Server.BranchManager do
 		# get the school id param from body
 		school_id = conn.params["school_id"]
 
-		db = Sarkar.School.get_db(school_id)
-
-
-		body = Poison.encode!(%{message: "Load db for exams"})
 		conn = append_resp_headers(conn)
-		send_resp(conn, 200, body)
+
+		case EdMarkaz.Auth.BranchManager.verify({ username, client_id, auth_token }) do
+			{:ok, _} ->
+
+				case start_school(school_id) do
+					{:ok, pid} ->
+						IO.puts "school start now"
+					_ ->
+						IO.puts	"school already started"
+				end
+
+				db = Sarkar.School.get_db(school_id)
+
+				p_map =  %{
+					"OWED" => 0,
+					"SUBMITTED" => 0,
+					"FORGIVEN" => 0,
+					"SCHOLARSHIP" => 0
+				}
+
+				# this should return %{ [date: string]: typeof p_map }
+
+				school_income = db["students"] |> Enum.reduce(%{}, fn({_, student}, agg) ->
+
+					# IMPORTANT:
+					# filter the student: params (not nil, not have payments, not section id)
+
+					monthvise_payments = student["payments"]
+					|> Enum.reduce(%{}, fn ({pid, payment}, agg2) ->
+
+						%{
+							"type" => p_type,
+							"amount" => p_amount,
+							"date" => p_date
+						} = payment
+
+						{:ok, payment_date } = DateTime.from_unix(p_date, :millisecond)
+
+						[year, month, _] = payment_date |> formatted_iso_date |> String.split("-")
+
+						period_key = month <> "-" <> year
+
+						# somehow from the front-end, in some case payment amount is string
+						amount =  if is_number(p_amount), do: p_amount, else: String.to_integer(p_amount)
+
+						# already exist for the month
+						if Map.has_key?(agg2, period_key) do
+
+							prev_amount = Dynamic.get(agg2, [period_key, p_type], 0)
+
+							if amount < 0 do
+
+								Dynamic.put(agg2, [period_key, "SCHOLARSHIP"], abs(amount) + prev_amount)
+
+							else
+								Dynamic.put(agg2, [period_key, p_type], amount + prev_amount)
+							end
+
+						else
+
+							# negative amount is also scholarship of payment type owed
+							if amount < 0 do
+
+								updated_debt = Dynamic.put(p_map, ["SCHOLARSHIP"], abs(amount))
+
+								Dynamic.put(agg2, [period_key], updated_debt)
+
+							else
+
+								updated_debt = Dynamic.put(p_map, [p_type], amount)
+
+								Dynamic.put(agg2, [period_key], updated_debt)
+
+							end
+
+						end
+
+					end)
+
+					# merge curr student payment stats with existing map
+
+					updated_agg = monthvise_payments |> Enum.reduce(agg, fn({k, v}, agg_payment) ->
+
+						if Map.has_key?(agg_payment, k) do
+
+							existing_item = Dynamic.get(agg_payment, [k])
+
+							updated_map =%{
+								"OWED" => existing_item["OWED"] + v["OWED"],
+								"SUBMITTED" => existing_item["SUBMITTED"] + v["SUBMITTED"],
+								"FORGIVEN" => existing_item["FORGIVEN"] + v["FORGIVEN"],
+								"SCHOLARSHIP" => existing_item["SCHOLARSHIP"] + v["SCHOLARSHIP"]
+							}
+
+							Dynamic.put(agg_payment, [k], updated_map)
+
+						else
+
+							Dynamic.put(agg_payment, [k], v)
+
+						end
+
+					end)
+
+					# return updated agg
+					updated_agg
+
+				end)
+
+				expense_stats = %{
+					"income" => 0,
+					"expense" => 0
+				}
+
+				# here we get %{ [date: string]: %{expense: number}}
+
+				school_expense = db["expenses"] |> Enum.reduce(%{}, fn({_, expense}, agg) ->
+
+					exp_category = Dynamic.get(expense, ["category"], "")
+					exp_amount = Dynamic.get(expense, ["amount"], 0)
+					exp_deduction = Dynamic.get(expense, ["deduction"], 0)
+					exp_type = Dynamic.get(expense, ["type"], "")
+					exp_expense = Dynamic.get(expense, ["expense"], "")
+					exp_date = Dynamic.get(expense, ["date"], "")
+
+
+
+					{:ok, expense_date } = DateTime.from_unix(exp_date, :millisecond)
+
+					[year, month, _] = expense_date |> formatted_iso_date |> String.split("-")
+
+					period_key = month <> "-" <> year
+
+					parsed_amount = if is_number(exp_amount), do: exp_amount, else: String.to_integer(exp_amount)
+					parsed_deduction = if is_number(exp_deduction), do: exp_deduction, else: String.to_integer(exp_deduction)
+
+					if exp_type == "PAYMENT_GIVEN" do
+
+						if Map.has_key?(agg, period_key) do
+
+							prev_amount = Dynamic.get(agg, [period_key, "expense"], 0)
+
+							amount = if exp_expense == "SALARY_EXPENSE", do: parsed_amount - parsed_deduction, else: parsed_amount
+
+							Dynamic.put(agg, [period_key, "expense"], amount + prev_amount)
+
+						else
+
+							amount = if exp_expense == "SALARY_EXPENSE", do: parsed_amount - parsed_deduction, else: parsed_amount
+
+							Dynamic.put(agg, [period_key, "expense"], amount)
+						end
+
+					else
+						agg
+					end
+
+				end)
+
+				response = school_expense |> Enum.reduce(%{}, fn ({k, v}, agg) ->
+
+					submitted = Dynamic.get(school_income, [k, "SUBMITTED"], 0)
+
+					merged = %{
+						"income" => submitted,
+						"expense" => v["expense"]
+					}
+
+					Dynamic.put(agg, [k], merged)
+
+				end)
+
+
+				body = Poison.encode!(response)
+				conn = append_resp_headers(conn)
+				send_resp(conn, 200, body)
+
+			{:error, err} ->
+				body = Poison.encode!(%{message: err})
+				send_resp(conn, 400, body)
+		end
 
 	end
 
