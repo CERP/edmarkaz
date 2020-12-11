@@ -241,7 +241,7 @@ defmodule EdMarkaz.Server.BranchManager do
 
 	end
 
-	get "/analytics-fees" do
+	get "/students-payment" do
 
 		# get the auth from req_headers
 		[ username, client_id, auth_token ] = get_auth_from_req_headers(conn)
@@ -259,7 +259,102 @@ defmodule EdMarkaz.Server.BranchManager do
 						IO.puts	"school already started"
 				end
 
-				body = Poison.encode!(%{message: "fees endpoint"})
+				db = Sarkar.School.get_db(school_id)
+
+
+				p_map =  %{
+					"OWED" => 0,
+					"SUBMITTED" => 0,
+					"FORGIVEN" => 0,
+					"SCHOLARSHIP" => 0
+				}
+
+				students = db["students"] |> Enum.reduce(%{}, fn({sid, student}, agg) ->
+
+					# IMPORTANT:
+					# filter the student: params (not nil, not have payments, not section id)
+
+					monthvise_payments = student["payments"]
+					|> Enum.reduce(%{}, fn ({pid, payment}, agg2) ->
+
+						%{
+							"type" => p_type,
+							"amount" => p_amount,
+							"date" => p_date
+						} = payment
+
+						{:ok, payment_date } = DateTime.from_unix(p_date, :millisecond)
+						[year, month, _] = payment_date |> formatted_iso_date |> String.split("-")
+
+						period_key = month <> "-" <> year
+
+						# somehow from the front-end, in some case payment amount is string
+						amount =  if is_number(p_amount), do: p_amount, else: String.to_integer(p_amount)
+
+						# already exist for the month
+						if Map.has_key?(agg2, period_key) do
+
+							prev_amount = Dynamic.get(agg2, [period_key, p_type], 0)
+
+							if amount < 0 do
+
+								Dynamic.put(agg2, [period_key, "SCHOLARSHIP"], abs(amount) + prev_amount)
+
+							else
+
+								Dynamic.put(agg2, [period_key, p_type], amount + prev_amount)
+
+							end
+
+						else
+
+							# negative amount is also scholarship of payment type owed
+							if amount < 0 do
+
+								updated_debt = Dynamic.put(p_map, ["SCHOLARSHIP"], abs(amount))
+
+								Dynamic.put(agg2, [period_key], updated_debt)
+
+							else
+
+								updated_debt = Dynamic.put(p_map, [p_type], amount)
+
+								Dynamic.put(agg2, [period_key], updated_debt)
+
+							end
+
+						end
+
+					end)
+
+					agg_payments = monthvise_payments |> Enum.reduce(p_map, fn({_, v}, agg) ->
+						%{
+							"OWED" => agg["OWED"] + v["OWED"],
+							"SUBMITTED" => agg["SUBMITTED"] + v["SUBMITTED"],
+							"FORGIVEN" => agg["FORGIVEN"] + v["FORGIVEN"],
+							"SCHOLARSHIP" => agg["SCHOLARSHIP"] + v["SCHOLARSHIP"]
+						}
+					end)
+
+					debt = abs(agg_payments["FORGIVEN"] + agg_payments["SCHOLARSHIP"] + agg_payments["SUBMITTED"] - agg_payments["OWED"])
+
+					sub_part = %{
+						"name" => student["Name"],
+						"fname" => student["ManName"],
+						"phone" => student["Phone"],
+						"section_id" => student["section_id"],
+						"payments" => %{
+							"monthvise" => monthvise_payments,
+							"aggregated" => agg_payments,
+							"debt" => debt
+						}
+					}
+
+					Dynamic.put(agg, [sid], sub_part)
+
+				end)
+
+				body = Poison.encode!(students)
 				conn = append_resp_headers(conn)
 				send_resp(conn, 200, body)
 
@@ -295,9 +390,9 @@ defmodule EdMarkaz.Server.BranchManager do
 
 					monthvise = student["attendance"] |> Enum.reduce(%{}, fn {key, value}, inner_agg ->
 
-							[ year, month, day ] = String.split(key, "-")
+							[year, month, _] = String.split(key, "-")
 
-							new_key = year <> "-" <> month
+							new_key = month <> "-" <> year
 
 							case Map.has_key?(inner_agg, new_key) do
 
@@ -353,22 +448,6 @@ defmodule EdMarkaz.Server.BranchManager do
 
 	end
 
-	get "/fee-analytics" do
-
-		# get the auth from req_headers
-		[ username, client_id, auth_token ] = get_auth_from_req_headers(conn)
-
-		# get the school id param from body
-		school_id = conn.params["school_id"]
-
-		db = Sarkar.School.get_db(school_id)
-
-
-		body = Poison.encode!(%{message: "Load db for exams"})
-		conn = append_resp_headers(conn)
-		send_resp(conn, 200, body)
-
-	end
 
 	get "/expense-analytics" do
 
