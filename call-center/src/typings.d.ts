@@ -137,12 +137,12 @@ interface CompleteOrders {
 }
 
 interface RatingCompleteOrders {
-	product_price: string
-	product_quality: string
-	product_range: string
-	delivery: string
-	processing_time: string
-	customer_service: string
+	product_price: number
+	product_quality: number
+	product_range: number
+	delivery: number
+	processing_time: number
+	customer_service: number
 }
 
 interface CancelOrders {
@@ -152,10 +152,10 @@ interface CancelOrders {
 }
 
 interface RatingCancelOrders {
-	product_price: string
-	product_quality: string
-	product_range: string
-	customer_service: string
+	product_price: number
+	product_quality: number
+	product_range: number
+	customer_service: number
 }
 
 interface CERPSchool {
