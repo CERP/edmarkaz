@@ -685,6 +685,59 @@ defmodule Sarkar.ActionHandler.Dashboard do
 
 	end
 
+	def handle_action(%{
+		"type" => "CREATE_BRANCH_MANAGER",
+		"client_id" => _client_id,
+		"payload" => %{
+			"username" => username,
+			"password" => password,
+			"value" => branches
+		}
+	},
+	%{ client_id: client_id } = state) do
+		case Sarkar.Auth.Dashboard.create_branch_manager({username, password, branches}) do
+			{:ok, resp} ->
+				{:reply, succeed(resp), state}
+			{:error, err} ->
+				{:reply, fail(err), state}
+		end
+	end
+
+	def handle_action(%{
+		"type" => "UPDATE_BRANCHES",
+		"client_id" => _client_id,
+		"payload" => %{
+			"username" => username,
+			"value" => branches
+		}
+	},
+	%{ client_id: client_id } = state) do
+		case Sarkar.Auth.Dashboard.update_branches({username, branches}) do
+			{:ok, resp} ->
+				{:reply, succeed(resp), state}
+			{:error, err} ->
+				{:reply, fail(err), state}
+		end
+	end
+
+	def handle_action(%{
+		"type" => "UPDATE_BRANCH_MANAGER_PASSWORD",
+		"client_id" => _client_id,
+		"payload" => %{
+			"username" => username,
+			"password" => password
+		}
+	},
+	%{ client_id: client_id } = state) do
+		case Sarkar.Auth.Dashboard.update_branch_manager_password({username, password}) do
+			{:ok, resp} ->
+				{:reply, succeed(resp), state}
+			{:error, err} ->
+				{:reply, fail(err), state}
+		end
+	end
+
+
 	defp fail(message) do
 		%{type: "failure", payload: message}
 	end

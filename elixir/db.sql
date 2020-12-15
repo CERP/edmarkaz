@@ -118,6 +118,12 @@ create table platform_writes
 		date timestamp default current_timestamp
 	);
 
+	CREATE TABLE branch_manager(
+		username text unique not null,
+		password text not null,
+		branches jsonb not null
+	);
+
 	create table targeted_instruction_assessments
 	(
 		id text unique not null,
