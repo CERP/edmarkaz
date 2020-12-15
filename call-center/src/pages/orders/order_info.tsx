@@ -126,10 +126,11 @@ class OrderInfo extends Component<propTypes, S> {
 		!this.state.show_form && this.props.updateOrderMeta(this.state.order, changes, this.props.supplier_id, moment(start_date).valueOf())
 	}
 
+	complete_orders: RatingCompleteOrders = { product_price: "Product Price", product_quality: "Product Quality", product_range: "Product Range", delivery: "delivery", processing_time: "Processing Time", customer_service: "Customer Service" }
+	cancel_orders: RatingCancelOrders = { product_price: "Product Price", product_quality: "Product Quality", product_range: "Product Range", customer_service: "Customer Service" }
+
 	render() {
 
-		const complete_orders: RatingCompleteOrders = { product_price: "Product Price", product_quality: "Product Quality", product_range: "Product Range", delivery: "delivery", processing_time: "Processing Time", customer_service: "Customer Service" }
-		const cancel_orders: RatingCancelOrders = { product_price: "Product Price", product_quality: "Product Quality", product_range: "Product Range", customer_service: "Customer Service" }
 		const { product_id, order_time, products, start_date } = this.props
 		const { order, school } = this.state
 		const ordered_product = products.db[product_id]
@@ -330,15 +331,15 @@ class OrderInfo extends Component<propTypes, S> {
 						<textarea placeholder="Reason" {...this.former.super_handle(["customer_experience", "complete_orders", "will_order_again"])} />
 					</div>
 					{
-						Object.keys(complete_orders).map((key) => {
-							return <div className="rating-row">
-								<label>{complete_orders[key]}</label>
+						Object.keys(this.complete_orders).map((key, index) => {
+							return <div className="rating-row" key={index}>
+								<label>{this.complete_orders[key]}</label>
 								<div className="rating-div ">
-									1<input type="radio" id="1" name={`complete_${key}`} value="1" onChange={this.former.handle(["customer_experience", "complete_orders", "rating", key])} />
-									2<input type="radio" id="2" name={`complete_${key}`} value="2" onChange={this.former.handle(["customer_experience", "complete_orders", "rating", key])} />
-									3<input type="radio" id="3" name={`complete_${key}`} value="3" onChange={this.former.handle(["customer_experience", "complete_orders", "rating", key])} />
-									4<input type="radio" id="4" name={`complete_${key}`} value="4" onChange={this.former.handle(["customer_experience", "complete_orders", "rating", key])} />
-									5<input type="radio" id="5" name={`complete_${key}`} value="5" onChange={this.former.handle(["customer_experience", "complete_orders", "rating", key])} />
+									1<input type="radio" value="1" {...this.former.handle(["customer_experience", "complete_orders", "rating", key])} />
+									2<input type="radio" value="2" {...this.former.handle(["customer_experience", "complete_orders", "rating", key])} />
+									3<input type="radio" value="3" {...this.former.handle(["customer_experience", "complete_orders", "rating", key])} />
+									4<input type="radio" value="4" {...this.former.handle(["customer_experience", "complete_orders", "rating", key])} />
+									5<input type="radio" value="5" {...this.former.handle(["customer_experience", "complete_orders", "rating", key])} />
 								</div>
 							</div>
 						})
@@ -349,15 +350,15 @@ class OrderInfo extends Component<propTypes, S> {
 						<textarea placeholder="Reason" {...this.former.super_handle(["customer_experience", "cancel_orders", "purchase_cancel_reason"])} />
 					</div>
 					{
-						Object.keys(cancel_orders).map((key) => {
+						Object.keys(this.cancel_orders).map((key) => {
 							return <div className="rating-row">
-								<label>{cancel_orders[key]}</label>
+								<label>{this.cancel_orders[key]}</label>
 								<div className="rating-div ">
-									1<input type="radio" id="1" name={`cancel_${key}`} value="1" {...this.former.handle(["customer_experience", "cancel_orders", "rating", key])} />
-									2<input type="radio" id="2" name={`cancel_${key}`} value="2" onChange={this.former.handle(["customer_experience", "cancel_orders", "rating", key])} />
-									3<input type="radio" id="3" name={`cancel_${key}`} value="3" onChange={this.former.handle(["customer_experience", "cancel_orders", "rating", key])} />
-									4<input type="radio" id="4" name={`cancel_${key}`} value="4" onChange={this.former.handle(["customer_experience", "cancel_orders", "rating", key])} />
-									5<input type="radio" id="5" name={`cancel_${key}`} value="5" onChange={this.former.handle(["customer_experience", "cancel_orders", "rating", key])} />
+									1<input type="radio" value="1" {...this.former.handle(["customer_experience", "cancel_orders", "rating", key])} />
+									2<input type="radio" value="2" {...this.former.handle(["customer_experience", "cancel_orders", "rating", key])} />
+									3<input type="radio" value="3" {...this.former.handle(["customer_experience", "cancel_orders", "rating", key])} />
+									4<input type="radio" value="4" {...this.former.handle(["customer_experience", "cancel_orders", "rating", key])} />
+									5<input type="radio" value="5" {...this.former.handle(["customer_experience", "cancel_orders", "rating", key])} />
 								</div>
 							</div>
 						})
