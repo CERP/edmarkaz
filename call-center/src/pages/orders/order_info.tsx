@@ -4,7 +4,6 @@ import { RouteComponentProps, withRouter } from 'react-router'
 import { connect } from 'react-redux'
 import { verifyOrder, rejectOrder, updateOrderMeta, saveCustomerExperience } from '../../actions'
 import moment from 'moment'
-import Rating from "@material-ui/lab/Rating";
 import { getSalesReps } from '../../utils/sales_rep'
 import compareObjects from '../../utils/compareObjects'
 
@@ -129,6 +128,8 @@ class OrderInfo extends Component<propTypes, S> {
 
 	render() {
 
+		const complete_orders: RatingCompleteOrders = { product_price: "Product Price", product_quality: "Product Quality", product_range: "Product Range", delivery: "delivery", processing_time: "Processing Time", customer_service: "Customer Service" }
+		const cancel_orders: RatingCancelOrders = { product_price: "Product Price", product_quality: "Product Quality", product_range: "Product Range", customer_service: "Customer Service" }
 		const { product_id, order_time, products, start_date } = this.props
 		const { order, school } = this.state
 		const ordered_product = products.db[product_id]
@@ -328,101 +329,39 @@ class OrderInfo extends Component<propTypes, S> {
 						<label>Will you be ordering again from Ilm Exchange? If no, why not?</label>
 						<textarea placeholder="Reason" {...this.former.super_handle(["customer_experience", "complete_orders", "will_order_again"])} />
 					</div>
-					<div className="row">
-						<label>Product Price</label>
-						<Rating
-							name="complete_product_price"
-							value={this.state.customer_experience.complete_orders.rating.product_price}
-							//@ts-ignore
-							onChange={this.former.handle(["customer_experience", "complete_orders", "rating", "product_price"])}
-						/>
-					</div>
-					<div className="row">
-						<label>Product Quality</label>
-						<Rating
-							name="complete_product_quality"
-							value={this.state.customer_experience.complete_orders.rating.product_quality}
-							//@ts-ignore
-							onChange={this.former.handle(["customer_experience", "complete_orders", "rating", "product_quality"])}
-						/>
-					</div>
-					<div className="row">
-						<label>Product Range</label>
-						<Rating
-							name="complete_product_range"
-							value={this.state.customer_experience.complete_orders.rating.product_range}
-							//@ts-ignore
-							onChange={this.former.handle(["customer_experience", "complete_orders", "rating", "product_range"])}
-						/>
-					</div>
-					<div className="row">
-						<label>delivery</label>
-						<Rating
-							name="complete_delivery"
-							value={this.state.customer_experience.complete_orders.rating.delivery}
-							//@ts-ignore
-							onChange={this.former.handle(["customer_experience", "complete_orders", "rating", "delivery"])}
-						/>
-					</div>
-					<div className="row">
-						<label>Processing Time</label>
-						<Rating
-							name="complete_processing_time"
-							value={this.state.customer_experience.complete_orders.rating.processing_time}
-							//@ts-ignore
-							onChange={this.former.handle(["customer_experience", "complete_orders", "rating", "processing_time"])}
-						/>
-					</div>
-					<div className="row">
-						<label>Customer Service</label>
-						<Rating
-							name="complete_customer_service"
-							value={this.state.customer_experience.complete_orders.rating.customer_service}
-							//@ts-ignore
-							onChange={this.former.handle(["customer_experience", "complete_orders", "rating", "customer_service"])}
-						/>
-					</div>
+					{
+						Object.keys(complete_orders).map((key) => {
+							return <div className="rating-row">
+								<label>{complete_orders[key]}</label>
+								<div className="rating-div ">
+									1<input type="radio" id="1" name={`complete_${key}`} value="1" onChange={this.former.handle(["customer_experience", "complete_orders", "rating", key])} />
+									2<input type="radio" id="2" name={`complete_${key}`} value="2" onChange={this.former.handle(["customer_experience", "complete_orders", "rating", key])} />
+									3<input type="radio" id="3" name={`complete_${key}`} value="3" onChange={this.former.handle(["customer_experience", "complete_orders", "rating", key])} />
+									4<input type="radio" id="4" name={`complete_${key}`} value="4" onChange={this.former.handle(["customer_experience", "complete_orders", "rating", key])} />
+									5<input type="radio" id="5" name={`complete_${key}`} value="5" onChange={this.former.handle(["customer_experience", "complete_orders", "rating", key])} />
+								</div>
+							</div>
+						})
+					}
 					<div className="divider">For Cancelled Orders</div>
 					<div className="row">
 						<label>Why did you not go ahead with the purchase? </label>
 						<textarea placeholder="Reason" {...this.former.super_handle(["customer_experience", "cancel_orders", "purchase_cancel_reason"])} />
 					</div>
-					<div className="row">
-						<label>Product Price</label>
-						<Rating
-							name="cancel_product_price"
-							value={this.state.customer_experience.complete_orders.rating.product_price}
-							//@ts-ignore
-							onChange={this.former.handle(["customer_experience", "cancel_orders", "rating", "product_price"])}
-						/>
-					</div>
-					<div className="row">
-						<label>Product Quality</label>
-						<Rating
-							name="cancel_product_quality"
-							value={this.state.customer_experience.complete_orders.rating.product_range}
-							//@ts-ignore
-							onChange={this.former.handle(["customer_experience", "cancel_orders", "rating", "product_quality"])}
-						/>
-					</div>
-					<div className="row">
-						<label>Product Range</label>
-						<Rating
-							name="cancel_product_range"
-							value={this.state.customer_experience.complete_orders.rating.product_range}
-							//@ts-ignore
-							onChange={this.former.handle(["customer_experience", "cancel_orders", "rating", "product_range"])}
-						/>
-					</div>
-					<div className="row">
-						<label>Customer Service</label>
-						<Rating
-							name="cancel_customer_service"
-							value={this.state.customer_experience.complete_orders.rating.customer_service}
-							//@ts-ignore
-							onChange={this.former.handle(["customer_experience", "cancel_orders", "rating", "customer_service"])}
-						/>
-					</div>
+					{
+						Object.keys(cancel_orders).map((key) => {
+							return <div className="rating-row">
+								<label>{cancel_orders[key]}</label>
+								<div className="rating-div ">
+									1<input type="radio" id="1" name={`cancel_${key}`} value="1" {...this.former.handle(["customer_experience", "cancel_orders", "rating", key])} />
+									2<input type="radio" id="2" name={`cancel_${key}`} value="2" onChange={this.former.handle(["customer_experience", "cancel_orders", "rating", key])} />
+									3<input type="radio" id="3" name={`cancel_${key}`} value="3" onChange={this.former.handle(["customer_experience", "cancel_orders", "rating", key])} />
+									4<input type="radio" id="4" name={`cancel_${key}`} value="4" onChange={this.former.handle(["customer_experience", "cancel_orders", "rating", key])} />
+									5<input type="radio" id="5" name={`cancel_${key}`} value="5" onChange={this.former.handle(["customer_experience", "cancel_orders", "rating", key])} />
+								</div>
+							</div>
+						})
+					}
 					<div className="row">
 						<label>Will you be ordering again from Ilm Exchange? If no, why not?</label>
 						<textarea placeholder="Reason" {...this.former.super_handle(["customer_experience", "cancel_orders", "will_order_again"])} />
