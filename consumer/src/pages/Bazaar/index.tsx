@@ -1,11 +1,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom';
-import Arrow from '../../icons/arrow.svg'
 import { getProducts } from '../../actions';
 import { Container } from '@material-ui/core';
 import Alert from 'components/Alert';
-
+import { InactiveSuppliers } from 'constants/index'
 import './style.css'
 
 interface P {
@@ -23,7 +22,7 @@ const getCategoryOrder = (category: string) => {
 		"Education Technology": 4,
 		"School Loans": 1,
 		"Textbooks": 2,
-		"Stationery and Printing": 6,
+		"School Supplies": 6,
 		"Learning Materials": 5,
 		"Solar Power": 7
 	} as { [k: string]: number }
@@ -80,15 +79,13 @@ class LoggedOutHome extends React.Component<P, S> {
 		})
 
 		const sorted = Object.entries(categories)
+			.filter(([c,]) => c)
 			.sort(([c1,], [c2,]) => getCategoryOrder(c1) - getCategoryOrder(c2))
 
 		return <div className="products">
-			{/* <div className="tabs-banner">
-				<img className="banner-img" src={banner} />
-			</div> */}
 			<Container maxWidth="md">
-				<Alert text="The bazaar service is currently suspended due to COVID-19. Please contact 0348-1119-119 for more information." />
 				<div className="tabs-home">
+					<Alert text="The availability of products and delivery charges may vary according to your location. Please contact 0348-1119-119 for more information." />
 					{
 						sorted
 							.map(([category, suppliers]) => {
@@ -96,11 +93,11 @@ class LoggedOutHome extends React.Component<P, S> {
 								return <div className="item-row" key={category}>
 									<div className="title-row" >
 										<div className="title">{category}</div>
-										<img className="arrow-icon" src={Arrow} alt="arrow" />
 									</div>
-									<div className="items">
+									<div className="items custom-scrollbar">
 										{
 											Object.entries(suppliers)
+												.filter(([sid, supplier]) => !(InactiveSuppliers.includes(sid)))
 												.sort(([, s1], [, s2]) => (s1.order || 9999) - (s2.order || 9999))
 												.map(([sid, profile]) => <Link className="item-card" to={`/supplier/${sid}`} key={`${category}-${sid}`}>
 													<img crossOrigin="anonymous" src={profile.logo && profile.logo.url} className="item-image" alt="product" />

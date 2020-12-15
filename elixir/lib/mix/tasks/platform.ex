@@ -1,6 +1,165 @@
 defmodule Mix.Tasks.Platform do
 	use Mix.Task
 
+	def run(["ingest_TI_assessments", school_id, assessments_csv_fname, diagnostic_test_csv_fname]) do
+		Application.ensure_all_started(:edmarkaz)
+
+		assessments_csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{assessments_csv_fname}.csv")) do
+			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{assessments_csv_fname}.csv")) |> CSV.decode!
+			false -> File.stream!("priv/#{assessments_csv_fname}.csv") |> CSV.decode!
+		end
+
+		diagnostic_test_csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{diagnostic_test_csv_fname}.csv")) do
+			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{diagnostic_test_csv_fname}.csv")) |> CSV.decode!
+			false -> File.stream!("priv/#{diagnostic_test_csv_fname}.csv") |> CSV.decode!
+		end
+
+		[ _ | assessments] = assessments_csv
+		|> Enum.map(fn row -> row end)
+
+		[ _ | diagnostic_test] = diagnostic_test_csv
+		|> Enum.map(fn row -> row end)
+
+		diagnostic_test_obj = diagnostic_test
+		|> Enum.reduce(%{}, fn([test_id, question_id, question_text, answer, slo]), agg ->
+			result = %{
+				"question_text" => question_text,
+				"answer" => answer,
+				"slo" => [slo]
+			}
+			Dynamic.put(agg, [test_id, question_id], result)
+		end)
+
+		assessments_obj = assessments
+		|> Enum.reduce(%{}, fn([test_id, subject, grade, label, type, pdf_url]), agg ->
+
+			test = %{
+					"label" => label,
+					"subject" => subject,
+					"grade" => grade,
+					"type" => type,
+					"pdf_url" => pdf_url,
+					"questions" => Dynamic.get(diagnostic_test_obj, [test_id])
+				}
+				Dynamic.put(agg, [test_id], test)
+			end)
+
+		EdMarkaz.TargetedInstructions.insert_targeted_instruction_assessments(["tests", assessments_obj])
+	end
+
+	def run(["ingest_TI_slo_mapping", school_id, slo_mapping_csv_fname]) do
+		Application.ensure_all_started(:edmarkaz)
+
+		slo_mapping_csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{slo_mapping_csv_fname}.csv")) do
+			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{slo_mapping_csv_fname}.csv")) |> CSV.decode!
+			false -> File.stream!("priv/#{slo_mapping_csv_fname}.csv") |> CSV.decode!
+		end
+
+		[ _ | slo_mapping] = slo_mapping_csv
+		|> Enum.map(fn row -> row end)
+
+		slo_mapping_obj = slo_mapping
+		|> Enum.reduce(%{}, fn([slo_id, description, category, link]), agg ->
+			sloMapping = %{
+				"description" => description,
+				"category" => category,
+				"link" => link
+			}
+			Dynamic.put(agg, [slo_id], sloMapping)
+		end)
+
+		EdMarkaz.TargetedInstructions.insert_targeted_instruction_slo_mapping(["slo_mapping", slo_mapping_obj])
+	end
+
+	def run(["ingest_TI_curriculum", school_id, curriculum_csv_fname]) do
+		Application.ensure_all_started(:edmarkaz)
+
+		curriculum_csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{curriculum_csv_fname}.csv")) do
+			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{curriculum_csv_fname}.csv")) |> CSV.decode!
+			false -> File.stream!("priv/#{curriculum_csv_fname}.csv") |> CSV.decode!
+		end
+
+		[ _ | curriculum] = curriculum_csv
+		|> Enum.map(fn row -> row end)
+
+		curriculum_obj = curriculum
+		|> Enum.reduce(%{}, fn([learning_level_id, subject, lesson_number, lesson_name, lesson_description, video_links, pdf_link]), agg ->
+			learning_levels = %{
+				"leasson_number" => lesson_number,
+				"lesson_name" => lesson_name,
+				"lesson_description" => lesson_description,
+				"subject" => subject,
+				"video_links" => video_links,
+				"pdf_link" => pdf_link
+			}
+			Dynamic.put(agg, [learning_level_id], learning_levels)
+		end)
+
+		EdMarkaz.TargetedInstructions.insert_targeted_instruction_curriculum(["curriculum", curriculum_obj])
+	end
+
+	def run(["platform-orders"]) do
+	Application.ensure_all_started(:edmarkaz)
+
+	{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
+		"SELECT
+			id, type, path, value, time
+			FROM platform_writes
+			WHERE path[4]='history' order by time asc", [])
+
+		new_state = resp.rows
+			|> Enum.reduce(%{}, fn([supplier_id, type, path, value, time], agg) ->
+
+				[_, _ | rest] = path
+
+				[sid, history, time | _] = rest
+
+				path_for_supplier = [sid, history, time, "supplier"]
+
+				case type do
+					"MERGE" ->
+						new_agg = Dynamic.put(agg, rest, value)
+						Dynamic.put(new_agg, path_for_supplier, supplier_id)
+					"DELETE" -> Dynamic.delete(agg, rest)
+					other ->
+						agg
+				end
+		end)
+
+		csv_data = new_state |> Enum.reduce([], fn({ sid, history }, agg)  ->
+			row = history["history"] |> Enum.map(fn({time, order})->
+
+				{:ok, order_date}  = DateTime.from_unix(String.to_integer(time), :millisecond)
+
+				iso_order_date = formatted_date(order_date)
+
+				meta_val_list = Map.values(order["meta"]) |> Enum.map( fn v ->
+
+					# a bad way to guess and convert unix to iso_date
+					if is_integer(v) and v > 1_500_000_000_000 do
+
+						{:ok, meta_date}  = DateTime.from_unix(v, :millisecond)
+
+						iso_meta_date = formatted_date(order_date)
+
+						else
+							v
+					end
+				end)
+
+				[time, order["supplier"], iso_order_date, order["event"], order["verified"] ] ++ meta_val_list
+
+			end)
+
+			agg ++ row
+
+		end)
+
+
+		IO.inspect csv_data
+
+	end
+
 	def run(["send_sms_messages", fname]) do
 
 		csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{fname}.csv")) do
@@ -16,7 +175,7 @@ defmodule Mix.Tasks.Platform do
 
 		failed = phone_numbers
 		|> Enum.map(fn num ->
-			case EdMarkaz.Contegris.send_sms(num, message) do
+			case EdMarkaz.Telenor.send_sms(num, message) do
 				{:ok, _} ->
 					IO.puts "sent message"
 					nil
@@ -302,6 +461,7 @@ defmodule Mix.Tasks.Platform do
 				"MERGE" -> Dynamic.put(agg, path, value)
 				"DELETE" -> Dynamic.delete(agg, path)
 			end
+
 		end)
 
 		IO.inspect state
@@ -666,6 +826,18 @@ defmodule Mix.Tasks.Platform do
 		case Registry.lookup(EdMarkaz.SupplierRegistry, id) do
 			[{_, _}] -> {:ok}
 			[] -> DynamicSupervisor.start_child(EdMarkaz.SupplierSupervisor, {EdMarkaz.Supplier, {id}})
+		end
+	end
+
+	defp formatted_date (date) do
+		[ date | _ ] = date |> DateTime.to_string |> String.split(" ")
+		date
+	end
+
+	defp start_school(school_id) do
+		case Registry.lookup(EdMarkaz.SchoolRegistry, school_id) do
+			[{_, _}] -> {:ok}
+			[] -> DynamicSupervisor.start_child(EdMarkaz.SchoolSupervisor, {Sarkar.School, {school_id}})
 		end
 	end
 

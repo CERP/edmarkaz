@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import Former from '~src/utils/former'
-import { reserveMaskedNumber, releaseMaskedNumber, getOwnProducts } from '~src/actions'
+import { reserveMaskedNumber, releaseMaskedNumber, getOwnProducts, getSchoolProfiles } from '~src/actions'
 import { sendSlackAlert } from '~src/actions/core'
 import { connect } from 'react-redux'
 import moment from 'moment'
@@ -11,6 +11,7 @@ interface P {
 	reserveNumber: (school_id: string) => any
 	releaseNumber: (school_id: string) => any
 	getProducts: () => void
+	loadSchools: (ids: string[]) => void
 	sendSlackAlert: (message: string, channel: string) => any
 	sync_state: RootBankState["sync_state"]
 	schools: RootBankState["new_school_db"]
@@ -18,7 +19,8 @@ interface P {
 }
 
 interface S {
-	filterMenu: boolean
+	// filterMenu: boolean
+	loadingSchools: boolean
 	activeOrder: string
 	filters: {
 		status: "IN_PROGRESS" | "DONE" | "ORDERED" | ""
@@ -30,14 +32,23 @@ interface S {
 
 type propTypes = RouteComponentProps & P
 
+
 class Orders extends Component<propTypes, S> {
 
 	former: Former
 	constructor(props: propTypes) {
 		super(props)
 
+		const blank = Object.keys(props.sync_state.matches)
+			.filter(k => props.schools[k] == undefined)
+
+		if (blank.length > 0) {
+			props.loadSchools(blank)
+		}
+
 		this.state = {
-			filterMenu: false,
+			// filterMenu: false,
+			loadingSchools: blank.length > 0,
 			activeOrder: "",
 			filters: {
 				status: "",
@@ -54,6 +65,16 @@ class Orders extends Component<propTypes, S> {
 		this.props.getProducts()
 	}
 
+	componentWillReceiveProps(nextProps: propTypes) {
+
+		const blank = Object.keys(nextProps.sync_state.matches)
+			.filter(k => nextProps.schools[k] === undefined)
+
+		//  need to put some kind of threshold here.
+		console.log("NEW PROPS: ", blank)
+		this.setState({ loadingSchools: false })
+	}
+
 	setActive = (order_id: string) => {
 		const activeOrder = this.state.activeOrder === order_id ? "" : order_id
 
@@ -61,6 +82,7 @@ class Orders extends Component<propTypes, S> {
 			activeOrder
 		})
 	}
+
 	textfilter = (e: OrderPlacedEvent) => {
 		const { text } = this.state.filters
 		const school = this.props.schools[e.meta.school_id]
@@ -72,13 +94,14 @@ class Orders extends Component<propTypes, S> {
 		}
 		return true
 	}
+
 	dateFilter = (time: number) => {
 		return time > this.state.filters.start_date && time < this.state.filters.end_date
 	}
 
 	render() {
 		const { sync_state, schools, products } = this.props
-		const { filterMenu, activeOrder, filters } = this.state
+		const { activeOrder, filters } = this.state
 		const events = Object.entries(sync_state.matches)
 			.filter(([sid, { status, history }]) => (status !== "REJECTED" && status !== "NEW") && Object.values(history).find((e) => e.event === "ORDER_PLACED"))
 			.reduce((agg, [sid, { status, history }]) => ({ ...agg, ...history }), {} as SchoolMatch["history"])
@@ -87,7 +110,7 @@ class Orders extends Component<propTypes, S> {
 			.filter(([id, e]) => e.event === "ORDER_PLACED" && e.verified && (this.textfilter(e) && this.dateFilter(e.time)))
 			.sort(([, a_e], [, b_e]) => b_e.time - a_e.time) as [string, OrderPlacedEvent][]
 
-		return products.loading ? <div> Loading </div> : <div className="orders page">
+		return (products.loading || this.state.loadingSchools) ? <div> Loading... </div> : <div className="orders page">
 			<div className="title">Orders</div>
 			<div className="form" style={{ width: "90%", marginBottom: "20px" }}>
 				<div className="row">
@@ -102,6 +125,17 @@ class Orders extends Component<propTypes, S> {
 					<label>End Date</label>
 					<input type="date" value={moment(filters.end_date).format("YYYY-MM-DD")} onChange={this.former.handle(["filters", "end_date"])} />
 				</div>
+				<div className="row">
+					<label>Status</label>
+					<select {...this.former.super_handle(["filters", "status"])}>
+						<option value="">Select status</option>
+						<option value="ORDER_PLACED">Order Placed</option>
+						<option value="IN_PROGRESS">In Progress</option>
+						<option value="COMPLETED">Completed</option>
+						<option value="SCHOOL_CANCELLED">School Cancelled</option>
+						<option value="SUPPLIER_CANCELLED">Supplier Cancelled</option>
+					</select>
+				</div>
 				{/* <div className="button blue" onClick={() => this.setState({ filterMenu: !filterMenu })}>Filters</div>
 				{
 					filterMenu && <>
@@ -115,6 +149,7 @@ class Orders extends Component<propTypes, S> {
 							</select>
 						</div>
 					</>
+
 				} */}
 			</div>
 			<div className="section newtable" style={{ width: "90%", padding: "5px" }}>
@@ -125,22 +160,25 @@ class Orders extends Component<propTypes, S> {
 					<div>Status</div>
 				</div>
 				{
-					orders.map(([id, order]) => {
-						const school = schools[order.meta.school_id]
-						const product = products.db[order.meta.product_id]
-						const schoolMatch = sync_state.matches[order.meta.school_id]
-						return <div key={id}>
-							<div className="newtable-row">
-								<div> {moment(order.time).format("DD-MM-YY")} </div>
-								<div className="clickable" onClick={() => this.setActive(id)}>{product.title}</div>
-								<div> {school.school_name} </div>
-								<div> {order.meta.status ? order.meta.status : "-"}</div>
+					orders
+						.filter(([id, order]) => order.verified === "VERIFIED" &&
+							(this.state.filters.status ? order.meta.status === this.state.filters.status : true))
+						.map(([id, order]) => {
+							const school = schools[order.meta.school_id]
+							const product = products.db[order.meta.product_id]
+							const schoolMatch = sync_state.matches[order.meta.school_id]
+							return <div key={id}>
+								<div className="newtable-row">
+									<div> {moment(order.time).format("DD-MM-YY")} </div>
+									<div className="clickable" onClick={() => this.setActive(id)}>{product.title}</div>
+									<div> {(school && school.school_name) || ''} </div>
+									<div> {order.meta.status ? order.meta.status : "-"}</div>
+								</div>
+								{
+									activeOrder === id && <OrderInfo key={`${id}-${JSON.stringify(order.meta)}`} order={order} product={product} school={school} schoolMatch={schoolMatch} />
+								}
 							</div>
-							{
-								activeOrder === id && <OrderInfo key={`${id}-${JSON.stringify(order.meta)}`} order={order} product={product} school={school} schoolMatch={schoolMatch} />
-							}
-						</div>
-					})
+						})
 				}
 			</div>
 
@@ -155,5 +193,6 @@ export default connect((state: RootBankState) => ({
 	reserveNumber: (school_id: string) => dispatch(reserveMaskedNumber(school_id)),
 	releaseNumber: (school_id: string) => dispatch(releaseMaskedNumber(school_id)),
 	getProducts: () => dispatch(getOwnProducts()),
+	loadSchools: (school_ids: string[]) => dispatch(getSchoolProfiles(school_ids)),
 	sendSlackAlert: (message: string, channel: string) => dispatch(sendSlackAlert(message, channel))
 }))(Orders)

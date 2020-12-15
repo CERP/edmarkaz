@@ -7,7 +7,9 @@ import { saveProductAction, saveProductImage } from '../../actions'
 import Former from '@cerp/former'
 
 import './style.css'
-import { getDownsizedImage } from '../../utils/image';
+import { getDownsizedImage } from '../../utils/image'
+import { Locations } from 'constants/index'
+import { toTitleCase } from 'utils/generic';
 
 interface OwnProps {
 	product_id: string
@@ -46,8 +48,23 @@ const newProduct = (supplier_id: string): Product => ({
 	},
 	deleted: false,
 	tags: {},
-	categories: {}
+	categories: {},
+	location: {
+		province: '',
+		district: '',
+		tehsil: ''
+	}
 })
+
+const categories = [
+	"Library Books & Co-curricular Activities",
+	"Education Technology",
+	"School Loans",
+	"Textbooks",
+	"School Supplies",
+	"Learning Materials",
+	"Solar Power"
+]
 
 class ProductInfo extends React.Component<propTypes, S> {
 
@@ -55,8 +72,13 @@ class ProductInfo extends React.Component<propTypes, S> {
 	constructor(props: propTypes) {
 		super(props);
 
+		const makeProduct = newProduct(props.supplier_id)
+
 		this.state = {
-			product: this.props.product || newProduct(props.supplier_id),
+			product: {
+				...(this.props.product || makeProduct),
+				location: this.props.product && this.props.product.location ? { ...this.props.product.location } : { ...makeProduct.location }
+			},
 			imageDataString: "",
 			newCategory: ""
 
@@ -170,16 +192,31 @@ class ProductInfo extends React.Component<propTypes, S> {
 		})
 	}
 
+	getDistrictTehsils = () => {
+		const { province, district } = this.state.product.location
+		// @ts-ignore
+		return Locations[province][district] || []
+	}
+
+	onProvinceChange = () => {
+
+		this.setState({
+			product: {
+				...this.state.product,
+				location: {
+					...this.state.product.location,
+					district: '',
+					tehsil: ''
+				}
+			}
+		})
+	}
+
+
 	render() {
-		const categories = [
-			"Library Books & Co-curricular Activities",
-			"Education Technology",
-			"School Loans",
-			"Textbooks",
-			"Stationery and Printing",
-			"Learning Materials",
-			"Solar Power"
-		]
+
+		const { province, district } = this.state.product.location
+
 		return <div className="product-info page">
 			<div className="close" onClick={this.onClose}>Close</div>
 			<div className="title">Product Info</div>
@@ -204,6 +241,40 @@ class ProductInfo extends React.Component<propTypes, S> {
 					<label>Price</label>
 					<input type="text" {...this.former.super_handle(["product", "price"])} placeholder="Price" />
 				</div>
+
+				<div className="row">
+					<label>Location</label>
+					<select {...this.former.super_handle(["product", "location", "province"], () => true, () => this.onProvinceChange())}>
+						<option value="">Select Province</option>
+						{
+							Object.keys(Locations).map(p => <option key={p} value={p}>{toTitleCase(p)}</option>)
+						}
+					</select>
+				</div>
+				{
+					province && <div className="row">
+						<label></label>
+						<select {...this.former.super_handle(["product", "location", "district"])}>
+							<option value="">Select District</option>
+							{
+								// @ts-ignore
+								Object.keys(Locations[province]).map(d => <option key={d} value={d}>{toTitleCase(d)}</option>)
+							}
+						</select>
+					</div>
+				}
+
+				{
+					province && district && <div className="row">
+						<label></label>
+						<select {...this.former.super_handle(["product", "location", "tehsil"])}>
+							<option value="">Select Tehsil</option>
+							{
+								this.getDistrictTehsils().map((t: string) => <option key={t} value={t}>{toTitleCase(t)}</option>)
+							}
+						</select>
+					</div>
+				}
 
 				<div className="section">
 

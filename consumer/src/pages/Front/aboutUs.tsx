@@ -34,14 +34,29 @@ const AboutUs = () => {
 			name: "Farah Basit"
 		},
 		{
+			url: "/images/ayesha.jpg",
+			position: "Research Assistant",
+			name: "Ayesha Ahmed"
+		},
+		{
+			position: "Data Research Assistant",
+			url: "https://storage.googleapis.com/ilmx-product-images/yusuf.jpeg",
+			name: "Yusuf Khwaja"
+		},
+		{
 			position: "Field Manager",
 			url: "https://storage.googleapis.com/ilmx-product-images/aboutumer.jpg",
 			name: "Umer Farooq"
 		},
+		// {
+		// 	position: "Senior Developer",
+		// 	url: "https://storage.googleapis.com/ilmx-product-images/rao_ali_ahmad.jpg",
+		// 	name: "Ali Ahmad"
+		// },
 		{
-			position: "Senior Developer",
-			url: "https://storage.googleapis.com/ilmx-product-images/rao_ali_ahmad.jpg",
-			name: "Ali Ahmad"
+			url: "/images/bisma.jpg",
+			position: "Call Center Assistant",
+			name: "Bisma Abdul Hafeez"
 		},
 		{
 			url: "https://storage.googleapis.com/ilmx-product-images/aboutali.jpg",
@@ -54,24 +69,24 @@ const AboutUs = () => {
 			name: "Asim Zaheer"
 		},
 		{
-			url: "https://storage.googleapis.com/ilmx-product-images/aboutnasir.jpg",
-			position: "Field Associate",
-			name: "Nasir Saeed"
-		},
-		{
 			url: "https://storage.googleapis.com/ilmx-product-images/aboutkaleem.jpg",
 			position: "Field Associate",
 			name: "Kaleem Majeed"
 		},
 		{
-			url: "https://storage.googleapis.com/ilmx-product-images/aboutawais.jpg",
+			url: "/images/farooq_azhar.jpg",
 			position: "Field Associate",
-			name: "Awais Sakhawat"
+			name: "Farooq Azhar"
 		},
 		{
-			url: "https://storage.googleapis.com/ilmx-product-images/aboutzohaib.jpg",
+			url: "/images/zahid.jpg",
 			position: "Field Associate",
-			name: "Muhammad Zohaib"
+			name: "Zahid Riaz"
+		},
+		{
+			url: "/images/ali_zohaib.jpg",
+			position: "Field Associate",
+			name: "Ali Zohaib"
 		}
 	])
 	const Partners = () => ([

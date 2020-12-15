@@ -1,4 +1,5 @@
 import Syncr from '@cerp/syncr'
+import { v4 } from 'uuid';
 import { createLoginSucceed, analyticsEvent, submitError } from './core';
 
 type Dispatch = (action: any) => any
@@ -582,6 +583,41 @@ export const placeOrder = (product: Product) => (dispatch: Dispatch, getState: G
 			console.error(err)
 		})
 }
+
+export const placeOrderAsVisitor = (order: ProductOrderAsVisitor) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+
+	const state = getState();
+
+	const profile = {
+		...order.request,
+		refcode: v4()
+	}
+
+	syncr.send({
+		type: "PLACE_ORDER_AS_VISITOR",
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		payload: {
+			product: order.product,
+			profile,
+			password: order.request.phone_number.substr(7) // last four digit, this is temporary
+		}
+	})
+		.then((res: { token: string; user: RootReducerState["auth"]["user"] }) => {
+			// get token back
+			console.log(res)
+			const token: string = res.token;
+
+			dispatch(createLoginSucceed(profile.phone_number, token, res.user, { profile }))
+		})
+		.catch(err => {
+			console.error(err)
+			dispatch({
+				type: "SCHOOL_SIGNUP_FAILED"
+			})
+		})
+}
+
 
 export const trackRoute = (path: string) => (dispatch: Dispatch, getState: () => RootReducerState) => {
 

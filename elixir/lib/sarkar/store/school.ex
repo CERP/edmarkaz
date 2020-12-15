@@ -50,6 +50,7 @@ defmodule Sarkar.Store.School do
 			end)
 			|> Enum.sort( fn({_, [_, _, _, _, d1]}, {_, [_, _, _, v, d2]} ) -> d1 < d2 end)
 			|> Enum.into(%{})
+			|> Enum.sort(fn ({_, [_, _, _, _, d1]}, {_, [_, _, _, _, d2]} ) -> d1 < d2 end)
 			|> Enum.map(fn {_, v} -> v end)
 
 		# array of map %{ type: "MERGE" | "DELETE", mutations: [ [date, value, path, type, client_id] ] }

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import Container from '@material-ui/core/Container'
-import { Box, Grid, Button } from '@material-ui/core'
-import { YouTube, Phone, Facebook, Height } from '@material-ui/icons'
+import { Grid, Button } from '@material-ui/core'
+import { YouTube, Phone, Facebook } from '@material-ui/icons'
 import Typography from '@material-ui/core/Typography'
-import { makeStyles, withStyles } from '@material-ui/core/styles'
+import { makeStyles } from '@material-ui/core/styles'
 import Modal from '../../components/Modal'
 import { getIDFromYoutbeLink } from 'utils/getIdFromYoutubeLink'
 import Youtube from 'react-youtube'
@@ -65,6 +65,8 @@ const useStyles = makeStyles((theme) => ({
 // 	}, 25);
 // 	window.location.href = "fb://groups/ilmexchangediscussionforum/";
 // }
+
+// eslint-disable-next-line
 const isYoutubeUrl = (link: string) => Boolean(link.match("^(http(s)?:\/\/)?((w){3}.)?youtu(be|.be)?(\.com)?\/.+"))
 
 const HelpFooter: React.FC<PropsType> = ({ hlink }) => {

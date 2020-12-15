@@ -9,7 +9,7 @@
 	flex-direction: column;
 	justify-content: center;
 	height: fit-content;
-	padding: 60px 40px;
+	padding: 40px;
 	width: calc(100% - 80px);
 }
 	.partition.main .info-container {
@@ -261,7 +261,7 @@
 	}
 	.front .partition {
 		flex-direction: row;
-		padding: 130px 5%;
+		padding: 60px 5%;
 		width: calc(100% - 10%);
 	}
 	.front .reverse {
@@ -351,4 +351,110 @@
 		height: 400px;
 		width: 400px;
 	}
+	.front .gallery {
+		margin-left: 70px;
+	}
+	.front .gallery .item-img {
+		width: 250px !important;
+		height: 220px !important;
+	}
+}
+
+.pill .i-am-a {
+	font-family: 'Caveat', cursive;
+	font-weight: bold;
+	font-size: 1.5rem !important;
+}
+
+.pill .i-am-a-title {
+	top: -18px;
+	position: relative;
+}
+
+.front .gallery {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+	grid-gap: 10px;
+	background-color: #1BB4BB;
+}
+.front .gallery-item {
+   margin: 0px;
+   padding: 0px;
+}
+
+.front .gallery-item .item-img {
+    width: 100%;
+    height: 100%;
+}
+
+.front .gallery-item-1 {
+    grid-column-start: 1;
+    grid-column-end: 1;
+    grid-row-start: 1;
+	grid-row-end: 1;
+	border-top: 10px solid #1BB4BB;
+    border-left: 10px solid #1BB4BB;
+}
+
+.front .gallery-item-2 {
+	grid-column-start: 2;
+    grid-column-end: 2;
+    grid-row-start: 1;
+	grid-row-end: 1;
+	border-top: 10px solid #1BB4BB;
+    border-right: 10px solid #1BB4BB;
+}
+
+.front .gallery-item-3 {
+	grid-column-start: 1;
+    grid-column-end: 1;
+    grid-row-start: 2;
+	grid-row-end: 2;
+	border-bottom: 10px solid #1BB4BB;
+	border-left: 10px solid #1BB4BB;
+
+}
+
+.front .gallery-item-4 {
+	grid-column-start: 2;
+    grid-column-end: 2;
+    grid-row-start: 2;
+	grid-row-end: 2;
+	border-bottom: 10px solid #1BB4BB;
+	border-right: 10px solid #1BB4BB;
+}
+
+
+
+.info-container.bazaar ul {
+	margin: 20px;
+	font-size: 16px;
+	line-height: 1.75em;
+	padding: 0;
+
+}
+
+.info-container.bazaar ul li {
+	list-style: none;
+	position: relative;
+	padding: 0 0 0 20px;
+	text-align: left;
+	font-weight: bold;
+}
+
+.info-container.bazaar ul.arrow li::before {
+	content: "";
+	position: absolute;
+	left: 0;
+	top: 8px;
+	height: 5px;
+	width: 5px;
+	border: 4px solid var(--red);
+	border-width: 3px 3px 0 0;
+	transform: rotate(45deg);
+}
+
+.info-container.bazaar .para {
+	margin: 20px 0px
 }

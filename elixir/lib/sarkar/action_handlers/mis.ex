@@ -135,6 +135,22 @@ defmodule Sarkar.ActionHandler.Mis do
 
 	end
 
+	def handle_action(%{"type" => "GET_TARGETED_INSTRUCTIONS", "payload" => payload }, %{ school_id: school_id, client_id: client_id } = state ) do
+
+		{:ok, assessments} = EdMarkaz.TargetedInstructions.get_assessments()
+		{:ok, slo_mapping} = EdMarkaz.TargetedInstructions.get_slo_mapping()
+		{:ok, curriculum} = EdMarkaz.TargetedInstructions.get_curriculum()
+
+		targeted_instructions = %{
+			"tests" => assessments,
+			"slo_mapping" => slo_mapping,
+			"curriculum" => curriculum
+		}
+
+		{:reply, succeed(targeted_instructions), state}
+
+	end
+
 	def handle_action(%{ "type" => "LOGIN",  "payload" => %{"school_id" => school_id, "client_id" => client_id, "password" => password }}, state) do
 		case Sarkar.Auth.login({school_id, client_id, password}) do
 			{:ok, token} ->
@@ -174,18 +190,90 @@ defmodule Sarkar.ActionHandler.Mis do
 		end
 	end
 
-	def handle_action(%{"type"=> "SIGN_UP", "sign_up_id" => sign_up_id, "payload" => %{"city" => city, "name" => name, "packageName" => packageName, "phone" => phone, "schoolName" => schoolName }}, state) do
-		payload = %{"city" => city, "name" => name, "packageName" => packageName, "phone" => phone, "schoolName" => schoolName }
+	def handle_action(
+		%{
+			"type"=> "SIGN_UP",
+			"sign_up_id" => sign_up_id,
+			"payload" => %{
+				"signup" => signup,
+				"referral" => referral
+			}
+		}, state) do
 
-		{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
-		"INSERT INTO mischool_sign_ups (id,form) VALUES ($1, $2)",
-		[sign_up_id, payload])
+		phone = signup["phone"]
+		password = signup["schoolPassword"]
+		city = signup["city"]
+		schoolName = signup["schoolName"]
+		package_name = signup["packageName"]
+		name = signup["name"]
 
-		alert_message = Poison.encode!(%{"text" => "New Sign-Up\nSchool Name: #{schoolName},\nPhone: #{phone},\nPackage: #{packageName},\nName: #{name},\nCity: #{city}"})
+		signup = Map.delete(signup, "schoolPassword")
 
-		{:ok, resp} = EdMarkaz.Slack.send_alert(alert_message,"#platform-dev")
+		case Postgrex.transaction(
+			EdMarkaz.DB,
+			fn(conn) ->
+				case EdMarkaz.DB.Postgres.query(
+					EdMarkaz.DB,
+						"INSERT INTO auth (id, password) values ($1, $2)",
+						[phone, hash(password, 52)]
+					)  do
+					{:ok, resp } -> {:ok, resp}
+					{:error, err} ->
+						DBConnection.rollback(
+							conn,
+							err
+						)
+				end
 
-		{:reply, succeed(), state}
+				case EdMarkaz.DB.Postgres.query(
+					conn,
+					"INSERT INTO mischool_referrals (id, time, value) VALUES ($1, $2, $3)",
+					[phone, :os.system_time(:millisecond), referral]
+				) do
+					{:ok, resp} -> {:ok, resp}
+					{:error, err} ->
+						DBConnection.rollback(
+							conn,
+							err
+						)
+				end
+
+				{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
+				"INSERT INTO mischool_sign_ups (id,form) VALUES ($1, $2)",
+				[sign_up_id, signup])
+			end,
+			pool: DBConnection.Poolboy
+		) do
+			{:ok, _resp} ->
+				start_school(phone)
+				Sarkar.School.signup_init_trial(phone)
+
+				Sarkar.Store.School.save(phone, %{
+					"max_students" => %{
+						"date" => :os.system_time(:millisecond),
+						"value" => 300,
+						"path" => ["db", "max_limit"],
+						"type" => "MERGE",
+						"client_id" => "backend"
+					}
+				})
+
+				alert_message = "New MISchool Signup\nSchool Name: #{schoolName},\nPhone: #{phone},\nPackage: #{package_name},\nName: #{name},\nDistrict: #{city}"
+
+				{:ok, resp} = EdMarkaz.Slack.send_alert(alert_message,"#platform-dev")
+
+				case EdMarkaz.Telenor.send_sms(phone, "Thank you for signing up on mischool.pk . Your MISchool credentials are: school_id: #{phone} and password: #{password} \n Please visit https://mischool.pk/school-login to login") do
+					{:ok, res} ->
+						{:reply, succeed(res), state}
+					{:error, msg} ->
+						{:reply, fail(msg), state}
+				end
+
+			{:error, err} ->
+				IO.inspect err.postgres.detail
+				{:reply, fail(err.postgres.detail), state}
+
+		end
 	end
 
 	def handle_action(%{ "type" => "SYNC", "payload" => %{"analytics" => analytics, "mutations" => mutations} = payload, "lastSnapshot" => last_sync_date }, %{ school_id: school_id, client_id: client_id } = state) do
@@ -234,7 +322,7 @@ defmodule Sarkar.ActionHandler.Mis do
 
 		msg_text = "<MISchool> Your temporary password is #{temp_pass}. (Please don't share with anyone)"
 
-		case EdMarkaz.Contegris.send_sms(phone_number, msg_text) do
+		case EdMarkaz.Telenor.send_sms(phone_number, msg_text) do
 			{:ok, res} ->
 				{:reply, succeed(res), state}
 			{:error, msg} ->
@@ -292,6 +380,12 @@ defmodule Sarkar.ActionHandler.Mis do
 
 	defp succeed() do
 		%{type: "success"}
+	end
+
+	defp hash(text, length) do
+		:crypto.hash(:sha512, text)
+		|> Base.url_encode64
+		|> binary_part(0, length)
 	end
 
 end

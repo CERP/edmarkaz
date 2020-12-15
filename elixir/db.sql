@@ -123,3 +123,26 @@ create table platform_writes
 		password text not null,
 		branches jsonb not null
 	);
+
+	create table targeted_instruction_assessments
+	(
+		id text unique not null,
+		value jsonb not null,
+		date timestamp default current_timestamp
+	);
+
+	create table targeted_instruction_curriculum
+	(
+		id text unique not null,
+		value jsonb not null,
+		date timestamp default current_timestamp
+	);
+
+	create table targeted_instruction_slo_mapping
+	(
+		id text unique not null,
+		value jsonb not null,
+		date timestamp default current_timestamp
+	);
+		-- chapter_id text not null,
+		-- lesson_id text not null,

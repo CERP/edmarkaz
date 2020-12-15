@@ -234,6 +234,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 
 		end
 	end
+
 	def handle_action(%{ "type" => "SMS_AUTH_CODE",
 		"client_id" => client_id,
 		"payload" => %{ "phone" => phone }}, state) do
@@ -245,7 +246,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 					refcode = Map.get(profile, "refcode")
 					{:ok, one_token} = EdMarkaz.Auth.gen_onetime_token(refcode)
 
-					case EdMarkaz.Contegris.send_sms(phone, "Click here to login https://ilmexchange.com/auth/#{one_token} ,Or enter code #{one_token}") do
+					case EdMarkaz.Telenor.send_sms( phone, "Click here to login https://ilmexchange.com/auth/#{one_token} ,Or enter code #{one_token}") do
 						{:ok, res} ->
 							{:reply, succeed(res), state}
 						{:error, msg} ->
@@ -310,7 +311,7 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 				{:ok, one_token} = EdMarkaz.Auth.gen_onetime_token(refcode)
 
 				spawn fn ->
-					res = EdMarkaz.Contegris.send_sms(
+					res = EdMarkaz.Telenor.send_sms(
 						number,
 						"Welcome to ilmExchange. Please go here to login https://ilmexchange.com/auth/#{one_token}"
 					)
@@ -572,12 +573,99 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 		end
 
 		spawn fn ->
-			EdMarkaz.Contegris.send_sms(id, "You have requested information for #{product_name} and will be contacted soon with more information.")
+			EdMarkaz.Telenor.send_sms(id, "You have requested information for #{product_name} and will be contacted soon with more information.")
 		end
 
 		{:reply, succeed(), state}
 
 	end
+
+	def handle_action(
+		%{
+			"type" => "PLACE_ORDER_AS_VISITOR",
+			"client_id" => client_id,
+			"payload" => %{
+				"product" => product,
+				"profile" => profile,
+				"password" => password
+			}
+		}, state) do
+
+
+		product_name = Map.get(product, "title")
+		product_id = Map.get(product,"id")
+		supplier_id = Map.get(product, "supplier_id")
+
+		phone_number = Map.get(profile, "phone_number")
+		school_name = Map.get(profile, "school_name")
+		school_owner = Map.get(profile, "school_owner")
+		refcode = Map.get(profile, "refcode")
+
+		spawn fn ->
+			EdMarkaz.Slack.send_alert("Mr./Mrs. #{school_name} placed an order for #{product_id} by #{supplier_id}. His/her contact number is #{phone_number}", "#platform-orders")
+		end
+
+		# create account
+		case EdMarkaz.Auth.create({ phone_number, password }) do
+			{:ok, text} ->
+				{:ok, res} = EdMarkaz.DB.Postgres.query(
+					EdMarkaz.DB,
+					"INSERT INTO platform_schools (id, db)
+					VALUES ($1, $2)
+					ON CONFLICT (id) DO UPDATE set db=excluded.db",
+					[refcode, profile]
+				)
+
+				start_supplier(supplier_id)
+
+				# place order
+
+				EdMarkaz.Supplier.place_order(supplier_id, product, refcode, client_id)
+
+				spawn fn ->
+					EdMarkaz.Telenor.send_sms(phone_number, "Mr./Mrs. #{school_owner},\nYou have requested information for #{product_name}. Our custom representative will contact you soon for more information.")
+				end
+
+				{:ok, token} = EdMarkaz.Auth.login({phone_number, client_id, password})
+				{:ok, one_token} = EdMarkaz.Auth.gen_onetime_token(refcode)
+
+				spawn fn ->
+					res = EdMarkaz.Telenor.send_sms(
+						phone_number,
+						"Mr./Mrs. #{school_owner}, Welcome to ilmExchange. Your account has been registered. Please visit https://ilmexchange.com/auth/#{one_token}to login into ilmxExchange."
+					)
+					IO.inspect res
+				end
+
+				spawn fn ->
+					time = :os.system_time(:millisecond)
+					case Sarkar.Analytics.Consumer.record(
+						client_id,
+						%{ "#{UUID.uuid4}" => %{
+								"type" => "SIGNUP",
+								"meta" => %{
+									"number" => phone_number,
+									"ref_code" => refcode
+								},
+								"time" => time
+							}
+						},
+						time
+					) do
+						%{"type" => "CONFIRM_ANALYTICS_SYNC", "time" => _} ->
+							IO.puts "SIGNUP ANALYTICS SUCCESS"
+						%{"type" => "ANALYTICS_SYNC_FAILED"} ->
+							IO.puts "SIGNUP ANALYTICS FAILED"
+					end
+				end
+
+				{:reply, succeed(%{token: token, user: "SCHOOL"}), %{id: phone_number, client_id: client_id}}
+			{:error, msg} ->
+				{:reply, fail(msg), state}
+		end
+
+	end
+
 	#For logged In
 	def handle_action(
 		%{

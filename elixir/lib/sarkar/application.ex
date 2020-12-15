@@ -7,6 +7,9 @@ defmodule EdMarkaz.Application do
 
 	def start(_type, _args) do
 		# List all child processes to be supervised
+
+		:ets.new(:telenor_ets, [:set, :public, :named_table])
+
 		children = [
 			{ Registry, keys: :duplicate, name: EdMarkaz.ConnectionRegistry },
 			{ Registry, keys: :unique, name: EdMarkaz.SupplierRegistry },

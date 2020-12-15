@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
-import { Container, Typography, IconButton, Paper, TextField, Input, makeStyles, Theme, createStyles, Snackbar, Card, CardActionArea, CardMedia, CardContent, CardActions, Button } from '@material-ui/core'
+import { Container, Typography, IconButton, Paper, Input, makeStyles, Theme, createStyles, Snackbar, Card, CardActionArea, CardMedia, CardContent, CardActions, Button } from '@material-ui/core'
 import Copy from '@material-ui/icons/FileCopy'
 import CloseIcon from '@material-ui/icons/Close';
 import DashboardGraphs from './Graphs/index'
@@ -40,7 +40,7 @@ const SchoolDashboard: React.FC<PropsType> = ({ auth, client_id, profile, getAna
 
 	useEffect(() => {
 		getAnalyticsEvents()
-	}, [])
+	}, [getAnalyticsEvents])
 
 	const { id, token } = auth
 

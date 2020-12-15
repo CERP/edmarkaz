@@ -4,6 +4,7 @@
 	"main": "index.js",
 	"license": "MIT",
 	"dependencies": {
+		"@cerp/former": "git+https://git@github.com/CERP/former.git",
 		"@ironbay/dynamic": "^1.0.10",
 		"components": "^0.1.0",
 		"deck.gl": "^6.4.3",

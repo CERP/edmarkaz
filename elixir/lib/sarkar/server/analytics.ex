@@ -321,6 +321,119 @@ defmodule EdMarkaz.Server.Analytics do
 
 	end
 
+	match "/platform-orders-new.csv" do
+
+		{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
+			"SELECT
+				id, type, path, value, time
+				FROM platform_writes
+				WHERE path[4]='history' order by time asc", [])
+
+		new_state = resp.rows
+			|> Enum.reduce(%{}, fn([supplier_id, type, path, value, time], agg) ->
+
+				[_, _ | rest] = path
+
+				[school_id, history, time | _] = rest
+
+				path_for_supplier = [school_id, history, time, "supplier"]
+
+				case type do
+					"MERGE" ->
+						new_agg = Dynamic.put(agg, rest, value)
+						Dynamic.put(new_agg, path_for_supplier, supplier_id)
+					"DELETE" -> Dynamic.delete(agg, rest)
+					other ->
+						agg
+				end
+		end)
+		csv_data = new_state
+			|> Enum.reduce([], fn({ school_id, history }, agg)  ->
+				row = history["history"]
+					#  need only order_placed event orders
+					|> Enum.filter(fn({_, order}) -> order["event"] == "ORDER_PLACED" end)
+					|> Enum.map(fn({time, order})->
+
+						meta = order["meta"]
+
+						case meta do
+							nil -> []
+							_ ->
+
+								{_, order_date}  = DateTime.from_unix(String.to_integer(time), :millisecond)
+
+								# put curr timestamp so that from_unix don't throw an error
+
+								{_, actual_dod}  = DateTime.from_unix(Map.get(meta, "actual_date_of_delivery", :os.system_time(:millisecond)), :millisecond)
+								{_, expected_cd}  = DateTime.from_unix(Map.get(meta, "expected_completion_date", :os.system_time(:millisecond)), :millisecond)
+								{_, expected_dod}  = DateTime.from_unix(Map.get(meta, "expected_date_of_delivery", :os.system_time(:millisecond)), :millisecond)
+
+								[
+									time,
+									order["supplier"],
+									formatted_date(order_date),
+									order["event"],
+									order["verified"],
+									meta["call_one"],
+									meta["call_two"],
+									meta["cancellation_reason"],
+									meta["payment_received"],
+									meta["product_id"],
+									meta["quantity"],
+									meta["sales_rep"],
+									meta["school_id"],
+									meta["status"],
+									meta["strategy"],
+									meta["total_amount"],
+									meta["actual_product_ordered"],
+									formatted_date(actual_dod),
+									formatted_date(expected_cd),
+									formatted_date(expected_dod),
+									meta["notes"],
+								]
+						end
+					end)
+
+				# return aggregatted data
+
+				agg ++ row
+
+			end)
+
+		csv = [[
+				"oid",
+				"supplier",
+				"date",
+				"event",
+				"verified_status",
+				"call_one",
+				"call_two",
+				"cancellation_reason",
+				"payment_received",
+				"product_id",
+				"quantity",
+				"sales_rep",
+				"school_id",
+				"status",
+				"strategy",
+				"total_amount",
+				"actual_product_ordered",
+				"actual_date_of_delivery",
+				"expected_completion_date",
+				"expected_date_of_delivery",
+				"notes"
+
+				] | csv_data]
+		|> CSV.encode
+		|> Enum.join()
+
+		conn
+		|> put_resp_header("content-type", "text/csv")
+		|> put_resp_header("cache-control", "no-cache")
+		|> send_resp( 200, csv)
+
+	end
+
 	match "/platform-orders.csv" do
 		{:ok, data} = case EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
 		"SELECT
@@ -329,6 +442,18 @@ defmodule EdMarkaz.Server.Analytics do
 			a.path[3] as school_id,
 			a.value->>'event' as event,
 			a.value->'meta'->>'product_id' as product_id,
+			a.value->'meta'->>'status' as status,
+			a.value->'meta'->>'call_one' as call_1,
+			a.value->'meta'->>'call_two' as call_2,
+			a.value->'meta'->>'quantity' as quantity,
+			a.value->'meta'->>'sales_rep' as sales_rep,
+			a.value->'meta'->>'total_amount' as total_amount,
+			a.value->'meta'->>'payment_received' as payment_received,
+			a.value->'meta'->>'cancellation_reason' as cancellation_reason,
+			to_timestamp((a.value->'meta'->>'actual_date_of_delivery')::bigint/1000)::date as actual_date_of_delivery,
+			to_timestamp((a.value->'meta'->>'expected_date_of_delivery')::bigint/1000)::date as expected_date_of_delivery,
+			to_timestamp((a.value->'meta'->>'expected_completion_date')::bigint/1000)::date as expected_completion_date,
+			a.value->'meta'->>'notes' as notes,
 			b.db->>'phone_number' as number
 		FROM platform_writes a JOIN platform_schools b ON a.path[3]=b.id
 		WHERE path[4] = 'history' and value->>'event' = 'ORDER_PLACED'
@@ -342,7 +467,26 @@ defmodule EdMarkaz.Server.Analytics do
 
 		formatted = data |> Enum.map(fn [id, d | rest ] -> [id, Date.to_string(d) | rest] end)
 
-		csv = [ ["supplier_id", "date", "school_id", "event", "product_id", "number"] | formatted]
+		csv = [[
+				"supplier_id",
+				"date",
+				"school_id",
+				"event",
+				"product_id",
+				"status",
+				"call_1",
+				"call_2",
+				"quantity",
+				"sales_rep",
+				"total_amount",
+				"payment_received",
+				"cancellation_reason",
+				"actual_date_of_delivery",
+				"expected_date_of_delivery",
+				"expected_completion_date",
+				"notes",
+				"number"
+				] | formatted]
 		|> CSV.encode
 		|> Enum.join()
 
@@ -553,6 +697,11 @@ defmodule EdMarkaz.Server.Analytics do
 
 	match _ do
 		send_resp(conn, 404, "not found")
+	end
+
+	defp formatted_date (date) do
+		[ date | _ ] = date |> DateTime.to_string |> String.split(" ")
+		date
 	end
 
 end
