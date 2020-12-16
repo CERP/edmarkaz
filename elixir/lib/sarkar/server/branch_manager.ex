@@ -113,9 +113,9 @@ defmodule EdMarkaz.Server.BranchManager do
 
 				case start_school(school_id) do
 					{:ok, pid} ->
-						IO.puts "school start now"
+						IO.puts "school started now"
 					_ ->
-						IO.puts	"school already started"
+						IO.puts	"school started already"
 				end
 
 				db = Sarkar.School.get_db(school_id)
@@ -139,66 +139,76 @@ defmodule EdMarkaz.Server.BranchManager do
 
 					# get the student attendance
 
-					student_attendance = student["attendance"] |> Enum.reduce(daily_stats["attendance"], fn {date, value}, inner_agg ->
+					if blank?(student) or blank?(student["attendance"]) or blank?(student["payments"]) do
+						agg
+					else
 
-						case current_date == date do
+						student_attendance = student["attendance"] |> Enum.reduce(daily_stats["attendance"], fn {date, value}, inner_agg ->
 
-							true ->
+							case current_date == date do
 
-								case value["status"] do
-									"PRESENT" ->
-										Map.put(inner_agg, "present", 1)
-									"ABSENT" ->
-										Map.put(inner_agg, "absent", 1)
-									_ ->
-										Map.put(inner_agg, "leave", 1)
+								true ->
+
+									case value["status"] do
+										"PRESENT" ->
+											Map.put(inner_agg, "present", 1)
+										"ABSENT" ->
+											Map.put(inner_agg, "absent", 1)
+										_ ->
+											Map.put(inner_agg, "leave", 1)
+									end
+
+								false ->
+
+									inner_agg
+							end
+
+						end)
+
+						# get the submitted payment
+
+						fee_collection = student["payments"] |> Enum.reduce(0, fn {id, value}, agg2 ->
+
+							if blank?(value) or blank?(value["date"]) do
+								agg2
+							else
+
+								{:ok, payment_date } = DateTime.from_unix(value["date"], :millisecond)
+
+								submitted_date = payment_date |> formatted_iso_date
+
+								case current_date == submitted_date do
+
+									true ->
+										agg2 + value["amount"]
+									false ->
+										agg2
 								end
+							end
+						end)
 
-							false ->
+						# merge attedance and payment stats into agg
 
-								inner_agg
-						end
+						%{ "present" => present, "absent" => absent, "leave" => leave } = agg["attendance"]
+						%{ "amount" => amount, "count" => count } = agg["payment"]
 
-					end)
+						attendance = %{
+							"present" => present + student_attendance["present"],
+							"absent" => absent + student_attendance["absent"],
+							"leave" =>  leave + student_attendance["leave"]
+						}
 
-					# get the submitted payment
-
-					fee_collection = student["payments"] |> Enum.reduce(0, fn {id, value}, inner_agg ->
-
-						{:ok, payment_date } = DateTime.from_unix(value["date"], :millisecond)
-
-						submitted_date = payment_date |> formatted_iso_date
-
-						case current_date == submitted_date do
-
+						payment = case fee_collection > 0 do
 							true ->
-								inner_agg + value["amount"]
+								%{ "amount" => amount + fee_collection, "count" => count + 1 }
 							false ->
-								inner_agg
+								agg["payment"]
 						end
 
-					end)
+						# return to agg
+						%{ "attendance" => attendance, "payment" => payment }
 
-					# merge attedance and payment stats into agg
-
-					%{ "present" => present, "absent" => absent, "leave" => leave } = agg["attendance"]
-					%{ "amount" => amount, "count" => count } = agg["payment"]
-
-					attendance = %{
-						"present" => present + student_attendance["present"],
-						"absent" => absent + student_attendance["absent"],
-						"leave" =>  leave + student_attendance["leave"]
-					}
-
-					payment = case fee_collection > 0 do
-						true ->
-							%{ "amount" => amount + fee_collection, "count" => count + 1 }
-						false ->
-							agg["payment"]
 					end
-
-					# return to agg
-					%{ "attendance" => attendance, "payment" => payment }
 
 				end)
 
@@ -271,87 +281,92 @@ defmodule EdMarkaz.Server.BranchManager do
 
 				students = db["students"] |> Enum.reduce(%{}, fn({sid, student}, agg) ->
 
-					# IMPORTANT:
-					# filter the student: params (not nil, not have payments, not section id)
+					if blank?(student) or blank?(student["Name"]) or blank?(student["section_id"]) or blank?(student["payments"]) do
+						agg
+					else
 
-					monthvise_payments = student["payments"]
-					|> Enum.reduce(%{}, fn ({pid, payment}, agg2) ->
+						monthvise_payments = student["payments"]
+						|> Enum.reduce(%{}, fn ({pid, payment}, agg2) ->
 
-						%{
-							"type" => p_type,
-							"amount" => p_amount,
-							"date" => p_date
-						} = payment
-
-						{:ok, payment_date } = DateTime.from_unix(p_date, :millisecond)
-						[year, month, _] = payment_date |> formatted_iso_date |> String.split("-")
-
-						period_key = month <> "-" <> year
-
-						# somehow from the front-end, in some case payment amount is string
-						amount =  if is_number(p_amount), do: p_amount, else: String.to_integer(p_amount)
-
-						# already exist for the month
-						if Map.has_key?(agg2, period_key) do
-
-							prev_amount = Dynamic.get(agg2, [period_key, p_type], 0)
-
-							if amount < 0 do
-
-								Dynamic.put(agg2, [period_key, "SCHOLARSHIP"], abs(amount) + prev_amount)
-
+							if blank?(payment) or blank?(payment["date"]) do
+								agg2
 							else
 
-								Dynamic.put(agg2, [period_key, p_type], amount + prev_amount)
+								%{
+									"type" => p_type,
+									"amount" => p_amount,
+									"date" => p_date
+								} = payment
 
+								{:ok, payment_date } = DateTime.from_unix(p_date, :millisecond)
+								[year, month, _] = payment_date |> formatted_iso_date |> String.split("-")
+
+								period_key = month <> "-" <> year
+
+								# somehow from the front-end, in some case payment amount is string
+								amount =  if is_number(p_amount), do: p_amount, else: String.to_integer(p_amount)
+
+								# already exist for the month
+								if Map.has_key?(agg2, period_key) do
+
+									prev_amount = Dynamic.get(agg2, [period_key, p_type], 0)
+
+									if amount < 0 do
+
+										Dynamic.put(agg2, [period_key, "SCHOLARSHIP"], abs(amount) + prev_amount)
+
+									else
+
+										Dynamic.put(agg2, [period_key, p_type], amount + prev_amount)
+
+									end
+
+								else
+
+									# negative amount is also scholarship of payment type owed
+									if amount < 0 do
+
+										updated_debt = Dynamic.put(p_map, ["SCHOLARSHIP"], abs(amount))
+
+										Dynamic.put(agg2, [period_key], updated_debt)
+
+									else
+
+										updated_debt = Dynamic.put(p_map, [p_type], amount)
+
+										Dynamic.put(agg2, [period_key], updated_debt)
+
+									end
+
+								end
 							end
+						end)
 
-						else
+						agg_payments = monthvise_payments |> Enum.reduce(p_map, fn({_, v}, agg_payment) ->
+							%{
+								"OWED" => agg_payment["OWED"] + v["OWED"],
+								"SUBMITTED" => agg_payment["SUBMITTED"] + v["SUBMITTED"],
+								"FORGIVEN" => agg_payment["FORGIVEN"] + v["FORGIVEN"],
+								"SCHOLARSHIP" => agg_payment["SCHOLARSHIP"] + v["SCHOLARSHIP"]
+							}
+						end)
 
-							# negative amount is also scholarship of payment type owed
-							if amount < 0 do
+						debt = abs(agg_payments["FORGIVEN"] + agg_payments["SCHOLARSHIP"] + agg_payments["SUBMITTED"] - agg_payments["OWED"])
 
-								updated_debt = Dynamic.put(p_map, ["SCHOLARSHIP"], abs(amount))
-
-								Dynamic.put(agg2, [period_key], updated_debt)
-
-							else
-
-								updated_debt = Dynamic.put(p_map, [p_type], amount)
-
-								Dynamic.put(agg2, [period_key], updated_debt)
-
-							end
-
-						end
-
-					end)
-
-					agg_payments = monthvise_payments |> Enum.reduce(p_map, fn({_, v}, agg_payment) ->
-						%{
-							"OWED" => agg_payment["OWED"] + v["OWED"],
-							"SUBMITTED" => agg_payment["SUBMITTED"] + v["SUBMITTED"],
-							"FORGIVEN" => agg_payment["FORGIVEN"] + v["FORGIVEN"],
-							"SCHOLARSHIP" => agg_payment["SCHOLARSHIP"] + v["SCHOLARSHIP"]
+						sub_part = %{
+							"name" => student["Name"],
+							"fname" => student["ManName"],
+							"phone" => student["Phone"],
+							"section_id" => student["section_id"],
+							"payments" => %{
+								"monthvise" => monthvise_payments,
+								"aggregated" => agg_payments,
+								"debt" => debt
+							}
 						}
-					end)
 
-					debt = abs(agg_payments["FORGIVEN"] + agg_payments["SCHOLARSHIP"] + agg_payments["SUBMITTED"] - agg_payments["OWED"])
-
-					sub_part = %{
-						"name" => student["Name"],
-						"fname" => student["ManName"],
-						"phone" => student["Phone"],
-						"section_id" => student["section_id"],
-						"payments" => %{
-							"monthvise" => monthvise_payments,
-							"aggregated" => agg_payments,
-							"debt" => debt
-						}
-					}
-
-					Dynamic.put(agg, [sid], sub_part)
-
+						Dynamic.put(agg, [sid], sub_part)
+					end
 				end)
 
 				body = Poison.encode!(students)
@@ -379,61 +394,71 @@ defmodule EdMarkaz.Server.BranchManager do
 
 				case start_school(school_id) do
 					{:ok, pid} ->
-						IO.puts "school start now"
+						IO.puts "school started now"
 					_ ->
-						IO.puts	"school already started"
+						IO.puts	"school started already"
 				end
 
 				db = Sarkar.School.get_db(school_id)
 
 				attendance_list = db["students"] |> Enum.reduce(%{}, fn {id, student}, agg ->
 
-					monthvise = student["attendance"] |> Enum.reduce(%{}, fn {key, value}, inner_agg ->
+					if blank?(student) or blank?(student["Name"]) or blank?(student["section_id"]) do
+						agg
+					else
 
-							[year, month, _] = String.split(key, "-")
+						monthvise = student["attendance"] |> Enum.reduce(%{}, fn ({key, value}, agg2) ->
 
-							new_key = month <> "-" <> year
+								if blank?(value) do
+									agg2
+								else
 
-							case Map.has_key?(inner_agg, new_key) do
+									[year, month, _] = String.split(key, "-")
 
-								true ->
+									new_key = month <> "-" <> year
 
-									%{ "present" => present, "absent" => absent, "leave" => leave } = Map.get(inner_agg, new_key)
+									case Map.has_key?(agg2, new_key) do
 
-									case value["status"] do
-										"PRESENT" ->
-											Dynamic.put(inner_agg, [new_key, "present"], present + 1)
-										"ABSENT" ->
-											Dynamic.put(inner_agg, [new_key, "absent"], absent + 1)
-										_ ->
-											Dynamic.put(inner_agg, [new_key, "leave"], leave + 1)
+										true ->
+
+											%{ "present" => present, "absent" => absent, "leave" => leave } = Map.get(agg2, new_key)
+
+											case value["status"] do
+												"PRESENT" ->
+													Dynamic.put(agg2, [new_key, "present"], present + 1)
+												"ABSENT" ->
+													Dynamic.put(agg2, [new_key, "absent"], absent + 1)
+												_ ->
+													Dynamic.put(agg2, [new_key, "leave"], leave + 1)
+											end
+
+										false ->
+
+											new_entry = case value["status"] do
+												"PRESENT" ->
+													%{ "present" => 1, "absent" => 0, "leave" => 0 }
+												"ABSENT" ->
+													%{ "present" => 0, "absent" => 1, "leave" => 0 }
+												_ ->
+													%{ "present" => 0, "absent" => 0, "leave" => 1 }
+											end
+
+											Dynamic.put(agg2, [new_key], new_entry)
 									end
+								end
 
-								false ->
+							end)
 
-									 new_entry = case value["status"] do
-										"PRESENT" ->
-											%{ "present" => 1, "absent" => 0, "leave" => 0 }
-										"ABSENT" ->
-											%{ "present" => 0, "absent" => 1, "leave" => 0 }
-										_ ->
-											%{ "present" => 0, "absent" => 0, "leave" => 1 }
-									end
+						sub_student = %{
+							"attendance" => monthvise,
+							"name" => student["Name"],
+							"fname" => student["ManName"],
+							"phone" => student["Phone"],
+							"section_id" => student["section_id"]
+						}
 
-									Dynamic.put(inner_agg, [new_key], new_entry)
-							end
-
-						end)
-
-					sub_student = %{
-						"attendance" => monthvise,
-						"name" => student["Name"],
-						"fname" => student["ManName"],
-						"phone" => student["Phone"],
-						"section_id" => student["section_id"]
-					}
-
-					Dynamic.put(agg, [id], sub_student)
+						Dynamic.put(agg, [id], sub_student)
+					end
 
 				end)
 
@@ -464,9 +489,9 @@ defmodule EdMarkaz.Server.BranchManager do
 
 				case start_school(school_id) do
 					{:ok, pid} ->
-						IO.puts "school start now"
+						IO.puts "school started now"
 					_ ->
-						IO.puts	"school already started"
+						IO.puts	"school started already"
 				end
 
 				db = Sarkar.School.get_db(school_id)
@@ -482,88 +507,95 @@ defmodule EdMarkaz.Server.BranchManager do
 
 				school_income = db["students"] |> Enum.reduce(%{}, fn({_, student}, agg) ->
 
-					# IMPORTANT:
-					# filter the student: params (not nil, not have payments, not section id)
+					if blank?(student) or blank?(student["Name"]) or blank?(student["section_id"]) or blank?(student["payments"]) do
+						agg
+					else
 
-					monthvise_payments = student["payments"]
-					|> Enum.reduce(%{}, fn ({pid, payment}, agg2) ->
+						monthvise_payments = student["payments"]
+						|> Enum.reduce(%{}, fn ({pid, payment}, agg2) ->
 
-						%{
-							"type" => p_type,
-							"amount" => p_amount,
-							"date" => p_date
-						} = payment
-
-						{:ok, payment_date } = DateTime.from_unix(p_date, :millisecond)
-
-						[year, month, _] = payment_date |> formatted_iso_date |> String.split("-")
-
-						period_key = month <> "-" <> year
-
-						# somehow from the front-end, in some case payment amount is string
-						amount =  if is_number(p_amount), do: p_amount, else: String.to_integer(p_amount)
-
-						# already exist for the month
-						if Map.has_key?(agg2, period_key) do
-
-							prev_amount = Dynamic.get(agg2, [period_key, p_type], 0)
-
-							if amount < 0 do
-
-								Dynamic.put(agg2, [period_key, "SCHOLARSHIP"], abs(amount) + prev_amount)
-
+							if blank?(payment) or blank?(payment["date"]) do
+								agg2
 							else
-								Dynamic.put(agg2, [period_key, p_type], amount + prev_amount)
+								%{
+									"type" => p_type,
+									"amount" => p_amount,
+									"date" => p_date
+								} = payment
+
+								{:ok, payment_date } = DateTime.from_unix(p_date, :millisecond)
+
+								[year, month, _] = payment_date |> formatted_iso_date |> String.split("-")
+
+								period_key = month <> "-" <> year
+
+								# somehow from the front-end, in some case payment amount is string
+								amount =  if is_number(p_amount), do: p_amount, else: String.to_integer(p_amount)
+
+								# already exist for the month
+								if Map.has_key?(agg2, period_key) do
+
+									prev_amount = Dynamic.get(agg2, [period_key, p_type], 0)
+
+									if amount < 0 do
+
+										Dynamic.put(agg2, [period_key, "SCHOLARSHIP"], abs(amount) + prev_amount)
+
+									else
+										Dynamic.put(agg2, [period_key, p_type], amount + prev_amount)
+									end
+
+								else
+
+									# negative amount is also scholarship of payment type owed
+									if amount < 0 do
+
+										updated_debt = Dynamic.put(p_map, ["SCHOLARSHIP"], abs(amount))
+
+										Dynamic.put(agg2, [period_key], updated_debt)
+
+									else
+
+										updated_debt = Dynamic.put(p_map, [p_type], amount)
+
+										Dynamic.put(agg2, [period_key], updated_debt)
+
+									end
+
+								end
 							end
 
-						else
+						end)
 
-							# negative amount is also scholarship of payment type owed
-							if amount < 0 do
+						# merge curr student payment stats with existing map
 
-								updated_debt = Dynamic.put(p_map, ["SCHOLARSHIP"], abs(amount))
+						updated_agg = monthvise_payments |> Enum.reduce(agg, fn({k, v}, agg_payment) ->
 
-								Dynamic.put(agg2, [period_key], updated_debt)
+							if Map.has_key?(agg_payment, k) do
+
+								existing_item = Dynamic.get(agg_payment, [k])
+
+								updated_map =%{
+									"OWED" => existing_item["OWED"] + v["OWED"],
+									"SUBMITTED" => existing_item["SUBMITTED"] + v["SUBMITTED"],
+									"FORGIVEN" => existing_item["FORGIVEN"] + v["FORGIVEN"],
+									"SCHOLARSHIP" => existing_item["SCHOLARSHIP"] + v["SCHOLARSHIP"]
+								}
+
+								Dynamic.put(agg_payment, [k], updated_map)
 
 							else
 
-								updated_debt = Dynamic.put(p_map, [p_type], amount)
-
-								Dynamic.put(agg2, [period_key], updated_debt)
+								Dynamic.put(agg_payment, [k], v)
 
 							end
 
-						end
+						end)
 
-					end)
+						# return updated agg
+						updated_agg
 
-					# merge curr student payment stats with existing map
-
-					updated_agg = monthvise_payments |> Enum.reduce(agg, fn({k, v}, agg_payment) ->
-
-						if Map.has_key?(agg_payment, k) do
-
-							existing_item = Dynamic.get(agg_payment, [k])
-
-							updated_map =%{
-								"OWED" => existing_item["OWED"] + v["OWED"],
-								"SUBMITTED" => existing_item["SUBMITTED"] + v["SUBMITTED"],
-								"FORGIVEN" => existing_item["FORGIVEN"] + v["FORGIVEN"],
-								"SCHOLARSHIP" => existing_item["SCHOLARSHIP"] + v["SCHOLARSHIP"]
-							}
-
-							Dynamic.put(agg_payment, [k], updated_map)
-
-						else
-
-							Dynamic.put(agg_payment, [k], v)
-
-						end
-
-					end)
-
-					# return updated agg
-					updated_agg
+					end
 
 				end)
 
@@ -574,50 +606,56 @@ defmodule EdMarkaz.Server.BranchManager do
 
 				# here we get %{ [date: string]: %{expense: number}}
 
-				school_expense = db["expenses"] |> Enum.reduce(%{}, fn({_, expense}, agg) ->
+				school_expense = db["expenses"]
+				|> Enum.reduce(%{}, fn({_, expense}, agg) ->
 
-					exp_category = Dynamic.get(expense, ["category"], "")
-					exp_amount = Dynamic.get(expense, ["amount"], 0)
-					exp_deduction = Dynamic.get(expense, ["deduction"], 0)
-					exp_type = Dynamic.get(expense, ["type"], "")
-					exp_expense = Dynamic.get(expense, ["expense"], "")
-					exp_date = Dynamic.get(expense, ["date"], "")
+					if blank?(expense) or blank?(expense["date"]) do
+						agg
+					else
+
+						exp_category = Dynamic.get(expense, ["category"], "")
+						exp_amount = Dynamic.get(expense, ["amount"], 0)
+						exp_deduction = Dynamic.get(expense, ["deduction"], 0)
+						exp_type = Dynamic.get(expense, ["type"], "")
+						exp_expense = Dynamic.get(expense, ["expense"], "")
+						exp_date = Dynamic.get(expense, ["date"], "")
 
 
+						{:ok, expense_date } = DateTime.from_unix(exp_date, :millisecond)
 
-					{:ok, expense_date } = DateTime.from_unix(exp_date, :millisecond)
+						[year, month, _] = expense_date |> formatted_iso_date |> String.split("-")
 
-					[year, month, _] = expense_date |> formatted_iso_date |> String.split("-")
+						period_key = month <> "-" <> year
 
-					period_key = month <> "-" <> year
+						parsed_amount = if is_number(exp_amount), do: exp_amount, else: String.to_integer(exp_amount)
+						parsed_deduction = if is_number(exp_deduction), do: exp_deduction, else: String.to_integer(exp_deduction)
 
-					parsed_amount = if is_number(exp_amount), do: exp_amount, else: String.to_integer(exp_amount)
-					parsed_deduction = if is_number(exp_deduction), do: exp_deduction, else: String.to_integer(exp_deduction)
+						if exp_type == "PAYMENT_GIVEN" do
 
-					if exp_type == "PAYMENT_GIVEN" do
+							if Map.has_key?(agg, period_key) do
 
-						if Map.has_key?(agg, period_key) do
+								prev_amount = Dynamic.get(agg, [period_key, "expense"], 0)
 
-							prev_amount = Dynamic.get(agg, [period_key, "expense"], 0)
+								amount = if exp_expense == "SALARY_EXPENSE", do: parsed_amount - parsed_deduction, else: parsed_amount
 
-							amount = if exp_expense == "SALARY_EXPENSE", do: parsed_amount - parsed_deduction, else: parsed_amount
+								Dynamic.put(agg, [period_key, "expense"], amount + prev_amount)
 
-							Dynamic.put(agg, [period_key, "expense"], amount + prev_amount)
+							else
+
+								amount = if exp_expense == "SALARY_EXPENSE", do: parsed_amount - parsed_deduction, else: parsed_amount
+
+								Dynamic.put(agg, [period_key, "expense"], amount)
+							end
 
 						else
-
-							amount = if exp_expense == "SALARY_EXPENSE", do: parsed_amount - parsed_deduction, else: parsed_amount
-
-							Dynamic.put(agg, [period_key, "expense"], amount)
+							agg
 						end
-
-					else
-						agg
 					end
 
 				end)
 
-				response = school_expense |> Enum.reduce(%{}, fn ({k, v}, agg) ->
+				response = school_expense
+				|> Enum.reduce(%{}, fn ({k, v}, agg) ->
 
 					submitted = Dynamic.get(school_income, [k, "SUBMITTED"], 0)
 
@@ -629,7 +667,6 @@ defmodule EdMarkaz.Server.BranchManager do
 					Dynamic.put(agg, [k], merged)
 
 				end)
-
 
 				body = Poison.encode!(response)
 				conn = append_resp_headers(conn)
