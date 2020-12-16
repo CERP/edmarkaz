@@ -21,11 +21,11 @@ defmodule Mix.Tasks.Platform do
 		|> Enum.map(fn row -> row end)
 
 		diagnostic_test_obj = diagnostic_test
-		|> Enum.reduce(%{}, fn([test_id, question_id, question_text, correct_answer, grade_level, slo_category, slo]), agg ->
+		|> Enum.reduce(%{}, fn([test_id, question_id, question_text, answer, grade, slo_category, slo]), agg ->
 			result = %{
 				"question_text" => question_text,
-				"correct_answer" => correct_answer,
-				"grade_level" => grade_level,
+				"answer" => answer,
+				"grade" => grade,
 				"slo_category" => slo_category,
 				"slo" => [slo]
 			}
@@ -33,13 +33,13 @@ defmodule Mix.Tasks.Platform do
 		end)
 
 		assessments_obj = assessments
-		|> Enum.reduce(%{}, fn([test_id, subject, grade_level, label, type, pdf_url]), agg ->
+		|> Enum.reduce(%{}, fn([test_id, type, subject, grade, label, pdf_url]), agg ->
 
 			test = %{
-					"label" => label,
-					"subject" => subject,
-					"grade_level" => grade_level,
 					"type" => type,
+					"subject" => subject,
+					"grade" => grade,
+					"label" => label,
 					"pdf_url" => pdf_url,
 					"questions" => Dynamic.get(diagnostic_test_obj, [test_id])
 				}
@@ -93,7 +93,7 @@ defmodule Mix.Tasks.Platform do
 				"lesson_duration" => lesson_duration,
 				"lesson_link" => lesson_link,
 				"material_links" => material_links,
-				"activity_links" => activity_links
+				"activity_links" => activity_links,
 				"teaching_manual_link" => teaching_manual_link
 			}
 			Dynamic.put(agg, [learning_level_id], learning_levels)
