@@ -7,7 +7,8 @@ defmodule EdMarkaz.TargetedInstructions do
 				id,
 				value,
 				date
-			) VALUES ($1,$2,current_timestamp)",
+			) VALUES ($1,$2,current_timestamp)
+			on Conflict(id) do update set value = $2",
 			[id, assessments]
 		) do
 			{:ok, resp} ->
@@ -28,7 +29,8 @@ defmodule EdMarkaz.TargetedInstructions do
 				id,
 				value,
 				date
-			) VALUES ($1,$2,current_timestamp)",
+			) VALUES ($1,$2,current_timestamp)
+			on Conflict(id) do update set value = $2",
 			[id, curriculum]
 		) do
 			{:ok, resp} ->
@@ -49,7 +51,8 @@ defmodule EdMarkaz.TargetedInstructions do
 				id,
 				value,
 				date
-			) VALUES ($1,$2,current_timestamp)",
+			) VALUES ($1,$2,current_timestamp)
+			on Conflict(id) do update set value = $2",
 			[id, slo_mapping]
 		) do
 			{:ok, resp} ->
