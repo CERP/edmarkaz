@@ -21,23 +21,25 @@ defmodule Mix.Tasks.Platform do
 		|> Enum.map(fn row -> row end)
 
 		diagnostic_test_obj = diagnostic_test
-		|> Enum.reduce(%{}, fn([test_id, question_id, question_text, answer, slo]), agg ->
+		|> Enum.reduce(%{}, fn([test_id, question_id, question_text, answer, grade, slo_category, slo]), agg ->
 			result = %{
 				"question_text" => question_text,
 				"answer" => answer,
+				"grade" => grade,
+				"slo_category" => slo_category,
 				"slo" => [slo]
 			}
 			Dynamic.put(agg, [test_id, question_id], result)
 		end)
 
 		assessments_obj = assessments
-		|> Enum.reduce(%{}, fn([test_id, subject, grade, label, type, pdf_url]), agg ->
+		|> Enum.reduce(%{}, fn([test_id, type, subject, grade, label, pdf_url]), agg ->
 
 			test = %{
-					"label" => label,
+					"type" => type,
 					"subject" => subject,
 					"grade" => grade,
-					"type" => type,
+					"label" => label,
 					"pdf_url" => pdf_url,
 					"questions" => Dynamic.get(diagnostic_test_obj, [test_id])
 				}
@@ -83,16 +85,18 @@ defmodule Mix.Tasks.Platform do
 		|> Enum.map(fn row -> row end)
 
 		curriculum_obj = curriculum
-		|> Enum.reduce(%{}, fn([learning_level_id, subject, lesson_number, lesson_name, lesson_description, video_links, pdf_link]), agg ->
+		|> Enum.reduce(%{}, fn([learning_level_id, subject, lesson_number, lesson_title, lesson_duration, lesson_link, material_links, activity_links, teaching_manual_link]), agg ->
 			learning_levels = %{
-				"leasson_number" => lesson_number,
-				"lesson_name" => lesson_name,
-				"lesson_description" => lesson_description,
 				"subject" => subject,
-				"video_links" => video_links,
-				"pdf_link" => pdf_link
+				"lesson_number" => lesson_number,
+				"lesson_title" => lesson_title,
+				"lesson_duration" => lesson_duration,
+				"lesson_link" => lesson_link,
+				"material_links" => material_links,
+				"activity_links" => activity_links,
+				"teaching_manual_link" => teaching_manual_link
 			}
-			Dynamic.put(agg, [learning_level_id], learning_levels)
+			Dynamic.put(agg, [learning_level_id, lesson_number], learning_levels)
 		end)
 
 		EdMarkaz.TargetedInstructions.insert_targeted_instruction_curriculum(["curriculum", curriculum_obj])
