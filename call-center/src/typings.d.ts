@@ -143,12 +143,12 @@ interface CancelOrders {
 }
 
 interface OrderRating {
-	product_price: number
-	product_quality: number
-	product_range: number
-	delivery?: number
-	processing_time?: number
-	customer_service: number
+	[product_price: string]: number
+	[product_quality: string]: number
+	[product_range: string]: number
+	[delivery?: string]: number
+	[processing_time?: string]: number
+	[customer_service: string]: number
 }
 
 interface CERPSchool {
