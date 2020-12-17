@@ -52,8 +52,8 @@ const default_meta_fields = () => ({
 	notes: ""
 })
 
-const complete_orders = { product_price: "Product Price", product_quality: "Product Quality", product_range: "Product Range", delivery: "delivery", processing_time: "Processing Time", customer_service: "Customer Service" }
 const cancel_orders = { product_price: "Product Price", product_quality: "Product Quality", product_range: "Product Range", customer_service: "Customer Service" }
+const complete_orders = { ...cancel_orders, delivery: "delivery", processing_time: "Processing Time" }
 
 class OrderInfo extends Component<propTypes, S> {
 
@@ -138,7 +138,8 @@ class OrderInfo extends Component<propTypes, S> {
 					...this.state.customer_experience.complete_orders,
 					rating: {
 						...this.state.customer_experience.complete_orders.rating,
-						[name.substring(9)]: value
+						//truncate complete keyword from name
+						[name.substring(9)]: parseInt(value)
 					}
 				}
 			}
@@ -154,7 +155,8 @@ class OrderInfo extends Component<propTypes, S> {
 					...this.state.customer_experience.cancel_orders,
 					rating: {
 						...this.state.customer_experience.cancel_orders.rating,
-						[name.substring(7)]: value
+						//truncate cancel keyword from name
+						[name.substring(7)]: parseInt(value)
 					}
 				}
 			}
@@ -353,8 +355,8 @@ class OrderInfo extends Component<propTypes, S> {
 						<label>Date of Delivery</label>
 						<input
 							type="date"
-							defaultValue={moment(this.state.customer_experience.date_of_delivery).format("MM-DD-YYYY")}
-							{...this.former.handle(["customer_experience", "date_of_delivery"])}
+							value={moment(this.state.customer_experience.date_of_delivery).format("YYYY-MM-DD")}
+							onChange={this.former.handle(["customer_experience", "date_of_delivery"])}
 						/>
 					</div>
 					<div className="divider">For Complete Orders</div>
@@ -367,11 +369,11 @@ class OrderInfo extends Component<propTypes, S> {
 							return <div className="rating-row" key={key}>
 								<label>{value}</label>
 								<div className="rating-div ">
-									1<input type="radio" value="1" name={`complete_${key}`} checked={(this.state.customer_experience.complete_orders.rating as any)[key] === "1"} onChange={this.handleChangeCompleteOrders} />
-									2<input type="radio" value="2" name={`complete_${key}`} checked={(this.state.customer_experience.complete_orders.rating as any)[key] === '2'} onChange={this.handleChangeCompleteOrders} />
-									3<input type="radio" value="3" name={`complete_${key}`} checked={(this.state.customer_experience.complete_orders.rating as any)[key] === '3'} onChange={this.handleChangeCompleteOrders} />
-									4<input type="radio" value="4" name={`complete_${key}`} checked={(this.state.customer_experience.complete_orders.rating as any)[key] === '4'} onChange={this.handleChangeCompleteOrders} />
-									5<input type="radio" value="5" name={`complete_${key}`} checked={(this.state.customer_experience.complete_orders.rating as any)[key] === '5'} onChange={this.handleChangeCompleteOrders} />
+									{
+										[1, 2, 3, 4, 5].map(v => {
+											return <>{v}<input type="radio" value={v} name={`complete_${key}`} checked={(this.state.customer_experience.complete_orders.rating as any)[key] === v} onChange={this.handleChangeCompleteOrders} /></>
+										})
+									}
 								</div>
 							</div>
 						})
@@ -386,11 +388,11 @@ class OrderInfo extends Component<propTypes, S> {
 							return <div className="rating-row">
 								<label>{value}</label>
 								<div className="rating-div ">
-									1<input type="radio" value="1" name={`cancel_${key}`} checked={(this.state.customer_experience.cancel_orders.rating as any)[key] === '1'} onChange={this.handleChangeCancelOrders} />
-									2<input type="radio" value="2" name={`cancel_${key}`} checked={(this.state.customer_experience.cancel_orders.rating as any)[key] === '2'} onChange={this.handleChangeCancelOrders} />
-									3<input type="radio" value="3" name={`cancel_${key}`} checked={(this.state.customer_experience.cancel_orders.rating as any)[key] === '3'} onChange={this.handleChangeCancelOrders} />
-									4<input type="radio" value="4" name={`cancel_${key}`} checked={(this.state.customer_experience.cancel_orders.rating as any)[key] === '4'} onChange={this.handleChangeCancelOrders} />
-									5<input type="radio" value="5" name={`cancel_${key}`} checked={(this.state.customer_experience.cancel_orders.rating as any)[key] === '5'} onChange={this.handleChangeCancelOrders} />
+									{
+										[1, 2, 3, 4, 5].map(v => {
+											return <>{v}<input type="radio" value={v} name={`cancel_${key}`} checked={(this.state.customer_experience.cancel_orders.rating as any)[key] === v} onChange={this.handleChangeCancelOrders} /></>
+										})
+									}
 								</div>
 							</div>
 						})

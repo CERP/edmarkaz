@@ -133,28 +133,21 @@ interface CustomerExperience {
 
 interface CompleteOrders {
 	will_order_again: string
-	rating: RatingCompleteOrders
-}
-
-interface RatingCompleteOrders {
-	product_price: number
-	product_quality: number
-	product_range: number
-	delivery: number
-	processing_time: number
-	customer_service: number
+	rating: OrderRating
 }
 
 interface CancelOrders {
 	purchase_cancel_reason: string
 	will_order_again: string
-	rating: RatingCancelOrders
+	rating: OrderRating
 }
 
-interface RatingCancelOrders {
+interface OrderRating {
 	product_price: number
 	product_quality: number
 	product_range: number
+	delivery?: number
+	processing_time?: number
 	customer_service: number
 }
 
