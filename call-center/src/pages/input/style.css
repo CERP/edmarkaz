@@ -203,6 +203,7 @@ a.block {
 	}
 
 	.form .row label {
+		color: #aaa;
 		transition: all .2s ease-out;
 	}
 
