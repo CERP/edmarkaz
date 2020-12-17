@@ -135,11 +135,11 @@ const AboutUs = () => {
 			name: "Radec",
 			info: ""
 		},
-		{
-			url: "https://storage.googleapis.com/ilmx-product-images/kp%20logo%20new.png",
-			name: "Knowledge Platform",
-			info: ""
-		},
+		// {
+		// 	url: "https://storage.googleapis.com/ilmx-product-images/kp%20logo%20new.png",
+		// 	name: "Knowledge Platform",
+		// 	info: ""
+		// },
 		{
 			url: "https://storage.googleapis.com/ilmx-product-images/jp%20logo.png",
 			name: "Javed Publishers",
