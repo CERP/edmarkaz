@@ -156,8 +156,8 @@ class OrderInfo extends Component<propTypes, S> {
 
 	handleChangeCompleteOrders = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target
-		//truncate complete keyword from name e.g name => complete_product_price
-		const complete_order_rating = name.substring(9)
+		//truncate complete keyword from name e.g name => complete_product_price, it will return product_price
+		const rating_key = name.substring(9)
 		this.setState({
 			customer_experience: {
 				...this.state.customer_experience,
@@ -165,7 +165,7 @@ class OrderInfo extends Component<propTypes, S> {
 					...this.state.customer_experience.complete_orders,
 					rating: {
 						...this.state.customer_experience.complete_orders.rating,
-						[complete_order_rating]: parseInt(value)
+						[rating_key]: parseInt(value)
 					}
 				}
 			}
@@ -174,8 +174,8 @@ class OrderInfo extends Component<propTypes, S> {
 
 	handleChangeCancelOrders = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target
-		//truncate cancel keyword from name e.g name => cancel_product_price
-		const cancel_order_rating = name.substring(7)
+		//truncate cancel keyword from name e.g name => cancel_product_price, it will return product_price
+		const rating_key = name.substring(7)
 		this.setState({
 			customer_experience: {
 				...this.state.customer_experience,
@@ -183,7 +183,7 @@ class OrderInfo extends Component<propTypes, S> {
 					...this.state.customer_experience.cancel_orders,
 					rating: {
 						...this.state.customer_experience.cancel_orders.rating,
-						[cancel_order_rating]: parseInt(value)
+						[rating_key]: parseInt(value)
 					}
 				}
 			}
