@@ -131,6 +131,8 @@ class OrderInfo extends Component<propTypes, S> {
 
 	handleChangeCompleteOrders = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target
+		//truncate complete keyword from name e.g name => complete_product_price
+		const complete_order_rating = name.substring(9)
 		this.setState({
 			customer_experience: {
 				...this.state.customer_experience,
@@ -138,8 +140,7 @@ class OrderInfo extends Component<propTypes, S> {
 					...this.state.customer_experience.complete_orders,
 					rating: {
 						...this.state.customer_experience.complete_orders.rating,
-						//truncate complete keyword from name
-						[name.substring(9)]: parseInt(value)
+						[complete_order_rating]: parseInt(value)
 					}
 				}
 			}
@@ -148,6 +149,8 @@ class OrderInfo extends Component<propTypes, S> {
 
 	handleChangeCancelOrders = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target
+		//truncate cancel keyword from name e.g name => cancel_product_price
+		const cancel_order_rating = name.substring(7)
 		this.setState({
 			customer_experience: {
 				...this.state.customer_experience,
@@ -155,8 +158,7 @@ class OrderInfo extends Component<propTypes, S> {
 					...this.state.customer_experience.cancel_orders,
 					rating: {
 						...this.state.customer_experience.cancel_orders.rating,
-						//truncate cancel keyword from name
-						[name.substring(7)]: parseInt(value)
+						[cancel_order_rating]: parseInt(value)
 					}
 				}
 			}
@@ -371,7 +373,10 @@ class OrderInfo extends Component<propTypes, S> {
 								<div className="rating-div ">
 									{
 										[1, 2, 3, 4, 5].map(v => {
-											return <>{v}<input type="radio" value={v} name={`complete_${key}`} checked={(this.state.customer_experience.complete_orders.rating as any)[key] === v} onChange={this.handleChangeCompleteOrders} /></>
+											return <>
+												<span>{v}</span>
+												<input type="radio" value={v} name={`complete_${key}`} checked={(this.state.customer_experience.complete_orders.rating as any)[key] === v} onChange={this.handleChangeCompleteOrders} />
+											</>
 										})
 									}
 								</div>
@@ -390,7 +395,10 @@ class OrderInfo extends Component<propTypes, S> {
 								<div className="rating-div ">
 									{
 										[1, 2, 3, 4, 5].map(v => {
-											return <>{v}<input type="radio" value={v} name={`cancel_${key}`} checked={(this.state.customer_experience.cancel_orders.rating as any)[key] === v} onChange={this.handleChangeCancelOrders} /></>
+											return <>
+												<span>{v}</span>
+												<input type="radio" value={v} name={`cancel_${key}`} checked={(this.state.customer_experience.cancel_orders.rating as any)[key] === v} onChange={this.handleChangeCancelOrders} />
+											</>
 										})
 									}
 								</div>
