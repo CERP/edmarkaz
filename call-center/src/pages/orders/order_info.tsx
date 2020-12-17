@@ -404,7 +404,7 @@ class OrderInfo extends Component<propTypes, S> {
 													type="radio"
 													value={v}
 													name={`complete_${key}`}
-													checked={(this.state.customer_experience.complete_orders.rating)[key] === v}
+													checked={(this.state.customer_experience.complete_orders.rating as any)[key] === v}
 													onChange={this.handleChangeCompleteOrders} />
 											</>
 										))
@@ -431,7 +431,7 @@ class OrderInfo extends Component<propTypes, S> {
 													type="radio"
 													value={v}
 													name={`cancel_${key}`}
-													checked={(this.state.customer_experience.cancel_orders.rating)[key] === v}
+													checked={(this.state.customer_experience.cancel_orders.rating as any)[key] === v}
 													onChange={this.handleChangeCancelOrders} />
 											</>
 										))
