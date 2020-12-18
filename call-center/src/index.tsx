@@ -15,7 +15,8 @@ import { loadDB, saveDB } from './utils/localStorage'
 import debounce from './utils/debounce';
 
 
-const debug_url = "wss://2cb25505.ngrok.io/ws"
+const debug_url = "wss://socket.ilmexchange.com/ws"
+// const debug_url = 'socket.ilmexchange.com'
 //@ts-ignore
 const host = window.api_url || debug_url;
 
