@@ -328,9 +328,8 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 			EdMarkaz.DB,
 			"INSERT INTO customer_experience (
 				phone,
-				feedback,
-				date
-			) VALUES ($1,$2,current_timestamp)
+				feedback
+			) VALUES ($1,$2)
 			",
 			[id, customer_experience]
 		) do
