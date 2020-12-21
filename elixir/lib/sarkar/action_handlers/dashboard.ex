@@ -127,9 +127,7 @@ defmodule Sarkar.ActionHandler.Dashboard do
 				%{"targeted_instruction_access" => false}
 			_ ->
 				[ [value, key] ] = targeted_instruction_access.rows
-				ret = %{ key => value }
-				IO.inspect ret
-				ret
+				%{ key => value }
 		end
 
 		{:reply, succeed(%{"trial_info" => trial_info, "student_info" => max_limit, "meta" => meta, "targeted_instruction" => targeted_instructions }), state}
