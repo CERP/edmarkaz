@@ -18,7 +18,7 @@ const TeacherSignin: React.FC<P> = ({ auth, createLogin, createAccount }) => {
 
 	return (
 		<Layout>
-			<div className="login-page">
+			<div className="login-page" style={{paddingBottom: 90}}>
 				<Container maxWidth="sm">
 					<div
 						className="section"

@@ -21,7 +21,6 @@ import Layout from 'components/Layout'
 import ilmxLogo from 'components/Header/ilmx.svg'
 import Youtube from 'react-youtube'
 import { AppUserRole } from 'constants/app'
-import Alert from 'components/Alert'
 
 import './style.css'
 
@@ -41,7 +40,7 @@ type VideoMeta = {
 
 const useStyles = makeStyles((theme: Theme) => ({
 	root: {
-		marginBottom: '8rem'
+		paddingBottom: '90px'
 	},
 	button: {
 		padding: theme.spacing(0.75),
@@ -122,6 +121,10 @@ const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile
 		setActiveStep((prevActiveStep) => prevActiveStep - 1)
 	}, [])
 
+	const handleStep = (step: number) => () => {
+		setActiveStep(step)
+	}
+
 	const handleAssessmentSubmission = (attemptedAssessment: AttemptedAssessment) => {
 
 		const teacherProfile: Partial<TeacherProfile> = {
@@ -147,12 +150,12 @@ const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile
 					</div>
 				</Modal>
 			}
-			<div className={"teacher-portal " + classes.root} >
+			<div className={"teacher-portal " + classes.root}>
 
 				<Container maxWidth="lg">
 					<div className={classes.pageMain}>
 						<Avatar variant="square" className={classes.ilmxLogo} src={ilmxLogo} alt="ilmx-logo" />
-						<Typography variant="h4" align="center" color="primary">Teacher Portal</Typography>
+						<Typography variant="h4" align="center" style={{ marginTop: 20, fontFamily: "futura" }} color="primary">Teacher Portal - Training Course</Typography>
 					</div>
 					{Object.keys(videos).length === 0 ? <div>Loading, Please wait...</div>
 						: <>
@@ -170,18 +173,17 @@ const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile
 											</Link>
 										</div>
 									</div>
-									<div className="alert-banner">
-										<Alert text="Please login as a teacher to take Assessment to get a certificate" />
-									</div>
 								</>
 							}
-							<Stepper activeStep={activeStep} variant="elevation" orientation="vertical" style={{ padding: 4 }}>
+							<Stepper activeStep={activeStep} variant="elevation" nonLinear orientation="vertical" style={{ padding: 4 }}>
 								{
 									flattened_videos
 										.sort(([, a], [, b]) => a.order - b.order)
 										.map(([id, value], index) => (<Step key={id + index}>
-											<StepButton completed={checkAssessmentTaken(id, value.assessment_id, profile)}>
-												<Typography color="primary" className={activeStep === index ? classes.stepLabelActive : classes.stepLabel}>
+											<StepButton onClick={handleStep(index)} completed={checkAssessmentTaken(id, value.assessment_id, profile)}>
+												<Typography
+													color="primary"
+													className={activeStep === index ? classes.stepLabelActive : classes.stepLabel}>
 													{value.title}
 												</Typography>
 											</StepButton>
@@ -192,6 +194,8 @@ const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile
 														<Button
 															disabled={activeStep === 0}
 															onClick={handleBack}
+															color={"default"}
+															variant="contained"
 															className={classes.button}
 														>
 															Back </Button>
@@ -204,11 +208,11 @@ const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile
 															{activeStep === flattened_videos.length - 1 ? 'Feedback' : 'Next'}
 														</Button>
 														<Button
-															disabled={(auth.token ? auth.user !== AppUserRole.TEACHER : true) || checkAssessmentTaken(id, value.assessment_id, profile)}
-															variant="outlined"
-															color="primary"
+															disabled={checkAssessmentTaken(id, value.assessment_id, profile)}
+															variant="contained"
+															color="secondary"
 															className={classes.button}
-															onClick={() => handleTakeAssessment(id, value.assessment_id)}
+															onClick={() => auth.token && auth.user === AppUserRole.TEACHER ?  handleTakeAssessment(id, value.assessment_id) : window.alert('Please logic as Teacher to continue')}
 														>
 															{checkAssessmentTaken(id, value.assessment_id, profile) ? 'Assessment Taken' : 'Take Assessment'}
 														</Button>
