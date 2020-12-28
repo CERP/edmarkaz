@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { getOrders, getProducts } from '../../actions'
 import { Link } from 'react-router-dom'
 import moment from 'moment'
+import './style.css'
 
 interface P {
 	orders: RootReducerState["orders"]

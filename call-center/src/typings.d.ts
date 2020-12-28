@@ -126,7 +126,7 @@ interface CustomerExperience {
 	location: string
 	sales_representative: string
 	product_ordered: string
-	date_of_delivery: string
+	date_of_delivery: number
 	complete_orders: CompleteOrders
 	cancel_orders: CancelOrders
 }

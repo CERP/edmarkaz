@@ -1,0 +1,15 @@
+.customer_experience .rating-row {
+	display: grid;
+	grid-template-columns: repeat(2, 50%);
+	margin-bottom: 1.5rem;
+}
+
+.customer_experience .rating-div {
+	display: flex;
+	width: 30%;
+	height: 20px
+}
+
+.customer_experience textarea {
+	text-align: left !important;
+}
