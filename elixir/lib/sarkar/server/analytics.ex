@@ -2,7 +2,7 @@ defmodule EdMarkaz.Server.Analytics do
 
 	use Plug.Router
 
-	plug BasicAuth, use_config: {:edmarkaz, :basic_auth}
+	# plug BasicAuth, use_config: {:edmarkaz, :basic_auth}
 
 	plug :match
 	plug :dispatch
@@ -10,6 +10,144 @@ defmodule EdMarkaz.Server.Analytics do
 	match "/hi" do
 		IO.puts "wowwww"
 		send_resp(conn, 200, "hello")
+
+	end
+
+	match "/faculty-permissions.csv" do
+
+		{:ok, resp} = case EdMarkaz.DB.Postgres.query(
+				EdMarkaz.DB,
+				"SELECT
+					school_id,
+					path,
+					value
+				FROM
+					flattened_schools
+				WHERE
+					path like 'faculty,%,permissions,%'",
+				[]
+			) do
+				{:ok, resp} -> {:ok, resp}
+				{:error, err} -> {:error, err}
+			end
+
+
+		merge_permissions = resp.rows
+			|> Enum.reduce(%{}, fn([school_id, path, value], agg) ->
+
+				[_, teacher_id, _, permission] = String.split(path, ",")
+
+				Dynamic.put(agg, [school_id, teacher_id, permission], value)
+
+			end)
+
+
+		csv_data = merge_permissions
+			|> Enum.reduce([], fn({school_id, faculty_permissions}, agg) ->
+
+				school_faculty = faculty_permissions
+					|> Enum.reduce([], fn({teacher_id, permissions}, agg2) ->
+
+						#  make sure permission should be sorted by key
+
+						values = Map.to_list(permissions)
+							|> Enum.sort(fn({k1,_}, {k2, _}) -> k1 <= k2 end)
+							|> Enum.map(fn({_, v}) -> v end)
+
+						single_teacher = [school_id, teacher_id] ++ values
+
+						agg2 ++ single_teacher
+
+					end)
+
+				agg ++ [school_faculty]
+
+			end)
+
+		csv = [
+			[
+				"school_id",
+				"teacher_id",
+				"daily_stats",
+				"expense",
+				"family",
+				"fee",
+				"prospective",
+				"setup_page"
+			] |
+			csv_data
+		]
+		|> CSV.encode()
+		|> Enum.join()
+
+		conn
+		|> put_resp_header("content-type", "text/csv")
+		|> put_resp_header("cache-control", "no-cache")
+		|> send_resp(200, csv)
+
+	end
+
+	match "/faculty-permissions-old.csv" do
+
+		{:ok, resp} = case EdMarkaz.DB.Postgres.query(
+				EdMarkaz.DB,
+				"SELECT
+					school_id,
+					path,
+					value
+				FROM
+					flattened_schools
+				WHERE
+					path like 'settings,permissions,%'",
+				[]
+			) do
+				{:ok, resp} -> {:ok, resp}
+				{:error, err} -> {:error, err}
+			end
+
+
+		merge_permissions = resp.rows
+			|> Enum.reduce(%{}, fn([school_id, path, value], agg) ->
+
+				[_,_, permission] = String.split(path, ",")
+
+				Dynamic.put(agg, [school_id, permission], value)
+
+			end)
+
+
+		csv_data = merge_permissions
+			|> Enum.reduce([], fn({school_id, permissions}, agg) ->
+
+				values = Map.to_list(permissions)
+					|> Enum.sort(fn({k1,_}, {k2, _}) -> k1 <= k2 end)
+					|> Enum.map(fn({_, v}) -> v end)
+
+				school_permissions = [school_id] ++ values
+
+				agg ++ [school_permissions]
+
+			end)
+
+		csv = [
+			[
+				"school_id",
+				"daily_stats",
+				"expense",
+				"family",
+				"fee",
+				"prospective",
+				"setup_page"
+			] |
+			csv_data
+		]
+		|> CSV.encode()
+		|> Enum.join()
+
+		conn
+		|> put_resp_header("content-type", "text/csv")
+		|> put_resp_header("cache-control", "no-cache")
+		|> send_resp(200, csv)
 
 	end
 
@@ -347,6 +485,7 @@ defmodule EdMarkaz.Server.Analytics do
 						agg
 				end
 		end)
+
 		csv_data = new_state
 			|> Enum.reduce([], fn({ school_id, history }, agg)  ->
 				row = history["history"]
