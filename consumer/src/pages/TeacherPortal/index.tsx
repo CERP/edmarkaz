@@ -270,6 +270,9 @@ const VideoCard: React.FC<CardProps> = ({ video }) => {
 
 	return (
 		<div className={classes.videoCard}>
+
+			<Typography variant="h6" color={"primary"} style={{direction: 'rtl'}}>{video.title_urdu}</Typography>
+
 			<Youtube
 				videoId={video.link}
 				className={"video-card"}
