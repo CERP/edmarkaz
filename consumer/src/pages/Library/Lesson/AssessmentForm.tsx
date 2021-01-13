@@ -103,7 +103,7 @@ const AssessmentForm: React.FC<Props> = ({ assessment, quit, submitAssessment })
 												onChange={() => chooseAnswer(qid, aid)}
 												value={aid}
 												control={<Radio />}
-												label={ans.answer}
+												label={ans.answer || ans.urdu_answer}
 												disabled={submitted}
 											/>
 											{

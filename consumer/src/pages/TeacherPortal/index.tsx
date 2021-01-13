@@ -21,6 +21,7 @@ import Layout from 'components/Layout'
 import ilmxLogo from 'components/Header/ilmx.svg'
 import Youtube from 'react-youtube'
 import { AppUserRole } from 'constants/app'
+import { FinalAssessment } from 'constants/teacher'
 
 import './style.css'
 
@@ -29,13 +30,6 @@ type P = {
 	auth: RootReducerState["auth"],
 	fetchTeacherPortalData: () => void
 	updateTeacherProfile: (teacherAssessment: Partial<TeacherProfile>) => void
-}
-
-type VideoMeta = {
-	assessment_id: string
-	title: string
-	description: string
-	link: string
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -155,10 +149,12 @@ const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile
 				<Container maxWidth="lg">
 					<div className={classes.pageMain}>
 						<Avatar variant="square" className={classes.ilmxLogo} src={ilmxLogo} alt="ilmx-logo" />
-						<Typography variant="h4" align="center" style={{ marginTop: 20, fontFamily: "futura" }} color="primary">Teacher Portal - Training Course</Typography>
+						<Typography variant="h4" align="center" style={{ marginTop: 10, fontFamily: "futura" }} color="primary">Teaching After COVID-19</Typography>
 					</div>
+
 					{Object.keys(videos).length === 0 ? <div>Loading, Please wait...</div>
 						: <>
+
 							{
 								(auth.token ? auth.user !== AppUserRole.TEACHER : true) && <>
 									<div className={classes.buttonLoginContainer}>
@@ -175,6 +171,17 @@ const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile
 									</div>
 								</>
 							}
+
+							<div style={{marginBottom: '15px', padding: 5}}>
+								<Typography
+									style={{ fontFamily: "futura", marginBottom: '10px' }}
+									color="primary"
+									variant="h4">Introduction</Typography>
+								<div className="">This training course has been very carefully tailored to aid teachers with knowledge regarding changes students may experience upon their return to 'physical' school during the time of Covid-19 like learning losses and disruption in their social emotional learning.
+									The course also equips teachers with appropriate riate and easy to implement strategies that can be used to navigate gaps and curate their lessons and activities in a manner that it restores the classroom environment.
+								</div>
+							</div>
+
 							<Stepper activeStep={activeStep} variant="elevation" nonLinear orientation="vertical" style={{ padding: 4 }}>
 								{
 									flattened_videos
@@ -212,7 +219,7 @@ const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile
 															variant="contained"
 															color="secondary"
 															className={classes.button}
-															onClick={() => auth.token && auth.user === AppUserRole.TEACHER ?  handleTakeAssessment(id, value.assessment_id) : window.alert('Please logic as Teacher to continue')}
+															onClick={() => auth.token && auth.user === AppUserRole.TEACHER ?  handleTakeAssessment(id, value.assessment_id) : window.alert('Please login as Teacher to continue')}
 														>
 															{checkAssessmentTaken(id, value.assessment_id, profile) ? 'Assessment Taken' : 'Take Assessment'}
 														</Button>
@@ -223,6 +230,20 @@ const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile
 							</Stepper>
 						</>
 					}
+
+					<div className="final-assessment">
+						<div className="heading">اہم ہدایت:</div>
+						<div className="intro">{FinalAssessment.introduction}</div>
+						<div className="contact">0348-1119119</div>
+						{
+							<ul>
+								{
+									FinalAssessment.questions
+										.map((q, index) => <li key={index + q.length}>{q}</li>)
+								}
+							</ul>
+						}
+					</div>
 				</Container>
 			</div>
 			<HelpFooter hlink={'tel:0348-1119-119'} />
@@ -240,7 +261,7 @@ export default connect((state: RootReducerState) => ({
 
 
 type CardProps = {
-	video: VideoMeta
+	video: TeacherPortalVideo
 }
 
 const VideoCard: React.FC<CardProps> = ({ video }) => {
@@ -256,12 +277,15 @@ const VideoCard: React.FC<CardProps> = ({ video }) => {
 					playerVars: {
 						rel: 0,
 						showinfo: 0,
-						autoplay: 0
+						autoplay: 0,
+						controls: 0,
 					}
 
 				}} />
 			<Typography variant="h6" color={"primary"}>Description:</Typography>
-			<Typography variant="body2" style={{ margin: 0 }} className={classes.actionsContainer}>{video.description}</Typography>
+			<Typography variant="body1" style={{ margin: '10px 0px' }} className={classes.actionsContainer}>{video.description}</Typography>
+			<Typography variant="body1" style={{ margin: '10px 0px', direction: "rtl" }} className={classes.actionsContainer}>{video.description_urdu}</Typography>
+
 		</div>
 	)
 }

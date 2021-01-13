@@ -14,12 +14,55 @@
   margin-left: 20px;
 }
 
+.teacher-portal .final-assessment {
+  margin: 10px 0px;
+  direction: rtl;
+}
+
+.teacher-portal .final-assessment .heading {
+  padding-inline-start: 10px;
+  margin-bottom: 10px;
+  font-size: 24px;
+}
+
+.teacher-portal .final-assessment .intro {
+  padding-inline-start: 10px;
+  font-weight: bold;
+  font-size: 16px;
+  color: var(--red);
+}
+
+.teacher-portal .final-assessment .contact {
+  text-align: center;
+  font-weight: bold;
+  font-size: 18px;
+  color: var(--blue);
+  margin-top: 15px;
+}
+
+.teacher-portal .final-assessment ul {
+  padding-inline-start: 20px;
+  list-style: arabic-indic;
+}
+
+.teacher-portal .final-assessment li {
+  padding: 5px 0px;
+}
+
 @media (max-width: 600px) {
+  .teacher-portal .final-assessment {
+    padding: 10px 20px;
+  }
+
   .teacher-portal .video-card {
     height: 320px;
   }
   .teacher-portal .login-button {
     margin: 0px;
+  }
+
+  .teacher-portal .final-assessment .intro {
+    font-size: 14px;
   }
 }
 
