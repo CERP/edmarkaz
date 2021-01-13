@@ -80,8 +80,10 @@ interface TeacherAttemptedAssessment {
 interface TeacherPortalVideo {
 	assessment_id: string
 	title: string
+	title_urdu: string
 	description: string
-	link: string,
+	description_urdu: string
+	link: string
 	order: number
 }
 

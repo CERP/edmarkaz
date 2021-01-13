@@ -18,9 +18,9 @@ defmodule Mix.Tasks.Platform do
 			answers = Enum.reduce(1..4, %{}, fn x, acc ->
 				is_correct = Map.get(ans_map, x) == correct_answer
 				answer = %{
-					"answer" => String.trim(Map.get(options, x)),
+					"answer" => "",
 					"correct_answer" =>  is_correct,
-					"urdu_answer" => "",
+					"urdu_answer" => String.trim(Map.get(options, x)),
 					"id" => Integer.to_string(x),
 					"active" => true,
 					"image" => "",
@@ -33,8 +33,8 @@ defmodule Mix.Tasks.Platform do
 				question = %{
 					"order" => String.trim(question_id),
 					"id" =>  String.trim(question_id),
-					"title" => String.trim(question_statement),
-					"title_urdu" => "",
+					"title" => "",
+					"title_urdu" => String.trim(question_statement),
 					"response_limit" => 0,
 					"multi_response" => false,
 					"image" => "",
@@ -65,8 +65,8 @@ defmodule Mix.Tasks.Platform do
 						question_id => %{
 							"order" => String.trim(question_id),
 							"id" =>  String.trim(question_id),
-							"title" => String.trim(question_statement),
-							"title_urdu" => "",
+							"title" => "",
+							"title_urdu" => String.trim(question_statement),
 							"response_limit" => 0,
 							"multi_response" => false,
 							"image" => "",
@@ -96,12 +96,14 @@ defmodule Mix.Tasks.Platform do
 		|> Enum.map(fn row -> row end)
 
 		reduced_videos = videos
-		|> Enum.reduce(%{}, fn([video_id, assessment_id, title, description, link, order]), agg ->
+		|> Enum.reduce(%{}, fn([video_id, assessment_id, title, title_urdu, description, description_urdu, link, order]), agg ->
 
 			meta = %{
 					"assessment_id" => assessment_id,
 					"title" => title,
+					"title_urdu" => title_urdu,
 					"description" => description,
+					"description_urdu" => description_urdu,
 					"link" => link,
 					"order" => String.to_integer(order)
 				}
