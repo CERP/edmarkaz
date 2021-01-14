@@ -149,7 +149,7 @@ const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile
 				<Container maxWidth="lg">
 					<div className={classes.pageMain}>
 						<Avatar variant="square" className={classes.ilmxLogo} src={ilmxLogo} alt="ilmx-logo" />
-						<Typography variant="h4" align="center" style={{ marginTop: 10, fontFamily: "futura" }} color="primary">Teaching After COVID-19</Typography>
+						<Typography variant="h4" align="center" style={{ marginTop: 10, fontFamily: "futura" }} color="primary">Teacher Portal-Training Course</Typography>
 					</div>
 
 					{Object.keys(videos).length === 0 ? <div>Loading, Please wait...</div>
@@ -173,10 +173,11 @@ const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile
 							}
 
 							<div style={{marginBottom: '15px', padding: 5}}>
+								<Typography variant="h5" style={{ fontFamily: "futura" }} color="primary">Teaching After COVID-19</Typography>
 								<Typography
 									style={{ fontFamily: "futura", marginBottom: '10px' }}
-									color="primary"
-									variant="h4">Introduction</Typography>
+									color="textSecondary"
+									variant="h5">Introduction</Typography>
 								<div className="">This training course has been very carefully tailored to aid teachers with knowledge regarding changes students may experience upon their return to 'physical' school during the time of Covid-19 like learning losses and disruption in their social emotional learning.
 									The course also equips teachers with appropriate riate and easy to implement strategies that can be used to navigate gaps and curate their lessons and activities in a manner that it restores the classroom environment.
 								</div>
