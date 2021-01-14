@@ -24,7 +24,8 @@ defmodule EdMarkaz.Server.Analytics do
 				FROM
 					flattened_schools
 				WHERE
-					path like 'faculty,%,permissions,%'",
+					path like 'faculty,%,permissions,%'
+				ORDER BY school_id",
 				[]
 			) do
 				{:ok, resp} -> {:ok, resp}
@@ -34,11 +35,11 @@ defmodule EdMarkaz.Server.Analytics do
 
 		merge_permissions = resp.rows
 			|> Enum.reduce(%{}, fn([school_id, path, value], agg) ->
+				# permission: setupPage | fee |family
 
 				[_, teacher_id, _, permission] = String.split(path, ",")
 
 				Dynamic.put(agg, [school_id, teacher_id, permission], value)
-
 			end)
 
 
@@ -48,7 +49,7 @@ defmodule EdMarkaz.Server.Analytics do
 				school_faculty = faculty_permissions
 					|> Enum.reduce([], fn({teacher_id, permissions}, agg2) ->
 
-						#  make sure permission should be sorted by key
+						#  make sure permission should be sorted by key alphabetically
 
 						values = Map.to_list(permissions)
 							|> Enum.sort(fn({k1,_}, {k2, _}) -> k1 <= k2 end)
@@ -56,11 +57,15 @@ defmodule EdMarkaz.Server.Analytics do
 
 						single_teacher = [school_id, teacher_id] ++ values
 
-						agg2 ++ single_teacher
+						# [[], [], [],...] ++ [[]]
+
+						agg2 ++ [single_teacher]
 
 					end)
 
-				agg ++ [school_faculty]
+				# [[],[],..] ++ [[],[],...]
+
+				agg ++ school_faculty
 
 			end)
 
@@ -98,7 +103,8 @@ defmodule EdMarkaz.Server.Analytics do
 				FROM
 					flattened_schools
 				WHERE
-					path like 'settings,permissions,%'",
+					path like 'settings,permissions,%,teacher'
+				ORDER BY school_id",
 				[]
 			) do
 				{:ok, resp} -> {:ok, resp}
@@ -108,22 +114,24 @@ defmodule EdMarkaz.Server.Analytics do
 
 		merge_permissions = resp.rows
 			|> Enum.reduce(%{}, fn([school_id, path, value], agg) ->
-
-				[_,_, permission] = String.split(path, ",")
+				# permission: setupPage | fee |family
+				[_, _, permission | _] = String.split(path, ",")
 
 				Dynamic.put(agg, [school_id, permission], value)
-
 			end)
-
 
 		csv_data = merge_permissions
 			|> Enum.reduce([], fn({school_id, permissions}, agg) ->
+
+				#  make sure permission should be sorted by key alphabetically
 
 				values = Map.to_list(permissions)
 					|> Enum.sort(fn({k1,_}, {k2, _}) -> k1 <= k2 end)
 					|> Enum.map(fn({_, v}) -> v end)
 
 				school_permissions = [school_id] ++ values
+
+				# [[],[],[],...] ++ [[]]
 
 				agg ++ [school_permissions]
 
