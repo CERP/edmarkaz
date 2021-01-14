@@ -2,7 +2,7 @@ defmodule EdMarkaz.Server.Analytics do
 
 	use Plug.Router
 
-	# plug BasicAuth, use_config: {:edmarkaz, :basic_auth}
+	plug BasicAuth, use_config: {:edmarkaz, :basic_auth}
 
 	plug :match
 	plug :dispatch
