@@ -149,7 +149,7 @@ const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile
 				<Container maxWidth="lg">
 					<div className={classes.pageMain}>
 						<Avatar variant="square" className={classes.ilmxLogo} src={ilmxLogo} alt="ilmx-logo" />
-						<Typography variant="h4" align="center" style={{ marginTop: 10, fontFamily: "futura" }} color="primary">Teacher Portal-Training Course</Typography>
+						<Typography variant="h4" align="center" style={{ marginTop: 10, fontFamily: "futura" }} color="primary">Teacher Training Course</Typography>
 					</div>
 
 					{Object.keys(videos).length === 0 ? <div>Loading, Please wait...</div>

@@ -84,7 +84,8 @@ const AssessmentForm: React.FC<Props> = ({ assessment, quit, submitAssessment })
 								<Typography
 									variant="h6"
 									color="textPrimary"
-									align="left"
+									align={qs.title_urdu ? 'right' : 'left' }
+									style={{direction: qs.title_urdu ? 'rtl' : 'ltr'}}
 								>
 									{qs.title ? `Qs: ${(qs.title || "").replace("$", "______")}` : qs.title_urdu}
 								</Typography>
@@ -96,7 +97,7 @@ const AssessmentForm: React.FC<Props> = ({ assessment, quit, submitAssessment })
 							<RadioGroup value={responses[qid] || ""}>
 								{
 									Object.entries(qs.answers).map(([aid, ans]) => {
-										return <div className="ans-row" key={`${qid}-${aid}`}>
+										return <div className="ans-row" key={`${qid}-${aid}`} 	style={{direction: ans.urdu_answer ? 'rtl' : 'ltr'}}>
 											<FormControlLabel
 												className="ans-statement"
 												style={submitted && ans.correct_answer ? { border: "2px solid green" } : submitted && !ans.correct_answer && responses[qid] === aid ? { border: "2px solid red" } : {}}
