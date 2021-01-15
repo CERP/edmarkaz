@@ -90,10 +90,10 @@ const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile
 	const flattened_videos = useMemo(() => (Object.entries(videos)), [videos])
 
 	useEffect(() => {
-		if (Object.keys(videos).length === 0) {
+		if (Object.keys(videos).length === 0 || Object.keys(assessments).length === 0) {
 			fetchTeacherPortalData()
 		}
-	}, [videos, fetchTeacherPortalData])
+	}, [videos, assessments, fetchTeacherPortalData])
 
 	const handleTakeAssessment = (videoId: string, assessmentId: string) => {
 		setAssessmentModal(true)
@@ -229,22 +229,22 @@ const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile
 											</StepContent>
 										</Step>))}
 							</Stepper>
+							<div className="final-assessment">
+								<Typography style={{ fontFamily: "futura", marginBottom: '10px' }} color="textSecondary" align="center" variant="h4">Final Assessment</Typography>
+								<div className="heading">اہم ہدایت:</div>
+								<div className="intro">{FinalAssessment.introduction}</div>
+								<div className="contact">0348-1119119</div>
+								{
+									<ul>
+										{
+											FinalAssessment.questions
+												.map((q, index) => <li key={index + q.length}>{q}</li>)
+										}
+									</ul>
+								}
+							</div>
 						</>
 					}
-
-					<div className="final-assessment">
-						<div className="heading">اہم ہدایت:</div>
-						<div className="intro">{FinalAssessment.introduction}</div>
-						<div className="contact">0348-1119119</div>
-						{
-							<ul>
-								{
-									FinalAssessment.questions
-										.map((q, index) => <li key={index + q.length}>{q}</li>)
-								}
-							</ul>
-						}
-					</div>
 				</Container>
 			</div>
 			<HelpFooter hlink={'tel:0348-1119-119'} />
