@@ -314,6 +314,33 @@ defmodule EdMarkaz.ActionHandler.CallCenter do
 		{:reply, succeed(resp), state}
 	end
 
+	def handle_action(
+		%{
+			"type" => "SAVE_CUSTOMER_EXPERIENCE",
+			"payload" => %{
+				"id" => id,
+				"customer_experience" => customer_experience
+			}
+		},
+		state
+	) do
+		case EdMarkaz.DB.Postgres.query(
+			EdMarkaz.DB,
+			"INSERT INTO customer_experience (
+				phone,
+				feedback
+			) VALUES ($1,$2)
+			",
+			[id, customer_experience]
+		) do
+			{:ok, resp} ->
+				{:reply, succeed("Customer experience saved"), state}
+			{:error, err} ->
+				IO.inspect err
+				{:reply, fail("insertion failed"), state}
+		end
+	end
+
 	def handle_action(%{"type" => "GET_PRODUCTS", "last_sync" => last_sync}, %{id: _id, client_id: _client_id} = state) do
 
 		_dt = DateTime.from_unix!(last_sync, :millisecond)

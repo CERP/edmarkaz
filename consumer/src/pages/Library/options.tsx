@@ -29,12 +29,12 @@ const getFeaturedApps = () => [
 		link_app: "http://bit.ly/muselessons",
 		logo: "https://storage.googleapis.com/ilmx-product-images/Sabaq%20logo.png"
 	},
-	{
-		title: "Knowledge Platform",
-		link_play: "https://play.google.com/store/apps/details?id=com.knowledgeplatform.lsp&hl=en",
-		link_app: "https://play.google.com/store/apps/details?id=com.knowledgeplatform.lsp&hl=en",
-		logo: "https://storage.googleapis.com/ilmx-product-images/kp%20logo%20new.png"
-	},
+	// {
+	// 	title: "Knowledge Platform",
+	// 	link_play: "https://play.google.com/store/apps/details?id=com.knowledgeplatform.lsp&hl=en",
+	// 	link_app: "https://play.google.com/store/apps/details?id=com.knowledgeplatform.lsp&hl=en",
+	// 	logo: "https://storage.googleapis.com/ilmx-product-images/kp%20logo%20new.png"
+	// },
 	{
 		title: "Taleemabad Primary",
 		link_play: "http://bit.ly/taleemabad",

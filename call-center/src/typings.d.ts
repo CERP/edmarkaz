@@ -120,6 +120,37 @@ interface Order {
 	verified?: "VERIFIED" | "NOT_VERIFIED" | "REJECTED"
 }
 
+interface CustomerExperience {
+	school_name: string
+	contact_number: string
+	location: string
+	sales_representative: string
+	product_ordered: string
+	date_of_delivery: number
+	complete_orders: CompleteOrders
+	cancel_orders: CancelOrders
+}
+
+interface CompleteOrders {
+	will_order_again: string
+	rating: OrderRating
+}
+
+interface CancelOrders {
+	purchase_cancel_reason: string
+	will_order_again: string
+	rating: OrderRating
+}
+
+interface OrderRating {
+	product_price: number
+	product_quality: number
+	product_range: number
+	delivery?: number
+	processing_time?: number
+	customer_service: number
+}
+
 interface CERPSchool {
 	alt_number: string
 	alt_phone_number: string

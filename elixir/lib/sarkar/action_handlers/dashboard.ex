@@ -113,7 +113,24 @@ defmodule Sarkar.ActionHandler.Dashboard do
 				{:ok, meta}
 		end
 
-		{:reply, succeed(%{"trial_info" => trial_info, "student_info" => max_limit, "meta" => meta }), state}
+		{:ok, targeted_instruction_access} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
+			"SELECT
+				value,
+				path
+			FROM flattened_schools
+			WHERE school_id=$1 AND path LIKE $2",
+			[school_id,"targeted_instruction_access"]
+		)
+
+		targeted_instructions = case length(targeted_instruction_access.rows) do
+			0 ->
+				%{"targeted_instruction_access" => false}
+			_ ->
+				[ [value, key] ] = targeted_instruction_access.rows
+				%{ key => value }
+		end
+
+		{:reply, succeed(%{"trial_info" => trial_info, "student_info" => max_limit, "meta" => meta, "targeted_instruction" => targeted_instructions }), state}
 	end
 
 	def handle_action(
@@ -579,6 +596,22 @@ defmodule Sarkar.ActionHandler.Dashboard do
 		{:reply, succeed("Successful"), state }
 	end
 
+	def handle_action(
+		%{
+			"type" => "TIP_ACCESS",
+			"payload" => %{
+				"school_id" => school_id,
+				"merges" => merges
+			}
+		},
+		state
+	) do
+
+		start_school_broadcast_changes(school_id, merges)
+
+		{:reply, succeed("Successful"), state }
+	end
+
 	def handle_action(%{
 			"type" => "RESET_SCHOOL_PASSWORD",
 			"client_id" => _client_id,
@@ -684,6 +717,59 @@ defmodule Sarkar.ActionHandler.Dashboard do
 		Sarkar.School.sync_changes(school_id,"backend", merges, :os.system_time(:millisecond))
 
 	end
+
+	def handle_action(%{
+		"type" => "CREATE_BRANCH_MANAGER",
+		"client_id" => _client_id,
+		"payload" => %{
+			"username" => username,
+			"password" => password,
+			"value" => branches
+		}
+	},
+	%{ client_id: client_id } = state) do
+		case Sarkar.Auth.Dashboard.create_branch_manager({username, password, branches}) do
+			{:ok, resp} ->
+				{:reply, succeed(resp), state}
+			{:error, err} ->
+				{:reply, fail(err), state}
+		end
+	end
+
+	def handle_action(%{
+		"type" => "UPDATE_BRANCHES",
+		"client_id" => _client_id,
+		"payload" => %{
+			"username" => username,
+			"value" => branches
+		}
+	},
+	%{ client_id: client_id } = state) do
+		case Sarkar.Auth.Dashboard.update_branches({username, branches}) do
+			{:ok, resp} ->
+				{:reply, succeed(resp), state}
+			{:error, err} ->
+				{:reply, fail(err), state}
+		end
+	end
+
+	def handle_action(%{
+		"type" => "UPDATE_BRANCH_MANAGER_PASSWORD",
+		"client_id" => _client_id,
+		"payload" => %{
+			"username" => username,
+			"password" => password
+		}
+	},
+	%{ client_id: client_id } = state) do
+		case Sarkar.Auth.Dashboard.update_branch_manager_password({username, password}) do
+			{:ok, resp} ->
+				{:reply, succeed(resp), state}
+			{:error, err} ->
+				{:reply, fail(err), state}
+		end
+	end
+
 
 	defp fail(message) do
 		%{type: "failure", payload: message}
