@@ -12,6 +12,7 @@ export const saveDB = (db: RootReducerState) => {
 		saveLessons(db.lessons)
 		saveAssessments(db.assessments)
 		saveActiveStudent(db.activeStudent)
+		saveTeacherPortal(db.teacher_portal)
 	}
 
 	catch (err) {
@@ -24,6 +25,7 @@ export const clearDB = () => {
 	localStorage.removeItem("sync_state")
 	localStorage.removeItem("last_snapshot")
 	localStorage.removeItem("school_db")
+	localStorage.removeItem("teacher_portal")
 }
 
 export const loadAuth = (): RootReducerState['auth'] => {
@@ -240,6 +242,33 @@ const loadSnapshot = () => {
 	return parseInt(localStorage.getItem("last_snapshot") || "0")
 }
 
+const saveTeacherPortal = (teacher_portal: RootReducerState['teacher_portal']) => {
+	localStorage.setItem("teacher_portal", JSON.stringify(teacher_portal))
+}
+
+const loadTeacherPortal = () => {
+	const initial: RootReducerState["teacher_portal"] = {
+		profile: {},
+		assessments: {},
+		videos: {}
+	}
+
+	const teacher_portal = localStorage.getItem("teacher_portal")
+
+	try {
+
+		if (teacher_portal === null) {
+			return initial
+		}
+
+		return JSON.parse(teacher_portal)
+	}
+	catch (ex) {
+		console.log(ex)
+		return initial
+	}
+}
+
 export const loadDB = (): RootReducerState => {
 
 	return {
@@ -260,6 +289,7 @@ export const loadDB = (): RootReducerState => {
 			signup_events: {},
 			video_events: {},
 			assessment_events: {}
-		}
+		},
+		teacher_portal: loadTeacherPortal()
 	}
 }

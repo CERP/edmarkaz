@@ -16,6 +16,8 @@ import AppPrivacy from 'pages/Privacy'
 import Campaign from 'pages/Front/campaign'
 import { CompetitionWinners } from 'pages/Challenge/winners'
 import { ScrollToTop } from 'components/ScrollToTop'
+import TeacherPortal from 'pages/TeacherPortal'
+import TeacherSignin from 'pages/TeacherPortal/Signin'
 
 const Routes = ({ store }: { store: Store }) => (
 	<Provider store={store}>
@@ -32,6 +34,8 @@ const Routes = ({ store }: { store: Store }) => (
 					<TrackedRoute exact path="/log-in" component={login} />
 					<TrackedRoute exact path="/school" component={School} />
 					<TrackedRoute exact path="/student" component={StudentPortal} />
+					<TrackedRoute exact path="/teacher" component={TeacherPortal} />
+					<TrackedRoute exact path="/teacher-login" component={TeacherSignin} />
 					<TrackedRoute exact path="/14th-august-competition-winners" component={CompetitionWinners} />
 					<Route path="/" component={TabsBar} />
 				</Switch>

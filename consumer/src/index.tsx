@@ -17,8 +17,8 @@ import { connected, disconnected } from './actions/core';
 import { ThemeProvider } from '@material-ui/core';
 import { theme } from './components/MuiTheme';
 
-
-const debug_url = "wss://socket.ilmexchange.com/ws"
+const debug_url = "wss://7bf939260c7b.ngrok.io/ws"
+// const debug_url = "wss://socket.ilmexchange.com/ws"
 //@ts-ignore
 const host = window.api_url || debug_url;
 

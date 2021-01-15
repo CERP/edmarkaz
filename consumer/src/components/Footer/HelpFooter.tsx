@@ -113,7 +113,7 @@ const HelpFooter: React.FC<PropsType> = ({ hlink }) => {
 
 	return (
 		<>
-			{width <= 425 ? <footer className={classes.footer}>
+			{width <= 425 ? <footer className={classes.footer} style={{ cursor: 'pointer' }}>
 				{showModal ? <Modal >
 					<div className="modal-box video-modal">
 						{

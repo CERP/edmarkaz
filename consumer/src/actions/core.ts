@@ -1,7 +1,6 @@
 import { Dispatch } from 'redux'
 import Syncr from '@cerp/syncr';
 import { v4 } from 'uuid';
-
 type GetState = () => RootReducerState
 
 const SYNC = "SYNC"

@@ -102,14 +102,130 @@ defmodule Mix.Tasks.Platform do
 		EdMarkaz.TargetedInstructions.insert_targeted_instruction_curriculum(["curriculum", curriculum_obj])
 	end
 
-	def run(["platform-orders"]) do
-	Application.ensure_all_started(:edmarkaz)
+	def run(["teacher_assessments", file_name ]) do
+		Application.ensure_all_started(:edmarkaz)
 
-	{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
-		"SELECT
-			id, type, path, value, time
-			FROM platform_writes
-			WHERE path[4]='history' order by time asc", [])
+		csv = File.stream!(Application.app_dir(:edmarkaz, "priv/#{file_name}.csv")) |> CSV.decode!
+
+		[ _ | assessments] = csv
+		|> Enum.map(fn row -> row end)
+
+		reduced_assessments = assessments
+		|> Enum.reduce(%{}, fn([video_id, assessment_id, question_id, question_statement, opt_a, opt_b, opt_c, opt_d, correct_answer]), agg ->
+
+			ans_map = %{ 1 => "A", 2 => "B", 3 => "C", 4 => "D" }
+			options = %{ 1 => opt_a, 2 => opt_b, 3 => opt_c, 4 => opt_d }
+
+			answers = Enum.reduce(1..4, %{}, fn x, acc ->
+				is_correct = Map.get(ans_map, x) == correct_answer
+				answer = %{
+					"answer" => "",
+					"correct_answer" =>  is_correct,
+					"urdu_answer" => String.trim(Map.get(options, x)),
+					"id" => Integer.to_string(x),
+					"active" => true,
+					"image" => "",
+					"audio" => ""
+				}
+				Map.put(acc, Integer.to_string(x), answer)
+				end)
+
+			if Map.has_key?(agg, assessment_id) do
+				question = %{
+					"order" => String.trim(question_id),
+					"id" =>  String.trim(question_id),
+					"title" => "",
+					"title_urdu" => String.trim(question_statement),
+					"response_limit" => 0,
+					"multi_response" => false,
+					"image" => "",
+					"urdu_image" => "",
+					"audio" => "",
+					"active" => true,
+					"answers" => answers
+				}
+				Dynamic.put(agg, [assessment_id, "questions", question_id], question)
+			else
+				assessment = %{
+					"meta" => %{
+						"medium" => "",
+						"grade" => "",
+						"subject" => "",
+						"chapter_id" => "",
+						"lesson_id" => "",
+						"type" => "MCQs",
+						"title" => "",
+						"id" => String.trim(assessment_id),
+						"order" => String.trim(assessment_id),
+						"time" => 0,
+						"total_marks" => 0,
+						"active" => true,
+						"source" => "Ilmx"
+					},
+					"questions" => %{
+						question_id => %{
+							"order" => String.trim(question_id),
+							"id" =>  String.trim(question_id),
+							"title" => "",
+							"title_urdu" => String.trim(question_statement),
+							"response_limit" => 0,
+							"multi_response" => false,
+							"image" => "",
+							"urdu_image" => "",
+							"audio" => "",
+							"active" => true,
+							"answers" => answers
+						}
+					}
+				}
+				Map.put(agg, assessment_id, assessment)
+			end
+		end)
+
+		reduced_assessments
+		|> Enum.each(fn({k, v}) ->
+			EdMarkaz.TeacherPortal.insert_assessments([k, v["meta"], v["questions"]])
+		end)
+	end
+
+	def run(["tp_videos", file_name ]) do
+		Application.ensure_all_started(:edmarkaz)
+
+		csv = File.stream!(Application.app_dir(:edmarkaz, "priv/#{file_name}.csv")) |> CSV.decode!
+
+		[ _ | videos] = csv
+		|> Enum.map(fn row -> row end)
+
+		reduced_videos = videos
+		|> Enum.reduce(%{}, fn([video_id, assessment_id, title, title_urdu, description, description_urdu, link, order]), agg ->
+
+			meta = %{
+					"assessment_id" => assessment_id,
+					"title" => title,
+					"title_urdu" => title_urdu,
+					"description" => description,
+					"description_urdu" => description_urdu,
+					"link" => link,
+					"order" => String.to_integer(order)
+				}
+			Dynamic.put(agg, [video_id], meta)
+		end)
+
+		reduced_videos
+		|> Enum.each(fn({k, v}) ->
+			EdMarkaz.TeacherPortal.insert_videos([k, v])
+		end)
+	end
+
+
+	def run(["platform-orders"]) do
+		Application.ensure_all_started(:edmarkaz)
+
+		{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
+			"SELECT
+				id, type, path, value, time
+				FROM platform_writes
+				WHERE path[4]='history' order by time asc", [])
 
 		new_state = resp.rows
 			|> Enum.reduce(%{}, fn([supplier_id, type, path, value, time], agg) ->
@@ -128,7 +244,7 @@ defmodule Mix.Tasks.Platform do
 					other ->
 						agg
 				end
-		end)
+			end)
 
 		csv_data = new_state |> Enum.reduce([], fn({ sid, history }, agg)  ->
 			row = history["history"] |> Enum.map(fn({time, order})->
