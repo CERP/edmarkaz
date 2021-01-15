@@ -230,7 +230,7 @@ const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile
 										</Step>))}
 							</Stepper>
 							<div className="final-assessment">
-								<Typography style={{ fontFamily: "futura", marginBottom: '10px' }} color="textSecondary" align="center" variant="h4">Final Assessment</Typography>
+								<Typography style={{ fontFamily: "futura", marginBottom: '10px' }} color="textSecondary" align="center" variant="h4">Final Project Assignment</Typography>
 								<div className="heading">اہم ہدایت:</div>
 								<div className="intro">{FinalAssessment.introduction}</div>
 								<div className="contact">0348-1119119</div>
