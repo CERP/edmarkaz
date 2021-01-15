@@ -4,8 +4,9 @@ import { RouteComponentProps, withRouter, Link } from 'react-router-dom'
 import { AppBar, Toolbar, IconButton, Button, makeStyles } from '@material-ui/core'
 import BackIcon from '@material-ui/icons/ArrowBack'
 import AccountCircle from '@material-ui/icons/AccountCircle'
-
 import { Home } from '@material-ui/icons'
+import { AppUserRole } from 'constants/app'
+
 
 //@ts-ignore
 import mis from '../../icons/mis.ico'
@@ -124,27 +125,38 @@ const StudentHeader: React.FC<SP> = ({ goBack, push, auth, lesson_meta, client_i
 	const classes = useStyles();
 
 	const toHome = () => {
-		if (auth.user === "SCHOOL") {
+		if (auth.user === AppUserRole.SCHOOL) {
 			push("/school")
 			return
 		}
-		if (auth.user === "STUDENT" || auth.user === "GUEST_STUDENT") {
+		if (auth.user === AppUserRole.STUDENT || auth.user === AppUserRole.GUEST_STUDENT) {
 			push("/student")
 			return
 		}
+
+		if (auth.user === AppUserRole.TEACHER || auth.user === AppUserRole.GUEST_TEACHER) {
+			push("/teacher")
+			return
+		}
+
 		push("")
 	}
 
 	const toAccount = () => {
-		if (auth.user === "SCHOOL") {
+		if (auth.user === AppUserRole.SCHOOL) {
 			push("/profile")
+			return
+		}
+
+		if (auth.user === AppUserRole.TEACHER) {
+			push("/teacher-profile")
 			return
 		}
 
 		push("/student-profile")
 	}
 
-	const guestLogout = () => {
+	const guestUserLogout = () => {
 		localStorage.removeItem("auth")
 		localStorage.removeItem("student-welcome")
 		window.history.pushState(undefined, '', '/')
@@ -170,7 +182,7 @@ const StudentHeader: React.FC<SP> = ({ goBack, push, auth, lesson_meta, client_i
 							<Home />
 						</IconButton>
 
-						{(auth.user === "SCHOOL" || auth.user === "STUDENT") && <IconButton onClick={toAccount} edge="start" color="inherit" aria-label="menu">
+						{(auth.user === AppUserRole.SCHOOL || auth.user === AppUserRole.STUDENT || auth.user === AppUserRole.TEACHER) && <IconButton onClick={toAccount} edge="start" color="inherit" aria-label="menu">
 							<AccountCircle />
 						</IconButton>}
 					</Toolbar>
@@ -183,7 +195,7 @@ const StudentHeader: React.FC<SP> = ({ goBack, push, auth, lesson_meta, client_i
 						<Button color="inherit" variant="text" disableRipple className={classes.title} component={Link} to="/"> ILMEXCHANGE </Button>
 
 						{
-							auth.user === "SCHOOL" && <IconButton href={`https://mischool.pk/auto-login?id=${auth.id}&key=${auth.token}&cid=${client_id}&ref=${profile.refcode}`} edge="start" color="inherit" aria-label="menu">
+							auth.user === AppUserRole.SCHOOL && <IconButton href={`https://mischool.pk/auto-login?id=${auth.id}&key=${auth.token}&cid=${client_id}&ref=${profile.refcode}`} edge="start" color="inherit" aria-label="menu">
 								<img src={mis} style={{ height: "30px" }} alt="mis" />
 							</IconButton>}
 
@@ -191,13 +203,13 @@ const StudentHeader: React.FC<SP> = ({ goBack, push, auth, lesson_meta, client_i
 							<Home />
 						</IconButton>
 
-						{(auth.user === "SCHOOL" || auth.user === "STUDENT") && <IconButton onClick={toAccount} edge="start" color="inherit" aria-label="menu">
+						{(auth.user === AppUserRole.SCHOOL || auth.user === AppUserRole.TEACHER || auth.user === AppUserRole.STUDENT) && <IconButton onClick={toAccount} edge="start" color="inherit" aria-label="menu">
 							<AccountCircle />
 						</IconButton>}
 					</Toolbar>
 			}
 		</AppBar>
-		{(auth.user === "GUEST_STUDENT" || auth.user === "GUEST_TEACHER") && <AppBar className={classes.logoutButtonBar} position="static">
+		{(auth.user === AppUserRole.GUEST_STUDENT || auth.user === AppUserRole.GUEST_TEACHER) && <AppBar className={classes.logoutButtonBar} position="static">
 			{
 				<Toolbar className={classes.logoutButtonToolbar}>
 					<h2 className={classes.guestUserHeading} >Guest User</h2>
@@ -205,7 +217,7 @@ const StudentHeader: React.FC<SP> = ({ goBack, push, auth, lesson_meta, client_i
 						variant="text"
 						disableRipple
 						className={classes.logoutBtn}
-						onClick={guestLogout}>
+						onClick={guestUserLogout}>
 						LOGOUT
 					</Button>
 				</Toolbar>

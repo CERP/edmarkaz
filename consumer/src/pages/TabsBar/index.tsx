@@ -17,6 +17,7 @@ import StudentPortalOptions from "../Library/options";
 import Layout from "../../components/Layout";
 import { Paper, Tabs, Tab } from "@material-ui/core";
 import StudentProfile from "../StudentPortal/studentProfile";
+import TeacherProfile from 'pages/TeacherPortal/Profile'
 import HelpFooter from "components/Footer/HelpFooter";
 
 import "./style.css";
@@ -137,6 +138,7 @@ class TabsBar extends Component<propTypes, S> {
 					<TrackedRoute exact path="/library/:medium/:grade/:subject" component={Library} />
 					<TrackedRoute exact path="/library/:medium/:grade/:subject/:chapter/:chapter_name" component={LessonPage} />
 					<TrackedRoute exact path="/student-profile" component={StudentProfile} />
+					<TrackedRoute exact path="/teacher-profile" component={TeacherProfile} />
 					<TrackedRoute exact path="/dashboard" component={SchoolDashboard} />
 				</>
 

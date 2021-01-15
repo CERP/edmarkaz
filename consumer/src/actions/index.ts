@@ -1,6 +1,8 @@
 import Syncr from '@cerp/syncr'
 import { v4 } from 'uuid';
 import { createLoginSucceed, analyticsEvent, submitError } from './core';
+import { TeacherActionTypes } from 'constants/index';
+import { AppUserRole } from 'constants/app';
 
 type Dispatch = (action: any) => any
 type GetState = () => RootReducerState
@@ -520,6 +522,7 @@ export const loadProfile = (number: string) => (dispatch: Dispatch, getState: Ge
 
 }
 
+
 export const SIGN_UP = "SIGN_UP"
 export const signUp = (number: string, password: string, profile: Partial<CERPSchool>) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 
@@ -558,6 +561,138 @@ export const signUp = (number: string, password: string, profile: Partial<CERPSc
 			// dispatch sign-up failed (phone number not unique?)
 		})
 
+}
+
+export const teacherLogin = (phone: string, password: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+
+	const state = getState()
+
+	dispatch({
+		type: TeacherActionTypes.LOGIN
+	})
+
+	syncr.send({
+		type: TeacherActionTypes.LOGIN,
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		payload: {
+			id: phone,
+			password
+		}
+	})
+		.then((res: { token: string, teacher_profile: TeacherProfile }) => {
+
+			const { token, teacher_profile } = res
+
+			dispatch({
+				type: TeacherActionTypes.LOGIN_SUCCEED,
+				payload: {
+					id: phone,
+					user: AppUserRole.TEACHER,
+					token,
+					profile: teacher_profile
+				}
+			})
+
+		})
+		.catch(err => {
+			console.error(err)
+
+			alert(err)
+
+			dispatch({
+				type: TeacherActionTypes.LOGIN_FAILURE
+			})
+		})
+
+}
+
+export const teacherSignup = (phone: string, password: string, profile: Partial<TeacherProfile>) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+
+	const state = getState()
+
+	dispatch({
+		type: TeacherActionTypes.SIGNUP
+	})
+
+	syncr.send({
+		type: TeacherActionTypes.SIGNUP,
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		payload: {
+			id: phone,
+			password,
+			profile
+		}
+	})
+		.then((res: { token: string }) => {
+
+			const { token } = res
+
+			dispatch({
+				type: TeacherActionTypes.SIGNUP_SUCCEED,
+				payload: {
+					id: phone,
+					user: AppUserRole.TEACHER,
+					token,
+					profile
+				}
+			})
+
+		})
+		.catch(err => {
+			console.error(err)
+
+			alert(err)
+
+			dispatch({
+				type: TeacherActionTypes.SIGNUP_FAILURE
+			})
+		})
+
+}
+
+export const teacherUpdateProfile = (profile: Partial<TeacherProfile>) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+
+	const state = getState()
+
+	dispatch({
+		type: TeacherActionTypes.UPDATE_PROFILE,
+	})
+
+	syncr.send({
+		type: TeacherActionTypes.UPDATE_PROFILE,
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		id: state.auth.id,
+		payload: {
+			id: state.auth.id,
+			value: profile
+		}
+	})
+		.then(resp => {
+
+			console.log(resp)
+
+			dispatch({
+				type: TeacherActionTypes.UPDATE_PROFILE_SUCCEED,
+				payload: profile
+			})
+
+		})
+		.catch(err => {
+			console.error(err)
+			dispatch({
+				type: TeacherActionTypes.UPDATE_PROFILE_FAILURE
+			})
+		})
+
+}
+
+export const teacherLogout = () => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+	dispatch({
+		type: TeacherActionTypes.LOGOUT,
+	})
 }
 
 export const placeOrder = (product: Product) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
@@ -690,5 +825,32 @@ export const fetchAnalyticsEvents = () => (dispatch: Dispatch, getState: () => R
 		.catch(err => {
 			console.log("Unable to fetch events")
 			dispatch(getAnalyticsEventsFailure())
+		})
+}
+
+export const fetchTeacherVideosAssessments = () => (dispatch: Dispatch, getState: () => RootReducerState, syncr: Syncr) => {
+
+	if (!syncr.ready) {
+		syncr.onNext("connect", () => dispatch(fetchTeacherVideosAssessments()))
+		return
+	}
+
+	const state = getState()
+
+	syncr.send({
+		type: TeacherActionTypes.VIDEOS_ASSESSMENTS,
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		payload: {}
+	})
+		.then(resp => {
+			dispatch({
+				type: TeacherActionTypes.VIDEOS_ASSESSMENTS_SUCCESS,
+				payload: resp
+			})
+		})
+		.catch(err => {
+			console.log("teacher video assessments", err)
+			dispatch({ type: TeacherActionTypes.VIDEOS_ASSESSMENTS_FAILURE })
 		})
 }

@@ -1,7 +1,8 @@
 create table auth
 (
 	id text unique not null,
-	password text not null
+	password text not null,
+	type text
 );
 
 create table tokens
@@ -151,5 +152,29 @@ create table platform_writes
 		feedback jsonb,
 		date timestamp default current_timestamp
 	);
-		-- chapter_id text not null,
-		-- lesson_id text not null,
+
+	create table teachers
+	(
+		id text not null, -- id (teacher phone)
+		path text not null, -- comma separated
+		value jsonb not null,
+		time bigint not null,
+		date timestamp default current_timestamp,
+		UNIQUE (id, path)
+	);
+
+	create index on teaches
+	(teacher_id);
+
+	create table teacher_assessments(
+		id text unique not null,
+		meta jsonb,
+		questions jsonb,
+		date timestamp default current_timestamp
+	);
+
+	create table tp_videos(
+		id text unique not null,
+		meta jsonb,
+		date timestamp default current_timestamp
+	);

@@ -1,4 +1,5 @@
 import Dynamic from '@ironbay/dynamic'
+import { AnyAction } from 'redux'
 
 import { MERGES, MergeAction, ON_CONNECT, ON_DISCONNECT, DELETES, DeletesAction, QUEUE, CONFIRM_SYNC_DIFF, ConfirmSyncAction, SnapshotDiffAction, SNAPSHOT_DIFF, LOGIN_SUCCEED, LoginSucceed, ConfirmAnalyticsSync, QueueAction } from '../actions/core'
 import {
@@ -13,7 +14,7 @@ import {
 	GET_ANALYTICS_EVENTS_FAILURE
 } from '../actions'
 
-import { AnyAction } from 'redux';
+import { TeacherActionTypes } from 'constants/index'
 
 const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerState => {
 
@@ -415,6 +416,87 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 						token: login_action.token,
 						user: login_action.user,
 						loading: false
+					}
+				}
+			}
+
+		case TeacherActionTypes.LOGIN:
+		case TeacherActionTypes.SIGNUP:
+			{
+				return {
+					...state,
+					auth: {
+						...state.auth,
+						loading: true
+					}
+				}
+			}
+
+		case TeacherActionTypes.LOGIN_SUCCEED:
+		case TeacherActionTypes.SIGNUP_SUCCEED:
+			{
+				const { profile, ...rest } = action.payload
+
+				return {
+					...state,
+					teacher_portal: {
+						...state.teacher_portal,
+						profile
+					},
+					auth: {
+						...state.auth,
+						...rest,
+						loading: false
+					}
+				}
+			}
+
+		case TeacherActionTypes.UPDATE_PROFILE_SUCCEED:
+			{
+
+				const flattened_update_profile = Dynamic.flatten(action.payload)
+
+				const { profile } = state.teacher_portal
+
+				const updated_profile = flattened_update_profile.reduce((agg, { path, value }) => Dynamic.put(agg, path, value), profile)
+
+				return {
+					...state,
+					teacher_portal: {
+						...state.teacher_portal,
+						profile: updated_profile
+					}
+				}
+			}
+
+		case TeacherActionTypes.LOGOUT:
+			{
+				return {
+					...state,
+					auth: {
+						...state.auth,
+						id: undefined,
+						user: undefined,
+						token: undefined
+					},
+					teacher_portal: {
+						...state.teacher_portal,
+						profile: {}
+					}
+
+				}
+			}
+
+		case TeacherActionTypes.VIDEOS_ASSESSMENTS_SUCCESS:
+			{
+				const { assessments, videos } = action.payload
+
+				return {
+					...state,
+					teacher_portal: {
+						...state.teacher_portal,
+						assessments,
+						videos
 					}
 				}
 			}

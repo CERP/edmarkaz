@@ -880,6 +880,125 @@ defmodule EdMarkaz.ActionHandler.Consumer do
 
 	end
 
+	def handle_action(
+		%{
+			"type" => "TEACHER_LOGIN",
+			"payload" => %{
+				"id" => id,
+				"password" => password
+			},
+			"client_id" => client_id
+		}, state) do
+
+		case EdMarkaz.Auth.login({id, client_id, password}) do
+			{:ok, token} ->
+				case EdMarkaz.TeacherPortal.get_profile(id) do
+					{:ok, profile} ->
+						{:reply, succeed(%{token: token, teacher_profile: profile}), state}
+					{:error, msg} ->
+						{:reply, fail(msg), %{}}
+				end
+			{:error, msg} ->
+				{:reply, fail(msg), %{}}
+		end
+	end
+
+	def handle_action(
+		%{
+			"type" => "TEACHER_SIGNUP",
+			"payload" => %{
+				"id" => phone,
+				"password" => password,
+				"profile" => profile
+			},
+			"client_id" => client_id
+		}, state) do
+
+		name = Map.get(profile, "name", "")
+
+		case EdMarkaz.Auth.create({ phone, password, "teacher" }) do
+			{:ok, text} ->
+
+				{:ok, resp} = EdMarkaz.TeacherPortal.save_profile({phone, profile})
+
+				{:ok, token} = EdMarkaz.Auth.login({phone, client_id, password})
+
+				spawn fn ->
+					EdMarkaz.Slack.send_alert("New Teacher portal Signup.\n Name: #{name} \n Phone: #{phone}", "#platform-dev")
+				end
+
+				spawn fn ->
+					res = EdMarkaz.Telenor.send_sms(
+						phone,
+						"Welcome #{name} to Ilm Exchange. Please visit https://ilmexchange.com/teacher-login to login into teacher portal."
+					)
+					IO.inspect res
+				end
+
+				spawn fn ->
+					time = :os.system_time(:millisecond)
+					case Sarkar.Analytics.Consumer.record(
+						client_id,
+						%{ "#{UUID.uuid4}" => %{
+								"type" => "TEACHER_SIGNUP",
+								"meta" => %{
+									"number" => phone,
+									"ref_code" => ""
+								},
+								"time" => time
+							}
+						},
+						time
+					) do
+						%{"type" => "CONFIRM_ANALYTICS_SYNC", "time" => _} ->
+							IO.puts "SIGNUP ANALYTICS SUCCESS"
+						%{"type" => "ANALYTICS_SYNC_FAILED"} ->
+							IO.puts "SIGNUP ANALYTICS FAILED"
+					end
+				end
+
+				{:reply, succeed(%{token: token}), state}
+
+			{:error, msg} ->
+				{:reply, fail(msg), state}
+		end
+	end
+
+
+	def handle_action(
+		%{
+			"type" => "TEACHER_PORTAL_VIDEOS_ASSESSMENTS",
+			"payload" => payload,
+			"client_id" => client_id
+		}, state) do
+
+		{:ok, tp_assessments} = EdMarkaz.TeacherPortal.get_assessments()
+		{:ok, tp_videos} = EdMarkaz.TeacherPortal.get_videos()
+
+		response = %{assessments: tp_assessments, videos: tp_videos}
+
+		{:reply, succeed(response), state}
+	end
+
+	def handle_action(
+		%{
+			"type" => "TEACHER_UPDATE_PROFILE",
+			"payload" => %{
+				"id" => teacher_id,
+				"value" => value
+			},
+			"client_id" => client_id
+		}, %{client_id: client, id: id} = state) do
+
+		case EdMarkaz.TeacherPortal.save_profile({teacher_id, value}) do
+			{:ok, _} ->
+				response = %{message: "profile updated successfully"}
+				{:reply, succeed(response), state}
+			{:error, err} ->
+				response = %{message: "db error while updating profile", error: err}
+				{:reply, fail(response), state}
+		end
+	end
 
 
 	#old sync

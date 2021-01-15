@@ -62,8 +62,42 @@ interface Lesson {
 		module_id?: string
 	}
 }
+
+interface TeacherProfile {
+	name: string
+	phone: string
+	school_name: string
+	gender?: "M" | "F"
+	attempted_assessments?: {
+		[id]: TeacherAttemptedAssessment
+	}
+}
+
+interface TeacherAttemptedAssessment {
+	questions: AttemptedAssessment
+}
+
+interface TeacherPortalVideo {
+	assessment_id: string
+	title: string
+	title_urdu: string
+	description: string
+	description_urdu: string
+	link: string
+	order: number
+}
+
 interface RootReducerState {
 	sync_state: SyncState;
+	teacher_portal: {
+		profile: Partial<TeacherProfile>
+		assessments: {
+			[id: string]: ILMXAssessment
+		}
+		videos: {
+			[id: string]: TeacherPortalVideo
+		}
+	},
 	auth: {
 		id?: string;
 		token?: string;
@@ -464,4 +498,10 @@ type OrderRequestForm = {
 type ProductOrderAsVisitor = {
 	product: Product
 	request: OrderRequestForm
+}
+
+type AttemptedAssessment = {
+	[qid: string]: {
+		correct: boolean
+	}
 }
