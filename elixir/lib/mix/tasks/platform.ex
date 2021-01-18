@@ -116,6 +116,8 @@ defmodule Mix.Tasks.Platform do
 			ans_map = %{ 1 => "A", 2 => "B", 3 => "C", 4 => "D" }
 			options = %{ 1 => opt_a, 2 => opt_b, 3 => opt_c, 4 => opt_d }
 
+			assessment_key = video_id <> "-" <> assessment_id
+
 			answers = Enum.reduce(1..4, %{}, fn x, acc ->
 				is_correct = Map.get(ans_map, x) == correct_answer
 				answer = %{
@@ -130,7 +132,7 @@ defmodule Mix.Tasks.Platform do
 				Map.put(acc, Integer.to_string(x), answer)
 				end)
 
-			if Map.has_key?(agg, video_id) do
+			if Map.has_key?(agg, assessment_key) do
 				question = %{
 					"order" => String.trim(question_id),
 					"id" =>  String.trim(question_id),
@@ -144,7 +146,7 @@ defmodule Mix.Tasks.Platform do
 					"active" => true,
 					"answers" => answers
 				}
-				Dynamic.put(agg, [video_id, "questions", question_id], question)
+				Dynamic.put(agg, [assessment_key, "questions", question_id], question)
 			else
 				assessment = %{
 					"meta" => %{
@@ -155,8 +157,8 @@ defmodule Mix.Tasks.Platform do
 						"lesson_id" => "",
 						"type" => "MCQs",
 						"title" => "",
-						"id" => String.trim(video_id),
-						"order" => String.trim(video_id),
+						"id" => String.trim(assessment_key),
+						"order" => "",
 						"time" => 0,
 						"total_marks" => 0,
 						"active" => true,
@@ -178,7 +180,7 @@ defmodule Mix.Tasks.Platform do
 						}
 					}
 				}
-				Map.put(agg, video_id, assessment)
+				Map.put(agg, assessment_key, assessment)
 			end
 		end)
 
@@ -199,8 +201,10 @@ defmodule Mix.Tasks.Platform do
 		reduced_videos = videos
 		|> Enum.reduce(%{}, fn([video_id, assessment_id, title, title_urdu, description, description_urdu, link, order]), agg ->
 
+			assessment_key = video_id <> "-" <> assessment_id
+
 			meta = %{
-					"assessment_id" => video_id,
+					"assessment_id" => assessment_key,
 					"title" => title,
 					"title_urdu" => title_urdu,
 					"description" => description,
