@@ -245,6 +245,9 @@ defmodule EdMarkaz.Server.Analytics do
 		|> send_resp(200, csv)
 	end
 
+	@doc """
+		Endpoint returns CSV containing mis_id, no.of students and teachers for each school and ilmx_id if exists
+	"""
 
 	match "/mis-quick-stats.csv" do
 
@@ -257,17 +260,11 @@ defmodule EdMarkaz.Server.Analytics do
 				mapper.ilmx_id
 			FROM (
 				SELECT
-					school.school_id as mis_id,
-					school.students,
-					school.faculty
-				FROM (
-						SELECT
-							school_id,
-							count(CASE WHEN fs.path LIKE 'students,%,Name' THEN fs.path END) as students,
-							count(CASE WHEN fs.path LIKE 'faculty,%,Name' THEN fs.path END) as faculty
-						FROM flattened_schools fs
-						GROUP BY school_id
-					) as school
+					school_id as mis_id,
+					count(CASE WHEN fs.path LIKE 'students,%,Name' THEN fs.path END) as students,
+					count(CASE WHEN fs.path LIKE 'faculty,%,Name' THEN fs.path END) as faculty
+				FROM flattened_schools fs
+				GROUP BY school_id
 			) as mis
 			LEFT JOIN ilmx_to_mis_mapper mapper
 			ON mis.mis_id = mapper.mis_id",
