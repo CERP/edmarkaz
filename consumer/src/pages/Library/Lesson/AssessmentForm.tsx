@@ -80,7 +80,7 @@ const AssessmentForm: React.FC<Props> = ({ assessment, quit, submitAssessment })
 				Object.entries((assessment && assessment.questions) || {})
 					.map(([qid, qs]) => {
 						return <Paper elevation={2} key={qid} style={submitted && responses[qid] === undefined ? { margin: "5px", padding: "20px", border: "1px solid red" } : { margin: "5px", padding: "20px" }}>
-							<div className="qs-row">
+							<div className="qs-row" style={{ alignItems: qs.title_urdu ? 'flex-end' : 'flex-start' }}>
 								<Typography
 									variant="h6"
 									color="textPrimary"

@@ -85,7 +85,6 @@ const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile
 	const [activeStep, setActiveStep] = useState(0)
 	const [showAssessmentModal, setAssessmentModal] = useState(false)
 	const [assessmentId, setAssessmentId] = useState('')
-	const [videoId, setVideoId] = useState('')
 
 	const flattened_videos = useMemo(() => (Object.entries(videos)), [videos])
 
@@ -95,16 +94,15 @@ const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile
 		}
 	}, [videos, assessments, fetchTeacherPortalData])
 
-	const handleTakeAssessment = (videoId: string, assessmentId: string) => {
+	const handleTakeAssessment = (assessmentId: string) => {
 		setAssessmentModal(true)
 		setAssessmentId(assessmentId)
-		setVideoId(videoId)
 	}
 
 	const handleQuitAssessment = () => {
 		setAssessmentModal(false)
 		setAssessmentId('')
-		setVideoId('')
+		// setVideoId('')
 	}
 
 	const handleNext = useCallback(() => {
@@ -123,7 +121,7 @@ const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile
 
 		const teacherProfile: Partial<TeacherProfile> = {
 			attempted_assessments: {
-				[`${videoId}-${assessmentId}`]: {
+				[assessmentId]: {
 					questions: attemptedAssessment
 				}
 			}
@@ -152,7 +150,7 @@ const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile
 						<Typography variant="h4" align="center" style={{ marginTop: 10, fontFamily: "futura" }} color="primary">Teacher Training Course</Typography>
 					</div>
 
-					{Object.keys(videos).length === 0 ? <div>Loading, Please wait...</div>
+					{Object.keys(videos).length === 0 || Object.keys(assessments).length === 0 ? <div>Loading, Please wait...</div>
 						: <>
 
 							{
@@ -188,7 +186,7 @@ const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile
 									flattened_videos
 										.sort(([, a], [, b]) => a.order - b.order)
 										.map(([id, value], index) => (<Step key={id + index}>
-											<StepButton onClick={handleStep(index)} completed={checkAssessmentTaken(id, value.assessment_id, profile)}>
+											<StepButton onClick={handleStep(index)} completed={checkAssessmentTaken(value.assessment_id, profile)}>
 												<Typography
 													color="primary"
 													className={activeStep === index ? classes.stepLabelActive : classes.stepLabel}>
@@ -216,13 +214,13 @@ const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile
 															{activeStep === flattened_videos.length - 1 ? 'Feedback' : 'Next'}
 														</Button>
 														<Button
-															disabled={checkAssessmentTaken(id, value.assessment_id, profile)}
+															disabled={checkAssessmentTaken(value.assessment_id, profile)}
 															variant="contained"
 															color="secondary"
 															className={classes.button}
-															onClick={() => auth.token && auth.user === AppUserRole.TEACHER ?  handleTakeAssessment(id, value.assessment_id) : window.alert('Please login as Teacher to continue')}
+															onClick={() => auth.token && auth.user === AppUserRole.TEACHER ?  handleTakeAssessment(value.assessment_id) : window.alert('Please login as Teacher to continue')}
 														>
-															{checkAssessmentTaken(id, value.assessment_id, profile) ? 'Assessment Taken' : 'Take Assessment'}
+															{checkAssessmentTaken(value.assessment_id, profile) ? 'Assessment Taken' : 'Take Assessment'}
 														</Button>
 													</div>
 												</div>
@@ -294,10 +292,9 @@ const VideoCard: React.FC<CardProps> = ({ video }) => {
 	)
 }
 
-const checkAssessmentTaken = (videoId: string, assessmentId: string, profile: Partial<TeacherProfile>): boolean => {
+const checkAssessmentTaken = (assessmentId: string, profile: Partial<TeacherProfile>): boolean => {
 
-	const assessment_key = videoId + "-" + assessmentId
 	const { attempted_assessments } = profile
 	// @ts-ignore
-	return attempted_assessments ? Boolean(attempted_assessments[assessment_key]) : false
+	return attempted_assessments ? Boolean(attempted_assessments[assessmentId]) : false
 }

@@ -130,7 +130,7 @@ defmodule Mix.Tasks.Platform do
 				Map.put(acc, Integer.to_string(x), answer)
 				end)
 
-			if Map.has_key?(agg, assessment_id) do
+			if Map.has_key?(agg, video_id) do
 				question = %{
 					"order" => String.trim(question_id),
 					"id" =>  String.trim(question_id),
@@ -144,7 +144,7 @@ defmodule Mix.Tasks.Platform do
 					"active" => true,
 					"answers" => answers
 				}
-				Dynamic.put(agg, [assessment_id, "questions", question_id], question)
+				Dynamic.put(agg, [video_id, "questions", question_id], question)
 			else
 				assessment = %{
 					"meta" => %{
@@ -155,8 +155,8 @@ defmodule Mix.Tasks.Platform do
 						"lesson_id" => "",
 						"type" => "MCQs",
 						"title" => "",
-						"id" => String.trim(assessment_id),
-						"order" => String.trim(assessment_id),
+						"id" => String.trim(video_id),
+						"order" => String.trim(video_id),
 						"time" => 0,
 						"total_marks" => 0,
 						"active" => true,
@@ -178,7 +178,7 @@ defmodule Mix.Tasks.Platform do
 						}
 					}
 				}
-				Map.put(agg, assessment_id, assessment)
+				Map.put(agg, video_id, assessment)
 			end
 		end)
 
@@ -200,7 +200,7 @@ defmodule Mix.Tasks.Platform do
 		|> Enum.reduce(%{}, fn([video_id, assessment_id, title, title_urdu, description, description_urdu, link, order]), agg ->
 
 			meta = %{
-					"assessment_id" => assessment_id,
+					"assessment_id" => video_id,
 					"title" => title,
 					"title_urdu" => title_urdu,
 					"description" => description,

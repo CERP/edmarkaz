@@ -73,7 +73,7 @@ const TeacherProfile: React.FC<P> = ({ teacher_portal, auth, logout }) => {
 							Object.entries(videos)
 								.sort(([, a], [, b]) => a.order - b.order)
 								.map(([id, value], index) => (<Step key={id + index} style={{ paddingTop: '4px', paddingBottom: '8px' }}>
-									<StepButton completed={checkAssessmentTaken(id, value.assessment_id, profile)}>
+									<StepButton completed={checkAssessmentTaken(value.assessment_id, profile)}>
 										{value.title}
 									</StepButton>
 								</Step>))
@@ -98,10 +98,9 @@ export default connect((state: RootReducerState) => ({
 	updateProfile: (profile: Partial<TeacherProfile>) => dispatch(teacherUpdateProfile(profile))
 }))(TeacherProfile)
 
-const checkAssessmentTaken = (videoId: string, assessmentId: string, profile: Partial<TeacherProfile>): boolean => {
+const checkAssessmentTaken = (assessmentId: string, profile: Partial<TeacherProfile>): boolean => {
 
-	const assessment_key = videoId + "-" + assessmentId
 	const { attempted_assessments } = profile
 	// @ts-ignore
-	return attempted_assessments ? Boolean(attempted_assessments[assessment_key]) : false
+	return attempted_assessments ? Boolean(attempted_assessments[assessmentId]) : false
 }
