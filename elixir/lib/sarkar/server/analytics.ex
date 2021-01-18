@@ -13,9 +13,13 @@ defmodule EdMarkaz.Server.Analytics do
 
 	end
 
+	@doc """
+		Endpoint returns a CSV containing faculty member id, and all of their permissions for each school (new way of handling faculty permissions).
+	"""
+
 	match "/faculty-permissions.csv" do
 
-		{:ok, resp} = case EdMarkaz.DB.Postgres.query(
+		{:ok, resp} = EdMarkaz.DB.Postgres.query(
 				EdMarkaz.DB,
 				"SELECT
 					school_id,
@@ -27,10 +31,7 @@ defmodule EdMarkaz.Server.Analytics do
 					path like 'faculty,%,permissions,%'
 				ORDER BY school_id",
 				[]
-			) do
-				{:ok, resp} -> {:ok, resp}
-				{:error, err} -> {:error, err}
-			end
+			)
 
 
 		merge_permissions = resp.rows
@@ -51,11 +52,11 @@ defmodule EdMarkaz.Server.Analytics do
 
 						#  make sure permission should be sorted by key alphabetically
 
-						values = Map.to_list(permissions)
-							|> Enum.sort(fn({k1,_}, {k2, _}) -> k1 <= k2 end)
-							|> Enum.map(fn({_, v}) -> v end)
+						expected_permissions = ["dailyStats", "expense", "family", "fee", "prospective", "setupPage"]
 
-						single_teacher = [school_id, teacher_id] ++ values
+						values = Enum.map(expected_permissions, fn(p) -> Map.get(permissions, p, "FALSE") end)
+
+						single_teacher = [school_id, teacher_id | values]
 
 						# [[], [], [],...] ++ [[]]
 
@@ -92,9 +93,13 @@ defmodule EdMarkaz.Server.Analytics do
 
 	end
 
+	@doc """
+		Endpoint returns a CSV containing each school id, all of faculty permissions from settings (old way of handling faculty permissions)
+	"""
+
 	match "/faculty-permissions-old.csv" do
 
-		{:ok, resp} = case EdMarkaz.DB.Postgres.query(
+		{:ok, resp} = EdMarkaz.DB.Postgres.query(
 				EdMarkaz.DB,
 				"SELECT
 					school_id,
@@ -106,10 +111,7 @@ defmodule EdMarkaz.Server.Analytics do
 					path like 'settings,permissions,%,teacher'
 				ORDER BY school_id",
 				[]
-			) do
-				{:ok, resp} -> {:ok, resp}
-				{:error, err} -> {:error, err}
-			end
+			)
 
 
 		merge_permissions = resp.rows
@@ -125,11 +127,11 @@ defmodule EdMarkaz.Server.Analytics do
 
 				#  make sure permission should be sorted by key alphabetically
 
-				values = Map.to_list(permissions)
-					|> Enum.sort(fn({k1,_}, {k2, _}) -> k1 <= k2 end)
-					|> Enum.map(fn({_, v}) -> v end)
+				expected_permissions = ["dailyStats", "expense", "family", "fee", "prospective", "setupPage"]
 
-				school_permissions = [school_id] ++ values
+				values = Enum.map(expected_permissions, fn(p) -> Map.get(permissions, p, "FALSE") end)
+
+				school_permissions = [school_id | values]
 
 				# [[],[],[],...] ++ [[]]
 
