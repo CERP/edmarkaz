@@ -245,6 +245,54 @@ defmodule EdMarkaz.Server.Analytics do
 		|> send_resp(200, csv)
 	end
 
+	@doc """
+		Endpoint returns CSV containing mis_id, no.of students and teachers for each school and ilmx_id if exists
+	"""
+
+	match "/mis-quick-stats.csv" do
+
+		{:ok, csv_data} = case EdMarkaz.DB.Postgres.query(
+			EdMarkaz.DB,
+			"SELECT
+				mis.mis_id,
+				mis.students,
+				mis.faculty,
+				mapper.ilmx_id
+			FROM (
+				SELECT
+					school_id as mis_id,
+					count(CASE WHEN fs.path LIKE 'students,%,Name' THEN fs.path END) as students,
+					count(CASE WHEN fs.path LIKE 'faculty,%,Name' THEN fs.path END) as faculty
+				FROM flattened_schools fs
+				GROUP BY school_id
+			) as mis
+			LEFT JOIN ilmx_to_mis_mapper mapper
+			ON mis.mis_id = mapper.mis_id",
+			[]
+		) do
+			{:ok, resp} -> {:ok, resp.rows}
+			{:error, err} -> {:error, err}
+		end
+
+		csv = [
+			[
+				"mis_id",
+				"students",
+				"faculty",
+				"ilmx_id"
+			] |
+			csv_data
+		]
+		|> CSV.encode()
+		|> Enum.join()
+
+		conn
+		|> put_resp_header("content-type", "text/csv")
+		|> put_resp_header("cache-control", "no-cache")
+		|> send_resp(200, csv)
+
+	end
+
 	match "/consumer-analytics.csv" do
 		{:ok, data} = case EdMarkaz.DB.Postgres.query(
 			EdMarkaz.DB,
