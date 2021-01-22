@@ -89,10 +89,8 @@ const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile
 	const flattened_videos = useMemo(() => (Object.entries(videos)), [videos])
 
 	useEffect(() => {
-		if (Object.keys(videos).length === 0 || Object.keys(assessments).length === 0) {
-			fetchTeacherPortalData()
-		}
-	}, [videos, assessments, fetchTeacherPortalData])
+		fetchTeacherPortalData()
+	}, [fetchTeacherPortalData])
 
 	const handleTakeAssessment = (assessmentId: string) => {
 		setAssessmentModal(true)
@@ -102,7 +100,6 @@ const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile
 	const handleQuitAssessment = () => {
 		setAssessmentModal(false)
 		setAssessmentId('')
-		// setVideoId('')
 	}
 
 	const handleNext = useCallback(() => {
@@ -280,7 +277,6 @@ const VideoCard: React.FC<CardProps> = ({ video }) => {
 						rel: 0,
 						showinfo: 0,
 						autoplay: 0,
-						controls: 0,
 					}
 
 				}} />

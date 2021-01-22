@@ -78,6 +78,7 @@ const AssessmentForm: React.FC<Props> = ({ assessment, quit, submitAssessment })
 		<div style={{ overflow: "auto", height: "100%" }}>
 			{
 				Object.entries((assessment && assessment.questions) || {})
+					.filter(([qid, qs]) =>  qs.title_urdu || qs.title)
 					.map(([qid, qs]) => {
 						return <Paper elevation={2} key={qid} style={submitted && responses[qid] === undefined ? { margin: "5px", padding: "20px", border: "1px solid red" } : { margin: "5px", padding: "20px" }}>
 							<div className="qs-row" style={{ alignItems: qs.title_urdu ? 'flex-end' : 'flex-start' }}>
@@ -96,21 +97,23 @@ const AssessmentForm: React.FC<Props> = ({ assessment, quit, submitAssessment })
 
 							<RadioGroup value={responses[qid] || ""}>
 								{
-									Object.entries(qs.answers).map(([aid, ans]) => {
-										return <div className="ans-row" key={`${qid}-${aid}`} 	style={{direction: ans.urdu_answer ? 'rtl' : 'ltr'}}>
-											<FormControlLabel
-												className="ans-statement"
-												style={submitted && ans.correct_answer ? { border: "2px solid green" } : submitted && !ans.correct_answer && responses[qid] === aid ? { border: "2px solid red" } : {}}
-												onChange={() => chooseAnswer(qid, aid)}
-												value={aid}
-												control={<Radio />}
-												label={ans.answer || ans.urdu_answer}
-												disabled={submitted}
-											/>
-											{
-												ans.image !== "" && <img className="ans-img" src={ans.image} alt="ans-img" />
-											}
-										</div >
+									Object.entries(qs.answers)
+										.filter(([aid, ans]) =>  ans.answer || ans.urdu_answer)
+										.map(([aid, ans]) => {
+											return <div className="ans-row" key={`${qid}-${aid}`} 	style={{direction: ans.urdu_answer ? 'rtl' : 'ltr'}}>
+												<FormControlLabel
+													className="ans-statement"
+													style={submitted && ans.correct_answer ? { border: "2px solid green" } : submitted && !ans.correct_answer && responses[qid] === aid ? { border: "2px solid red" } : {}}
+													onChange={() => chooseAnswer(qid, aid)}
+													value={aid}
+													control={<Radio />}
+													label={ans.answer || ans.urdu_answer}
+													disabled={submitted}
+												/>
+												{
+													ans.image !== "" && <img className="ans-img" src={ans.image} alt="ans-img" />
+												}
+											</div >
 									})
 								}
 							</RadioGroup>
