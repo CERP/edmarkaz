@@ -33,7 +33,7 @@ defmodule Mix.Tasks.Platform do
 		end)
 
 		assessments_obj = assessments
-		|> Enum.reduce(%{}, fn([test_id, type, subject, grade, label, pdf_url]), agg ->
+		|> Enum.reduce(%{}, fn([test_id, type, subject, grade, label, pdf_url, answer_pdf_url]), agg ->
 
 			test = %{
 					"type" => type,
@@ -41,6 +41,7 @@ defmodule Mix.Tasks.Platform do
 					"grade" => grade,
 					"label" => label,
 					"pdf_url" => pdf_url,
+					"answer_pdf_url" => answer_pdf_url,
 					"questions" => Dynamic.get(diagnostic_test_obj, [test_id])
 				}
 				Dynamic.put(agg, [test_id], test)
@@ -85,18 +86,19 @@ defmodule Mix.Tasks.Platform do
 		|> Enum.map(fn row -> row end)
 
 		curriculum_obj = curriculum
-		|> Enum.reduce(%{}, fn([learning_level_id, subject, lesson_number, lesson_title, lesson_duration, lesson_link, material_links, activity_links, teaching_manual_link]), agg ->
+		|> Enum.reduce(%{}, fn([learning_level_id, subject, lesson_number, lesson_title, lesson_duration, lesson_link, material_names, material_links, activity_links, teaching_manual_link]), agg ->
 			learning_levels = %{
 				"subject" => subject,
 				"lesson_number" => lesson_number,
 				"lesson_title" => lesson_title,
 				"lesson_duration" => lesson_duration,
 				"lesson_link" => lesson_link,
+				"material_names" => material_names,
 				"material_links" => material_links,
 				"activity_links" => activity_links,
 				"teaching_manual_link" => teaching_manual_link
 			}
-			Dynamic.put(agg, [learning_level_id, lesson_number], learning_levels)
+			Dynamic.put(agg, [learning_level_id, subject, lesson_number], learning_levels)
 		end)
 
 		EdMarkaz.TargetedInstructions.insert_targeted_instruction_curriculum(["curriculum", curriculum_obj])

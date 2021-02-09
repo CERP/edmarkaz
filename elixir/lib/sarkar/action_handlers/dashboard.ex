@@ -130,7 +130,24 @@ defmodule Sarkar.ActionHandler.Dashboard do
 				%{ key => value }
 		end
 
-		{:reply, succeed(%{"trial_info" => trial_info, "student_info" => max_limit, "meta" => meta, "targeted_instruction" => targeted_instructions }), state}
+		{:ok, tip_pilot} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
+			"SELECT
+				value,
+				path
+			FROM flattened_schools
+			WHERE school_id=$1 AND path LIKE $2",
+			[school_id,"tip_pilot"]
+		)
+
+		tip_pilot = case length(tip_pilot.rows) do
+			0 ->
+				%{"tip_pilot" => false}
+			_ ->
+				[ [value, key] ] = tip_pilot.rows
+				%{ key => value }
+		end
+
+		{:reply, succeed(%{"trial_info" => trial_info, "student_info" => max_limit, "meta" => meta, "targeted_instruction" => targeted_instructions, "tip_pilot" => tip_pilot }), state}
 	end
 
 	def handle_action(
@@ -599,6 +616,22 @@ defmodule Sarkar.ActionHandler.Dashboard do
 	def handle_action(
 		%{
 			"type" => "TIP_ACCESS",
+			"payload" => %{
+				"school_id" => school_id,
+				"merges" => merges
+			}
+		},
+		state
+	) do
+
+		start_school_broadcast_changes(school_id, merges)
+
+		{:reply, succeed("Successful"), state }
+	end
+
+	def handle_action(
+		%{
+			"type" => "TIP_PILOT_ACCESS",
 			"payload" => %{
 				"school_id" => school_id,
 				"merges" => merges
