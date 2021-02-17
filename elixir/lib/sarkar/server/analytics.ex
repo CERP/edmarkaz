@@ -161,6 +161,71 @@ defmodule EdMarkaz.Server.Analytics do
 
 	end
 
+	@doc """
+		Endpoint returns a CSV containing teacher phone, name, gender, school_name and number of taken assessments
+	"""
+
+	match "/teacher-portal-stats.csv" do
+
+		{:ok, resp} = EdMarkaz.DB.Postgres.query(
+				EdMarkaz.DB,
+				"SELECT
+					id,
+					path,
+					value
+				FROM
+					teachers
+				ORDER BY id",
+				[]
+			)
+
+
+		inflate_teachers = resp.rows
+			|> Enum.reduce(%{}, fn([id, path, value], agg) ->
+
+				split_path = String.split(path, ",")
+
+				Dynamic.put(agg, [id] ++ split_path , value)
+			end)
+
+		csv_data = inflate_teachers
+			|> Enum.reduce([], fn({teacher_id, teacher}, agg) ->
+
+				attempted_assessments = Map.get(teacher, "attempted_assessments", %{}) |> Map.keys |> length
+
+				info_list = [
+					teacher["phone"],
+					teacher["name"],
+					teacher["gender"],
+					teacher["school_name"],
+					attempted_assessments
+				]
+
+				# [[],[],[],...] ++ [[]]
+				agg ++ [info_list]
+
+			end)
+
+		csv = [
+			[
+				"phone",
+				"name",
+				"gender",
+				"school",
+				"attempted_assessments"
+			] |
+			csv_data
+		]
+		|> CSV.encode()
+		|> Enum.join()
+
+		conn
+		|> put_resp_header("content-type", "text/csv")
+		|> put_resp_header("cache-control", "no-cache")
+		|> send_resp(200, csv)
+
+	end
+
 	match "/mis-usage.csv" do
 
 		{:ok, data} = case EdMarkaz.DB.Postgres.query(
