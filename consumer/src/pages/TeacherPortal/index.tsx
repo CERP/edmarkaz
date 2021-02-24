@@ -72,7 +72,14 @@ const useStyles = makeStyles((theme: Theme) => ({
 		width: '280px',
 		height: '100%'
 	},
-	videoCard: {}
+	videoCard: {},
+	completedAssessmentsAlert: {
+		textAlign: 'left',
+		margin: 10,
+		fontWeight: 'bold',
+		fontSize: 16,
+		color: 'var(--red)'
+	}
 }))
 
 
@@ -167,14 +174,14 @@ const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile
 								</>
 							}
 
-							<div style={{marginBottom: '15px', padding: 5}}>
+							<div style={{ marginBottom: '15px', padding: 5 }}>
 								<Typography variant="h5" style={{ fontFamily: "futura" }} color="primary">Teaching After COVID-19</Typography>
 								<Typography
 									style={{ fontFamily: "futura", marginBottom: '10px' }}
 									color="textSecondary"
 									variant="h5">Introduction</Typography>
 								<div className="">This training course has been very carefully tailored to aid teachers with knowledge regarding changes students may experience upon their return to 'physical' school during the time of Covid-19 like learning losses and disruption in their social emotional learning.
-									The course also equips teachers with appropriate riate and easy to implement strategies that can be used to navigate gaps and curate their lessons and activities in a manner that it restores the classroom environment.
+								The course also equips teachers with appropriate riate and easy to implement strategies that can be used to navigate gaps and curate their lessons and activities in a manner that it restores the classroom environment.
 								</div>
 							</div>
 
@@ -215,7 +222,7 @@ const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile
 															variant="contained"
 															color="secondary"
 															className={classes.button}
-															onClick={() => auth.token && auth.user === AppUserRole.TEACHER ?  handleTakeAssessment(value.assessment_id) : window.alert('Please login as Teacher to continue')}
+															onClick={() => auth.token && auth.user === AppUserRole.TEACHER ? handleTakeAssessment(value.assessment_id) : window.alert('Please login as Teacher to continue')}
 														>
 															{checkAssessmentTaken(value.assessment_id, profile) ? 'Assessment Taken' : 'Take Assessment'}
 														</Button>
@@ -224,6 +231,14 @@ const TeacherPortal: React.FC<P> = ({ auth, teacher_portal, updateTeacherProfile
 											</StepContent>
 										</Step>))}
 							</Stepper>
+							{
+								// this is make sure teacher taken last assessment
+								// TODO: update this logic
+								(auth.token && auth.user === AppUserRole.TEACHER &&
+									checkAssessmentTaken(flattened_videos[flattened_videos.length - 1][1].assessment_id, profile)) && (
+									<div className={classes.completedAssessmentsAlert}>Thank you for completing the assessments! If you would like a teacher training certificate, please complete the final assignment below.</div>
+								)
+							}
 							<div className="final-assessment">
 								<Typography style={{ fontFamily: "futura", marginBottom: '10px' }} color="textSecondary" align="center" variant="h4">Final Project Assignment</Typography>
 								<div className="heading">اہم ہدایت:</div>
@@ -267,7 +282,7 @@ const VideoCard: React.FC<CardProps> = ({ video }) => {
 	return (
 		<div className={classes.videoCard}>
 
-			<Typography variant="h6" color={"primary"} style={{direction: 'rtl'}}>{video.title_urdu}</Typography>
+			<Typography variant="h6" color={"primary"} style={{ direction: 'rtl' }}>{video.title_urdu}</Typography>
 
 			<Youtube
 				videoId={video.link}
