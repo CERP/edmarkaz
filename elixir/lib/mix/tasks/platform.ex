@@ -33,7 +33,7 @@ defmodule Mix.Tasks.Platform do
       # note that there may be a student with a blank id that we actually WANT to keep --
       # we should copy flattened state for students with "" id, give them a new id, and merge those in. then carefully delete student with blank id
 		mapped_writes = res.rows
-        |> Enum.filter( fn([_,_,path,_,_])-> if length(path)>2, do: Enum.at(path,2)!="", else: true end)
+        # |> Enum.filter( fn([_,_,path,_,_])-> if length(path)>2, do: Enum.at(path,2)!="", else: true end)
 		|> Enum.map(fn ([time, type, path, value, client_id]) ->
 			%{"date" => time, "type" => type, "path" => path, "value" => value, "client_id" => client_id}
 		end)
@@ -45,22 +45,22 @@ defmodule Mix.Tasks.Platform do
 		# new_state = res.rows
 		# |> Enum.reduce(%{}, fn([time, type, path, value, client_id], agg) ->
 
-		# # 	# case path |> Enum.member?("5f6d0983-3a46-4627-8303-82c8c47992f2") do
-		# # 		# true ->
-		# 			case type do
-		# 				"MERGE" ->
-		# 					# IO.inspect path
-		# 					# IO.inspect value
-		# 					Dynamic.put(agg, path, value)
-		# 				"DELETE" -> Dynamic.delete(agg, path)
-		# 				other ->
-		# 					# IO.inspect other
-		# 					agg
-		# 			end
-		# # 		# false ->
-		# # 			# agg
+			# case path |> Enum.member?("5f6d0983-3a46-4627-8303-82c8c47992f2") do
+			# 	true ->
+				# case type do
+				# 	"MERGE" ->
+				# 		# IO.inspect path
+				# 		# IO.inspect value
+				# 		Dynamic.put(agg, path, value)
+				# 	"DELETE" -> Dynamic.delete(agg, path)
+				# 	other ->
+				# 		# IO.inspect other
+				# 		agg
+				# end
+				# false ->
+				# 	agg
 
-		# 	# end
+			# end
 		# end)
 
         # IO.puts "-----NEW STATE------"
@@ -765,7 +765,7 @@ defmodule Mix.Tasks.Platform do
 
 		IO.puts "--- Inserting into writes ---"
 
-		chunk_size = round(length(writes) / 6)
+		chunk_size = round(length(writes) / 200)
 
 		chunks = Enum.chunk_every(writes, chunk_size)
 
@@ -773,6 +773,9 @@ defmodule Mix.Tasks.Platform do
 			save_writes(school_id, x)
 			IO.puts "NEXT CHUNK"
 		end)
+
+		IO.puts "--- Insertion DONE ---"
+
 	end
 
 	def save_writes(school_id, writes) do
@@ -780,7 +783,7 @@ defmodule Mix.Tasks.Platform do
 			|> Enum.map(fn %{"date" => date, "value" => value, "path" => path, "type" => type, "client_id" => client_id} ->
 				[school_id, path, value, date, type, client_id]
 			end)
-			|> Enum.reduce([], fn curr, agg -> Enum.concat(agg, curr) end)
+			|> Enum.reduce([], fn curr, agg -> Enum.concat(curr, agg) end)
 
 		gen_value_strings_writes = Stream.with_index(writes, 1)
 			|> Enum.map(fn {w, i} ->
@@ -801,7 +804,7 @@ defmodule Mix.Tasks.Platform do
 	end
 
 	defp save_flattened(school_id, writes) do
-		flattened_db = writes
+		temp = writes
 			|> Enum.reduce([], fn(%{"date" => date, "value" => value, "path" => path, "type" => type, "client_id" => client_id}, agg) ->
 
 				path = Enum.drop(path, 1)
@@ -809,19 +812,23 @@ defmodule Mix.Tasks.Platform do
 					flat_write = Dynamic.flatten(value)
 						|> Enum.map(fn {k, v} -> {Enum.join(path ++ k, ","), [type, school_id, path ++ k, v, date]} end)
 
-					Enum.concat(agg, flat_write)
+					Enum.concat(flat_write, agg)
 				else
 					[{Enum.join(path, ","), [type, school_id, path, value, date]} | agg]
 					# Enum.concat( agg, [[type, school_id, path, value, date]] )
 				end
 			end)
+
+		IO.puts "completed reduce step"
+
+		flattened_db = temp
 			|> Enum.sort( fn({_, [_, _, _, _, d1]}, {_, [_, _, _, _, d2]} ) -> d1 < d2 end)
 			|> Enum.into(%{})
 			|> Enum.sort(fn ({_, [_, _, _, _, d1]}, {_, [_, _, _, _, d2]} ) -> d1 < d2 end)
 			|> Enum.map(fn {_, v} -> v end)
 
 
-    #   IO.puts "----step1 flattened----"
+      IO.puts "----sorting done---"
 
     #   IO.inspect flattened_db, limit: :infinity
 
@@ -883,14 +890,18 @@ defmodule Mix.Tasks.Platform do
 
  		# IO.puts "-----DB SQUENCE------"
 
- 		# # now just generate the sql queries for each one of these segments
+ 		# now just generate the sql queries for each one of these segments
 
- 		chunk_size = 1000
+ 		chunk_size = 500
 
  		results = Postgrex.transaction(EdMarkaz.DB, fn(conn) ->
 
+			IO.puts "In Transaction step"
+
  			flattened_db_sequence
  			|> Enum.map(fn %{"type" => type, "mutations" => muts} ->
+
+				IO.puts "in muts chunked"
 
  				muts
  				|> Enum.chunk_every(chunk_size)
@@ -917,8 +928,8 @@ defmodule Mix.Tasks.Platform do
 							# IO.inspect arguments, limit: :infinity
 							res = EdMarkaz.DB.Postgres.query(conn, query_string, arguments)
 							IO.inspect res
-							{:ok, res2} = res
-							res2
+							# {:ok, res2} = res
+							# res2
 
  						"DELETE" ->
 
@@ -935,19 +946,19 @@ defmodule Mix.Tasks.Platform do
  								} end)
 
  							query_string = "DELETE FROM flattened_schools WHERE school_id = $1 and #{Enum.join(query_section, " OR ")}"
-							# IO.inspect query_string
-							# IO.inspect [school_id | arguments]
+							IO.inspect query_string
+							IO.inspect [school_id | arguments]
 							# {:ok, res} =
 							res = EdMarkaz.DB.Postgres.query(conn, query_string, [school_id | arguments])
 							IO.inspect res
-							{:ok, res2} = res
-							res2
+							# {:ok, res2} = res
+							# res2
 						_ ->
 
 					end
 				end)
 			end)
-		end, pool: DBConnection.Poolboy, timeout: 60_000*20)
+		end, pool: DBConnection.Poolboy, timeout: 60_000*80)
 
 		# IO.puts "-----QUERY TRANSACTION------"
 
