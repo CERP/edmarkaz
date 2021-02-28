@@ -30,7 +30,7 @@ defmodule EdMarkaz.Application do
 					types: EdMarkaz.PostgrexTypes,
 					pool: DBConnection.Poolboy,
 					pool_size: 10,
-					timeout: 60000
+					timeout: 60_000 * 20
 			},
 			:poolboy.child_spec(:image_worker, [
 				{:name, {:local, :image_worker}},

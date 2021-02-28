@@ -1,5 +1,5 @@
 defmodule EdMarkaz.DB.Postgres do
 	def query(db, querystring, params, opts \\ []) do
-		Postgrex.query(db, querystring, params, pool: DBConnection.Poolboy, timeout: 60000)
+		Postgrex.query(db, querystring, params, pool: DBConnection.Poolboy, timeout: 60_000 * 20)
 	end
 end

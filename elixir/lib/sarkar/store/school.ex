@@ -13,7 +13,7 @@ defmodule Sarkar.Store.School do
 			|> Enum.map(fn %{"date" => date, "value" => value, "path" => path, "type" => type, "client_id" => client_id} ->
 				[school_id, path, value, date, type, client_id]
 			end)
-			|> Enum.reduce([], fn curr, agg -> Enum.concat(agg, curr) end)
+			|> Enum.reduce([], fn curr, agg -> Enum.concat(curr, agg) end)
 
 		gen_value_strings_writes = Stream.with_index(Map.values(writes), 1)
 			|> Enum.map(fn {w, i} ->
@@ -42,7 +42,7 @@ defmodule Sarkar.Store.School do
 					flat_write = Dynamic.flatten(value)
 						|> Enum.map(fn {p, v} -> {Enum.join(path ++ p, ","), [type, school_id, path ++ p, v, date]} end)
 
-					Enum.concat(agg, flat_write)
+					Enum.concat(flat_write, agg)
 				else
 					[{Enum.join(path, ","), [type, school_id, path, value, date]} | agg]
 					# Enum.concat( agg, [[type, school_id, path, value, date]] )
