@@ -17,4 +17,8 @@ defmodule EdMarkaz.Router do
 		send_resp(conn, 200, "hello from plug")
 	end
 
+    match _ do 
+      send_resp(conn, 404, "page not found")
+    end
+
 end
