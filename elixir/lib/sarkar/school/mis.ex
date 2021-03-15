@@ -232,14 +232,11 @@ end
 			{db, writes, %{}, 0},
 			fn({path_key, payload}, {agg_db, agg_writes, agg_new_writes, max_date}) ->
 
-				%{
-					"action" => %{
-						"path" => path,
-						"type" => type,
-						"value" => value
-					},
-					"date" => date
-				} = payload
+                date = Map.get(payload, "date")
+                action = Map.get(payload, "action")
+                path = Map.get(action, "path")
+                type = Map.get(action, "type")
+                value = Map.get(action, "value", "")
 
 				[prefix | p ] = path
 
