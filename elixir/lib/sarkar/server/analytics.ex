@@ -957,6 +957,188 @@ defmodule EdMarkaz.Server.Analytics do
 		|> send_resp( 200, csv)
 	end
 
+	@doc """
+		Endpoint returns a CSV containing school id, student_id, student_name, roll #, class, test_id, total_score, obtained_score
+	"""
+
+	match "/TIP-results-data.csv" do
+
+		# Get TIP schools
+		{:ok, resp} = EdMarkaz.DB.Postgres.query(
+			EdMarkaz.DB,
+			"SELECT
+				school_id
+			FROM
+				flattened_schools
+			WHERE
+				path like 'targeted_instruction_access'
+				and school_id != 'cerp'",
+			[]
+		)
+
+		schools = resp.rows |> Enum.map(fn [id] -> id end)
+
+		# Start and Get the Database
+
+		schools_records = schools |> Enum.reduce([], fn (school_id, agg) ->
+
+
+			case start_school(school_id) do
+				{:ok, pid} ->
+					IO.puts "school started now"
+				_ ->
+					IO.puts	"school started already"
+			end
+
+			school_db = Sarkar.School.get_db(school_id)
+
+			# Get sections
+			school_sections = Map.get(school_db, "classes") |> sections
+
+			students_records = Map.get(school_db, "students")
+				|> Enum.reduce([], fn({std_id, std}, agg2) ->
+
+						results = Dynamic.get(std, ["targeted_instruction", "results"])
+
+						if(results != nil) do
+							student_tests = results
+							|> Enum.filter(fn x -> x != nil end)
+							|> calculate_res
+							|> Enum.map(fn (test) ->
+								# [] ++ test
+								[
+									school_id,
+									std_id,
+									Map.get(std, "Name"),
+									Map.get(std, "RollNumber"),
+									Map.get(school_sections, Map.get(std, "section_id"))
+								] ++ test
+
+							end)
+
+							# [[], [],[],[]] ++ [ student_tests ]
+
+							agg2 ++ student_tests
+						else
+							agg2
+						end
+					end)
+				#  [[], [], [], []...] ++ [[], [], [],[]...]
+				agg ++ students_records
+
+		end)
+
+		csv = [
+			[
+				"school_id",
+				"student_id",
+				"student_name",
+				"roll #",
+				"class",
+				"test_id",
+				"total_score",
+				"obtained_score"
+			] |
+			schools_records
+		]
+		|> CSV.encode()
+		|> Enum.join()
+
+		conn
+		|> put_resp_header("content-type", "text/csv")
+		|> put_resp_header("cache-control", "no-cache")
+		|> send_resp(200, csv)
+
+	end
+
+	@doc """
+		Endpoint returns a CSV containing school id, student_id, student_name, roll #, class, subject, grade
+	"""
+
+	match "/TIP-grades-data.csv" do
+
+		# Get TIP schools
+		{:ok, resp} = EdMarkaz.DB.Postgres.query(
+			EdMarkaz.DB,
+			"SELECT
+				school_id
+			FROM
+				flattened_schools
+			WHERE
+				path like 'targeted_instruction_access'",
+			[]
+		)
+
+		schools = resp.rows |> Enum.map(fn [id] -> id end)
+
+		# Start and Get the Database
+
+		schools_records = schools |> Enum.reduce([], fn (school_id, agg) ->
+
+			case start_school(school_id) do
+				{:ok, pid} ->
+					IO.puts "school started now"
+				_ ->
+					IO.puts	"school started already"
+			end
+
+			school_db = Sarkar.School.get_db(school_id)
+
+			# Get sections
+			school_sections = Map.get(school_db, "classes") |> sections
+			# traverse students
+			students_records = Map.get(school_db, "students")
+				|> Enum.reduce([], fn({std_id, std}, agg2) ->
+					# traverse learning levels
+						learning_levels = Dynamic.get(std, ["targeted_instruction", "learning_level"])
+
+						if(learning_levels != nil) do
+							student_tests = learning_levels
+							|> get_grades
+							|> Enum.map(fn (test) ->
+								[
+									school_id,
+									std_id,
+									Map.get(std, "Name"),
+									Map.get(std, "RollNumber"),
+									Map.get(school_sections, Map.get(std, "section_id"))
+								] ++ test
+
+							end)
+
+							# [[], [],[],[]] ++ [ student_tests ]
+
+							agg2 ++ student_tests
+						else
+							agg2
+						end
+					end)
+				#  [[], [], [], []...] ++ [[], [], [],[]...]
+				agg ++ students_records
+		end)
+
+		csv = [
+			[
+				"school_id",
+				"student_id",
+				"student_name",
+				"roll #",
+				"class",
+				"subject",
+				"grade"
+			] |
+			schools_records
+		]
+		|> CSV.encode()
+		|> Enum.join()
+
+		conn
+		|> put_resp_header("content-type", "text/csv")
+		|> put_resp_header("cache-control", "no-cache")
+		|> send_resp(200, csv)
+
+	end
+
 	match _ do
 		send_resp(conn, 404, "not found")
 	end
@@ -964,6 +1146,58 @@ defmodule EdMarkaz.Server.Analytics do
 	defp formatted_date (date) do
 		[ date | _ ] = date |> DateTime.to_string |> String.split(" ")
 		date
+	end
+
+	defp sections (classes) do
+		classes |> Enum.reduce(%{}, fn ({cid, class_info}, agg) ->
+			section = Map.get(class_info, "sections")
+				|> Enum.reduce(%{}, fn ({sid, sec_info}, agg2) ->
+						Dynamic.put(agg2, [sid], Map.get(class_info, "name"))
+					end)
+			Map.merge(agg, section)
+		end)
+	end
+
+	defp calculate_res (results) do
+
+		results
+			|> Enum.reduce([], fn({test_id, test}, agg) ->
+
+				total_marks = Map.get(test, "questions") |> Map.keys() |> length
+				obtained_marks = Map.get(test, "questions") |> Enum.reduce(0, fn({qid, question}, agg2) ->
+
+					if Map.get(question, "is_correct"), do: agg2 + 1, else: agg2
+				end)
+
+				test_info = [
+					test_id,
+					total_marks,
+					obtained_marks
+				]
+
+				# [[], [], []] ++ [[]]
+				agg ++ [test_info]
+
+			end)
+	end
+
+	defp start_school(school_id) do
+		case Registry.lookup(EdMarkaz.SchoolRegistry, school_id) do
+			[{_, _}] -> {:ok}
+			[] -> DynamicSupervisor.start_child(EdMarkaz.SchoolSupervisor, {Sarkar.School, {school_id}})
+		end
+	end
+
+	defp get_grades(learning_levels) do
+		learning_levels |> Enum.reduce([], fn({sub, obj}, agg) ->
+			grade = Map.get(obj, "grade")
+			grade_info = [
+				sub,
+				grade
+			]
+			agg ++ [grade_info]
+
+		end)
 	end
 
 end
