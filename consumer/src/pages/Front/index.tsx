@@ -99,34 +99,39 @@ const FrontPage = () => {
 				<Link className="pill" to="/bazaar"> Bazaar </Link>
 			</div>
 		</div>
-		<div className="partition reverse bg-teal">
+		<div className="partition bg-teal reverse">
 			<div className="img-container">
 				<div className="circle-frame">
-					<img className="img" src={Flag} alt="student" />
+					<img className="img" src={School} alt="school" />
 				</div>
 			</div>
 			<div className="info-container">
-				<div className="heading white">14th August Competition Winners!</div>
-				<div className="para white">
-					We're proud to announce the winners for 14th August drawing Competition
+				<div className="heading white">FOR SCHOOLS</div>
+				<div className="para">
+					Join our network of over 1500 schools and get access to information,
+					tools for schools and Pakistan's largest Education Marketplace
 				</div>
-				<Link className="pill" to="/14th-august-competition-winners"> Enter </Link>
+				<Link className="pill" to="/school"> School Portal</Link>
 			</div>
 		</div>
+
 		<div className="partition">
 			<div className="img-container">
 				<div className="circle-frame">
-					<img className="img" src={Campaign} alt="student" />
+					<img className="img" src={Teacher} alt="teacher" />
 				</div>
 			</div>
 			<div className="info-container">
-				<div className="heading">Back to School SMS Program</div>
+				<div className="heading">FOR TEACHERS</div>
 				<div className="para">
-					Schools are reopening soon. Get back into learning mode with ilmexchange! Challenge yourself with these questions.
+					Teaching is hard work, but there are countless resources out there to help.
+					We curate and organize high quality materials and teacher training content
+					to help you and your classroom be the very best!
 				</div>
-				<Link className="pill" to="/sms"> Enter </Link>
+				<Link className="pill" to="/teacher"> Teacher Portal</Link>
 			</div>
 		</div>
+
 		<div className="partition bg-teal reverse">
 			<div className="img-container">
 				<div className="circle-frame">
@@ -142,39 +147,6 @@ const FrontPage = () => {
 					engaging content through lessons, video games and quizzes
 				</div>
 				<Link className="pill" to="/student"> Student Portal</Link>
-			</div>
-		</div>
-
-		<div className="partition">
-			<div className="img-container">
-				<div className="circle-frame">
-					<img className="img" src={School} alt="school" />
-				</div>
-			</div>
-			<div className="info-container">
-				<div className="heading">FOR SCHOOLS</div>
-				<div className="para">
-					Join our network of over 1500 schools and get access to information,
-					tools for schools and Pakistan's largest Education Marketplace
-				</div>
-				<Link className="pill" to="/school"> School Portal</Link>
-			</div>
-		</div>
-
-		<div className="partition bg-teal reverse">
-			<div className="img-container">
-				<div className="circle-frame">
-					<img className="img" src={Teacher} alt="teacher" />
-				</div>
-			</div>
-			<div className="info-container">
-				<div className="heading white">FOR TEACHERS</div>
-				<div className="para white">
-					Teaching is hard work, but there are countless resources out there to help.
-					We curate and organize high quality materials and teacher training content
-					to help you and your classroom be the very best!
-				</div>
-				<Link className="pill" to="/teacher"> Teacher Portal</Link>
 			</div>
 		</div>
 
