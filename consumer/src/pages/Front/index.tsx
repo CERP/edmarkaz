@@ -10,7 +10,7 @@ import TeacherMain from './assets/teacher_main.png'
 
 import Student from './assets/student.jpeg'
 import School from './assets/school.jpeg'
-import Teaching from './assets/teaching.png'
+import Teaching from './assets/teaching.jpeg'
 
 import './style.css'
 
@@ -98,34 +98,35 @@ const FrontPage = () => {
 				<Link className="pill" to="/bazaar"> Bazaar </Link>
 			</div>
 		</div>
-		<div className="partition bg-teal reverse">
-			<div className="img-container">
-				<div className="circle-frame">
-					<img className="img" src={School} alt="school" />
-				</div>
-			</div>
-			<div className="info-container">
-				<div className="heading white">FOR SCHOOLS</div>
-				<div className="para">
-					Join our network of over 1500 schools and get access to information,
-					tools for schools and Pakistan's largest Education Marketplace
-				</div>
-				<Link className="pill" to="/school"> School Portal</Link>
-			</div>
-		</div>
 
-		<div className="partition">
+		<div className="partition reverse bg-teal">
 			<div className="img-container">
 				<div className="circle-frame">
 					<img className="img" src={Teaching} alt="teacher-teaching" />
 				</div>
 			</div>
 			<div className="info-container">
-				<div className="heading">Teaching After Covid-19</div>
-				<div className="para">
-					A free teacher training course
+				<div className="heading white">Teaching After Covid-19</div>
+				<div className="para white">
+				Ilm Exchange brings you a free teacher training course that has been carefully tailored to facilitate teachers with knowledge and strategies in the classroom during and after Covid-19.
 				</div>
 				<Link className="pill" style={{ width: '90%' }} to="/teacher">Click here to start the course</Link>
+			</div>
+		</div>
+
+		<div className="partition">
+			<div className="img-container">
+				<div className="circle-frame">
+					<img className="img" src={School} alt="school" />
+				</div>
+			</div>
+			<div className="info-container">
+				<div className="heading">FOR SCHOOLS</div>
+				<div className="para">
+					Join our network of over 1500 schools and get access to information,
+					tools for schools and Pakistan's largest Education Marketplace
+				</div>
+				<Link className="pill" to="/school"> School Portal</Link>
 			</div>
 		</div>
 
