@@ -1,19 +1,18 @@
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
+
 import Header from '../../components/Header'
+import Modal from '../../components/Modal'
+
 import StudentMain from './assets/student_main.png'
 import SchoolMain from './assets/school_main.png'
 import TeacherMain from './assets/teacher_main.png'
-import Flag from './assets/flag-background.jpg'
 
 import Student from './assets/student.jpeg'
 import School from './assets/school.jpeg'
-import Teacher from './assets/teacher.png'
-import Campaign from './assets/campaign.jpg'
+import Teaching from './assets/teaching.png'
 
 import './style.css'
-import { Link } from 'react-router-dom'
-import Modal from '../../components/Modal'
-
 
 const FrontPage = () => {
 
@@ -118,17 +117,15 @@ const FrontPage = () => {
 		<div className="partition">
 			<div className="img-container">
 				<div className="circle-frame">
-					<img className="img" src={Teacher} alt="teacher" />
+					<img className="img" src={Teaching} alt="teacher-teaching" />
 				</div>
 			</div>
 			<div className="info-container">
-				<div className="heading">FOR TEACHERS</div>
+				<div className="heading">Teaching After Covid-19</div>
 				<div className="para">
-					Teaching is hard work, but there are countless resources out there to help.
-					We curate and organize high quality materials and teacher training content
-					to help you and your classroom be the very best!
+					A free teacher training course
 				</div>
-				<Link className="pill" to="/teacher"> Teacher Portal</Link>
+				<Link className="pill" style={{ width: '90%' }} to="/teacher">Click here to start the course</Link>
 			</div>
 		</div>
 
