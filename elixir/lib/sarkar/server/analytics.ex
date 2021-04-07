@@ -2,7 +2,7 @@ defmodule EdMarkaz.Server.Analytics do
 
 	use Plug.Router
 
-	plug BasicAuth, use_config: {:edmarkaz, :basic_auth}
+	# plug BasicAuth, use_config: {:edmarkaz, :basic_auth}
 
 	plug :match
 	plug :dispatch
@@ -972,7 +972,7 @@ defmodule EdMarkaz.Server.Analytics do
 				flattened_schools
 			WHERE
 				path like 'targeted_instruction_access'
-				and school_id != 'cerp'",
+				and school_id like 'DIL%'",
 			[]
 		)
 
@@ -1036,8 +1036,8 @@ defmodule EdMarkaz.Server.Analytics do
 				"roll #",
 				"class",
 				"test_id",
-				"total_score",
-				"obtained_score"
+				"question_id",
+				"answer"
 			] |
 			schools_records
 		]
@@ -1139,6 +1139,79 @@ defmodule EdMarkaz.Server.Analytics do
 
 	end
 
+	match "/TIP-schools-data.csv" do
+		IO.inspect "Humna"
+
+		# Get TIP schools
+		{:ok, resp} = EdMarkaz.DB.Postgres.query(
+			EdMarkaz.DB,
+			"SELECT
+				school_id
+			FROM
+				flattened_schools
+			WHERE
+				path like 'targeted_instruction_access'
+				and school_id = 'PKschool2'",
+			[]
+		)
+
+		schools = resp.rows |> Enum.map(fn [id] -> id end)
+		# Start and Get the Database
+		IO.inspect schools
+
+		schools_records = schools |> Enum.reduce([], fn(school_id, agg) ->
+
+			case start_school(school_id) do
+				{:ok, pid} ->
+					IO.puts "school started now"
+				_ ->
+					IO.puts	"school started already"
+			end
+
+			school_db = Sarkar.School.get_db(school_id)
+
+			# Get sections
+			school_sections = Map.get(school_db, "classes") |> sections
+			# traverse students
+			students_records = Map.get(school_db, "students")
+				|> Enum.reduce([], fn({std_id, std}, agg2) ->
+
+							student_tests =
+								[
+									school_id,
+									Map.get(std, "Name"),
+									Map.get(std, "RollNumber"),
+									Map.get(school_sections, Map.get(std, "section_id"))
+								]
+								agg2 ++ student_tests
+								IO.inspect student_tests
+
+							end)
+
+				agg ++ students_records
+		end)
+		IO.inspect schools_records
+
+		csv = [
+			[
+				"school_id",
+				"student_name",
+				"roll #",
+				"class",
+			] |
+			schools_records
+		]
+		|> CSV.encode()
+		|> Enum.join()
+
+		conn
+		|> put_resp_header("content-type", "text/csv")
+		|> put_resp_header("cache-control", "no-cache")
+		|> send_resp(200, csv)
+
+	end
+
+
 	match _ do
 		send_resp(conn, 404, "not found")
 	end
@@ -1163,21 +1236,26 @@ defmodule EdMarkaz.Server.Analytics do
 		results
 			|> Enum.reduce([], fn({test_id, test}, agg) ->
 
-				total_marks = Map.get(test, "questions") |> Map.keys() |> length
-				obtained_marks = Map.get(test, "questions") |> Enum.reduce(0, fn({qid, question}, agg2) ->
+				questions = Map.get(test, "questions")
+				|> Enum.reduce([], fn({question_id, question}, agg2) ->
 
-					if Map.get(question, "is_correct"), do: agg2 + 1, else: agg2
-				end)
+					test_info = [
+						test_id,
+						question_id,
+						Map.get(question, "is_correct"),
+					]
 
-				test_info = [
-					test_id,
-					total_marks,
-					obtained_marks
-				]
+				# total_marks = Map.get(test, "questions") |> Map.keys() |> length
+				# obtained_marks = Map.get(test, "questions") |> Enum.reduce(0, fn({qid, question}, agg2) ->
 
+					# if Map.get(question, "is_correct"), do: agg2 + 1, else: agg2
+				agg2 ++ [test_info]
+
+				# IO.inspect test_info
+			end)
+				agg ++ questions
 				# [[], [], []] ++ [[]]
-				agg ++ [test_info]
-
+				# IO.inspect questions
 			end)
 	end
 
