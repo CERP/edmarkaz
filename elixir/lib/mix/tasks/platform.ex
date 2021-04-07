@@ -104,6 +104,38 @@ defmodule Mix.Tasks.Platform do
 		EdMarkaz.TargetedInstructions.insert_targeted_instruction_curriculum(["curriculum", curriculum_obj])
 	end
 
+	def run(["ingest_TI_quizzes", school_id, quizzes_csv_fname]) do
+		Application.ensure_all_started(:edmarkaz)
+
+		quizzes_csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{quizzes_csv_fname}.csv")) do
+			true -> File.stream!(Application.app_dir(:edmarkaz, "priv/#{quizzes_csv_fname}.csv")) |> CSV.decode!
+			false -> File.stream!("priv/#{quizzes_csv_fname}.csv") |> CSV.decode!
+		end
+
+		[ _ | quizzes] = quizzes_csv
+		|> Enum.map(fn row -> row end)
+
+		quizzes_obj = quizzes
+		|> Enum.reduce(%{}, fn([quiz_id, type, subject, grade, quiz_order, quiz_title, label, pdf_url, answer_pdf_url, slo_category, slo]), agg ->
+
+			quiz = %{
+					"type" => type,
+					"subject" => subject,
+					"grade" => grade,
+					"quiz_order" => quiz_order,
+					"quiz_title" => quiz_title,
+					"label" => label,
+					"pdf_url" => pdf_url,
+					"answer_pdf_url" => answer_pdf_url,
+					"slo_category" => slo_category,
+					"slo" => slo
+				}
+				Dynamic.put(agg, [quiz_id], quiz)
+			end)
+
+		EdMarkaz.TargetedInstructions.insert_targeted_instruction_quizzes(["quizzes", quizzes_obj])
+	end
+
 	def run(["teacher_assessments", file_name ]) do
 		Application.ensure_all_started(:edmarkaz)
 

@@ -140,11 +140,13 @@ defmodule Sarkar.ActionHandler.Mis do
 		{:ok, assessments} = EdMarkaz.TargetedInstructions.get_assessments()
 		{:ok, slo_mapping} = EdMarkaz.TargetedInstructions.get_slo_mapping()
 		{:ok, curriculum} = EdMarkaz.TargetedInstructions.get_curriculum()
+		{:ok, quizzes} = EdMarkaz.TargetedInstructions.get_quizzes()
 
 		targeted_instructions = %{
 			"tests" => assessments,
 			"slo_mapping" => slo_mapping,
-			"curriculum" => curriculum
+			"curriculum" => curriculum,
+			"quizzes" => quizzes
 		}
 
 		{:reply, succeed(targeted_instructions), state}

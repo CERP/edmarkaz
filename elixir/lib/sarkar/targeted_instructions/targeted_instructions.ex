@@ -20,6 +20,27 @@ defmodule EdMarkaz.TargetedInstructions do
 		end
 	end
 
+	def insert_targeted_instruction_quizzes([id, quizzes]) do
+		case EdMarkaz.DB.Postgres.query(
+			EdMarkaz.DB,
+			"INSERT INTO targeted_instruction_quizzes (
+				id,
+				value,
+				date
+			) VALUES ($1,$2,current_timestamp)
+			on Conflict(id) do update set value = $2",
+			[id, quizzes]
+		) do
+			{:ok, resp} ->
+				IO.puts "OK"
+				{:ok}
+			{:error, err} ->
+				IO.puts "quizzes merge failed"
+				IO.inspect err
+				{:error, err}
+		end
+	end
+
 	def insert_targeted_instruction_curriculum([id, curriculum]) do
 
 		case EdMarkaz.DB.Postgres.query(
@@ -94,6 +115,16 @@ defmodule EdMarkaz.TargetedInstructions do
 				[head | _] = result
 				{:ok, head}
 		end
+	end
+
+	def get_quizzes() do
+
+		query_string = "SELECT value FROM targeted_instruction_quizzes"
+
+		{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB, query_string, [])
+		[quizzes |_] = resp.rows |> Enum.map(fn[value] -> value end)
+		{:ok, quizzes}
+
 	end
 
 end
