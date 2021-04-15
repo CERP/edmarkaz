@@ -30,6 +30,34 @@ defmodule EdMarkaz.Server.MIS do
 		|> send_resp(200, body)
 	end
 
+	get "/contact-us" do
+
+		%{ "name" => name, "phone" => phone, "message" => message } = conn.body_params
+
+		slack_alert = "Contact request for MISchool\n Sender details are: Name: #{name}, Phone: #{phone}, Message: #{message}}"
+
+		{:ok, resp} = EdMarkaz.Slack.send_alert(slack_alert,"#mis")
+
+		msg = "Dear" <> name <> "\nYour request has been received, we will contact you soon!"
+
+		# case EdMarkaz.Telenor.send_sms(phone, msg)
+		# 	{:ok, resp} ->
+		# 		IO.puts "Message has been sent to " <> phone
+		# 	{:error, error} ->
+		# 		IO.puts "There's problem encountered while sending message to " <> phone
+		# end
+
+		resp = %{
+			"message" => msg
+		}
+
+		body = Poison.encode!(resp)
+
+		conn
+		|> append_headers
+		|> send_resp(200, body)
+	end
+
 	match _ do
 		body = Poison.encode!(%{message: "Not Found"})
 		conn
