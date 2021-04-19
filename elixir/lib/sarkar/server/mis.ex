@@ -34,7 +34,7 @@ defmodule EdMarkaz.Server.MIS do
 
 		%{ "name" => name, "phone" => phone, "message" => message } = conn.body_params
 
-		slack_alert = "Contact request for MISchool\n Sender details are: Name: #{name}, Phone: #{phone}, Message: #{message}"
+		slack_alert = "Contact request for MISchool\n Sender details are:\nName: #{name}\nPhone: #{phone}\nMessage: #{message}"
 
 		{:ok, resp} = EdMarkaz.Slack.send_alert(slack_alert,"#mis")
 
