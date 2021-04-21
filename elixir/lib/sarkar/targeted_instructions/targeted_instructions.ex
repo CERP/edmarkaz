@@ -12,8 +12,7 @@ defmodule EdMarkaz.TargetedInstructions do
 			[id, assessments]
 		) do
 			{:ok, resp} ->
-				IO.puts "OK"
-				{:ok}
+				{:ok, resp}
 			{:error, err} ->
 				IO.puts "assessments merge failed"
 				IO.inspect err
@@ -34,8 +33,7 @@ defmodule EdMarkaz.TargetedInstructions do
 			[id, curriculum]
 		) do
 			{:ok, resp} ->
-				IO.puts "OK"
-				{:ok}
+				{:ok, resp}
 			{:error, err} ->
 				IO.puts "curriculum merge failed"
 				IO.inspect err
@@ -66,33 +64,36 @@ defmodule EdMarkaz.TargetedInstructions do
 	end
 
 	def get_assessments() do
-
 		query_string = "SELECT value FROM targeted_instruction_assessments"
 
-		{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB, query_string, [])
-		[assessments |_] = resp.rows |> Enum.map(fn[value] -> value end)
-		{:ok, assessments}
+		{:ok, assessments} = execute_query(query_string)
 	end
 
 	def get_slo_mapping() do
-
 		query_string = "SELECT value FROM targeted_instruction_slo_mapping"
 
-		{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB, query_string, [])
-		[slo_mapping |_] = resp.rows |> Enum.map(fn[value] -> value end)
-		{:ok, slo_mapping}
-
+		{:ok, slo_mapping } = execute_query(query_string)
 	end
 
 
 	def get_curriculum() do
-
 		query_string = "SELECT value FROM targeted_instruction_curriculum"
 
-		{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB, query_string, [])
-		[curriculum |_] = resp.rows |> Enum.map(fn[value] -> value end)
-		{:ok, curriculum}
+		{:ok, curriculum } = execute_query(query_string)
+	end
 
+	defp execute_query(query_string) do
+		{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB, query_string, [])
+
+		result = resp.rows |> Enum.map(fn[value] -> value end)
+
+		case result do
+			[] ->
+				{:ok, %{}}
+			_ ->
+				[head | _] = result
+				{:ok, head}
+		end
 	end
 
 end
