@@ -86,7 +86,7 @@ defmodule Mix.Tasks.Platform do
 		|> Enum.map(fn row -> row end)
 
 		curriculum_obj = curriculum
-		|> Enum.reduce(%{}, fn([learning_level_id, subject, lesson_number, lesson_title, lesson_duration, lesson_link, material_names, material_links, activity_links, teaching_manual_link]), agg ->
+		|> Enum.reduce(%{}, fn([learning_level_id, subject, lesson_number, lesson_title, lesson_duration, lesson_link, material_names, material_links, activity_links, teaching_manual_link, slo_category, slo]), agg ->
 			learning_levels = %{
 				"subject" => subject,
 				"lesson_number" => lesson_number,
@@ -96,7 +96,9 @@ defmodule Mix.Tasks.Platform do
 				"material_names" => material_names,
 				"material_links" => material_links,
 				"activity_links" => activity_links,
-				"teaching_manual_link" => teaching_manual_link
+				"teaching_manual_link" => teaching_manual_link,
+				"slo_category" => slo_category,
+				"slo" => [slo],
 			}
 			Dynamic.put(agg, [learning_level_id, subject, lesson_number], learning_levels)
 		end)
@@ -116,7 +118,7 @@ defmodule Mix.Tasks.Platform do
 		|> Enum.map(fn row -> row end)
 
 		quizzes_obj = quizzes
-		|> Enum.reduce(%{}, fn([quiz_id, type, subject, grade, quiz_order, quiz_title, label, pdf_url, answer_pdf_url, slo_category, slo]), agg ->
+		|> Enum.reduce(%{}, fn([quiz_id, type, subject, grade, quiz_order, quiz_title, total_marks, label, pdf_url, answer_pdf_url, slo_category, slo]), agg ->
 
 			quiz = %{
 					"type" => type,
@@ -124,11 +126,12 @@ defmodule Mix.Tasks.Platform do
 					"grade" => grade,
 					"quiz_order" => quiz_order,
 					"quiz_title" => quiz_title,
+					"total_marks" => total_marks,
 					"label" => label,
 					"pdf_url" => pdf_url,
 					"answer_pdf_url" => answer_pdf_url,
 					"slo_category" => slo_category,
-					"slo" => slo
+					"slo" => [slo]
 				}
 				Dynamic.put(agg, [quiz_id], quiz)
 			end)
