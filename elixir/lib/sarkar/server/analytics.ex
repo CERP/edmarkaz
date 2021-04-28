@@ -217,7 +217,14 @@ defmodule EdMarkaz.Server.Analytics do
 
 			end)
 
-		sorted_csv_data = csv_data  |> Enum.sort_by(fn([_,_,_,_,d1,_]) -> d1 end, {:asc, Date})
+		sorted_csv_data = csv_data |> Enum.sort(fn([_,_,_,_,d1,_], [_,_,_,_,d2,_]) ->
+			case Date.compare(d1,d2) do
+				:lt ->
+					true
+				_ ->
+					false
+			end
+		end)
 
 		csv = [
 			[
