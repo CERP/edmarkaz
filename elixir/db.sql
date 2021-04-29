@@ -133,6 +133,14 @@ create table platform_writes
 		date timestamp default current_timestamp
 	);
 
+	create table targeted_instruction_quizzes
+	(
+		id text unique not null,
+		value jsonb not null,
+		date timestamp default current_timestamp
+	);
+
+
 	create table targeted_instruction_curriculum
 	(
 		id text unique not null,
@@ -155,8 +163,10 @@ create table platform_writes
 
 	create table teachers
 	(
-		id text not null, -- id (teacher phone)
-		path text not null, -- comma separated
+		id text not null,
+		-- id (teacher phone)
+		path text not null,
+		-- comma separated
 		value jsonb not null,
 		time bigint not null,
 		date timestamp default current_timestamp,
@@ -166,14 +176,16 @@ create table platform_writes
 	create index on teaches
 	(teacher_id);
 
-	create table teacher_assessments(
+	create table teacher_assessments
+	(
 		id text unique not null,
 		meta jsonb,
 		questions jsonb,
 		date timestamp default current_timestamp
 	);
 
-	create table tp_videos(
+	create table tp_videos
+	(
 		id text unique not null,
 		meta jsonb,
 		date timestamp default current_timestamp
