@@ -103,6 +103,11 @@ defmodule EdMarkaz.TargetedInstructions do
 		{:ok, curriculum } = execute_query(query_string)
 	end
 
+	def get_quizzes() do
+		query_string = "SELECT value FROM targeted_instruction_quizzes"
+		{:ok, quizzes} = execute_query(query_string)
+ 	end
+
 	defp execute_query(query_string) do
 		{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB, query_string, [])
 
@@ -115,16 +120,6 @@ defmodule EdMarkaz.TargetedInstructions do
 				[head | _] = result
 				{:ok, head}
 		end
-	end
-
-	def get_quizzes() do
-
-		query_string = "SELECT value FROM targeted_instruction_quizzes"
-
-		{:ok, resp} = EdMarkaz.DB.Postgres.query(EdMarkaz.DB, query_string, [])
-		[quizzes |_] = resp.rows |> Enum.map(fn[value] -> value end)
-		{:ok, quizzes}
-
 	end
 
 end
