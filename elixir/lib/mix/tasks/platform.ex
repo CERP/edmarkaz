@@ -86,7 +86,7 @@ defmodule Mix.Tasks.Platform do
 		|> Enum.map(fn row -> row end)
 
 		curriculum_obj = curriculum
-		|> Enum.reduce(%{}, fn([learning_level_id, subject, lesson_number, lesson_title, lesson_duration, lesson_link, material_names, material_links, activity_links, teaching_manual_link, slo_category, slo]), agg ->
+		|> Enum.reduce(%{}, fn([learning_level_id, subject, lesson_number, lesson_title, lesson_duration, lesson_link, material_names, material_links, activity_links, teaching_manual_link, slo_category, slo, quiz_id]), agg ->
 			learning_levels = %{
 				"subject" => subject,
 				"lesson_number" => lesson_number,
@@ -99,6 +99,7 @@ defmodule Mix.Tasks.Platform do
 				"teaching_manual_link" => teaching_manual_link,
 				"slo_category" => slo_category,
 				"slo" => [slo],
+				"quiz_id" => quiz_id
 			}
 			Dynamic.put(agg, [learning_level_id, subject, lesson_number], learning_levels)
 		end)
@@ -118,22 +119,22 @@ defmodule Mix.Tasks.Platform do
 		|> Enum.map(fn row -> row end)
 
 		quizzes_obj = quizzes
-		|> Enum.reduce(%{}, fn([quiz_id, type, subject, grade, quiz_order, quiz_title, total_marks, label, pdf_url, answer_pdf_url, slo_category, slo]), agg ->
+		|> Enum.reduce(%{}, fn([quiz_id, type, grade, subject, quiz_order, quiz_title, total_marks, label, pdf_url, answer_pdf_url, slo_category, slo]), agg ->
 
 			quiz = %{
 					"type" => type,
-					"subject" => subject,
 					"grade" => grade,
-					"quiz_order" => quiz_order,
+					"subject" => subject,
+					"quiz_order" => String.to_integer(quiz_order),
 					"quiz_title" => quiz_title,
-					"total_marks" => total_marks,
+					"total_marks" => String.to_integer(total_marks),
 					"label" => label,
 					"pdf_url" => pdf_url,
 					"answer_pdf_url" => answer_pdf_url,
 					"slo_category" => slo_category,
 					"slo" => [slo]
 				}
-				Dynamic.put(agg, [quiz_id], quiz)
+				Dynamic.put(agg, [grade, subject, quiz_id], quiz)
 			end)
 
 		EdMarkaz.TargetedInstructions.insert_targeted_instruction_quizzes(["quizzes", quizzes_obj])
