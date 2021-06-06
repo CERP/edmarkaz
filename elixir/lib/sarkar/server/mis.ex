@@ -58,6 +58,28 @@ defmodule EdMarkaz.Server.MIS do
 		|> send_resp(200, body)
 	end
 
+	post "/school-password-reset" do
+
+		%{ "schoolId" => schoolId } = conn.body_params
+
+		slack_alert = "Reset School Password Request\n School Id: #{schoolId}"
+
+		# Do we need to verify school exist or not in database?
+		{:ok, resp} = EdMarkaz.Slack.send_alert(slack_alert,"#mis")
+
+		msg = "Your request has been received, we will contact you soon!"
+
+		resp = %{
+			"message" => msg
+		}
+
+		body = Poison.encode!(resp)
+
+		conn
+		|> append_headers
+		|> send_resp(200, body)
+	end
+
 	match _ do
 		body = Poison.encode!(%{message: "Not Found"})
 		conn
