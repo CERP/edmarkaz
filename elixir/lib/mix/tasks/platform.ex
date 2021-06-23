@@ -1,6 +1,220 @@
 defmodule Mix.Tasks.Platform do
 	use Mix.Task
 
+		def run([
+			"tip_Generate_Json",
+			slo_mapping_csv_fname,
+			curriculum_csv_fname,
+			assessments_pdf_fname,
+			diagnostic_test_csv_fname,
+			quizzes_csv_fname
+		]) do
+		IO.puts("IN TO JSON")
+
+		# SLO Mapping
+		slo_mapping_csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{slo_mapping_csv_fname}.csv")) do
+			true ->
+			File.stream!(Application.app_dir(:edmarkaz, "priv/#{slo_mapping_csv_fname}.csv"))
+			|> CSV.decode!()
+
+			false ->
+			File.stream!("priv/#{slo_mapping_csv_fname}.csv") |> CSV.decode!()
+		end
+
+		[_ | slo_mapping] = slo_mapping_csv
+			|> Enum.map(fn row -> row end)
+
+		slo_mapping_obj = slo_mapping
+			|> Enum.reduce(%{}, fn [slo_id, description, category, link], agg ->
+				sloMapping = %{
+				"description" => description,
+				"category" => category,
+				"link" => link
+				}
+
+				Dynamic.put(agg, [slo_id], sloMapping)
+			end)
+
+		# ============================== END ======================
+		# Curriculum Stuff
+		curriculum_csv = case File.exists?(Application.app_dir(:edmarkaz, "priv/#{curriculum_csv_fname}.csv")) do
+			true ->
+			File.stream!(Application.app_dir(:edmarkaz, "priv/#{curriculum_csv_fname}.csv"))
+			|> CSV.decode!()
+
+			false ->
+			File.stream!("priv/#{curriculum_csv_fname}.csv") |> CSV.decode!()
+		end
+
+		[_ | curriculum] = curriculum_csv
+			|> Enum.map(fn row -> row end)
+
+		curriculum_obj = curriculum
+			|> Enum.reduce(
+				%{},
+				fn [
+					learning_level_id,
+					subject,
+					lesson_number,
+					lesson_title,
+					lesson_duration,
+					lesson_link,
+					material_names,
+					material_links,
+					activity_links,
+					teaching_manual_link,
+					slo_category,
+					slo,
+					quiz_id
+				], agg ->
+				learning_levels = %{
+					"subject" => subject,
+					"lesson_number" => lesson_number,
+					"lesson_title" => lesson_title,
+					"lesson_duration" => lesson_duration,
+					"lesson_link" => lesson_link,
+					"material_names" => material_names,
+					"material_links" => material_links,
+					"activity_links" => activity_links,
+					"teaching_manual_link" => teaching_manual_link,
+					"slo_category" => slo_category,
+					"slo" => [slo],
+					"quiz_id" => quiz_id
+				}
+
+				Dynamic.put(agg, [learning_level_id, subject, lesson_number], learning_levels)
+			end)
+
+		# ============================== END ======================
+
+		# Assessments Stuff
+		assessments_csv =
+		case File.exists?(Application.app_dir(:edmarkaz, "priv/#{assessments_pdf_fname}.csv")) do
+			true ->
+			File.stream!(Application.app_dir(:edmarkaz, "priv/#{assessments_pdf_fname}.csv"))
+			|> CSV.decode!()
+
+			false ->
+			File.stream!("priv/#{assessments_pdf_fname}.csv") |> CSV.decode!()
+		end
+
+		diagnostic_test_csv =
+		case File.exists?(Application.app_dir(:edmarkaz, "priv/#{diagnostic_test_csv_fname}.csv")) do
+			true ->
+			File.stream!(Application.app_dir(:edmarkaz, "priv/#{diagnostic_test_csv_fname}.csv"))
+			|> CSV.decode!()
+
+			false ->
+			File.stream!("priv/#{diagnostic_test_csv_fname}.csv") |> CSV.decode!()
+		end
+
+		[_ | assessments] = assessments_csv
+			|> Enum.map(fn row -> row end)
+
+		[_ | diagnostic_test] = diagnostic_test_csv
+			|> Enum.map(fn row -> row end)
+
+		diagnostic_test_obj = diagnostic_test
+			|> Enum.reduce(
+				%{},
+				fn [
+					test_id,
+					question_id,
+					question_text,
+					answer,
+					grade,
+					slo_category,
+					slo
+				], agg ->
+				result = %{
+				"question_text" => question_text,
+				"answer" => answer,
+				"grade" => grade,
+				"slo_category" => slo_category,
+				"slo" => [slo]
+				}
+
+				Dynamic.put(agg, [test_id, question_id], result)
+			end)
+
+		assessments_obj = assessments
+			|> Enum.reduce(%{}, fn [test_id, type, subject, grade, label, pdf_url, answer_pdf_url], agg ->
+				test = %{
+					"type" => type,
+					"subject" => subject,
+					"grade" => grade,
+					"label" => label,
+					"pdf_url" => pdf_url,
+					"answer_pdf_url" => answer_pdf_url,
+					"questions" => Dynamic.get(diagnostic_test_obj, [test_id])
+					}
+
+				Dynamic.put(agg, [test_id], test)
+			end)
+
+		# ============================== END ======================
+		# Quizzes Stuff
+
+		quizzes_csv =
+		case File.exists?(Application.app_dir(:edmarkaz, "priv/#{quizzes_csv_fname}.csv")) do
+			true ->
+			File.stream!(Application.app_dir(:edmarkaz, "priv/#{quizzes_csv_fname}.csv"))
+			|> CSV.decode!()
+
+			false ->
+			File.stream!("priv/#{quizzes_csv_fname}.csv") |> CSV.decode!()
+		end
+
+		[_ | quizzes] =
+		quizzes_csv
+		|> Enum.map(fn row -> row end)
+
+		quizzes_obj =
+		quizzes
+		|> Enum.reduce(%{}, fn [
+								quiz_id,
+								type,
+								grade,
+								subject,
+								quiz_order,
+								quiz_title,
+								total_marks,
+								label,
+								pdf_url,
+								answer_pdf_url,
+								slo_category,
+								slo
+								],
+								agg ->
+			quiz = %{
+			"type" => type,
+			"grade" => grade,
+			"subject" => subject,
+			"quiz_order" => String.to_integer(quiz_order),
+			"quiz_title" => quiz_title,
+			"total_marks" => String.to_integer(total_marks),
+			"label" => label,
+			"pdf_url" => pdf_url,
+			"answer_pdf_url" => answer_pdf_url,
+			"slo_category" => slo_category,
+			"slo" => [slo]
+			}
+
+			Dynamic.put(agg, [grade, subject, quiz_id], quiz)
+		end)
+
+		# ============================== END ======================
+
+		data = %{
+		"tests" => assessments_obj,
+		"slo_mapping" => slo_mapping_obj,
+		"curriculum" => curriculum_obj,
+		"quizzes" => quizzes_obj
+		}
+
+		File.write!("priv/tip.json", Poison.encode!(data))
+	end
+
 	def run(["ingest_TI_assessments", school_id, assessments_csv_fname, diagnostic_test_csv_fname]) do
 		Application.ensure_all_started(:edmarkaz)
 
