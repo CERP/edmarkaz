@@ -37,13 +37,13 @@ defmodule Sarkar.Server.Analytics do
 
 	def init(%{bindings: %{type: "writes.csv"}} = req, state) do
 
-		{:ok, data} = case EdMarkaz.DB.Postgres.query(EdMarkaz.DB,
+		{:ok, data} = case Postgrex.query(EdMarkaz.DB,
 		"SELECT school_id, to_timestamp(time/1000)::date::text as date, count(DISTINCT time)
 		FROM writes
 		WHERE NOT (path[4]='payments' and value->>'type'='OWED')
 		GROUP BY school_id, date
 		ORDER BY date desc",
-		[]) do
+		[], pool: DBConnection.Poolboy, timeout: :infinity) do
 				{:ok, resp} -> {:ok, resp.rows}
 				{:error, err} -> {:error, err}
 		end

@@ -1,19 +1,18 @@
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
+
 import Header from '../../components/Header'
+import Modal from '../../components/Modal'
+
 import StudentMain from './assets/student_main.png'
 import SchoolMain from './assets/school_main.png'
 import TeacherMain from './assets/teacher_main.png'
-import Flag from './assets/flag-background.jpg'
 
 import Student from './assets/student.jpeg'
 import School from './assets/school.jpeg'
-import Teacher from './assets/teacher.png'
-import Campaign from './assets/campaign.jpg'
+import Teaching from './assets/teaching.jpeg'
 
 import './style.css'
-import { Link } from 'react-router-dom'
-import Modal from '../../components/Modal'
-
 
 const FrontPage = () => {
 
@@ -99,49 +98,19 @@ const FrontPage = () => {
 				<Link className="pill" to="/bazaar"> Bazaar </Link>
 			</div>
 		</div>
+
 		<div className="partition reverse bg-teal">
 			<div className="img-container">
 				<div className="circle-frame">
-					<img className="img" src={Flag} alt="student" />
+					<img className="img" src={Teaching} alt="teacher-teaching" />
 				</div>
 			</div>
 			<div className="info-container">
-				<div className="heading white">14th August Competition Winners!</div>
+				<div className="heading white">Teaching After Covid-19</div>
 				<div className="para white">
-					We're proud to announce the winners for 14th August drawing Competition
+				Ilm Exchange brings you a free teacher training course that has been carefully tailored to facilitate teachers with knowledge and strategies in the classroom during and after Covid-19.
 				</div>
-				<Link className="pill" to="/14th-august-competition-winners"> Enter </Link>
-			</div>
-		</div>
-		<div className="partition">
-			<div className="img-container">
-				<div className="circle-frame">
-					<img className="img" src={Campaign} alt="student" />
-				</div>
-			</div>
-			<div className="info-container">
-				<div className="heading">Back to School SMS Program</div>
-				<div className="para">
-					Schools are reopening soon. Get back into learning mode with ilmexchange! Challenge yourself with these questions.
-				</div>
-				<Link className="pill" to="/sms"> Enter </Link>
-			</div>
-		</div>
-		<div className="partition bg-teal reverse">
-			<div className="img-container">
-				<div className="circle-frame">
-					<img className="img" src={Student} alt="student" />
-				</div>
-			</div>
-			<div className="info-container">
-				<div className="heading white">FOR STUDENTS</div>
-				<div className="para white">
-					At ilmexchange, we aim to bring together the largest collection
-					of digital educational resources for students in Pakistan.
-					Whether you prefer learning in Urdu or English, we bring you fun,
-					engaging content through lessons, video games and quizzes
-				</div>
-				<Link className="pill" to="/student"> Student Portal</Link>
+				<Link className="pill" style={{ width: '90%' }} to="/teacher">Click here to start the course</Link>
 			</div>
 		</div>
 
@@ -164,17 +133,18 @@ const FrontPage = () => {
 		<div className="partition bg-teal reverse">
 			<div className="img-container">
 				<div className="circle-frame">
-					<img className="img" src={Teacher} alt="teacher" />
+					<img className="img" src={Student} alt="student" />
 				</div>
 			</div>
 			<div className="info-container">
-				<div className="heading white">FOR TEACHERS</div>
+				<div className="heading white">FOR STUDENTS</div>
 				<div className="para white">
-					Teaching is hard work, but there are countless resources out there to help.
-					We curate and organize high quality materials and teacher training content
-					to help you and your classroom be the very best!
+					At ilmexchange, we aim to bring together the largest collection
+					of digital educational resources for students in Pakistan.
+					Whether you prefer learning in Urdu or English, we bring you fun,
+					engaging content through lessons, video games and quizzes
 				</div>
-				<Link className="pill" to="/teacher"> Teacher Portal</Link>
+				<Link className="pill" to="/student"> Student Portal</Link>
 			</div>
 		</div>
 

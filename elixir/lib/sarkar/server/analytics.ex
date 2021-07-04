@@ -172,39 +172,59 @@ defmodule EdMarkaz.Server.Analytics do
 				"SELECT
 					id,
 					path,
-					value
+					value,
+					date::date
 				FROM
 					teachers
 				ORDER BY id",
 				[]
 			)
 
-
-		inflate_teachers = resp.rows
-			|> Enum.reduce(%{}, fn([id, path, value], agg) ->
+		inflate_records = resp.rows
+			|> Enum.reduce(%{}, fn([id, path, value, date], agg) ->
 
 				split_path = String.split(path, ",")
 
-				Dynamic.put(agg, [id] ++ split_path , value)
+				updated_agg = Dynamic.put(agg, ["teachers_map", id] ++ split_path , value)
+
+				Dynamic.put(updated_agg, ["signups_map",id], date)
 			end)
+
+		teacher_signup_date = Map.get(inflate_records, "signups_map")
+		inflate_teachers = Map.get(inflate_records, "teachers_map")
 
 		csv_data = inflate_teachers
 			|> Enum.reduce([], fn({teacher_id, teacher}, agg) ->
 
-				attempted_assessments = Map.get(teacher, "attempted_assessments", %{}) |> Map.keys |> length
+				if(Map.has_key?(teacher_signup_date, teacher_id)) do
 
-				info_list = [
-					teacher["phone"],
-					teacher["name"],
-					teacher["gender"],
-					teacher["school_name"],
-					attempted_assessments
-				]
+					attempted_assessments = Map.get(teacher, "attempted_assessments", %{}) |> Map.keys |> length
 
-				# [[],[],[],...] ++ [[]]
-				agg ++ [info_list]
+					info_list = [
+						teacher_id,
+						Map.get(teacher, "name"),
+						Map.get(teacher, "gender"),
+						Map.get(teacher, "school_name"),
+						Map.get(teacher_signup_date, teacher_id, ""),
+						attempted_assessments
+					]
+
+					# [[],[],[],...] ++ [[]]
+					agg ++ [info_list]
+				else
+					agg
+				end
 
 			end)
+
+		sorted_csv_data = csv_data |> Enum.sort(fn([_,_,_,_,d1,_], [_,_,_,_,d2,_]) ->
+			case Date.compare(d1,d2) do
+				:lt ->
+					true
+				_ ->
+					false
+			end
+		end)
 
 		csv = [
 			[
@@ -212,9 +232,10 @@ defmodule EdMarkaz.Server.Analytics do
 				"name",
 				"gender",
 				"school",
+				"signup_date",
 				"attempted_assessments"
 			] |
-			csv_data
+			sorted_csv_data
 		]
 		|> CSV.encode()
 		|> Enum.join()
