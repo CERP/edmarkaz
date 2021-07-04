@@ -1037,7 +1037,9 @@ defmodule EdMarkaz.Server.Analytics do
 				"class",
 				"test_id",
 				"question_id",
-				"answer"
+				"answer",
+				"slo",
+				"slo_category"
 			] |
 			schools_records
 		]
@@ -1065,7 +1067,8 @@ defmodule EdMarkaz.Server.Analytics do
 			FROM
 				flattened_schools
 			WHERE
-				path like 'targeted_instruction_access'",
+				path like 'targeted_instruction_access'
+				and school_id like 'PKschool%'",
 			[]
 		)
 
@@ -1181,10 +1184,9 @@ defmodule EdMarkaz.Server.Analytics do
 									school_id,
 									Map.get(std, "Name"),
 									Map.get(std, "RollNumber"),
-									Map.get(school_sections, Map.get(std, "section_id"))
+									Map.get(school_sections, Map.get(std, "section_id")) || "N/A"
 								]
 								agg2 ++ student_tests
-								IO.inspect student_tests
 
 							end)
 
@@ -1243,6 +1245,8 @@ defmodule EdMarkaz.Server.Analytics do
 						test_id,
 						question_id,
 						Map.get(question, "is_correct"),
+						Map.get(question, "slo"),
+						Map.get(question, "slo_category")
 					]
 
 				# total_marks = Map.get(test, "questions") |> Map.keys() |> length
